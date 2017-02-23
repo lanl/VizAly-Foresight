@@ -1,0 +1,44 @@
+#hacc_ldflags and hacc_mpi_ldflags causes linker errors without including openmp
+#using c99 instead of gnu99 causes pthread errors
+
+module purge
+module load cmake/3.6.2
+module load gcc/6.2.0
+module load openmpi/1.10.3-gcc_6.2.0
+
+#module load cudatoolkit
+#module use /usr/projects/rru/opt/cerrillos/modules
+#module load rru-fftw-3.3-openmpi-gcc-1.4.3
+#unexport CC
+
+export FFTW_MAJOR_VERSION=3
+
+export HACC_PLATFORM="Darwin"
+export HACC_OBJDIR="${HACC_PLATFORM}"
+
+export HACC_CFLAGS="-O3 -g -fopenmp -std=gnu99"
+export HACC_CC="gcc"
+
+export HACC_CXXFLAGS="-O3 -g -fopenmp"
+export HACC_CXX="g++"
+
+export HACC_LDFLAGS="-lm -fopenmp ${PV_LDFLAGS}"
+
+export HACC_MPI_CFLAGS="-O3 -std=gnu99 -g -fopenmp"
+#export HACC_MPI_CFLAGS="-O3 -Wall -std=c99 -g -fopenmp"
+export HACC_MPI_CC="mpicc"
+
+
+export HACC_MPI_CXXFLAGS="-O3 -g -Wno-deprecated -fopenmp -fPIC"
+#export HACC_MPI_CXXFLAGS="-O3 -Wall -Wno-deprecated -g -fopenmp"
+export HACC_MPI_CXX="mpicxx"
+
+#adds paraview support, correct linkage
+#export HACC_MPI_CPPFLAGS="-I/home/pulido/bin-paraview-5.0.1/include" 
+#"-I/usr/projects/cinema/2.0/darwin/local/paraview/5.0.0/include/paraview-5.0"
+
+export HACC_MPI_LDFLAGS="-lm -fopenmp ${PV_LDFLAGS}"
+
+## Propagate GenericIO env variables
+export GIO_MPICXX="${HACC_MPI_CXX}"
+#export GIO_CXXFLAGS="${HACC_MPI_CXXFLAGS}"
