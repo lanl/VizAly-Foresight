@@ -8,7 +8,7 @@
 
 
 
-hacc_data::hacc_data(const MPI_Comm &comm)
+hacc_data::hacc_data(MPI_Comm &comm)
 	: comm(comm)
 {
 }
@@ -27,7 +27,7 @@ void hacc_data::read(const std::string &in_name, std::vector<data_field> &data)
 	gio::GenericIO handler(this->comm, in_name);
 	handler.openAndReadHeader();
 	std::size_t num_particles = handler.readNumElems(rank);
-	for(int i = 0; i < temp.size(); ++i)
+	for(std::size_t i = 0; i < temp.size(); ++i)
 	{
 		temp[i].resize(num_particles + handler.requestedExtraSpace() / sizeof(float));
 		handler.addVariable(channel[i], temp[i], true);
@@ -35,7 +35,7 @@ void hacc_data::read(const std::string &in_name, std::vector<data_field> &data)
 	handler.readData(rank);
 
 	data.resize(channel.size());
-	for(int i = 0; i < temp.size(); ++i)
+	for(std::size_t i = 0; i < temp.size(); ++i)
 	{
 		data[i].type = data_field::data_type::FLOAT;
 		data[i].size = temp[i].size();
@@ -57,11 +57,9 @@ void hacc_data::write(const std::string &in_name, const std::string &out_name, c
 	MPI_Comm_rank(this->comm, &rank);
 
 	//---- Header information ----
-	//int num_ranks;
-	//int dims[3];
 	double phys_origin[3], phys_scale[3];
 	std::vector<gio::GenericIO::VariableInfo> vinfo;
-	//std::vector<rankData> rank_meta;
+	int coords[3];
 
 	//---- Open GenericIO file and read header ----
 	gio::GenericIO in_handler(this->comm, in_name);
@@ -69,18 +67,10 @@ void hacc_data::write(const std::string &in_name, const std::string &out_name, c
 
 	//---- Extract GenericIO header information ----
 	std::size_t num_particles = in_handler.readNumElems(rank);
-	//in_handler.readDims(dims);
 	in_handler.readPhysOrigin(phys_origin);
 	in_handler.readPhysScale(phys_scale);
-	//num_ranks = in_handler.readNRanks();
 	in_handler.getVariableInfo(vinfo);
-
-	/*rank_meta.resize(num_ranks);
-	for(std::size_t i = 0; i < rank_meta.size(); ++i)
-	{
-		rank_meta[i].numPoints = in_handler.readNumElems(i);
-		in_handler.readCoords(rank_meta[i].coords, i);
-	}*/	
+	in_handler.readCoords(coords, rank);
 
 	//---- Add variables to be read to the gio file handler ----
 	x.resize(num_particles + in_handler.requestedExtraSpace() / sizeof(float));
@@ -120,6 +110,13 @@ void hacc_data::write(const std::string &in_name, const std::string &out_name, c
 	vz.assign(static_cast<float *>(data[5].data), static_cast<float *>(data[5].data) + data[5].size);
 
 	//---- Open GenericIO output file ----
+	gio::GenericIO::setNaturalDefaultPartition();
+
+	int decomposition[3] = {8, 8, 4};
+	int period[3] = {0, 0, 0};
+	MPI_Cart_create(this->comm, 3, decomposition, period, 0, &this->comm);
+	MPI_Cart_coords(this->comm, rank, 3, coords);
+
 	gio::GenericIO out_handler(this->comm, out_name);
 
 	//---- Input GenericIO header information ----

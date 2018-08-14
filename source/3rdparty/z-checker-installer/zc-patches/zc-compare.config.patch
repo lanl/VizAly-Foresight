@@ -1,0 +1,11 @@
+--- zc.config	2017-04-27 20:45:54.187007345 -0500
++++ zc-compare.config	2017-04-27 21:00:00.501298412 -0500
+@@ -9,7 +9,7 @@
+ #example: checkingStatus = PROBE_COMPRESSOR
+ #example: checkingStatus = ANALYZE_DATA
+ #example: chekcingStatus = COMPARE_COMPRESSOR
+-checkingStatus = ANALYZE_DATA
++checkingStatus = COMPARE_COMPRESSOR
+ 
+ [DATA]
+ #to analyze the properties of the single data set

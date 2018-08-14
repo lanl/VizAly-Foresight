@@ -1,0 +1,11 @@
+--- testfloat_CompDecomp.sh	2017-05-23 12:42:44.310083801 -0500
++++ testfloat_CompDecomp.sh.fast	2017-05-23 12:42:57.971087720 -0500
+@@ -15,7 +15,7 @@
+ dim3=$6
+ dim4=$7
+ 
+-compressor=sz
++compressor=sz_f
+ 
+ fileList=`cd "$dataDir";ls *.dat`
+ for file in $fileList

@@ -11,13 +11,13 @@
 class hacc_data : public data_handler
 {
 	public:
-		hacc_data(const MPI_Comm &comm);
+		hacc_data(MPI_Comm &comm);
 
 		void read(const std::string &in_name, std::vector<data_field> &data) override;
 		void write(const std::string &in_name, const std::string &out_name, const std::vector<data_field> &data) override;
 
 	private:
-		const MPI_Comm &comm;
+		MPI_Comm &comm;
 };
 
 

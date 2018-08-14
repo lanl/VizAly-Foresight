@@ -22,7 +22,7 @@ option(${NAME_ID}_INSTALL
 )
 
 # include modules
-include(GenerateExportHeader)
+#include(GenerateExportHeader)
 
 # add source files
 set(PROJECT_SOURCE_FILES
@@ -76,11 +76,11 @@ target_include_directories(${PROJECT_NAME}
 # add library dependencies
 target_link_libraries(${PROJECT_NAME}
 	PUBLIC genericio
-	PUBLIC netcdf
+	PUBLIC utility
 )
 
 # generate visibility header
-generate_export_header(${PROJECT_NAME})
+#generate_export_header(${PROJECT_NAME})
 
 # install instructions
 if(${NAME_ID}_BUILD_STATIC AND ${NAME_ID}_INSTALL)

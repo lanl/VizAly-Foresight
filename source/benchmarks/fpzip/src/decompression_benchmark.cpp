@@ -30,6 +30,11 @@ void decompression_benchmark::preprocess()
 
 	for(std::size_t i = 0; i < this->data->size(); ++i)
 	{
+		if(this->data->at(i).data != nullptr)
+		{
+			std::free(this->data->at(i).data);
+		}
+
 		std::size_t limit;
 		switch(this->data->at(i).type)
 		{
@@ -59,30 +64,28 @@ void decompression_benchmark::execute()
 {
 	for(std::size_t i = 0; i < this->data->size(); ++i)
 	{
-		this->fpz.push_back(fpzip_read_from_buffer(this->cdata->at(i).data));
+		this->fpz.push_back(fpzip_read_from_buffer(static_cast<std::uint8_t *>(this->cdata->at(i).data)));
 		this->fpz[i]->prec = this->precision;
 		this->fpz[i]->nx = this->data->at(i).size;
 		this->fpz[i]->ny = 1;
 		this->fpz[i]->nz = 1;
 		this->fpz[i]->nf = 1;
 
-		std::size_t typesize;
 		switch(this->data->at(i).type)
 		{
 			case data_field::data_type::FLOAT:
 				this->fpz[i]->type = FPZIP_TYPE_FLOAT;
-				typesize = sizeof(float);
+				this->data->at(i).data = std::malloc(sizeof(float) * this->data->at(i).size);
+				fpzip_read(this->fpz[i], static_cast<float *>(this->data->at(i).data));
 				break;
 			case data_field::data_type::DOUBLE:
 				this->fpz[i]->type = FPZIP_TYPE_DOUBLE;
-				typesize = sizeof(double);
+				this->data->at(i).data = std::malloc(sizeof(double) * this->data->at(i).size);
+				fpzip_read(this->fpz[i], static_cast<double *>(this->data->at(i).data));
 				break;
 			default:
 				throw std::runtime_error("Invalid data type!");
 		}
-
-		this->data->at(i).data = std::malloc(typesize * this->data->at(i).size);
-		fpzip_read(this->fpz[i], this->data->at(i).data);
 	}
 }
 

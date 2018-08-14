@@ -1,0 +1,57 @@
+The files in this directory provide suggestions for customizing an
+initialization file ("rc file") for latexmk.  See the latexmk
+documentation for general information on its initialization files.
+
+Not only do these files provide solutions to particular problems, but
+they can be also used as inspiration for solutions to other cases.
+
+NOTES: 
+
+1. The examples are not complete rc files, but contain fragments that
+   you can copy to one of your .latexmkrc/latexmkrc files.
+
+2. These examples are developed by particular users to solve
+   particular problems.  You may have to customize them for your own
+   needs.  So read the comments carefully, and understand how the
+   examples are working.
+
+3. I have generally arranged for filenames to be quoted on command
+   lines, e.g., 
+
+       system( "makeindex -o \"$_[0].lnd\" \"$_[0].ldx\"" );
+
+   In many cases the quotes may be omitted, as in 
+
+       system( "makeindex -o $_[0].lnd $_[0].ldx" );
+
+   But it is preferable to leave the quotes in, since they provide
+   safety against special characters in filenames.  The double quotes
+   appear not to cause problems in all situations that I have tried.
+
+5. Note that the files for exceltex and pythontex illustrate an answer
+   to an issue that arises in the following generic situation:
+   a.  A LaTeX package wants to use an external program to do some
+       processing. It does this by writing a control file that is used
+       by the external program.
+   b.  The user is to run the external program after a first run of
+       latex/pdflatex (etc).  It generates some files that are to be
+       read by a subsequent compilation of the TeX document.
+   c.  It is desired to do the run of the external program and
+       to do the extra run of latex/pdflatex only when necessary. 
+   d.  Possibly there are further dependencies on files used by the
+       external program.
+   The third problem is handled nicely by latexmk's normal mechanisms,
+   but it is necessary to persuade it to create a suitable rule to run
+   the external program.  A nice trick with custom dependencies,
+   illustrated by exceltex and pythontex examples, gets the rule set
+   up.  The exceltex shows how dependencies on other files can be
+   determined. 
+
+6. Further assistance for latexmk can be provided when style files
+   provide suitable messages about missing files.  See the
+   exceltex1.sty and pythontex1.sty files for examples of what is
+   needed.  These files are modifications of exceltex.sty and
+   pythontex.sty that provide the necessary assistance.  (The versions
+   were the ones current on 30 April 2013.)
+
+

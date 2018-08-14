@@ -38,7 +38,7 @@ std::size_t gather_size(const MPI_Comm &comm, const data_field &field)
 int main(int argc, char **argv)
 {
 	//---- Gather command line arguments ----
-	int minargs = 20;
+	int minargs = 21;
 	if(argc - 1 < minargs)
 	{
 		throw std::runtime_error("Wrong number of command line arguments! Minimum " + std::to_string(minargs) + " were expected, " + std::to_string(argc - 1) + " were given.");
@@ -66,6 +66,8 @@ int main(int argc, char **argv)
 	params.relBoundRatio = std::stod(std::string(argv[18]));
 	params.pw_relBoundRatio = std::stod(std::string(argv[19]));
 	params.segment_size = std::stoi(std::string(argv[20]));
+
+	std::size_t nthreads = std::stoul(std::string(argv[21]));
 
 	//---- Init MPI ----
 	MPI_Init(&argc, &argv);
@@ -114,7 +116,7 @@ int main(int argc, char **argv)
 	benchmark::timings dresults = dbench.run();
 
 	//---- Save reconstructed data ----
-	handler->write(in_name, out_name, udata);
+	//handler->write(in_name, out_name, udata);
 
 	//---- Gather total original and compressed data sizes ----
 	std::vector<std::size_t> original_size(data.size() + 1, 0);
@@ -128,18 +130,23 @@ int main(int argc, char **argv)
 	}
 
 	//---- Compute error metrics -----
-	std::vector<double> abs_err, snr;
+	std::vector<double> abs_err, rel_err, snr;
 	error err(comm);
 	for(std::size_t i = 0; i < data.size(); ++i)
 	{
+		std::tuple<double, double> error;
 		switch(data[i].type)
 		{
 			case data_field::data_type::FLOAT:
-				abs_err.push_back(err.absolute(static_cast<float *>(data[i].data), static_cast<float *>(udata[i].data), data[i].size));
+				error = err.relative(static_cast<float *>(data[i].data), static_cast<float *>(udata[i].data), data[i].size);
+				abs_err.push_back(std::get<0>(error));
+				rel_err.push_back(std::get<1>(error));
 				snr.push_back(err.snr(static_cast<float *>(data[i].data), static_cast<float *>(udata[i].data), data[i].size));
 				break;
 			case data_field::data_type::DOUBLE:
-				abs_err.push_back(err.absolute(static_cast<double *>(data[i].data), static_cast<double *>(udata[i].data), data[i].size));
+				error = err.relative(static_cast<double *>(data[i].data), static_cast<double *>(udata[i].data), data[i].size);
+				abs_err.push_back(std::get<0>(error));
+				rel_err.push_back(std::get<1>(error));
 				snr.push_back(err.snr(static_cast<double *>(data[i].data), static_cast<double *>(udata[i].data), data[i].size));
 				break;
 		}
@@ -160,6 +167,8 @@ int main(int argc, char **argv)
 		ss << params.max_quant_intervals << ";" << params.quantization_intervals << ";" << params.dataEndianType << ";" << params.sol_ID << ";";
 		ss << params.layers << ";" << params.sampleDistance << ";" << params.predThreshold << ";" << params.offset << ";" << params.szMode << ";";
 		ss << params.gzipMode << ";" << params.errorBoundMode << ";" << params.absErrBound << ";" << params.relBoundRatio << ";";
+		ss << params.pw_relBoundRatio << ";" << params.segment_size << ";";
+		ss << nthreads << ";"; 
 		ss << original_size.back() << ";" << compressed_size.back() << ";";
 		ss << ratios.back() << ";";
 
@@ -175,16 +184,23 @@ int main(int argc, char **argv)
 
 		for(std::size_t i = 0; i < data.size(); ++i)
 		{
+			ss << rel_err[i] << ";";
+		}
+
+		for(std::size_t i = 0; i < data.size(); ++i)
+		{
 			ss << snr[i] << ";";
 		}
 
-		ss << cresults.init.min_time << ";" << cresults.init.max_time << ";" << cresults.init.avg_time << ";";
-		ss << cresults.execute.min_time << ";" << cresults.execute.max_time << ";" << cresults.execute.avg_time << ";";
-		ss << cresults.cleanup.min_time << ";" << cresults.cleanup.max_time << ";" << cresults.cleanup.avg_time << ";";
+		double gb = original_size.back() / 1000.0 / 1000.0 / 1000.0;
 
-		ss << dresults.init.min_time << ";" << dresults.init.max_time << ";" << dresults.init.avg_time << ";";
-		ss << dresults.execute.min_time << ";" << dresults.execute.max_time << ";" << dresults.execute.avg_time << ";";
-		ss << dresults.cleanup.min_time << ";" << dresults.cleanup.max_time << ";" << dresults.cleanup.avg_time << ";";
+		ss << gb / cresults.init.min_time << ";" << gb / cresults.init.max_time << ";" << gb / cresults.init.avg_time << ";";
+		ss << gb / cresults.execute.min_time << ";" << gb / cresults.execute.max_time << ";" << gb / cresults.execute.avg_time << ";";
+		ss << gb / cresults.cleanup.min_time << ";" << gb / cresults.cleanup.max_time << ";" << gb / cresults.cleanup.avg_time << ";";
+
+		ss << gb / dresults.init.min_time << ";" << gb / dresults.init.max_time << ";" << gb / dresults.init.avg_time << ";";
+		ss << gb / dresults.execute.min_time << ";" << gb / dresults.execute.max_time << ";" << gb / dresults.execute.avg_time << ";";
+		ss << gb / dresults.cleanup.min_time << ";" << gb / dresults.cleanup.max_time << ";" << gb / dresults.cleanup.avg_time;
 
 		fio file(result_name, std::ios::out | std::ios::app);
 		file.writeline(ss.str());

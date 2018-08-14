@@ -21,7 +21,7 @@ class data_loader
 			MPAS
 		};
 
-		static data_handler * create(const MPI_Comm &comm, data_loader::format data_format);
+		static data_handler * create(MPI_Comm &comm, data_loader::format data_format);
 };
 
 

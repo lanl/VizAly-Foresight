@@ -22,7 +22,7 @@ class decompression_benchmark : public benchmark
 		~decompression_benchmark();
 
 	private:
-		lzma_stream strm;
+		std::vector<lzma_stream> strm;
 		std::uint8_t inbuf[BUFSIZ], outbuf[BUFSIZ];
 
 	protected:

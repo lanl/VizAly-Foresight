@@ -24,25 +24,35 @@ decompression_benchmark::~decompression_benchmark()
 
 void decompression_benchmark::preprocess()
 {
+	for(std::size_t i = 0; i < this->data->size(); ++i)
+	{
+		if(this->data->at(i).data != nullptr)
+		{
+			std::free(this->data->at(i).data);
+		}
+	}
 }
 
 
 void decompression_benchmark::init()
 {
-	this->strm = LZMA_STREAM_INIT;
-	lzma_ret ret = lzma_stream_decoder(&this->strm, UINT64_MAX, LZMA_CONCATENATED);
-	switch(ret)
+	for(std::size_t i = 0; i < this->data->size(); ++i)
 	{
-		case LZMA_OK:
-			break;
-		case LZMA_MEM_ERROR:
-			throw std::runtime_error("Memory allocation failed!");
-			break;
-		case LZMA_OPTIONS_ERROR:
-			throw std::runtime_error("Unsupported decompressor flags!");
-			break;
-		default:
-			throw std::runtime_error("Unknown error, possibly a buf!");
+		this->strm.push_back(LZMA_STREAM_INIT);
+		lzma_ret ret = lzma_stream_decoder(&this->strm[i], UINT64_MAX, LZMA_CONCATENATED);
+		switch(ret)
+		{
+			case LZMA_OK:
+				break;
+			case LZMA_MEM_ERROR:
+				throw std::runtime_error("Memory allocation failed!");
+				break;
+			case LZMA_OPTIONS_ERROR:
+				throw std::runtime_error("Unsupported decompressor flags!");
+				break;
+			default:
+				throw std::runtime_error("Unknown error, possibly a buf!");
+		}
 	}
 }
 
@@ -53,10 +63,10 @@ void decompression_benchmark::execute()
 	{
 		lzma_action action = LZMA_RUN;
 
-		this->strm.next_in = nullptr;
-		this->strm.avail_in = 0;
-		this->strm.next_out = this->outbuf;
-		this->strm.avail_out = sizeof(this->outbuf);
+		this->strm[i].next_in = nullptr;
+		this->strm[i].avail_in = 0;
+		this->strm[i].next_out = this->outbuf;
+		this->strm[i].avail_out = sizeof(this->outbuf);
 
 		std::size_t it = 0;
 		std::size_t pos = 0;
@@ -76,9 +86,9 @@ void decompression_benchmark::execute()
 
 		while(running)
 		{
-			if(this->strm.avail_in == 0 && it < this->cdata->at(i).size)
+			if(this->strm[i].avail_in == 0 && it < this->cdata->at(i).size)
 			{
-				this->strm.next_in = this->inbuf;
+				this->strm[i].next_in = this->inbuf;
 				std::size_t bufsize = 0;
 				while(bufsize + 1 < BUFSIZ && it < this->cdata->at(i).size)
 				{
@@ -86,7 +96,7 @@ void decompression_benchmark::execute()
 					++bufsize;
 					++it;
 				}
-				this->strm.avail_in = bufsize;
+				this->strm[i].avail_in = bufsize;
 
 				if(it == this->cdata->at(i).size)
 				{
@@ -94,14 +104,14 @@ void decompression_benchmark::execute()
 				}
 			}
 
-			lzma_ret ret = lzma_code(&this->strm, action);
-			if(this->strm.avail_out == 0 || ret == LZMA_STREAM_END)
+			lzma_ret ret = lzma_code(&this->strm[i], action);
+			if(this->strm[i].avail_out == 0 || ret == LZMA_STREAM_END)
 			{
-				std::size_t write_size = sizeof(this->outbuf) - this->strm.avail_out;
+				std::size_t write_size = sizeof(this->outbuf) - this->strm[i].avail_out;
 				std::copy(this->outbuf, this->outbuf + write_size, static_cast<std::uint8_t *>(this->data->at(i).data) + pos);
 				pos += write_size;
-				this->strm.next_out = this->outbuf;
-				this->strm.avail_out = sizeof(outbuf);
+				this->strm[i].next_out = this->outbuf;
+				this->strm[i].avail_out = sizeof(outbuf);
 			}
 
 			switch(ret)
@@ -136,7 +146,10 @@ void decompression_benchmark::execute()
 
 void decompression_benchmark::cleanup()
 {
-	lzma_end(&this->strm);
+	for(std::size_t i = 0; i < this->data->size(); ++i)
+	{
+		lzma_end(&this->strm[i]);
+	}
 }
 
 

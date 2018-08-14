@@ -42,6 +42,7 @@ set(PROJECT_INTERFACE_HEADER_FILES
 	include/error.hpp
 	include/fio.hpp
 	include/stopwatch.hpp
+	include/log.hpp
 )
 
 # add library targets

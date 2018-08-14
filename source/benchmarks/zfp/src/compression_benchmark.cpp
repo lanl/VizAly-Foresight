@@ -31,6 +31,14 @@ void compression_benchmark::preprocess()
 	this->zfp.clear();
 	this->field.clear();
 	this->stream.clear();
+
+	for(std::size_t i = 0; i < this->data->size(); ++i)
+	{
+		if(this->cdata->at(i).data != nullptr)
+		{
+			std::free(this->cdata->at(i).data);
+		}
+	}
 }
 
 
@@ -78,11 +86,11 @@ void compression_benchmark::execute()
 				throw std::invalid_argument("Unknown mode!");
 		}
 
-		this->stream.push_back(stream_open(this->cdata->at(i).data, this->cdata->at(i).size));
-		zfp_stream_set_bit_stream(this->zfp[i], this->stream[i]);
-
 		this->cdata->at(i).type = data_field::data_type::BYTE;
 		this->cdata->at(i).data = std::malloc(zfp_stream_maximum_size(this->zfp[i], this->field[i]));
+
+		this->stream.push_back(stream_open(this->cdata->at(i).data, this->cdata->at(i).size));
+		zfp_stream_set_bit_stream(this->zfp[i], this->stream[i]);
 
 		this->cdata->at(i).size = zfp_compress(this->zfp[i], this->field[i]);
 		this->cdata->at(i).data = std::realloc(this->cdata->at(i).data, this->cdata->at(i).size);

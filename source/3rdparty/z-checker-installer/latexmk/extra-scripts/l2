@@ -1,0 +1,143 @@
+#!/bin/csh -f
+#(ie run the cshell on this but don't read the .cshrc)
+
+# l2: 2002 Nov 12. John Collins. 
+# l2: 2002 Nov 11. John Collins. 
+# l2: 2002 Nov  6. John Collins. 
+# l2: 2002 Nov  5. John Collins. Simplified from l v. 2.17
+
+set myname=l2
+set displayErrors = 0
+set mainCwd = $cwd
+
+
+#alias beep '(echo -n ""; sleep 1; echo -n "")'
+alias beep '(echo -n "")'
+
+
+nextarg:
+if ( "$1" == "-d" ) then
+    set displayErrors=1
+    shift
+    goto nextarg
+endif
+if ( "$1" == "-d-" ) then
+    set displayErrors=0
+    shift
+    goto nextarg
+endif
+
+if ( ("$1" == "") || ("$1" == "-h") || ("$1" == "--help") ) then
+   echo "Usage $myname [-d|-d-] paper.tex"
+   echo ""
+   echo "  -d  ==> display errors"
+   echo "  -d- ==> do not display errors (default)"
+   echo "  -h, --help  ==> show this message"
+   exit 0
+endif
+
+set paper=$1
+if ( "$paper:e" == "" ) then
+   set base=$paper
+   set paper=${base}.tex
+else
+   set base=$paper:r
+endif
+
+if !(-f $paper) then
+   echo $paper does not exist\!
+   exit 1
+endif
+
+# set overfull = Overfull
+set overfull = NoOverfull
+echo ALL $overfull MESSAGES WILL BE SUPPRESSED
+# see Lamport page 177 for dealing with overfull boxes.
+# basically, do this:
+# \documentclass[12pt,draft]{article}
+# draft will mark the overfull boxes and the solution
+# will become obvious...
+
+# run latex.  The cat /dev/null prevents
+# latex from stopping.  Errors are reported to paper.log
+cat /dev/null | latex $paper | grep -v $overfull
+
+# determine if there was an error, by looking at paper.log:
+grep "Emergency stop" $base.log 
+@ emergencyStop = ($status == 0)
+
+# Also find if no output produced:
+#     Examine only the last line of the file to pick out only the
+#     message produced by TeX, and not something else with the same
+#     string. 
+tail -1 $base.log | grep "No pages of output."
+@ noOutput = ($status == 0)
+
+if ($emergencyStop || $noOutput)then
+   # begin latexerrors %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+   echo create and display latex errors
+   beep&
+   set err = /tmp/`whoami`-$base:t
+   set tmperr = $err.tex
+
+   echo "\documentclass[12pt]{article}" > $tmperr
+   echo "\textwidth 7.5in"  >> $tmperr
+   echo "\begin{document}" >> $tmperr
+   if ( $emergencyStop ) then
+        echo "Error(s) in tex file ($paper): " >> $tmperr
+   else if ( $noOutput ) then
+        echo "No output from tex file ($paper): " >> $tmperr
+   endif
+   echo "\begin{verbatim}" >> $tmperr
+
+   cat $base.log >> $tmperr
+
+   echo "\end{verbatim}" >> $tmperr
+   echo "\end{document}" >> $tmperr
+
+   # latex puts its generated files in the current directory, rather
+   # than the directory of the source file.  So change to the
+   # temporary directory, and run latex with the path removed from the
+   # filename argument: 
+   pushd /tmp
+      latex $err:t
+   popd
+
+   # Give the original latex file a valid dvi file containing the error log.
+   cp $err.dvi $base.dvi
+
+   # Make a dummy aux file.  And also make a .aux.bak file.  This
+   # solves the following:
+   #      1.  Sometimes a run with errors results from or has produced
+   #          a bad .aux file.  This gets read in on the next run and
+   #          an infinite error loop results unless the .aux file is
+   #          deleted or replaced by something innocuous.
+   #      2.  Latexmk is liable to make extra runs of latex after an
+   #          error is produced. In simple cases, this can be avoided
+   #          if the aux file is later than the tex file and the
+   #          aux.bak file has the same contents.  
+   echo "\relax" > $base.aux
+   echo "\relax" > $base.aux.bak
+
+   rm -f $err.aux $err.log $err.tex
+
+   if ( $displayErrors) then
+       # Popup a new window containing the error log
+       if ( $emergencyStop ) then
+           echo xdvi display shows the last page of the errors
+           set page = '+'
+       else
+           set page = '' 
+       endif
+       xdvi $err.dvi $page &
+       sleep 2
+   endif
+   rm -f $err.dvi
+
+   exit 1
+   # end   latexerrors %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+else
+   echo Successful run
+   exit 0
+endif

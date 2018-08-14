@@ -1,5 +1,8 @@
 # library CMakeLists.txt template
 
+# minimum cmake version requirement
+cmake_minimum_required(VERSION 3.5.1)
+
 # project name
 project(genericio)
 
@@ -9,14 +12,17 @@ string(TOUPPER ${PROJECT_NAME} NAME_ID)
 # option for STATIC or SHARED
 option(${NAME_ID}_BUILD_STATIC
 	"Build a static version of this library"
-	OFF
+	ON
 )
 
-# project specific options
-option(${NAME_ID}_ENABLE_BGQ_ENVIRONMENT
-	"Enable BGQ Environment"
-	OFF
+# option for installing the target
+option(${NAME_ID}_INSTALL
+	"Install the include headers and the static target (if build) of ${PROJECT_NAME}."
+	ON
 )
+
+# include modules
+#include(GenerateExportHeader)
 
 # add source files
 set(PROJECT_SOURCE_FILES
@@ -64,23 +70,12 @@ else()
 	)
 endif()
 
-# gather compile definitions
-set(DEFINITIONS __STDC_CONSTANT_MACROS)
-
-if(${NAME_ID}_ENABLE_BGQ_ENVIRONMENT)
-	set(DEFINITIONS ${DEFINITIONS} __bgq__)
-endif()
-
-# add compile definitions
-# if no defintions need to be set, this command needs to be commented out
-target_compile_definitions(${PROJECT_NAME}
-	PUBLIC ${DEFINITIONS}
+# set c++ standard
+set_target_properties(${PROJECT_NAME} PROPERTIES
+	CXX_STANDARD 11
+	CXX_STANDARD_REQUIRED ON
+	CXX_EXTENSIONS OFF
 )
-
-# add compile flags
-# if no definitions need to be set, this command needs to be commented out
-#target_compile_options(${PROJECT}
-#)
 
 # add include directories
 target_include_directories(${PROJECT_NAME}
@@ -93,30 +88,26 @@ target_link_libraries(${PROJECT_NAME}
 	PUBLIC openmp
 )
 
-# add doxygen API documentation
-find_package(Doxygen)
+# add compile definitions
+# if no definitions need to be set, this command needs to be commented out
+target_compile_definitions(${PROJECT_NAME}
+	PUBLIC __STDC_CONSTANT_MACROS
+)
 
-if(DOXYGEN_FOUND)
-	configure_file(
-		${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
-		${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-		@ONLY
-	)
+# add compile flags
+# if no flags need to be set, this command needs to be commented out
+#target_compile_options(${PROJECT_NAME}
+#)
 
-	add_custom_target(doxygen
-		${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		COMMENT "Generating API documentation with Doxygen"
-		VERBATIM
-	)
-endif()
+# generate visibility header
+#generate_export_header(${PROJECT_NAME})
 
 # install instructions
-if(${NAME_ID}_BUILD_STATIC)
+if(${NAME_ID}_BUILD_STATIC AND ${NAME_ID}_INSTALL)
 	install(TARGETS ${PROJECT_NAME}
-		DESTINATION lib
+		DESTINATION lib/3rdparty/${PROJECT_NAME}
 	)
-else()
+elseif(NOT ${NAME_ID}_BUILD_STATIC)
 	if(WIN32)
 		install(TARGETS ${PROJECT_NAME}
 			DESTINATION bin
@@ -128,11 +119,9 @@ else()
 	endif()
 endif()
 
-install(FILES
-	${PROJECT_INTERFACE_HEADER_FILES}
-	DESTINATION include/${PROJECT_NAME}
-)
-
-#install(TARGETS doxygen
-#	DESTINATION docs
-#)
+if(${NAME_ID}_INSTALL)
+	install(FILES
+		${PROJECT_INTERFACE_HEADER_FILES}
+		DESTINATION include/3rdparty/${PROJECT_NAME}
+	)
+endif()

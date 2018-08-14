@@ -44,11 +44,11 @@ int main(int argc, char **argv)
 	}
 
 	std::string in_name = std::string(argv[1]);
-	std::string out_name = std::string(argv[2]);
-	std::string result_name = std::string(argv[3]);
-	std::string format = std::string(argv[4]);
-	std::size_t repetitions = std::stoul(std::string(argv[5]));
-	std::string preset = std::string(argv[6]);
+	std::string result_name = std::string(argv[2]);
+	std::string format = std::string(argv[3]);
+	std::size_t repetitions = std::stoul(std::string(argv[4]));
+	std::string preset = std::string(argv[5]);
+	std::size_t nthreads = std::stoul(std::string(argv[6]));
 
 	//---- Init MPI ----
 	MPI_Init(&argc, &argv);
@@ -119,7 +119,7 @@ int main(int argc, char **argv)
 		}
 
 		std::stringstream ss;
-		ss << in_name << ";" << format << ";" << repetitions << ";" << size << ";" << preset << ";";
+		ss << in_name << ";" << format << ";" << repetitions << ";" << size << ";" << preset << ";" << nthreads << ";";
 		ss << original_size.back() << ";" << compressed_size.back() << ";";
 		ss << std::setprecision(15) << ratios.back() << ";";
 
@@ -128,13 +128,15 @@ int main(int argc, char **argv)
 			ss << ratios[i] << ";";
 		}
 
-		ss << cresults.init.min_time << ";" << cresults.init.max_time << ";" << cresults.init.avg_time << ";";
-		ss << cresults.execute.min_time << ";" << cresults.execute.max_time << ";" << cresults.execute.avg_time << ";";
-		ss << cresults.cleanup.min_time << ";" << cresults.cleanup.max_time << ";" << cresults.cleanup.avg_time << ";";
+		double gb = original_size.back() / 1000.0 / 1000.0 / 1000.0;
 
-		ss << dresults.init.min_time << ";" << dresults.init.max_time << ";" << dresults.init.avg_time << ";";
-		ss << dresults.execute.min_time << ";" << dresults.execute.max_time << ";" << dresults.execute.avg_time << ";";
-		ss << dresults.cleanup.min_time << ";" << dresults.cleanup.max_time << ";" << dresults.cleanup.avg_time << ";";
+		ss << gb / cresults.init.min_time << ";" << gb / cresults.init.max_time << ";" << gb / cresults.init.avg_time << ";";
+		ss << gb / cresults.execute.min_time << ";" << gb / cresults.execute.max_time << ";" << gb / cresults.execute.avg_time << ";";
+		ss << gb / cresults.cleanup.min_time << ";" << gb / cresults.cleanup.max_time << ";" << gb / cresults.cleanup.avg_time << ";";
+
+		ss << gb / dresults.init.min_time << ";" << gb / dresults.init.max_time << ";" << gb / dresults.init.avg_time << ";";
+		ss << gb / dresults.execute.min_time << ";" << gb / dresults.execute.max_time << ";" << gb / dresults.execute.avg_time << ";";
+		ss << gb / dresults.cleanup.min_time << ";" << gb / dresults.cleanup.max_time << ";" << gb / dresults.cleanup.avg_time;
 
 		fio file(result_name, std::ios::out | std::ios::app);
 		file.writeline(ss.str());

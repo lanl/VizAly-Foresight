@@ -24,6 +24,13 @@ decompression_benchmark::~decompression_benchmark()
 
 void decompression_benchmark::preprocess()
 {
+	for(std::size_t i = 0; i < this->cdata->size(); ++i)
+	{
+		if(this->data->at(i).data != nullptr)
+		{
+			std::free(this->data->at(i).data);
+		}
+	}
 }
 
 

@@ -24,6 +24,13 @@ compression_benchmark::~compression_benchmark()
 
 void compression_benchmark::preprocess()
 {
+	for(std::size_t i = 0; i < this->data->size(); ++i)
+	{
+		if(this->cdata->at(i).data != nullptr)
+		{
+			std::free(this->cdata->at(i).data);
+		}
+	}
 }
 
 

@@ -31,6 +31,11 @@ void compression_benchmark::preprocess()
 
 	for(std::size_t i = 0; i < this->data->size(); ++i)
 	{
+		if(this->cdata->at(i).data != nullptr)
+		{
+			std::free(this->cdata->at(i).data);
+		}
+
 		std::size_t limit;
 		switch(this->data->at(i).type)
 		{
@@ -61,29 +66,36 @@ void compression_benchmark::execute()
 {
 	for(std::size_t i = 0; i < this->data->size(); ++i)
 	{
-		this->fpz.push_back(fpzip_write_to_buffer(this->cdata->at(i).data, this->cdata->at(i).size));
-		this->fpz[i]->prec = this->precision;
-		this->fpz[i]->nx = this->data->at(i).size;
-		this->fpz[i]->ny = 1;
-		this->fpz[i]->nz = 1;
-		this->fpz[i]->nf = 1;
 		switch(this->data->at(i).type)
 		{
 			case data_field::data_type::FLOAT:
-				this->fpz[i]->type = FPZIP_TYPE_FLOAT;
 				this->cdata->at(i).size = 1024 + this->data->at(i).size * sizeof(float);
+				this->cdata->at(i).data = std::malloc(this->cdata->at(i).size);
+				this->fpz.push_back(fpzip_write_to_buffer(static_cast<std::uint8_t *>(this->cdata->at(i).data), this->cdata->at(i).size));
+				this->fpz[i]->prec = this->precision;
+				this->fpz[i]->nx = this->data->at(i).size;
+				this->fpz[i]->ny = 1;
+				this->fpz[i]->nz = 1;
+				this->fpz[i]->nf = 1;
+				this->fpz[i]->type = FPZIP_TYPE_FLOAT;
+				this->cdata->at(i).size = fpzip_write(this->fpz[i], static_cast<float *>(this->data->at(i).data));
 				break;
 			case data_field::data_type::DOUBLE:
-				this->fpz[i]->type = FPZIP_TYPE_DOUBLE;
 				this->cdata->at(i).size = 1024 + this->data->at(i).size * sizeof(double);
+				this->cdata->at(i).data = std::malloc(this->cdata->at(i).size);
+				this->fpz.push_back(fpzip_write_to_buffer(static_cast<std::uint8_t *>(this->cdata->at(i).data), this->cdata->at(i).size));
+				this->fpz[i]->prec = this->precision;
+				this->fpz[i]->nx = this->data->at(i).size;
+				this->fpz[i]->ny = 1;
+				this->fpz[i]->nz = 1;
+				this->fpz[i]->nf = 1;
+				this->fpz[i]->type = FPZIP_TYPE_DOUBLE;
+				this->cdata->at(i).size = fpzip_write(this->fpz[i], static_cast<double *>(this->data->at(i).data));
 			default:
 				throw std::runtime_error("Invalid data type!");
 		}
 
 		this->cdata->at(i).type = data_field::data_type::BYTE;
-		this->cdata->at(i).data = std::malloc(this->cdata->at(i).size);
-
-		this->cdata->at(i).size = fpzip_write(this->fpz[i], this->data->at(i).data);
 		this->cdata->at(i).data = std::realloc(this->cdata->at(i).data, this->cdata->at(i).size);
 	}
 }

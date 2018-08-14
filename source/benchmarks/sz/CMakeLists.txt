@@ -49,7 +49,8 @@ install(TARGETS ${PROJECT_NAME}
 	DESTINATION bin
 )
 
-#install(FILES
-#	${OTHER_FILES}
-#	DESTINATION somepath
-#)
+install(FILES
+	${CMAKE_SOURCE_DIR}/../run/sz_benchmark.sh
+	${CMAKE_SOURCE_DIR}/../run/run_sz.sh
+	DESTINATION run
+)

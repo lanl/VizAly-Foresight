@@ -27,22 +27,21 @@ benchmark::timings benchmark::run()
 	std::vector<double> execute_times(this->repetitions_m, 0);
 	std::vector<double> cleanup_times(this->repetitions_m, 0);
 
-	//for(std::size_t i = 0; i < this->repetitions_m; ++i)
-	for(std::size_t i = 0; i < 1; ++i)
+	for(std::size_t i = 0; i < this->repetitions_m; ++i)
 	{
 		this->preprocess();
 
-		//watch.trigger();
+		watch.trigger();
 		this->init();
-		//init_times[i] = watch.trigger();
+		init_times[i] = watch.trigger();
 		
-		//watch.trigger();
+		watch.trigger();
 		this->execute();
-		//execute_times[i] = watch.trigger();
+		execute_times[i] = watch.trigger();
 
-		//watch.trigger();
+		watch.trigger();
 		this->cleanup();
-		//cleanup_times[i] = watch.trigger();
+		cleanup_times[i] = watch.trigger();
 
 		this->postprocess();
 	}
@@ -74,13 +73,6 @@ benchmark::timings benchmark::run()
 			.avg_time = std::accumulate(cleanup_times.begin(), cleanup_times.end(), 0.0) / static_cast<double>(cleanup_times.size())
 		}
 	};
-
-	/*benchmark::results result = {
-		.min_time=*(minmax.first),
-		.max_time=*(minmax.second),
-		//.avg_time=avg
-		.avg_time=std::accumulate(times.begin(), times.end(), 0.0) / static_cast<double>(times.size())
-	};*/
 
 	return results;
 }

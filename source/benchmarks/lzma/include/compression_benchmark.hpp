@@ -25,7 +25,7 @@ class compression_benchmark : public benchmark
 
 	private:
 		std::uint32_t clevel;
-		lzma_stream strm;
+		std::vector<lzma_stream> strm;
 		std::uint8_t inbuf[BUFSIZ], outbuf[BUFSIZ];
 
 	protected:

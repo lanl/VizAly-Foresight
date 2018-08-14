@@ -8,7 +8,7 @@
 
 
 
-data_handler *  data_loader::create(const MPI_Comm &comm, data_loader::format data_format)
+data_handler *  data_loader::create(MPI_Comm &comm, data_loader::format data_format)
 {
 	switch(data_format)
 	{

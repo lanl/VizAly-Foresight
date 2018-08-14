@@ -49,7 +49,8 @@ install(TARGETS ${PROJECT_NAME}
 	DESTINATION bin
 )
 
-#install(FILES
-#	${OTHER_FILES}
-#	DESTINATION somepath
-#)
+install(FILES
+	${CMAKE_SOURCE_DIR}/../run/lzma_benchmark.sh
+	${CMAKE_SOURCE_DIR}/../run/run_lzma.sh
+	DESTINATION run
+)

@@ -31,6 +31,14 @@ void compression_benchmark::preprocess()
 {
 	this->temp_cdata.clear();
 	this->temp_cdata.resize(this->data->size());
+
+	for(std::size_t i = 0; i < this->data->size(); ++i)
+	{
+		if(this->cdata->at(i).data != nullptr)
+		{
+			std::free(this->cdata->at(i).data);
+		}
+	}
 }
 
 

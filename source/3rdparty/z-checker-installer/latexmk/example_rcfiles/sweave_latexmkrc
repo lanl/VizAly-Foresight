@@ -1,0 +1,57 @@
+# This is to allow the use of Sweave with latexmk, and in addition to
+#    make synctex work properly with it.  
+# SEE THE IMPORTANT NOTES below.
+#
+# Sweave (http://www.stat.uni-muenchen.de/~leisch/Sweave/) is a tool
+# that allows to embed the R code for complete data analyses in latex
+# documents.  The user edits a file with an extension like .Rnw, and
+# the .tex file is generated from this.
+#
+# Four problems are solved by the code below:
+# 1. Generate the .tex file automatically.
+# 2. Arrange not to re-run unmodified chunks of R code.  (A pure
+#    optimization.)
+# 3. Fix the execution environment for (pdf)latex.
+# 4. Deal with synctex: If the user wants to use synctex
+#    (www.tug.org/TUGboat/tb29-3/tb93laurens.pdf) to synchronize the
+#    pdf file with the source file, by default synctex does the
+#    synchronization with the generated .tex file, not the original 
+#    source file.  Postprocessing of the .synctex.gz file is necessary
+#    to fix this.
+#
+# The following version was worked out and  tested by a user (thanks
+# to Brian Beitzel) on MSWindows.  It will need at least one change to
+# work on UNIX-like operating systems (which include Linux and OS-X).
+
+# N.B. ===> IMPORTANT NOTES <===
+#
+# 1. The patchDVI package for R needs to be installed from R-Forge, as
+#    follows:
+#
+#  install.packages("patchDVI", repos="http://R-Forge.R-project.org")
+#
+# 2. In all Sweave (.Rnw) documents, the following lines must be included:
+#
+#         \usepackage{Sweave}
+#         \SweaveOpts{concordance=TRUE}
+
+
+# Fix the pdflatex command to run Sweave first, and to postprocess the
+#  .synctex.gz file:
+# !!!!! THIS IS THE VERSION FOR MS-WINDOWS, with && as a command
+# separator
+$pdflatex = "cmd /c "
+       . "Rscript -e \"library(cacheSweave); setCacheDir(getwd()); "
+       . "Sweave('%S', driver=cacheSweaveDriver)\""
+       . " && R CMD pdflatex -interaction=nonstopmode -synctex=1 %O %B.tex"
+       . " && Rscript -e "
+       . "\"library('patchDVI');patchSynctex('%B.synctex.gz')\"";
+#
+# !!!TO FIX THIS FOR Linux/OS-X/UNIX, try uncommenting the following:
+#  (this version hasn't been tested).
+#$pdflatex = "Rscript -e \"library(cacheSweave); setCacheDir(getwd()); "
+#       . "Sweave('%S', driver=cacheSweaveDriver)\""
+#       . " ; R CMD pdflatex -interaction=nonstopmode -synctex=1 %O %B.tex"
+#       . " ; Rscript -e "
+#       . "\"library('patchDVI');patchSynctex('%B.synctex.gz')\"";
+

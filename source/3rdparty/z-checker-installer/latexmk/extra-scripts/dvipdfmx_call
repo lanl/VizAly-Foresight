@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Run dvipdfmx from dvipdf-style command-line
+# Assume no options specified
+# If this script is called from latexmk,
+#    we have $1=source.dvi, $2=dest.pdf
+# But for safety, let's handle correctly a one argument call,
+#    i.e., $1=source, with no $2
+
+if [ "$2" = "" ]; then
+   dvipdfmx $1
+else
+   dvipdfmx -o $2 $1
+fi

@@ -5,6 +5,7 @@
 #include <cmath>
 #include <algorithm>
 #include <vector>
+#include <tuple>
 
 #include <mpi.h>
 
@@ -17,6 +18,7 @@ class error
 		error(const MPI_Comm &comm);
 
 		template<class TYPE> double absolute(const TYPE *orig, const TYPE *pred, std::size_t size);
+		template<class TYPE> std::tuple<double, double> relative(const TYPE *orig, const TYPE *pred, std::size_t size);
 		template<class TYPE> double snr(const TYPE *orig, const TYPE *pred, std::size_t size);
 
 	private:
@@ -38,6 +40,31 @@ template<class TYPE> double error::absolute(const TYPE *orig, const TYPE *pred, 
 	MPI_Allreduce(&diff, &result, 1, MPI_DOUBLE, MPI_MAX, this->comm);
 
 	return result;
+}
+
+
+template<class TYPE> std::tuple<double, double> error::relative(const TYPE *orig, const TYPE *pred, std::size_t size)
+{
+	double rel_diff = 0;
+	double abs_diff = 0;
+	for(std::size_t i = 0; i < size; ++i)
+	{
+		double abs_err = std::abs(static_cast<double>(pred[i]) - static_cast<double>(orig[i]));
+		if(orig[i] < 1)
+		{
+			abs_diff = std::max(abs_diff, abs_err);
+		}
+		else
+		{
+			rel_diff = std::max(rel_diff, abs_err / std::abs(static_cast<double>(orig[i])));
+		}
+	}
+
+	double abs_result, rel_result;
+	MPI_Allreduce(&abs_diff, &abs_result, 1, MPI_DOUBLE, MPI_MAX, this->comm);
+	MPI_Allreduce(&rel_diff, &rel_result, 1, MPI_DOUBLE, MPI_MAX, this->comm);
+
+	return std::make_tuple(abs_result, rel_result);
 }
 
 

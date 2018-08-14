@@ -33,20 +33,13 @@ compression_benchmark::~compression_benchmark()
 
 void compression_benchmark::preprocess()
 {
-/*	for(std::size_t i = 0; i < this->data->size(); ++i)
+	for(std::size_t i = 0; i < this->data->size(); ++i)
 	{
-		this->cdata->at(i).size = 0;
-		this->cdata->at(i).type = data_field::data_type::BYTE;
-		switch(this->data->at(i).type)
+		if(this->cdata->at(i).data != nullptr)
 		{
-			case data_field::data_type::FLOAT:
-				this->cdata->at(i).data = new std::uint8_t[sizeof(float) * this->data->at(i).size];
-				break;
-			case data_field::data_type::DOUBLE:
-				this->cdata->at(i).data = new std::uint8_t[sizeof(double) * this->data->at(i).size];
-				break;
+			std::free(this->cdata->at(i).data);
 		}
-	}*/
+	}
 }
 
 
@@ -107,14 +100,4 @@ void compression_benchmark::cleanup()
 
 void compression_benchmark::postprocess()
 {
-/*	for(std::size_t i = 0; i < this->data->size(); ++i)
-	{
-		if(this->cdata->at(i).size > 0)
-		{
-			std::uint8_t *temp = new std::uint8_t[this->cdata->at(i).size];
-			std::copy(static_cast<std::uint8_t *>(this->cdata->at(i).data), static_cast<std::uint8_t *>(this->cdata->at(i).data) + this->cdata->at(i).size, temp);
-			delete[] this->cdata->at(i).data;
-			this->cdata->at(i).data = temp;
-		}
-	}*/
 }

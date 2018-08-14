@@ -1,0 +1,13 @@
+1. Decimation Interpolation Lossy Compressor
+Compress: keep only 1/k data points, specifically, keep the fist data point every k data points.
+Decompress: interpolte the rest (k-1)/k data points.
+
+Example:
+./DeciIntrller 10 -f /home/dtao001/CESM-testdata/CLDLOW_1_1800_3600.dat 3600 1800
+
+2. Single/double floating point data to half floating point data converter
+Compress: convert single/double precision floating-point data (32/64-bit) to half precision floating-point data (16-bit).
+Decompress: convert half precision floating-point data to single/double precision floating-point data.
+
+Example:
+./HfPrecCvter -f /home/dtao001/CESM-testdata/CLDLOW_1_1800_3600.dat 3600 1800

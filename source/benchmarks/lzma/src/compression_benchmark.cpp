@@ -35,28 +35,39 @@ void compression_benchmark::preprocess()
 
 		this->clevel |= LZMA_PRESET_EXTREME;
 	}
+
+	for(std::size_t i = 0; i < this->data->size(); ++i)
+	{
+		if(this->cdata->at(i).data != nullptr)
+		{
+			std::free(this->cdata->at(i).data);
+		}
+	}
 }
 
 
 void compression_benchmark::init()
 {
-	this->strm = LZMA_STREAM_INIT;
-	lzma_ret ret = lzma_easy_encoder(&this->strm, this->clevel, LZMA_CHECK_CRC64);
-	switch(ret)
+	for(std::size_t i = 0; i < this->data->size(); ++i)
 	{
-		case LZMA_OK:
-			break;
-		case LZMA_MEM_ERROR:
-			throw std::runtime_error("Memory allocation failed!");
-			break;
-		case LZMA_OPTIONS_ERROR:
-			throw std::runtime_error("Specified preset is not supported!");
-			break;
-		case LZMA_UNSUPPORTED_CHECK:
-			throw std::runtime_error("Specified integrity check is not supported!");
-			break;
-		default:
-			throw std::runtime_error("Unknown error, possibly a bug!");
+		this->strm.push_back(LZMA_STREAM_INIT);
+		lzma_ret ret = lzma_easy_encoder(&this->strm[i], this->clevel, LZMA_CHECK_CRC64);
+		switch(ret)
+		{
+			case LZMA_OK:
+				break;
+			case LZMA_MEM_ERROR:
+				throw std::runtime_error("Memory allocation failed!");
+				break;
+			case LZMA_OPTIONS_ERROR:
+				throw std::runtime_error("Specified preset is not supported!");
+				break;
+			case LZMA_UNSUPPORTED_CHECK:
+				throw std::runtime_error("Specified integrity check is not supported!");
+				break;
+			default:
+				throw std::runtime_error("Unknown error, possibly a bug!");
+		}
 	}
 }
 
@@ -67,10 +78,10 @@ void compression_benchmark::execute()
 	{
 		lzma_action action = LZMA_RUN;
 
-		this->strm.next_in = nullptr;
-		this->strm.avail_in = 0;
-		this->strm.next_out = this->outbuf;
-		this->strm.avail_out = sizeof(this->outbuf);
+		this->strm[i].next_in = nullptr;
+		this->strm[i].avail_in = 0;
+		this->strm[i].next_out = this->outbuf;
+		this->strm[i].avail_out = sizeof(this->outbuf);
 
 		std::size_t it = 0;
 		bool running = true;
@@ -93,9 +104,9 @@ void compression_benchmark::execute()
 
 		while(running)
 		{
-			if(this->strm.avail_in == 0 && it < this->data->at(i).size)
+			if(this->strm[i].avail_in == 0 && it < this->data->at(i).size)
 			{
-				this->strm.next_in = this->inbuf;
+				this->strm[i].next_in = this->inbuf;
 				std::size_t bufsize = 0;
 				while(bufsize + typesize < BUFSIZ && it < this->data->at(i).size)
 				{
@@ -106,7 +117,7 @@ void compression_benchmark::execute()
 					bufsize += typesize;
 					++it;
 				}
-				this->strm.avail_in = bufsize;
+				this->strm[i].avail_in = bufsize;
 
 				if(it == this->data->at(i).size)
 				{
@@ -114,14 +125,14 @@ void compression_benchmark::execute()
 				}
 			}
 
-			lzma_ret ret = lzma_code(&this->strm, action);
-			if(this->strm.avail_out == 0 || ret == LZMA_STREAM_END)
+			lzma_ret ret = lzma_code(&this->strm[i], action);
+			if(this->strm[i].avail_out == 0 || ret == LZMA_STREAM_END)
 			{
-				std::size_t write_size = sizeof(this->outbuf) - this->strm.avail_out;
+				std::size_t write_size = sizeof(this->outbuf) - this->strm[i].avail_out;
 				std::copy(this->outbuf, this->outbuf + write_size, static_cast<std::uint8_t *>(this->cdata->at(i).data) + this->cdata->at(i).size);
 				this->cdata->at(i).size += write_size;
-				this->strm.next_out = this->outbuf;
-				this->strm.avail_out = sizeof(this->outbuf);
+				this->strm[i].next_out = this->outbuf;
+				this->strm[i].avail_out = sizeof(this->outbuf);
 			}
 
 			switch(ret)
@@ -149,7 +160,10 @@ void compression_benchmark::execute()
 
 void compression_benchmark::cleanup()
 {
-	lzma_end(&this->strm);
+	for(std::size_t i = 0; i < this->data->size(); ++i)
+	{
+		lzma_end(&this->strm[i]);
+	}
 }
 
 

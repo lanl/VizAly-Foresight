@@ -31,6 +31,14 @@ void decompression_benchmark::preprocess()
 	this->zfp.clear();
 	this->field.clear();
 	this->stream.clear();
+
+	for(std::size_t i = 0; i < this->cdata->size(); ++i)
+	{
+		if(this->data->at(i).data != nullptr)
+		{
+			std::free(this->data->at(i).data);
+		}
+	}
 }
 
 
