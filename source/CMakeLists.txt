@@ -28,7 +28,7 @@ add_subdirectory(utility)
 add_subdirectory(data_loader)
 
 # benchmark projects
-#add_subdirectory(benchmarks/blosc)
+add_subdirectory(benchmarks/blosc)
 #add_subdirectory(benchmarks/gio)
 #add_subdirectory(benchmarks/lzma)
 #add_subdirectory(benchmarks/fpzip)
