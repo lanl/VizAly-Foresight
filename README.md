@@ -25,7 +25,7 @@ source /src/env.sh
 
 To build the test suite and show the output of a simple example, do:
 ```
-git clone -b dev https://github.com/cmbiwer/VizAly-CBench.git
+git clone https://github.com/lanl/VizAly-CBench.git
 cd VizAly-CBench
 ./config.sh
 ./build.sh
