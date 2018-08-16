@@ -34,10 +34,10 @@ The compressor benchmark takes an input a json file that specifies the input par
 * compressors to use
 * metrics
 
-## Currently Supported file formats
+### Currently Supported file formats
 * GenericIO
 
-## Currently Supported compressors
+### Currently Supported compressors
 * Lossless BLOSC
 
 # Copyright and license
