@@ -9,6 +9,7 @@
 #include "json.hpp"
 #include "timer.hpp"
 #include "log.hpp"
+#include "memory.hpp"
 
 // Metrics
 #include "relativeError.hpp"
@@ -99,6 +100,9 @@ int main(int argc, char *argv[])
 	// Cycle through params
     for (int i = 0; i < params.size(); i++)
     {
+        Memory memLoad;
+        memLoad.start();
+
         ioMgr->loadData(params[i]);
         MPI_Barrier(MPI_COMM_WORLD);
 
@@ -108,7 +112,8 @@ int main(int argc, char *argv[])
 
         MPI_Barrier(MPI_COMM_WORLD);
 
-        Timer totTime; totTime.start();
+        Timer totTime; 
+        totTime.start();
         //
         // ---------- Abstract to separate compress/decompress class -----------
         if (inputCompressorType == "blosc")
@@ -183,6 +188,12 @@ int main(int argc, char *argv[])
         }
         totTime.stop();
         debuglog << "Total Runtime: " << totTime.getDuration() << " s" << std::endl << std::endl << std::endl;
+
+        debuglog << "Memory in use: " << memLoad.getMemoryInUseInMB() << " MB" << std::endl;
+        ioMgr->close();
+
+        memLoad.stop();
+        debuglog << "Memory leaked: " << memLoad.getMemorySizeInMB() << " MB" << std::endl;
 
         appendLog(outputLogFile, debuglog);
 		MPI_Barrier(MPI_COMM_WORLD);

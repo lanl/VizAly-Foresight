@@ -26,6 +26,11 @@ class Memory
 	double getMemorySizeInKB(){ return usage_size/1024.0; }
 	double getMemorySizeInMB(){ return usage_size/(1024.0*1024.0); }
 
+	double getMemoryInUseInB();
+	double getMemoryInUseInKB();
+	double getMemoryInUseInMB();
+
+
 	unsigned long getMemoryRSSInB(){ return usage_rss; }
 	double getMemoryRSSInKB(){ return usage_rss/1024.0; }
 	double getMemoryRSSInMB(){ return usage_rss/(1024.0*1024.0); }
@@ -54,6 +59,31 @@ inline void Memory::stop()
 	usage_rss = after_rss - before_rss;
 }
 
+
+double Memory::getMemoryInUseInB()
+{
+	unsigned long after_size, after_rss;
+	GetMemorySize(after_size, after_rss);
+
+	return (after_size - before_size);
+}
+
+double Memory::getMemoryInUseInKB()
+{
+	unsigned long after_size, after_rss;
+	GetMemorySize(after_size, after_rss);
+
+	return (after_size - before_size)/(1024.0);
+}
+
+
+double Memory::getMemoryInUseInMB()
+{
+	unsigned long after_size, after_rss;
+	GetMemorySize(after_size, after_rss);
+
+	return (after_size - before_size)/(1024.0*1024.0);
+}
 
 
 // From VisIt avt/Pipeline/Pipeline/avtMemory.cpp
