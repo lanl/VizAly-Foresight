@@ -1,0 +1,14 @@
+language: cpp
+
+sudo: required
+
+os: linux
+
+notifications:
+  email: false
+
+env:
+  - MPI_IMPL=openmpi
+
+script:
+  - source build.sh
