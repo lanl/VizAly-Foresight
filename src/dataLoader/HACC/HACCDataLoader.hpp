@@ -5,6 +5,7 @@
 #include "thirdparty/genericio/GenericIO.h"
 #include "gioData.hpp"
 #include "dataLoaderInterface.hpp"
+#include "timer.hpp"
 
 class HACCDataLoader: public DataLoaderInterface
 {
@@ -17,7 +18,6 @@ class HACCDataLoader: public DataLoaderInterface
 
     void init(std::string _filename, MPI_Comm _comm);
     int loadData(std::string paramName);
-    std::string getDataInfo();
 };
 
 
@@ -40,21 +40,10 @@ inline void HACCDataLoader::init(std::string _filename, MPI_Comm _comm)
 }
 
 
-inline std::string HACCDataLoader::getDataInfo()
-{
-    std::stringstream dataInfo;
-    dataInfo << myRank << " ~ Loader type: HACC" << std::endl;
-    dataInfo << "Filename: " << filename << std::endl;
-    dataInfo << "Param: " << param << std::endl;
-    dataInfo << "dataType: " << dataType << std::endl;
-    dataInfo << "numElements: " << numElements << std::endl;
-
-    return dataInfo.str();
-}
-
 
 inline int HACCDataLoader::allocateMem(std::string dataType, size_t numElements, int offset)
 {
+    // Allocate mem
     if (dataType == "float")
         data = new float[numElements + offset];
     else if (dataType == "double")
@@ -78,6 +67,7 @@ inline int HACCDataLoader::allocateMem(std::string dataType, size_t numElements,
     else
         return 0;
 
+    // Get size
     if (dataType == "float")
         elemSize = sizeof(float);
     else if (dataType == "double")
@@ -108,6 +98,10 @@ inline int HACCDataLoader::allocateMem(std::string dataType, size_t numElements,
 
 inline int HACCDataLoader::loadData(std::string paramName)
 {
+    Timer clock;
+    log.str("");
+    
+  clock.start();
     gio::GenericIO *gioReader;
     param = paramName;
 
@@ -233,7 +227,8 @@ inline int HACCDataLoader::loadData(std::string paramName)
 
         offset = offset + Np;
     }
-    
+  clock.stop();
+    log << "Loading data took " << clock.getDuration() << " s" << std::endl;
 }
 
 #endif

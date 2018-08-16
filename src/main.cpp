@@ -66,8 +66,7 @@ int main(int argc, char *argv[])
     	params.push_back( jsonInput["input"]["scalars"][j] );
 
     std::string inputCompressorType = jsonInput["compressor"];
-    //std::cout << myRank << " of " << numRanks << std::endl;
-    //return 0;
+
 
 
     //
@@ -91,7 +90,11 @@ int main(int argc, char *argv[])
     {
         ioMgr->loadData(params[i]);
         MPI_Barrier(MPI_COMM_WORLD);
-        metricslog << ioMgr->getDataInfo() << std::endl;
+
+
+        
+        metricslog << ioMgr->getDataInfo();
+        metricslog << ioMgr->getLog();
 
         Timer totTime; totTime.start();
         //
@@ -107,9 +110,12 @@ int main(int argc, char *argv[])
             size_t isize = ioMgr->elemSize*ioMgr->numElements;
             size_t osize = isize + BLOSC_MAX_OVERHEAD;
 
+
+
             void * cdata = std::malloc(isize); //byte array;
             osize = blosc_compress(9, 1, ioMgr->elemSize, isize, ioMgr->data, cdata, osize);
             
+
             if (osize < 0)
             {
                 throw std::runtime_error("Compression error. Error code: " + std::to_string(osize));
@@ -120,7 +126,8 @@ int main(int argc, char *argv[])
             }
             metricslog << inputCompressorType << ":InputBytes: " << isize << " OutputBytes: " << osize << std::endl;
 
-            cTime.stop(); metricslog << inputCompressorType << ":CompressTime: " << cTime.getDuration() << std::endl;
+            cTime.stop(); 
+            metricslog << inputCompressorType << ":CompressTime: " << cTime.getDuration() << std::endl;
 
             // decompress
             Timer dTime; dTime.start();
@@ -133,7 +140,7 @@ int main(int argc, char *argv[])
 
             blosc_destroy();
 
-            
+
             // Compute metrics
             std::vector<double> rel_err(ioMgr->numElements);
             std::vector<double> abs_err(ioMgr->numElements);
@@ -163,17 +170,20 @@ int main(int argc, char *argv[])
             metricslog << "-----------------------------\n";
         }
         totTime.stop();
-        metricslog << "--Field " << params[i]  << " :TotRuntime: " << totTime.getDuration() << std::endl;
+        metricslog << "--Field " << params[i]  << " :TotRuntime: " << totTime.getDuration() << std::endl << std::endl;
 
 		MPI_Barrier(MPI_COMM_WORLD);
 	}
 
+    writeLog(outputLogFile + "_" + std::to_string(myRank), metricslog.str());
+    if (myRank == 0)
+        std::cout << " Complete! " << std::endl;
 
 	MPI_Finalize();
 
-    writeLog(outputLogFile, metricslog.str());
+    
 
-    std::cout << " Complete! " << std::endl;
+    
 	return 0;
 }
 
@@ -181,6 +191,6 @@ int main(int argc, char *argv[])
 /*
 
 Run:
-mpirun -np 2 CBench ../inputs/blosc.json
+mpirun -np 2 CBench ../inputs/jesus_blosc.json
 
 */
