@@ -11,25 +11,16 @@ Pascal Grosset, pascalgrosset@lanl.gov
 
 # Example
 
-A ``Dockerfile`` is provided which shows how to install the dependencies on a CentOS 7 machine.
-To build the Docker image and run a container, do:
-```
-docker build  --tag cbench .
-docker run -it cbench:latest /bin/bash
-```
-
-Then once in the container get GCC with:
-```
-source /src/env.sh
-```
-
 To build the test suite and show the output of a simple example, do:
 ```
 git clone https://github.com/lanl/VizAly-CBench.git
 cd VizAly-CBench
-./config.sh
-./build.sh
-cd run
-bash run.sh ${REMOTE_USERNAME} ${REMOTE_HOSTNAME} ${REMOTE_FILE_PATH}
-cat output/bigcrunch_benchmark/result.csv
+mkdir build
+cd build
+ccmake ../src/
+
+make -j
+
+./CBench ../inputs/jesus_blosc.json
+cat ../testing/data/metrics.txt.log
 ```
