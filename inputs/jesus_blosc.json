@@ -1,0 +1,30 @@
+{
+	"input" : 
+	{
+		"filetype-comment" : "tyep of file to load; HACC or NYX",
+		"filetype" : "HACC",
+
+		"filename-comment": "name of input file",
+		"filename": "..\\testing\\data\\m000.full.mpicosmo.50",
+
+		
+		"scalars-comment" : "which scalars to test",
+		"scalars" : ["x", "y", "z", "vx", "vy", "vz"]
+	},
+
+  "output": {
+    "logfname-comment": "name of output log file",
+    "logfname" : "..\\testing\\data\\metrics.txt"
+  },
+
+
+	"compressor-comment" : "which compressor to test",
+	"compressor" : "blosc",
+
+	"metrics-comment" : "which metrics to use",
+	"metrics" : 
+	[
+		"absolute_error",
+		"relative_error"
+	]
+}
