@@ -7,16 +7,16 @@ VizAly is a general framework for **A**na**ly**sis and **Vi**suali**z**ation of 
 
 # Example
 
-##To build:
+## To build:
 git clone https://github.com/lanl/VizAly-CBench.git
 cd VizAly-CBench
 source build.sh
 
-##Running:
+## Running:
 mpirun -np 2 ./CBench ../inputs/jesus_blosc.json
 
-##Verifying:
-cat ../testing/data/metrics.txt.log
+## Verifying:
+cat ../testing/data/metrics_0.log
 
 
 # Copyright and license
