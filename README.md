@@ -11,6 +11,7 @@ VizAly is a general framework for **A**na**ly**sis and **Vi**suali**z**ation of 
 * OpenMPI 2 or higher
 
 ## Build:
+The folder scrips contains modules to load on the Cooley supercomputer at ANL and Darwin supercomputer at LANL
 ```
 $ git clone https://github.com/lanl/VizAly-CBench.git
 $ cd VizAly-CBench
