@@ -33,6 +33,7 @@ CBench takes as input a json file that specifies the input parameters. The list 
 * metric-filename
 * compressors to use
 * metrics
+
 Examples of input json files are in inputs folder. 
 
 ### Currently Supported file formats:
