@@ -9,6 +9,12 @@ include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/metrics)
 include_directories(${CMAKE_SOURCE_DIR}/utils)
 
+include_directories(${CMAKE_SOURCE_DIR}/compressors)
+include_directories(${CMAKE_SOURCE_DIR}/compressors/BLOSC)
+include_directories(${CMAKE_SOURCE_DIR}/compressors/BigCrunch)
+
+
+
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader/HACC)
 # something for nyx here
