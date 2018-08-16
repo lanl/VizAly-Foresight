@@ -3,14 +3,9 @@
 # get GCC compiler
 source /src/env.sh
 
-# create build dir
-cd /src/VizAly-CBench
-mkdir build
-cd build
-
 # build
-cmake ../src
-make -j
+cd /src/VizAly-CBench
+source build.sh
 
 # run example
 mpirun -np 2 --allow-run-as-root ./CBench ../inputs/blosc.json
