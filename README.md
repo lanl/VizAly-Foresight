@@ -21,7 +21,7 @@ $ source build.sh
 ## Running:
 ```
 $ mpirun -np 2 ./CBench ../inputs/jesus_blosc.json
-$ cat ../testing/data/metrics_0.log
+$ cat metrics_0.log
 ```
 
 # Copyright and license
