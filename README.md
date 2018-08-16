@@ -24,6 +24,22 @@ $ mpirun -np 2 ./CBench ../inputs/jesus_blosc.json
 $ cat metrics_0.log
 ```
 
+# Usage
+The compressor benchmark takes an input a json file that specifies the input parameters to the program. Examples of input files are in inputs. The list of parameters to specity are:
+* filetype (HACC or NYX)
+* filename
+* scalars to analyze
+* log-filename
+* metric-filename
+* compressors to use
+* metrics
+
+## Currently Supported file formats
+* GenericIO
+
+## Currently Supported compressors
+* Lossless BLOSC
+
 # Copyright and license
 LANS has asserted copyright on the software package C17078, entitled Framework for Analysis and Visualization of Simulation Data.   
 
