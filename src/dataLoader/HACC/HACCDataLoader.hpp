@@ -14,10 +14,13 @@ class HACCDataLoader: public DataLoaderInterface
 
   public:
     HACCDataLoader();
+    ~HACCDataLoader();
     int allocateMem(std::string dataType, size_t numElements, int offset);
+    int deAllocateMem();
 
     void init(std::string _filename, MPI_Comm _comm);
     int loadData(std::string paramName);
+    int close(){ deAllocateMem(); }
 };
 
 
@@ -28,6 +31,11 @@ inline HACCDataLoader::HACCDataLoader()
     loader = "HACC";
 }
 
+inline HACCDataLoader::~HACCDataLoader()
+{
+    deAllocateMem();
+}
+
 
 inline void HACCDataLoader::init(std::string _filename, MPI_Comm _comm)
 {
@@ -36,8 +44,6 @@ inline void HACCDataLoader::init(std::string _filename, MPI_Comm _comm)
 
     MPI_Comm_size(comm, &numRanks);
     MPI_Comm_rank(comm, &myRank);
-
-    //std::cout << myRank << " ~ " << myRank << " _of_ " << numRanks << std::endl;
 }
 
 
@@ -95,6 +101,39 @@ inline int HACCDataLoader::allocateMem(std::string dataType, size_t numElements,
     return 1;
 }
 
+
+inline int HACCDataLoader::deAllocateMem()
+{
+    if (data == NULL) // already deallocated!
+        return 1;
+
+    if (dataType == "float")
+        delete[](float*) data;
+    else if (dataType == "double")
+        delete[](double*) data;
+    else if (dataType == "int8_t")
+        delete[](int8_t*) data;
+    else if (dataType == "int16_t")
+        delete[](int16_t*) data;
+    else if (dataType == "int32_t")
+        delete[](int32_t*) data;
+    else if (dataType == "int64_t")
+        delete[](int64_t*) data;
+    else if (dataType == "uint8_t")
+        delete[](uint8_t*) data;
+    else if (dataType == "uint16_t")
+        delete[](uint16_t*) data;
+    else if (dataType == "uint32_t")
+        delete[](uint32_t*) data;
+    else if (dataType == "uint64_t")
+        delete[](uint64_t*) data;
+    else
+        return 0;
+
+    data = NULL;
+
+    return 1;
+}
 
 
 inline int HACCDataLoader::loadData(std::string paramName)

@@ -24,6 +24,7 @@ class DataLoaderInterface
   public:
     virtual void init(std::string _filename, MPI_Comm _comm) = 0;
     virtual int loadData(std::string paramName) = 0;
+    virtual int close() = 0;
 
     std::string getDataInfo();
     std::string getLog() { return log.str(); }
@@ -36,14 +37,10 @@ class DataLoaderInterface
 
 inline std::string DataLoaderInterface::getDataInfo()
 {
-    int myRank;
-    MPI_Comm_rank(comm, &myRank);
-
     std::stringstream dataInfo;
-    dataInfo << "Loader type: " << loader << std::endl;
+    dataInfo << "\nLoader type: " << loader << std::endl;
     dataInfo << "Filename: " << filename << std::endl;
     dataInfo << "Total number of elements: " << totalNumberOfElements << std::endl;
-    //dataInfo << "\nRank: " << myRank << std::endl;
     dataInfo << "Param: " << param << std::endl;
     dataInfo << "dataType: " << dataType << std::endl;
     dataInfo << "numElements: " << numElements << std::endl;
