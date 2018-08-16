@@ -16,4 +16,4 @@ make -j
 ./CBench ../inputs/blosc.json
 
 # view output
-cat ../testing/data/metrics.txt.log
+cat ../testing/data/metrics.txt
