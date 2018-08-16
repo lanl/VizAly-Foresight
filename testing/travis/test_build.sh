@@ -13,7 +13,7 @@ cmake ../src
 make -j
 
 # run example
-./CBench ../inputs/blosc.json
+mpirun -np 2 --allow-run-as-root ./CBench ../inputs/blosc.json
 
 # view output
 cat runlog_0.log
