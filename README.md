@@ -25,7 +25,7 @@ $ cat metrics_0.log
 ```
 
 # Usage
-The compressor benchmark takes an input a json file that specifies the input parameters to the program. Examples of input files are in inputs. The list of parameters to specity are:
+CBench takes as input a json file that specifies the input parameters. The list of parameters to specity are:
 * filetype (HACC or NYX)
 * filename
 * scalars to analyze
@@ -33,6 +33,7 @@ The compressor benchmark takes an input a json file that specifies the input par
 * metric-filename
 * compressors to use
 * metrics
+Examples of input json files are in inputs folder. 
 
 ### Currently Supported file formats:
 * GenericIO
