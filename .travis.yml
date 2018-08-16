@@ -1,14 +1,18 @@
-language: cpp
-
 sudo: required
 
-os: linux
+services:
+  - docker
 
-notifications:
-  email: false
-
-env:
-  - MPI_IMPL=openmpi
-
-script:
-  - source build.sh
+jobs:
+  include:
+    #- stage: push docker image
+    #  script:
+    #  - docker build -t cbench .
+    #  - docker tag cbench:latest cmbiwer/vizaly-cbench:v0
+    #  - docker push cmbiwer/vizaly-cbench
+    - stage: test build
+      script:
+      # pull container
+      - docker pull cmbiwer/vizaly-cbench:v0
+      # create a volume and run testing/travis/test_build.sh
+      - docker run -v "$(pwd)":/src/VizAly-CBench -it cmbiwer/vizaly-cbench:v0 /bin/bash /src/VizAly-CBench/testing/travis/test_build.sh

@@ -29,3 +29,5 @@ LANS has asserted copyright on the software package C17078, entitled Framework f
 
 # Contact
 Pascal Grosset, pascalgrosset@lanl.gov
+
+https://travis-ci.org/lanl/VizAly-CBench.svg?branch=master
