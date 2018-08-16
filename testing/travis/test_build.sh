@@ -1,17 +1,19 @@
 #! /bin/bash
 
-ls
-pwd
-
+# get GCC compiler
 source /src/env.sh
 
+# create build dir
 cd /src/VizAly-CBench
 mkdir build
 cd build
-cmake ../src
 
+# build
+cmake ../src
 make -j
 
+# run example
 ./CBench ../inputs/blosc.json
 
+# view output
 cat ../testing/data/metrics.txt.log
