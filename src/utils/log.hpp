@@ -101,6 +101,15 @@ inline std::string Log::getLog()
 ///////////////////////////////////////////////////////////////////////////////////
 ///////////// Simple Logging
 
+inline void writeFile(std::string filename, std::string log)
+{
+	std::ofstream outputFile( filename.c_str(), std::ios::out);
+	outputFile << log;
+	outputFile.close();
+}
+
+
+
 inline void writeLog(std::string filename, std::string log)
 {
 	std::ofstream outputFile( (filename+ ".log").c_str(), std::ios::out);
@@ -115,11 +124,22 @@ inline void writeLogApp(std::string filename, std::string log)
 	outputFile.close();
 }
 
-inline void writeLogNew(std::string filename, std::string log)
+
+
+inline void writeLog(std::string filename, std::stringstream log)
 {
 	std::ofstream outputFile( (filename+ ".log").c_str(), std::ios::out);
-	outputFile << log;
+	outputFile << log.str();
 	outputFile.close();
+}
+
+inline void appendLog(std::string filename, std::stringstream & log)
+{
+	std::ofstream outputFile( (filename+ ".log").c_str(), std::ios::out | std::ios::app);
+	outputFile << log.str();
+	outputFile.close();
+
+	log.str("");	// clears the log
 }
 
 #endif

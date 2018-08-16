@@ -59,7 +59,11 @@ int main(int argc, char *argv[])
 	// Load in the parameters
 	std::string inputFileType = jsonInput["input"]["filetype"]; 
 	std::string inputFile = jsonInput["input"]["filename"]; 
+
     std::string outputLogFile = jsonInput["output"]["logfname"];
+    outputLogFile += "_" + std::to_string(myRank);
+
+    std::string metricsFile = jsonInput["output"]["metricsfname"];
 
 	std::vector< std::string > params;
 	for (int j=0; j<jsonInput["input"]["scalars"].size(); j++)
@@ -68,6 +72,13 @@ int main(int argc, char *argv[])
     std::string inputCompressorType = jsonInput["compressor"];
 
 
+
+    //
+    // Create log and metrics files
+    std::stringstream debuglog;
+    std::stringstream metricslog;
+
+    writeLog(outputLogFile, debuglog.str());
 
     //
 	// Open file
@@ -83,7 +94,7 @@ int main(int argc, char *argv[])
 
 	ioMgr->init(inputFile, MPI_COMM_WORLD);
 
-    std::stringstream metricslog;
+    
     //
 	// Cycle through params
     for (int i = 0; i < params.size(); i++)
@@ -91,10 +102,11 @@ int main(int argc, char *argv[])
         ioMgr->loadData(params[i]);
         MPI_Barrier(MPI_COMM_WORLD);
 
+        debuglog << ioMgr->getDataInfo();
+        debuglog << ioMgr->getLog();
+        appendLog(outputLogFile, debuglog);
 
-        
-        metricslog << ioMgr->getDataInfo();
-        metricslog << ioMgr->getLog();
+        MPI_Barrier(MPI_COMM_WORLD);
 
         Timer totTime; totTime.start();
         //
@@ -124,10 +136,10 @@ int main(int argc, char *argv[])
             {
                 cdata = std::realloc(cdata, osize);
             }
-            metricslog << inputCompressorType << ":InputBytes: " << isize << " OutputBytes: " << osize << std::endl;
+            debuglog << "\n" << inputCompressorType << " ~ InputBytes: " << isize << ", OutputBytes: " << osize << std::endl;
 
             cTime.stop(); 
-            metricslog << inputCompressorType << ":CompressTime: " << cTime.getDuration() << std::endl;
+            debuglog << inputCompressorType << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
 
             // decompress
             Timer dTime; dTime.start();
@@ -136,7 +148,7 @@ int main(int argc, char *argv[])
             size_t sz = blosc_decompress(cdata, decompdata, osize);
             if (sz < 0)
                 throw std::runtime_error("Decompression error. Error code: " + std::to_string(sz));
-            dTime.stop(); metricslog << inputCompressorType << ":DeompressTime: " << cTime.getDuration() << std::endl;
+            dTime.stop(); debuglog << inputCompressorType << " ~ DeompressTime: " << cTime.getDuration() << " s " << std::endl;
 
             blosc_destroy();
 
@@ -164,18 +176,19 @@ int main(int argc, char *argv[])
             double total_rel_err = total_max_rel_err;
             double total_abs_err = total_max_abs_err;
            
-            metricslog << "----- " << params[i] << " error metrics ----- " << std::endl;
-            metricslog << " Max Rel Error: " << total_rel_err << std::endl;
-            metricslog << " Max Abs Error: " << total_abs_err << std::endl;
-            metricslog << "-----------------------------\n";
+            debuglog << "\n ----- " << params[i] << " error metrics ----- " << std::endl;
+            debuglog << " Max Rel Error: " << total_rel_err << std::endl;
+            debuglog << " Max Abs Error: " << total_abs_err << std::endl;
+            debuglog << "-----------------------------\n";
         }
         totTime.stop();
-        metricslog << "--Field " << params[i]  << " :TotRuntime: " << totTime.getDuration() << std::endl << std::endl;
+        debuglog << "Total Runtime: " << totTime.getDuration() << " s" << std::endl << std::endl << std::endl;
 
+        appendLog(outputLogFile, debuglog);
 		MPI_Barrier(MPI_COMM_WORLD);
 	}
 
-    writeLog(outputLogFile + "_" + std::to_string(myRank), metricslog.str());
+    //writeLog(outputLogFile, outputLogFile.str());
     if (myRank == 0)
         std::cout << " Complete! " << std::endl;
 

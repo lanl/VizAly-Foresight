@@ -25,6 +25,7 @@ inline HACCDataLoader::HACCDataLoader()
 {
     myRank = 0;
     numRanks = 0;
+    loader = "HACC";
 }
 
 
@@ -113,9 +114,11 @@ inline int HACCDataLoader::loadData(std::string paramName)
     int numDataRanks = gioReader->readNRanks();
 
     // Count number of elements
-    size_t totalNumberOfElements = 0;
+    totalNumberOfElements = 0;
     for (int i=0; i<numDataRanks; ++i)
         totalNumberOfElements += gioReader->readNumElems(i);
+
+
 
     //std::cout << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
 

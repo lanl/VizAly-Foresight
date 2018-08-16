@@ -13,8 +13,11 @@
 	},
 
   "output": {
-    "logfname-comment": "name of output log file",
-    "logfname" : "metrics"
+	"logfname-comment": "name of output log file",
+    "logfname" : "runlog",
+
+    "metricsfname-comment": "name of file with output",
+    "metricsfname" : "metrics"
   },
 
 
