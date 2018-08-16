@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
             size_t sz = blosc_decompress(cdata, decompdata, osize);
             if (sz < 0)
                 throw std::runtime_error("Decompression error. Error code: " + std::to_string(sz));
-            dTime.stop(); debuglog << inputCompressorType << " ~ DeompressTime: " << cTime.getDuration() << " s " << std::endl;
+            dTime.stop(); debuglog << inputCompressorType << " ~ DeompressTime: " << dTime.getDuration() << " s " << std::endl;
 
             blosc_destroy();
 
