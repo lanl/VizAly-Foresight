@@ -25,7 +25,7 @@ $ cat metrics_0.log
 ```
 
 # Usage
-CBench takes as input a json file that specifies the input parameters. The list of parameters to specity are:
+CBench takes as input a json file (examples of input json files are in the **_inputs_** folder) that specifies the input parameters. The list of parameters to specity are:
 * filetype (HACC or NYX)
 * filename
 * scalars to analyze
@@ -34,7 +34,7 @@ CBench takes as input a json file that specifies the input parameters. The list 
 * compressors to use
 * metrics
 
-Examples of input json files are in the **_inputs_** folder. 
+ 
 
 ### Currently Supported file formats:
 * GenericIO
