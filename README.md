@@ -59,7 +59,9 @@ Each compressor has its own class with the following four functions:
 # Copyright and license
 LANS has asserted copyright on the software package C17078, entitled Framework for Analysis and Visualization of Simulation Data.   
 
-# Contact
-Pascal Grosset, pascalgrosset@lanl.gov
+# Developers
+* Chris Biwer
+* Pascal Grosset
+* Jesus Pulido
 
 [![Build Status](https://travis-ci.org/lanl/VizAly-CBench.svg?branch=master)](https://travis-ci.org/lanl/VizAly-CBench)
