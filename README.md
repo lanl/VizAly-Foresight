@@ -20,19 +20,19 @@ $ source build.sh
 
 ## Running:
 ```
-$ mpirun -np 2 ./CBench ../inputs/jesus_blosc.json
+$ mpirun -np 2 ./CBench ../inputs/blosc.json
 $ cat runlog_0.log
 ```
 
 # Usage
 CBench takes as input a json file (examples of input json files are in the **_inputs_** folder) that specifies the input parameters. The list of parameters to specity are:
-* filetype (HACC or NYX)
-* filename
-* scalars to analyze
-* log-filename
-* metric-filename
-* compressors to use
-* metrics
+* Filetype (HACC or NYX)
+* Filename
+* Scalars to analyze
+* Log-filename
+* Metric-filename
+* Compressors to use
+* Metrics
 
 ### Currently Supported file formats:
 * GenericIO
@@ -44,7 +44,8 @@ CBench takes as input a json file (examples of input json files are in the **_in
 ### Currently Supported metrics:
 * Absolute Error
 * Relative Error
-* Runtime and Memory Usage
+* Runtime
+* Memory Usage
 
 # Copyright and license
 LANS has asserted copyright on the software package C17078, entitled Framework for Analysis and Visualization of Simulation Data.   
