@@ -60,7 +60,7 @@ endif()
 add_executable(CBench main.cpp)
 target_link_libraries(CBench ${MPI_LIBRARIES} GenericIO)
 target_link_libraries(CBench blosc)
-target_link_libraries(CBench BigCrunch)
+target_link_libraries(CBench bigcrunch)
 
 
 # Prevent in source builds since they are evil
