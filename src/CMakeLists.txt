@@ -37,6 +37,9 @@ include(CheckIncludeFiles)
 include(ExternalProject)
 add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2")
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2/blosc)
+add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch")
+include_directories(${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch/include)
+
 
 # MPI
 find_package(MPI)
@@ -57,6 +60,7 @@ endif()
 add_executable(CBench main.cpp)
 target_link_libraries(CBench ${MPI_LIBRARIES} GenericIO)
 target_link_libraries(CBench blosc)
+target_link_libraries(CBench BigCrunch)
 
 
 # Prevent in source builds since they are evil
