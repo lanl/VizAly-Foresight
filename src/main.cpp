@@ -24,7 +24,7 @@
 #include "HACCDataLoader.hpp"
 
 // Compressors
-#include "BLOSCCompressor.hpp"
+#include "blosccompressor.hpp"
 #include "BigCrunchCompressor.hpp"
 
 
