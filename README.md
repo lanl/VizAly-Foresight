@@ -43,9 +43,9 @@ CBench takes as input a json file (examples of input json files are in the **_in
 * Lossless BLOSC
 
 ### Currently Supported metrics:
-* absolute error
-* relative error
-
+* Absolute Error
+* Relative Error
+* Runtime and Memory Usage
 
 # Copyright and license
 LANS has asserted copyright on the software package C17078, entitled Framework for Analysis and Visualization of Simulation Data.   
