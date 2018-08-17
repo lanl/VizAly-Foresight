@@ -1,33 +1,30 @@
 {
-	"input" : 
-	{
-		"filetype-comment" : "tyep of file to load; HACC or NYX",
-		"filetype" : "HACC",
+  "input": {
+    "filetype-comment": "type of file to load; HACC or NYX",
+    "filetype": "HACC",
 
-		"filename-comment": "name of input file",
-		"filename": "../testing/data/m000.full.mpicosmo.50",
+    "filename-comment": "name of input file",
+    "filename": "../testing/data/m000.full.mpicosmo.50",
 
-		
-		"scalars-comment" : "which scalars to test",
-		"scalars" : ["x", "y", "z", "vx", "vy", "vz"]
-	},
+    "scalars-comment": "which scalars to test",
+    "scalars": [ "x", "y", "z", "vx", "vy", "vz" ]
+  },
 
   "output": {
-	"logfname-comment": "name of output log file",
-    "logfname" : "runlog",
+    "logfname-comment": "name of output log file",
+    "logfname": "runlog",
 
     "metricsfname-comment": "name of file with output",
-    "metricsfname" : "metrics"
+    "metricsfname": "metrics"
   },
 
 
-	"compressor-comment" : "which compressor to test",
-	"compressor" : "blosc",
+  "compressor-comment": "which compressor to test",
+  "compressors": [ "blosc", "BigCrunch" ],
 
-	"metrics-comment" : "which metrics to use",
-	"metrics" : 
-	[
-		"absolute_error",
-		"relative_error"
-	]
+  "metrics-comment": "which metrics to use",
+  "metrics": [
+    "absolute_error",
+    "relative_error"
+  ]
 }

@@ -2,11 +2,17 @@
 #define _MEM_H_
 
 #if defined(__unix__) || defined(__unix) || defined(unix) 
-
 #include <sys/sysinfo.h>
+#include <unistd.h>
+#endif // Linux
+
+#if defined(WIN32)
+#include <windows.h>
+#include "psapi.h" //MSVC Performance query
+#endif // Windows
+
 #include <stdio.h>
 #include <iostream>
-#include <unistd.h>
 
 class Memory
 {
@@ -85,7 +91,7 @@ double Memory::getMemoryInUseInMB()
 	return (after_size - before_size)/(1024.0*1024.0);
 }
 
-
+#if defined(__unix__) || defined(__unix) || defined(unix) 
 // From VisIt avt/Pipeline/Pipeline/avtMemory.cpp
 inline void Memory::GetMemorySize(unsigned long &size, unsigned long &rss)
 {
@@ -106,7 +112,42 @@ inline void Memory::GetMemorySize(unsigned long &size, unsigned long &rss)
     rss  *= (unsigned long)getpagesize();
     fclose(file);
 }
-
-
 #endif	// Linux
+
+#if defined(WIN32)
+inline void Memory::GetMemorySize(unsigned long &size, unsigned long &rss)
+{
+	//Total Virtual Memory
+	//MEMORYSTATUSEX memInfo;
+	//memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+	//GlobalMemoryStatusEx(&memInfo);
+	//DWORDLONG totalVirtualMem = memInfo.ullTotalPageFile;
+
+	//System Virtual Memory Used
+	//DWORDLONG virtualMemUsed = memInfo.ullTotalPageFile - memInfo.ullAvailPageFile;
+
+	//System Total Physical RAM
+	//DWORDLONG totalPhysMem = memInfo.ullTotalPhys;
+
+	//Total Physical Memory Used
+	//DWORDLONG physMemUsed = memInfo.ullTotalPhys - memInfo.ullAvailPhys;
+
+	//Virtual Memory by current process
+	PROCESS_MEMORY_COUNTERS_EX pmc;
+	GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
+	SIZE_T virtualMemUsedByMe = pmc.PrivateUsage;
+
+	//Physical Memory Used by Current Process
+	SIZE_T physMemUsedByMe = pmc.WorkingSetSize;
+
+	//cout << "Virtual Memory: " << virtualMemUsed / (1024 * 1024) << " / " << totalVirtualMem / (1024 * 1024) << " MB \n";
+	//cout << "Physical Memory: " << physMemUsed / (1024 * 1024) << " / " << totalPhysMem / (1024 * 1024) << " MB\n";
+	//std::cout << "Current Process: Virt: " << virtualMemUsedByMe / (1024 * 1024) << " MB Phys: " << physMemUsedByMe / (1024 * 1024) << " MB\n";
+	//std::cout << "\n";
+
+	size = virtualMemUsedByMe;
+	rss = physMemUsedByMe;
+}
+#endif // Windows
+
 #endif	// _MEM_H_2
