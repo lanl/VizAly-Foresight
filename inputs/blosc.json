@@ -21,7 +21,7 @@
   	},
 
 	"compressor-comment" : "which compressor to test",
-	"compressors" : ["blosc", "BigCruch"],
+	"compressors" : ["blosc", "BigCrunch"],
 
 	"metrics-comment" : "which metrics to use",
   "metrics": [

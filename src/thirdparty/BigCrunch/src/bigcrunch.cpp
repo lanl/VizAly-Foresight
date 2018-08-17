@@ -22,7 +22,7 @@ namespace bigcrunch
         {
             switch(setting.first)
             {
-            case config_t::ERROR:
+            case config_t::ERR:
                 this->error = setting.second;
                 break;
             case config_t::TOLERANCE:

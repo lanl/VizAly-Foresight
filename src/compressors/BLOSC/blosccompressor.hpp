@@ -17,6 +17,8 @@ class BLOSCCompressor: public CompressorInterface
     int compress(void *input, void *&output, size_t dataType, size_t n);
     int decompress(void *&input, void *&output, size_t dataType, size_t n);
     void close();
+
+	size_t cbytes;
 };
 
 inline BLOSCCompressor::BLOSCCompressor()
@@ -45,7 +47,7 @@ inline int BLOSCCompressor::compress(void *input, void *&output, size_t dataType
 
 	output = std::malloc(isize); //byte array;
 	osize = blosc_compress(9, 1, dataType, isize, input, output, osize);
-
+	
 	if (osize < 0)
 	{
 		throw std::runtime_error("Compression error. Error code: " + std::to_string(osize));
@@ -54,10 +56,12 @@ inline int BLOSCCompressor::compress(void *input, void *&output, size_t dataType
 	{
 		output = std::realloc(output, osize);
 	}
-	std::cout << "\n" << compressorName << " ~ InputBytes: " << isize << ", OutputBytes: " << osize << ", cRatio: " << (isize/osize) << std::endl;
 	cTime.stop();
 
-	std::cout << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
+	cbytes = osize;
+
+	log << "\n" << compressorName << " ~ InputBytes: " << isize << ", OutputBytes: " << osize << ", cRatio: " << (isize/osize) << std::endl;
+	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
 
     return 1;
 }

@@ -24,11 +24,8 @@
 #include "HACCDataLoader.hpp"
 
 // Compressors
-extern "C"
-{
-    #include <blosc.h>
-}
 #include "BLOSCCompressor.hpp"
+#include "BigCrunchCompressor.hpp"
 
 
 int main(int argc, char *argv[])
@@ -107,9 +104,11 @@ int main(int argc, char *argv[])
     for (int c=0; c<compressors.size(); ++c)
     {
 
-        if (compressors[c] == "blosc")
-            compressorMgr = new BLOSCCompressor();
-        else
+		if (compressors[c] == "blosc")
+			compressorMgr = new BLOSCCompressor();
+		else if (compressors[c] == "BigCrunch")
+			compressorMgr = new BigCrunchCompressor();
+		else
         {
             std::cout << "Unsupported compressor: " << compressors[c] << "...Skipping!" << std::endl;
             continue;
@@ -133,22 +132,18 @@ int main(int argc, char *argv[])
 
             MPI_Barrier(MPI_COMM_WORLD);
 
-            /*
-            Timer totTime; 
-            totTime.start();
-		    */
-
 			//
 			// compress
 			void * cdata = NULL;
-			
 			compressorMgr->compress(ioMgr->data, cdata, ioMgr->type(), ioMgr->size());
-			std::cout << " cdata: " << cdata << std::endl;
 
 			//
 			// decompress
 			void * decompdata = NULL;
             compressorMgr->decompress(cdata, decompdata, ioMgr->type(), ioMgr->size() );
+
+			writeLogApp(outputLogFile, compressorMgr->getLog());
+			compressorMgr->clearLog();
 
 			//
             // Compute metrics
@@ -178,11 +173,6 @@ int main(int argc, char *argv[])
             debuglog << " Max Rel Error: " << total_rel_err << std::endl;
             debuglog << " Max Abs Error: " << total_abs_err << std::endl;
             debuglog << "-----------------------------\n";
-            
-            /*
-            totTime.stop();
-            debuglog << "Total Runtime: " << totTime.getDuration() << " s" << std::endl << std::endl << std::endl;
-            */
 
 			std::free(decompdata);
 
