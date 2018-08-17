@@ -123,7 +123,7 @@ namespace bigcrunch
      */
     enum config_t
     {
-        ERROR,
+        ERR,
         TOLERANCE,
         BLOSC_NTHREADS,
         BLOSC_COMPRESSOR,
