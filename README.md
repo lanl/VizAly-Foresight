@@ -47,6 +47,16 @@ CBench takes as input a json file (examples of input json files are in the **_in
 * Runtime
 * Memory Usage
 
+# Design
+
+## Compressor interface
+
+Each compressor has its own class with the following four functions:
+* ``init`` to initialize the compressor
+* ``compress`` to compress the data
+* ``decompress`` to decompress the data
+* ``close`` to remove anything after the test
+
 # Copyright and license
 LANS has asserted copyright on the software package C17078, entitled Framework for Analysis and Visualization of Simulation Data.   
 
