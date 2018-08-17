@@ -7,7 +7,7 @@ VizAly is a general framework for **A**na**ly**sis and **Vi**suali**z**ation of 
 # Installing VizAly-CBench
 ## Requirements:
 * CMake 3.6.2 or higher
-* GCC 4.9 or higher
+* GCC 4.9 or higher (C++11 minimum)
 * OpenMPI 2 or higher
 
 ## Build:
@@ -21,7 +21,7 @@ $ source build.sh
 ## Running:
 ```
 $ mpirun -np 2 ./CBench ../inputs/jesus_blosc.json
-$ cat metrics_0.log
+$ cat runlog_0.log
 ```
 
 # Usage
@@ -34,13 +34,12 @@ CBench takes as input a json file (examples of input json files are in the **_in
 * compressors to use
 * metrics
 
- 
-
 ### Currently Supported file formats:
 * GenericIO
 
 ### Currently Supported compressors:
 * Lossless BLOSC
+* Lossy BigCrunch
 
 ### Currently Supported metrics:
 * Absolute Error
