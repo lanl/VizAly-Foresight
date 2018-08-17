@@ -45,7 +45,6 @@ CBench takes as input a json file (examples of input json files are in the **_in
 * Absolute Error
 * Relative Error
 * Runtime
-* Memory Usage
 
 # Design
 
