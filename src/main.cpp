@@ -25,7 +25,7 @@
 
 // Compressors
 #include "blosccompressor.hpp"
-#include "BigCrunchCompressor.hpp"
+#include "BigCrunchcompressor.hpp"
 
 
 int main(int argc, char *argv[])
