@@ -80,6 +80,7 @@ int main(int argc, char *argv[])
 
     writeLog(outputLogFile, debuglog.str());
 
+
     //
 	// Open file
     DataLoaderInterface *ioMgr;
@@ -95,9 +96,9 @@ int main(int argc, char *argv[])
 	ioMgr->init(inputFile, MPI_COMM_WORLD);
 
 	std::cout << "Starting compressors...\n";
+
     // 
     // Cycle through compressors and parameters
-
     CompressorInterface *compressorMgr;
 
     // Compressors
@@ -123,7 +124,8 @@ int main(int argc, char *argv[])
             Memory memLoad;
             memLoad.start();
 
-            ioMgr->loadData(params[i]);
+            assert ( ioMgr->loadData(params[i]) == 1);
+
             MPI_Barrier(MPI_COMM_WORLD);
 
             debuglog << ioMgr->getDataInfo();
@@ -194,8 +196,6 @@ int main(int argc, char *argv[])
         std::cout << " Complete! " << std::endl;
 
 	MPI_Finalize();
-
-    
 
     
 	return 0;
