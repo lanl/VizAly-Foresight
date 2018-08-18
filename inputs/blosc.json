@@ -11,7 +11,6 @@
 		"scalars" : ["x", "y", "z", "vx", "vy", "vz"]
 	},
 
-
   	"output": 
   	{
 		"logfname-comment": "name of output log file",
@@ -22,7 +21,7 @@
   	},
 
 	"compressor-comment" : "which compressor to test",
-	"compressors" : ["blosc", "bigCruch"],
+	"compressors" : ["blosc", "BigCrunch"],
 
 	"metrics-comment" : "which metrics to use",
   "metrics": [

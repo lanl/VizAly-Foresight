@@ -158,12 +158,9 @@ int main(int argc, char *argv[])
                 rel_err.push_back(err);
                 abs_err.push_back(err2);
             }
-            totTime.stop();
-            debuglog << "Total Runtime: " << totTime.getDuration() << " s" << std::endl << std::endl << std::endl;
-            */
 
-            debuglog << "Memory in use: " << memLoad.getMemoryInUseInMB() << " MB" << std::endl;
-            ioMgr->close();
+            double max_rel_err = *std::max_element(rel_err.begin(), rel_err.end());
+            double max_abs_err = *std::max_element(abs_err.begin(), abs_err.end());
 
             double total_max_rel_err = 0;
             double total_max_abs_err = 0;
