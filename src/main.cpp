@@ -15,20 +15,17 @@
 #include "relativeError.hpp"
 #include "absoluteError.hpp"
 
+// Interfaces
+#include "dataLoaderInterface.hpp"
+#include "compressorInterface.hpp"
+
 // Readers
 #include "thirdparty/genericio/GenericIO.h"
-
-// Compressors
-extern "C"
-{
-    #include <blosc.h>
-}
-
-#include "dataLoaderInterface.hpp"
 #include "HACCDataLoader.hpp"
 
-#include "compressorInterface.hpp"
-#include "BLOSCCompressor.hpp"
+// Compressors
+#include "blosccompressor.hpp"
+#include "BigCrunchcompressor.hpp"
 
 
 int main(int argc, char *argv[])
@@ -72,8 +69,8 @@ int main(int argc, char *argv[])
     	params.push_back( jsonInput["input"]["scalars"][j] );
 
     std::vector< std::string > compressors;
-    for (int j=0; j<jsonInput["input"]["compressors"].size(); j++)
-        compressors.push_back( jsonInput["input"]["compressors"][j] );
+    for (int j=0; j<jsonInput["compressors"].size(); j++)
+        compressors.push_back( jsonInput["compressors"][j] );
 
 
     //
@@ -97,7 +94,7 @@ int main(int argc, char *argv[])
 
 	ioMgr->init(inputFile, MPI_COMM_WORLD);
 
-    
+	std::cout << "Starting compressors...\n";
     // 
     // Cycle through compressors and parameters
 
@@ -107,20 +104,24 @@ int main(int argc, char *argv[])
     for (int c=0; c<compressors.size(); ++c)
     {
 
-        if (compressors[c] == "BLOSC")
-            compressorMgr = new BLOSCCompressor();
-        else
+		if (compressors[c] == "blosc")
+			compressorMgr = new BLOSCCompressor();
+		else if (compressors[c] == "BigCrunch")
+			compressorMgr = new BigCrunchCompressor();
+		else
         {
-            std::cout << "Unsupported compressor!!!" << std::endl;
+            std::cout << "Unsupported compressor: " << compressors[c] << "...Skipping!" << std::endl;
             continue;
         }  
 
+		// init
+		compressorMgr->init();
 
     	// Cycle through params
         for (int i=0; i<params.size(); i++)
         {
             Memory memLoad;
-          memLoad.start();
+            memLoad.start();
 
             ioMgr->loadData(params[i]);
             MPI_Barrier(MPI_COMM_WORLD);
@@ -131,84 +132,52 @@ int main(int argc, char *argv[])
 
             MPI_Barrier(MPI_COMM_WORLD);
 
-            /*
-            Timer totTime; 
-            totTime.start();
-            //
-            // ---------- Abstract to separate compress/decompress class -----------
-            if (inputCompressorType == "blosc")
+			//
+			// compress
+			void * cdata = NULL;
+			compressorMgr->compress(ioMgr->data, cdata, ioMgr->type(), ioMgr->size());
+
+			//
+			// decompress
+			void * decompdata = NULL;
+            compressorMgr->decompress(cdata, decompdata, ioMgr->type(), ioMgr->size() );
+
+			writeLogApp(outputLogFile, compressorMgr->getLog());
+			compressorMgr->clearLog();
+
+			//
+            // Compute metrics
+            std::vector<double> rel_err(ioMgr->size());
+            std::vector<double> abs_err(ioMgr->size());
+                
+            for (std::size_t j = 0; j < ioMgr->size(); ++j)
             {
-                //Timer initTime; initTime.start();
-                blosc_init();
-                //initTime.stop(); metricslog << inputCompressorType << ":InitTime: " << initTime.getDuration() << std::endl;
-                // compress
-                Timer cTime; cTime.start();
-                // Default Input Params: {clevel=9, shuffle=1, sizeof(data), idatasize, idata, cdata, odatasize);
-                size_t isize = ioMgr->elemSize*ioMgr->numElements;
-                size_t osize = isize + BLOSC_MAX_OVERHEAD;
-
-
-
-                void * cdata = std::malloc(isize); //byte array;
-                osize = blosc_compress(9, 1, ioMgr->elemSize, isize, ioMgr->data, cdata, osize);
-                
-
-                if (osize < 0)
-                {
-                    throw std::runtime_error("Compression error. Error code: " + std::to_string(osize));
-                }
-                if (osize > 0)
-                {
-                    cdata = std::realloc(cdata, osize);
-                }
-                debuglog << "\n" << inputCompressorType << " ~ InputBytes: " << isize << ", OutputBytes: " << osize << std::endl;
-
-                cTime.stop(); 
-                debuglog << inputCompressorType << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
-
-                // decompress
-                Timer dTime; dTime.start();
-                osize = ioMgr->elemSize*ioMgr->numElements;
-                void * decompdata = std::malloc(osize);
-                size_t sz = blosc_decompress(cdata, decompdata, osize);
-                if (sz < 0)
-                    throw std::runtime_error("Decompression error. Error code: " + std::to_string(sz));
-                dTime.stop(); debuglog << inputCompressorType << " ~ DeompressTime: " << dTime.getDuration() << " s " << std::endl;
-
-                blosc_destroy();
-
-
-                // Compute metrics
-                std::vector<double> rel_err(ioMgr->numElements);
-                std::vector<double> abs_err(ioMgr->numElements);
-                
-                for (std::size_t j = 0; j < ioMgr->numElements; ++j)
-                {
-                    // Max set tolerence to 1
-                    double err = relativeError(static_cast<float *>(ioMgr->data)[j], static_cast<float *>(decompdata)[j], 1);
-                    double err2 = absoluteError(static_cast<float *>(ioMgr->data)[j], static_cast<float *>(decompdata)[j]);
-                    rel_err.push_back(err);
-                    abs_err.push_back(err2);
-                }
-
-                double max_rel_err = *std::max_element(rel_err.begin(), rel_err.end());
-                double max_abs_err = *std::max_element(abs_err.begin(), abs_err.end());
-
-                double total_max_rel_err = 0;
-                double total_max_abs_err = 0;
-                MPI_Reduce(&max_rel_err, &total_max_rel_err, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-                MPI_Reduce(&max_abs_err, &total_max_abs_err, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-                double total_rel_err = total_max_rel_err;
-                double total_abs_err = total_max_abs_err;
-               
-                debuglog << "\n ----- " << params[i] << " error metrics ----- " << std::endl;
-                debuglog << " Max Rel Error: " << total_rel_err << std::endl;
-                debuglog << " Max Abs Error: " << total_abs_err << std::endl;
-                debuglog << "-----------------------------\n";
+                // Max set tolerence to 1
+                double err = relativeError(static_cast<float *>(ioMgr->data)[j], static_cast<float *>(decompdata)[j], 1);
+                double err2 = absoluteError(static_cast<float *>(ioMgr->data)[j], static_cast<float *>(decompdata)[j]);
+                rel_err.push_back(err);
+                abs_err.push_back(err2);
             }
             totTime.stop();
             debuglog << "Total Runtime: " << totTime.getDuration() << " s" << std::endl << std::endl << std::endl;
             */
+
+            debuglog << "Memory in use: " << memLoad.getMemoryInUseInMB() << " MB" << std::endl;
+            ioMgr->close();
+
+            double total_max_rel_err = 0;
+            double total_max_abs_err = 0;
+            MPI_Reduce(&max_rel_err, &total_max_rel_err, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+            MPI_Reduce(&max_abs_err, &total_max_abs_err, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+            double total_rel_err = total_max_rel_err;
+            double total_abs_err = total_max_abs_err;
+               
+            debuglog << "\n ----- " << params[i] << " error metrics ----- " << std::endl;
+            debuglog << " Max Rel Error: " << total_rel_err << std::endl;
+            debuglog << " Max Abs Error: " << total_abs_err << std::endl;
+            debuglog << "-----------------------------\n";
+
+			std::free(decompdata);
 
             debuglog << "Memory in use: " << memLoad.getMemoryInUseInMB() << " MB" << std::endl;
             ioMgr->close();
@@ -220,7 +189,7 @@ int main(int argc, char *argv[])
     		MPI_Barrier(MPI_COMM_WORLD);
     	}
 
-        compressorMgr->close();
+		compressorMgr->close();
     }
 
     //writeLog(outputLogFile, outputLogFile.str());

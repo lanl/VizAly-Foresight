@@ -15,7 +15,8 @@ class DataLoaderInterface
     std::string dataType;
     std::string param;
 
-    //size_t numElements;
+    size_t numElements;
+	size_t elemSize;
     //void *data;
 
     MPI_Comm comm;
@@ -26,11 +27,11 @@ class DataLoaderInterface
     virtual int loadData(std::string paramName) = 0;
     virtual int close() = 0;
 
+	size_t size() { return numElements; }
+	size_t type() { return elemSize; }
     std::string getDataInfo();
     std::string getLog() { return log.str(); }
 
-    size_t numElements;
-    size_t elemSize;
     void *data;
 };
 

@@ -12,12 +12,15 @@ class CompressorInterface
 
   public:
     virtual void init() = 0;
-    virtual int compress(void *input, void *output, size_t dataType, size_t n) = 0;
-    virtual int decompress(void *input, void *output, size_t dataType, size_t n) = 0;
-    virtual int close() = 0;
+    virtual int compress(void *input, void *&output, size_t dataType, size_t n) = 0;
+    virtual int decompress(void *&input, void *&output, size_t dataType, size_t n) = 0;
+    virtual void close() = 0;
 
     std::string getCompressorInfo();
     std::string getLog() { return log.str(); }
+	void clearLog() { log.str(""); }
+
+	size_t cbytes;
 };
 
 

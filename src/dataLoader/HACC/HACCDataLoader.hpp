@@ -20,7 +20,7 @@ class HACCDataLoader: public DataLoaderInterface
 
     void init(std::string _filename, MPI_Comm _comm);
     int loadData(std::string paramName);
-    int close(){ deAllocateMem(); }
+    int close(){ return deAllocateMem(); }
 };
 
 
