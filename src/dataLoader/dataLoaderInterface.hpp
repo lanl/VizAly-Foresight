@@ -40,8 +40,8 @@ class DataLoaderInterface
 	virtual int loadData(std::string paramName) = 0;
 	virtual int close() = 0;
 
-	size_t size() { return numElements; }
-	size_t type() { return elemSize; }
+	size_t getNumElements() { return numElements; }
+	size_t getTypeSize() { return elemSize; }
 	std::string getDataInfo();
 	std::string getLog() { return log.str(); }
 };

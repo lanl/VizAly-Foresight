@@ -27,11 +27,13 @@ class CompressorInterface
     virtual void close() = 0;
 
     std::string getCompressorInfo();
+    std::string getCompressorName(){ return compressorName; }
     std::string getLog() { return log.str(); }
 	void clearLog() { log.str(""); }
 
 	size_t cbytes;
 };
+
 
 
 inline std::string CompressorInterface::getCompressorInfo()
