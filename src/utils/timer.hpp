@@ -1,3 +1,13 @@
+/*================================================================================
+This software is open source software available under the BSD-3 license.
+
+Copyright (c) 2017, Los Alamos National Security, LLC.
+All rights reserved.
+
+Authors:
+ - Pascal Grosset
+================================================================================*/
+
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
@@ -12,7 +22,6 @@ class Timer
 	std::chrono::duration<double> elapsed_seconds;
 
   public:
-
 	Timer();
 	~Timer();
 
@@ -23,12 +32,12 @@ class Timer
 	static std::string getCurrentTime();	// get the current time
 };
 
-inline Timer::Timer(){}
-inline Timer::~Timer(){}
+inline Timer::Timer() {}
+inline Timer::~Timer() {}
 
-inline void Timer::start(){ startTime = std::chrono::system_clock::now(); }
-inline void Timer::stop(){ endTime = std::chrono::system_clock::now(); elapsed_seconds = endTime - startTime; }
-inline double Timer::getDuration(){ return elapsed_seconds.count(); }
+inline void Timer::start() { startTime = std::chrono::system_clock::now(); }
+inline void Timer::stop() { endTime = std::chrono::system_clock::now(); elapsed_seconds = endTime - startTime; }
+inline double Timer::getDuration() { return elapsed_seconds.count(); }
 
 
 inline std::string Timer::getCurrentTime()
@@ -37,7 +46,7 @@ inline std::string Timer::getCurrentTime()
 	tm *ltm = localtime(&now);
 
 	std::stringstream ss;
-	ss << "_"<< 1 + ltm->tm_mon << "_" << ltm->tm_mday << "__" << ltm->tm_hour << "_" << ltm->tm_min << "_" << ltm->tm_sec << "_" << std::endl;
+	ss << "_" << 1 + ltm->tm_mon << "_" << ltm->tm_mday << "__" << ltm->tm_hour << "_" << ltm->tm_min << "_" << ltm->tm_sec << "_" << std::endl;
 	return ss.str();
 }
 

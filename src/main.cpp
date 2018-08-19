@@ -1,3 +1,15 @@
+/*================================================================================
+This software is open source software available under the BSD-3 license.
+
+Copyright (c) 2017, Los Alamos National Security, LLC.
+All rights reserved.
+
+Authors:
+ - Pascal Grosset
+ - Jesus Pulido
+ - Chris Biwer
+================================================================================*/
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -34,10 +46,10 @@ int main(int argc, char *argv[])
 	if (argc < 2)
 	{
 		std::cout << "Input argument needed. Run as: ../inputs/blosc.json" << std::endl;
-        std::cout << "Read arguments: " << argc << std::endl;
+		std::cout << "Read arguments: " << argc << std::endl;
 		return 0;
 	}
-	
+
 
 	//
 	// init MPI
@@ -56,33 +68,35 @@ int main(int argc, char *argv[])
 
 	//
 	// Load in the parameters
-	std::string inputFileType = jsonInput["input"]["filetype"]; 
-	std::string inputFile = jsonInput["input"]["filename"]; 
+	std::string inputFileType = jsonInput["input"]["filetype"];
+	std::string inputFile = jsonInput["input"]["filename"];
 
-    std::string outputLogFile = jsonInput["output"]["logfname"];
-    outputLogFile += "_" + std::to_string(myRank);
+	std::string outputLogFile = jsonInput["output"]["logfname"];
+	outputLogFile += "_" + std::to_string(myRank);
 
-    std::string metricsFile = jsonInput["output"]["metricsfname"];
+	std::string metricsFile = jsonInput["output"]["metricsfname"];
 
 	std::vector< std::string > params;
-	for (int j=0; j<jsonInput["input"]["scalars"].size(); j++)
-    	params.push_back( jsonInput["input"]["scalars"][j] );
+	for (int j = 0; j < jsonInput["input"]["scalars"].size(); j++)
+		params.push_back( jsonInput["input"]["scalars"][j] );
 
-    std::vector< std::string > compressors;
-    for (int j=0; j<jsonInput["compressors"].size(); j++)
-        compressors.push_back( jsonInput["compressors"][j] );
+	std::vector< std::string > compressors;
+	for (int j = 0; j < jsonInput["compressors"].size(); j++)
+		compressors.push_back( jsonInput["compressors"][j] );
 
 
-    //
-    // Create log and metrics files
-    std::stringstream debuglog;
-    std::stringstream metricslog;
+	//
+	// Create log and metrics files
+	std::stringstream debuglog;
+	std::stringstream metricsInfo;
 
-    writeLog(outputLogFile, debuglog.str());
+	writeLog(outputLogFile, debuglog.str());
 
-    //
+	metricsInfo << "Input file: " << inputFile << std::endl;
+
+	//
 	// Open file
-    DataLoaderInterface *ioMgr;
+	DataLoaderInterface *ioMgr;
 
 	if (inputFileType == "HACC")
 		ioMgr = new HACCDataLoader();
@@ -94,110 +108,133 @@ int main(int argc, char *argv[])
 
 	ioMgr->init(inputFile, MPI_COMM_WORLD);
 
-	std::cout << "Starting compressors...\n";
-    // 
-    // Cycle through compressors and parameters
 
-    CompressorInterface *compressorMgr;
+	//
+	// Cycle through compressors and parameters
+	CompressorInterface *compressorMgr;
 
-    // Compressors
-    for (int c=0; c<compressors.size(); ++c)
-    {
-
+	// Compressors
+	for (int c = 0; c < compressors.size(); ++c)
+	{
 		if (compressors[c] == "blosc")
 			compressorMgr = new BLOSCCompressor();
 		else if (compressors[c] == "BigCrunch")
 			compressorMgr = new BigCrunchCompressor();
 		else
-        {
-            std::cout << "Unsupported compressor: " << compressors[c] << "...Skipping!" << std::endl;
-            continue;
-        }  
+		{
+			std::cout << "Unsupported compressor: " << compressors[c] << "...Skipping!" << std::endl;
+			continue;
+		}
+
 
 		// init
 		compressorMgr->init();
+		metricsInfo << "\n---------------------------------------" << std::endl;
+		metricsInfo << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
 
-    	// Cycle through params
-        for (int i=0; i<params.size(); i++)
-        {
-            Memory memLoad;
-            memLoad.start();
+		// Cycle through params
+		for (int i = 0; i < params.size(); i++)
+		{
+			Timer compressClock, decompressClock;
+			Memory memLoad;
 
-            ioMgr->loadData(params[i]);
-            MPI_Barrier(MPI_COMM_WORLD);
+			memLoad.start();
 
-            debuglog << ioMgr->getDataInfo();
-            debuglog << ioMgr->getLog();
-            appendLog(outputLogFile, debuglog);
+			assert ( ioMgr->loadData(params[i]) == 1);
 
-            MPI_Barrier(MPI_COMM_WORLD);
+			MPI_Barrier(MPI_COMM_WORLD);
+
+			debuglog << ioMgr->getDataInfo();
+			debuglog << ioMgr->getLog();
+			appendLog(outputLogFile, debuglog);
+
+			MPI_Barrier(MPI_COMM_WORLD);
 
 			//
 			// compress
 			void * cdata = NULL;
-			compressorMgr->compress(ioMgr->data, cdata, ioMgr->type(), ioMgr->size());
+
+			compressClock.start();
+			compressorMgr->compress(ioMgr->data, cdata, ioMgr->getTypeSize(), ioMgr->getNumElements());
+			compressClock.stop();
 
 			//
 			// decompress
 			void * decompdata = NULL;
-            compressorMgr->decompress(cdata, decompdata, ioMgr->type(), ioMgr->size() );
+
+			decompressClock.start();
+			compressorMgr->decompress(cdata, decompdata, ioMgr->getTypeSize(), ioMgr->getNumElements() );
+			decompressClock.stop();
 
 			writeLogApp(outputLogFile, compressorMgr->getLog());
 			compressorMgr->clearLog();
 
+
 			//
-            // Compute metrics
-            std::vector<double> rel_err(ioMgr->size());
-            std::vector<double> abs_err(ioMgr->size());
-                
-            for (std::size_t j = 0; j < ioMgr->size(); ++j)
-            {
-                // Max set tolerence to 1
-                double err = relativeError(static_cast<float *>(ioMgr->data)[j], static_cast<float *>(decompdata)[j], 1);
-                double err2 = absoluteError(static_cast<float *>(ioMgr->data)[j], static_cast<float *>(decompdata)[j]);
-                rel_err.push_back(err);
-                abs_err.push_back(err2);
-            }
+			// Compute metrics
+			std::vector<double> rel_err(ioMgr->getNumElements());
+			std::vector<double> abs_err(ioMgr->getNumElements());
 
-            double max_rel_err = *std::max_element(rel_err.begin(), rel_err.end());
-            double max_abs_err = *std::max_element(abs_err.begin(), abs_err.end());
+			for (std::size_t j = 0; j < ioMgr->getNumElements(); ++j)
+			{
+				// Max set tolerence to 1
+				double err = relativeError(static_cast<float *>(ioMgr->data)[j], static_cast<float *>(decompdata)[j], 1);
+				double err2 = absoluteError(static_cast<float *>(ioMgr->data)[j], static_cast<float *>(decompdata)[j]);
+				rel_err.push_back(err);
+				abs_err.push_back(err2);
+			}
 
-            double total_max_rel_err = 0;
-            double total_max_abs_err = 0;
-            MPI_Reduce(&max_rel_err, &total_max_rel_err, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-            MPI_Reduce(&max_abs_err, &total_max_abs_err, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-            double total_rel_err = total_max_rel_err;
-            double total_abs_err = total_max_abs_err;
-               
-            debuglog << "\n ----- " << params[i] << " error metrics ----- " << std::endl;
-            debuglog << " Max Rel Error: " << total_rel_err << std::endl;
-            debuglog << " Max Abs Error: " << total_abs_err << std::endl;
-            debuglog << "-----------------------------\n";
+			double max_rel_err = *std::max_element(rel_err.begin(), rel_err.end());
+			double max_abs_err = *std::max_element(abs_err.begin(), abs_err.end());
+			double compress_time = compressClock.getDuration();
+			double decompress_time = decompressClock.getDuration();
+			double compress_throughput = compress_time / (ioMgr->getNumElements() * ioMgr->getTypeSize());
+			double decompress_throughput = decompress_time / (ioMgr->getNumElements() * ioMgr->getTypeSize());
+
+			double total_max_rel_err = 0;
+			double total_max_abs_err = 0;
+			double max_compress_throughput = 0;
+			double max_decompress_throughput = 0;
+
+			MPI_Reduce(&max_rel_err, &total_max_rel_err, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+			MPI_Reduce(&max_abs_err, &total_max_abs_err, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+			MPI_Reduce(&compress_throughput, &max_compress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+			MPI_Reduce(&decompress_throughput, &max_decompress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+			debuglog << "\n ----- " << params[i] << " error metrics ----- " << std::endl;
+			debuglog << " Max Rel Error: " << max_rel_err << std::endl;
+			debuglog << " Max Abs Error: " << max_abs_err << std::endl;
+			debuglog << " Compress time: " << max_abs_err << std::endl;
+			debuglog << " Decompress time: " << max_abs_err << std::endl;
+			debuglog << "-----------------------------\n";
+
+			metricsInfo << "\nField: " << params[i] << std::endl;
+			metricsInfo << "Max Rel Error: " << max_rel_err << std::endl;
+			metricsInfo << "Max Abs Error: " << max_abs_err << std::endl;
+			metricsInfo << "Compression Throughput: " << compress_throughput << " bytes/s" << std::endl;
+			metricsInfo << "DeCompression Throughput: " << decompress_throughput << " bytes/s" << std::endl;
 
 			std::free(decompdata);
 
-            debuglog << "Memory in use: " << memLoad.getMemoryInUseInMB() << " MB" << std::endl;
-            ioMgr->close();
+			debuglog << "Memory in use: " << memLoad.getMemoryInUseInMB() << " MB" << std::endl;
+			ioMgr->close();
 
-            memLoad.stop();
-            debuglog << "Memory leaked: " << memLoad.getMemorySizeInMB() << " MB" << std::endl;
+			memLoad.stop();
+			debuglog << "Memory leaked: " << memLoad.getMemorySizeInMB() << " MB" << std::endl;
 
-            appendLog(outputLogFile, debuglog);
-    		MPI_Barrier(MPI_COMM_WORLD);
-    	}
+			appendLog(outputLogFile, debuglog);
+			MPI_Barrier(MPI_COMM_WORLD);
+		}
 
 		compressorMgr->close();
-    }
+	}
 
-    //writeLog(outputLogFile, outputLogFile.str());
-    if (myRank == 0)
-        std::cout << " Complete! " << std::endl;
+	if (myRank == 0)
+		writeFile(metricsFile, metricsInfo.str());
 
 	MPI_Finalize();
 
-    
 
-    
 	return 0;
 }
 
@@ -205,6 +242,6 @@ int main(int argc, char *argv[])
 /*
 
 Run:
-mpirun -np 2 CBench ../inputs/jesus_blosc.json
+mpirun -np 2 CBench ../inputs/blosc.json
 
 */
