@@ -35,9 +35,9 @@ include(CheckIncludeFile)
 include(CheckIncludeFileCXX)
 include(CheckIncludeFiles)
 include(ExternalProject)
-add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2")
-include_directories(${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2/blosc)
-set_property(TARGET blosc PROPERTY POSITION_INDEPENDENT_CODE ON)
+#add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2")
+#include_directories(${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2/blosc)
+#set_property(TARGET blosc PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch")
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch/include)
@@ -59,7 +59,8 @@ endif()
 #add_subdirectory(demoApps)
 
 add_executable(CBench main.cpp)
-target_link_libraries(CBench ${MPI_LIBRARIES} GenericIO blosc bigcrunch) #may need to target libblosc
+#target_link_libraries(CBench ${MPI_LIBRARIES} GenericIO blosc bigcrunch) #may need to target libblosc
+target_link_libraries(CBench ${MPI_LIBRARIES} GenericIO bigcrunch)
 
 # Prevent in source builds since they are evil
 if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
