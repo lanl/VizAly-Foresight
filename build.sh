@@ -6,7 +6,10 @@ if [ "$#" -ne 1 ]; then
 else 
   buildDir=$1 
 fi 
- 
+
+#create install directory
+mkdir install
+
 # Create build directory 
 mkdir $buildDir 
 cd $buildDir 
@@ -14,3 +17,4 @@ cd $buildDir
 # build 
 cmake ../src 
 make -j16 
+make install

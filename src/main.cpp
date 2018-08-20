@@ -188,8 +188,8 @@ int main(int argc, char *argv[])
 			double max_abs_err = *std::max_element(abs_err.begin(), abs_err.end());
 			double compress_time = compressClock.getDuration();
 			double decompress_time = decompressClock.getDuration();
-			double compress_throughput = compress_time / (ioMgr->getNumElements() * ioMgr->getTypeSize());
-			double decompress_throughput = decompress_time / (ioMgr->getNumElements() * ioMgr->getTypeSize());
+			double compress_throughput  =  ( (ioMgr->getNumElements() * ioMgr->getTypeSize())/(1024*1024.0) ) / compress_time;
+			double decompress_throughput = ( (ioMgr->getNumElements() * ioMgr->getTypeSize())/(1024*1024.0) ) / decompress_time;
 
 			double total_max_rel_err = 0;
 			double total_max_abs_err = 0;
@@ -211,8 +211,8 @@ int main(int argc, char *argv[])
 			metricsInfo << "\nField: " << params[i] << std::endl;
 			metricsInfo << "Max Rel Error: " << max_rel_err << std::endl;
 			metricsInfo << "Max Abs Error: " << max_abs_err << std::endl;
-			metricsInfo << "Compression Throughput: " << compress_throughput << " bytes/s" << std::endl;
-			metricsInfo << "DeCompression Throughput: " << decompress_throughput << " bytes/s" << std::endl;
+			metricsInfo << "Compression Throughput: " << compress_throughput << " MB/s" << std::endl;
+			metricsInfo << "DeCompression Throughput: " << decompress_throughput << " MB/s" << std::endl;
 
 			std::free(decompdata);
 
