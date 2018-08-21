@@ -134,6 +134,9 @@ int main(int argc, char *argv[])
 		metricsInfo << "\n---------------------------------------" << std::endl;
 		metricsInfo << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
 
+		debuglog << "-----------------------------------------" << std::endl;
+		debuglog << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
+
 		// Cycle through params
 		for (int i=0; i<params.size(); i++)
 		{
@@ -222,7 +225,7 @@ int main(int argc, char *argv[])
 			ioMgr->close();
 
 			memLoad.stop();
-			debuglog << "Memory leaked: " << memLoad.getMemorySizeInMB() << " MB" << std::endl;
+			debuglog << "Memory leaked: " << memLoad.getMemorySizeInMB() << " MB \n\n" << std::endl;
 
 			appendLog(outputLogFile, debuglog);
 			MPI_Barrier(MPI_COMM_WORLD);
