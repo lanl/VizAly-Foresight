@@ -17,4 +17,3 @@ cd $buildDir
 # build 
 cmake ../src 
 make -j16 
-make install

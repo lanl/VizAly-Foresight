@@ -35,6 +35,7 @@ Authors:
 #include "thirdparty/genericio/GenericIO.h"
 #include "HACCDataLoader.hpp"
 
+
 // Compressors
 #include "blosccompressor.hpp"
 #include "BigCrunchcompressor.hpp"
@@ -113,9 +114,10 @@ int main(int argc, char *argv[])
 	// Cycle through compressors and parameters
 	CompressorInterface *compressorMgr;
 
-	// Compressors
+	// Loop compressors
 	for (int c = 0; c < compressors.size(); ++c)
 	{
+		// Process compressors
 		if (compressors[c] == "blosc")
 			compressorMgr = new BLOSCCompressor();
 		else if (compressors[c] == "BigCrunch")
@@ -133,7 +135,7 @@ int main(int argc, char *argv[])
 		metricsInfo << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
 
 		// Cycle through params
-		for (int i = 0; i < params.size(); i++)
+		for (int i=0; i<params.size(); i++)
 		{
 			Timer compressClock, decompressClock;
 			Memory memLoad;
@@ -142,13 +144,13 @@ int main(int argc, char *argv[])
 
 			assert ( ioMgr->loadData(params[i]) == 1);
 
-			MPI_Barrier(MPI_COMM_WORLD);
 
 			debuglog << ioMgr->getDataInfo();
 			debuglog << ioMgr->getLog();
 			appendLog(outputLogFile, debuglog);
 
 			MPI_Barrier(MPI_COMM_WORLD);
+
 
 			//
 			// compress
