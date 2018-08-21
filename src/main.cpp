@@ -35,6 +35,7 @@ Authors:
 #include "thirdparty/genericio/GenericIO.h"
 #include "HACCDataLoader.hpp"
 
+
 // Compressors
 #include "blosccompressor.hpp"
 #include "BigCrunchcompressor.hpp"
@@ -113,9 +114,10 @@ int main(int argc, char *argv[])
 	// Cycle through compressors and parameters
 	CompressorInterface *compressorMgr;
 
-	// Compressors
+	// Loop compressors
 	for (int c = 0; c < compressors.size(); ++c)
 	{
+		// Process compressors
 		if (compressors[c] == "blosc")
 			compressorMgr = new BLOSCCompressor();
 		else if (compressors[c] == "BigCrunch")
@@ -132,8 +134,11 @@ int main(int argc, char *argv[])
 		metricsInfo << "\n---------------------------------------" << std::endl;
 		metricsInfo << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
 
+		debuglog << "-----------------------------------------" << std::endl;
+		debuglog << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
+
 		// Cycle through params
-		for (int i = 0; i < params.size(); i++)
+		for (int i=0; i<params.size(); i++)
 		{
 			Timer compressClock, decompressClock;
 			Memory memLoad;
@@ -142,13 +147,13 @@ int main(int argc, char *argv[])
 
 			assert ( ioMgr->loadData(params[i]) == 1);
 
-			MPI_Barrier(MPI_COMM_WORLD);
 
 			debuglog << ioMgr->getDataInfo();
 			debuglog << ioMgr->getLog();
 			appendLog(outputLogFile, debuglog);
 
 			MPI_Barrier(MPI_COMM_WORLD);
+
 
 			//
 			// compress
@@ -188,8 +193,8 @@ int main(int argc, char *argv[])
 			double max_abs_err = *std::max_element(abs_err.begin(), abs_err.end());
 			double compress_time = compressClock.getDuration();
 			double decompress_time = decompressClock.getDuration();
-			double compress_throughput = (ioMgr->getNumElements() * ioMgr->getTypeSize()) / compress_time;
-			double decompress_throughput = (ioMgr->getNumElements() * ioMgr->getTypeSize()) / decompress_time;
+			double compress_throughput  =  ( (ioMgr->getNumElements() * ioMgr->getTypeSize())/(1024*1024.0) ) / compress_time;
+			double decompress_throughput = ( (ioMgr->getNumElements() * ioMgr->getTypeSize())/(1024*1024.0) ) / decompress_time;
 
 			double total_max_rel_err = 0;
 			double total_max_abs_err = 0;
@@ -211,8 +216,8 @@ int main(int argc, char *argv[])
 			metricsInfo << "\nField: " << params[i] << std::endl;
 			metricsInfo << "Max Rel Error: " << max_rel_err << std::endl;
 			metricsInfo << "Max Abs Error: " << max_abs_err << std::endl;
-			metricsInfo << "Compression Throughput: " << compress_throughput << " bytes/s" << std::endl;
-			metricsInfo << "DeCompression Throughput: " << decompress_throughput << " bytes/s" << std::endl;
+			metricsInfo << "Compression Throughput: " << compress_throughput << " MB/s" << std::endl;
+			metricsInfo << "DeCompression Throughput: " << decompress_throughput << " MB/s" << std::endl;
 
 			std::free(decompdata);
 
@@ -220,7 +225,7 @@ int main(int argc, char *argv[])
 			ioMgr->close();
 
 			memLoad.stop();
-			debuglog << "Memory leaked: " << memLoad.getMemorySizeInMB() << " MB" << std::endl;
+			debuglog << "Memory leaked: " << memLoad.getMemorySizeInMB() << " MB \n\n" << std::endl;
 
 			appendLog(outputLogFile, debuglog);
 			MPI_Barrier(MPI_COMM_WORLD);

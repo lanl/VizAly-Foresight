@@ -6,6 +6,7 @@ All rights reserved.
 
 Authors:
  - Pascal Grosset
+ - Jesus Pulido
 ================================================================================*/
 
 #ifndef _COMPRESSOR_INTERFACE_H_
@@ -13,9 +14,16 @@ Authors:
 
 #include <string>
 #include <sstream>
+#include <unordered_map>
+#include "timer.hpp"
+#include "memory.hpp"
+#include "strConvert.hpp"
 
 class CompressorInterface
 {
+  public:
+    std::unordered_map<std::string, std::string> compressorParameters;
+
   protected:
     std::string compressorName;
     std::stringstream log;
