@@ -30,8 +30,8 @@ class CompressorInterface
 
   public:
     virtual void init() = 0;
-    virtual int compress(void *input, void *&output, size_t dataType, size_t n) = 0;
-    virtual int decompress(void *&input, void *&output, size_t dataType, size_t n) = 0;
+    virtual int compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n) = 0;
+    virtual int decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n) = 0;
     virtual void close() = 0;
 
     std::string getCompressorInfo();

@@ -43,6 +43,7 @@ class DataLoaderInterface
 	size_t getNumElements() { return numElements; }
 	size_t getTypeSize() { return elemSize; }
 	std::string getType(){ return dataType; }
+	std::string getParam(){ return param; }
 
 	std::string getDataInfo();
 	std::string getLog() { return log.str(); }

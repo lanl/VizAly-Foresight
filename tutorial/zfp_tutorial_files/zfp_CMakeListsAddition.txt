@@ -12,6 +12,6 @@ if (USE_ZFP)
 	set (ZFP_INCLUDE_PATH ${ZFP_INCLUDE_PATH} CACHE STRING "ZFP include directory")
 	include_directories(${ZFP_INCLUDE_PATH})
 
-	#Add a definition	
+	#Add a definition
 	add_definitions(-DHAVE_ZFP)
 endif(USE_ZFP)

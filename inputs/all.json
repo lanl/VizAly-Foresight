@@ -8,7 +8,12 @@
 		"filename": "../testing/data/m000.full.mpicosmo.50",
 
 		"scalars-comment" : "which scalars to test",
-		"scalars" : ["x", "y", "z", "vx", "vy", "vz"]
+		"scalars" : ["x", "y", "z", "vx", "vy", "vz"],
+
+		"parameters" :
+		{
+			"tolerance" : 0.000001
+		}
 	},
 
 	"output" :

@@ -19,6 +19,5 @@
 	{
 		double tolerance = jsonInput["input"]["parameters"]["tolerance"];
 		compressorMgr->compressorParameters["tolerance"] = std::to_string(tolerance);
-		compressorMgr->compressorParameters["dataType"] = ioMgr->getType();
 	}
 #endif

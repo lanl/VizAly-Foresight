@@ -14,8 +14,8 @@ class BLOSCCompressor: public CompressorInterface
     ~BLOSCCompressor();
 
     void init();
-    int compress(void *input, void *&output, size_t dataType, size_t n);
-    int decompress(void *&input, void *&output, size_t dataType, size_t n);
+    int compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
+    int decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
     void close();
 
 	size_t cbytes;
@@ -37,16 +37,16 @@ inline void BLOSCCompressor::init()
 	blosc_init();
 }
 
-inline int BLOSCCompressor::compress(void *input, void *&output, size_t dataType, size_t n)
+inline int BLOSCCompressor::compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
 {
 	// compress
 	Timer cTime; cTime.start();
 	// Default Input Params: {clevel=9, shuffle=1, sizeof(data), idatasize, input, output, odatasize);
-	size_t isize = dataType*n;
+	size_t isize = dataTypeSize*n;
 	size_t osize = isize + BLOSC_MAX_OVERHEAD;
 
 	output = std::malloc(isize); //byte array;
-	osize = blosc_compress(9, 1, dataType, isize, input, output, osize);
+	osize = blosc_compress(9, 1, dataTypeSize, isize, input, output, osize);
 	
 	if (osize < 0)
 	{
@@ -66,10 +66,10 @@ inline int BLOSCCompressor::compress(void *input, void *&output, size_t dataType
     return 1;
 }
 
-inline int BLOSCCompressor::decompress(void *&input, void *&output, size_t dataType, size_t n)
+inline int BLOSCCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
 {
 	Timer dTime; dTime.start();
-	size_t osize = dataType*n;
+	size_t osize = dataTypeSize*n;
 	output = std::malloc(osize);
 	size_t sz = blosc_decompress(input, output, osize);
 	if (sz < 0)
