@@ -39,7 +39,7 @@ Authors:
 // Compressors
 #include "blosccompressor.hpp"
 #include "BigCrunchcompressor.hpp"
-
+#include "SZcompressor.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -122,6 +122,8 @@ int main(int argc, char *argv[])
 			compressorMgr = new BLOSCCompressor();
 		else if (compressors[c] == "BigCrunch")
 			compressorMgr = new BigCrunchCompressor();
+		else if (compressors[c] == "SZ")
+			compressorMgr = new SZCompressor();
 		else
 		{
 			std::cout << "Unsupported compressor: " << compressors[c] << "...Skipping!" << std::endl;

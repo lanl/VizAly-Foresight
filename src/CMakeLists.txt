@@ -12,6 +12,7 @@ include_directories(${CMAKE_SOURCE_DIR}/utils)
 include_directories(${CMAKE_SOURCE_DIR}/compressors)
 include_directories(${CMAKE_SOURCE_DIR}/compressors/BLOSC)
 include_directories(${CMAKE_SOURCE_DIR}/compressors/BigCrunch)
+include_directories(${CMAKE_SOURCE_DIR}/compressors/SZ)
 
 
 
@@ -40,6 +41,20 @@ include(ExternalProject)
 add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch")
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch/include)
 
+add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/SZ")
+include_directories (
+	${CMAKE_SOURCE_DIR}/thirdparty/SZ/sz/include
+	${CMAKE_SOURCE_DIR}/thirdparty/SZ/zlib
+        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd
+        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/common
+        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/compress
+        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/decompress
+        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/deprecated
+        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/dictBuilder
+        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/dll
+        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/legacy
+        )
+
 # add libs
 set (EXTRA_LIBS "")
 
@@ -59,7 +74,7 @@ endif()
 
 # Build executable
 add_executable(CBench main.cpp)
-target_link_libraries(CBench ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO bigcrunch)
+target_link_libraries(CBench ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO bigcrunch SZ zstd zlib)
 
 
 # Prevent in source builds since they are evil
