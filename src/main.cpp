@@ -208,8 +208,8 @@ int main(int argc, char *argv[])
 
 			double max_compress_throughput = 0;
 			double max_decompress_throughput = 0;
-			double compress_throughput = ((double)(ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024*1024) )/ compress_time;
-			double decompress_throughput = ((double)(ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024*1024) )/ decompress_time;
+			double compress_throughput = ((double)(ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0*1024.0) )/ compress_time;
+			double decompress_throughput = ((double)(ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0*1024.0) )/ decompress_time;
 			MPI_Reduce(&compress_throughput, &max_compress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 			MPI_Reduce(&decompress_throughput, &max_decompress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
