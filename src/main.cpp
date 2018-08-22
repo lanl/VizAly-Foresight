@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 
 	// Loop compressors
 	for (int c = 0; c < compressors.size(); ++c)
-	{
+	{	
 		// Process compressors
 		if (compressors[c] == "blosc")
 			compressorMgr = new BLOSCCompressor();
@@ -142,6 +142,8 @@ int main(int argc, char *argv[])
 			std::cout << "Unsupported compressor: " << compressors[c] << "...Skipping!" << std::endl;
 			continue;
 		}
+
+		
 
 
 		// init
@@ -211,6 +213,7 @@ int main(int argc, char *argv[])
 				metricsMgr->execute(ioMgr->data, decompdata, ioMgr->getNumElements());
 				debuglog << metricsMgr->getLog();
 				metricsInfo << metricsMgr->getLog();
+				csvOutput << metricsMgr->getGlobalValue() << ", ";
 				metricsMgr->close();
 			}
 
