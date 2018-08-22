@@ -75,8 +75,7 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
 	MPI_Reduce(&max_abs_err, &total_max_abs_err, 1, MPI_DOUBLE, MPI_MAX, 0, comm);// MPI_COMM_WORLD);
 	total_val = total_max_abs_err;
 
-	// Only reports the error per-rank for now
-	log << " Max Abs Error: " << max_abs_err << std::endl;
+	log << " Max Abs Error: " << total_max_abs_err << std::endl;
 
 	MPI_Barrier(comm);
 	return;
