@@ -10,15 +10,27 @@ set (CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 set (LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
-find_package (FFTW)
-if (FFTW_FOUND)
-  include_directories (${FFTW_INCLUDES})
-  add_definitions (-DHAVE_FFTW3)
+option(SZ_ENABLE_FFTW
+	"Enable FFTW for SZ."
+	OFF
+)
+if(SZ_ENABLE_FFTW)
+    find_package (FFTW)
+    if (FFTW_FOUND)
+      include_directories (${FFTW_INCLUDES})
+      add_definitions (-DHAVE_FFTW3)
+    endif ()
 endif ()
 
-find_package (NETCDF)
-if (NETCDF_FOUND)
-  include_directories (${NETCDF_INCLUDE_DIRS})
+option(SZ_ENABLE_NETCDF
+	"Enable reading NETCDF data."
+	OFF
+)
+if(SZ_ENABLE_NETCDF)
+    find_package (NETCDF)
+    if (NETCDF_FOUND)
+      include_directories (${NETCDF_INCLUDE_DIRS})
+    endif ()
 endif ()
 
 include_directories (

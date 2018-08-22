@@ -35,12 +35,17 @@ Authors:
 
 // Compressors
 #include "blosccompressor.hpp"
+#ifdef CBENCH_HAS_BIG_CRUNCH
 #include "BigCrunchcompressor.hpp"
+#endif
+#ifdef CBENCH_HAS_SZ
 #include "SZcompressor.hpp"
+#endif
 
 // Metrics
 #include "relativeError.hpp"
 #include "absoluteError.hpp"
+#include "meansquareError.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -124,10 +129,14 @@ int main(int argc, char *argv[])
 		// Process compressors
 		if (compressors[c] == "blosc")
 			compressorMgr = new BLOSCCompressor();
+#ifdef CBENCH_HAS_BIG_CRUNCH
 		else if (compressors[c] == "BigCrunch")
 			compressorMgr = new BigCrunchCompressor();
+#endif
+#ifdef CBENCH_HAS_SZ
 		else if (compressors[c] == "SZ")
 			compressorMgr = new SZCompressor();
+#endif
 		else
 		{
 			std::cout << "Unsupported compressor: " << compressors[c] << "...Skipping!" << std::endl;
@@ -191,7 +200,9 @@ int main(int argc, char *argv[])
 				if (metrics[m] == "relative_error")
 					metricsMgr = new relativeError();
 				else if (metrics[m] == "absolute_error")
-					metricsMgr = new absoluteError();
+					metricsMgr = new absoluteError(); 
+				else if (metrics[m] == "mse")
+					metricsMgr = new meansquareError();
 				else
 				{
 					std::cout << "Unsupported metric: " << metrics[c] << "...Skipping!" << std::endl;

@@ -58,8 +58,6 @@ inline void meansquareError::execute(void *original, void *approx, size_t n) {
 
 	for (std::size_t i = 0; i < n; ++i)
 	{
-		//double absolute_error = std::abs(original - approx);
-		
 		mse += pow(( static_cast<float *>(original)[i]-static_cast<float *>(approx)[i]), 2.0);
 	}
 
@@ -67,10 +65,12 @@ inline void meansquareError::execute(void *original, void *approx, size_t n) {
 	val = local_mse;
 
 	double total_mse = 0;
+	size_t total_n = 0;
 	MPI_Reduce(&mse, &total_mse, 1, MPI_DOUBLE, MPI_SUM, 0, comm);// MPI_COMM_WORLD);
-	total_val = total_max_mse;
+	MPI_Reduce(&n, &total_n, 1, MPI_UNSIGNED_LONG_LONG, MPI_SUM, 0, comm);// MPI_COMM_WORLD);
+	total_val = total_mse/(double)total_n;
 	
-	log << " Max MSE: " << total_max_mse << std::endl;
+	log << " MSE: " << total_val << std::endl;
 
 	MPI_Barrier(comm);
 	return;

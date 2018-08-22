@@ -4,17 +4,29 @@ project(CBench)
 
 set (CMAKE_CXX_STANDARD 11)
 
+option(CBENCH_ENABLE_BLOSC
+	"Enable BLOSC."
+	ON
+)
+option(CBENCH_ENABLE_BIG_CRUNCH
+	"Enable BigCrunch."
+	ON
+)
+if(WIN32)
+option(CBENCH_ENABLE_SZ
+	"Enable SZ."
+	OFF
+)
+else()
+option(CBENCH_ENABLE_SZ
+	"Enable SZ."
+	ON
+)
+endif()
 
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/metrics)
 include_directories(${CMAKE_SOURCE_DIR}/utils)
-
-include_directories(${CMAKE_SOURCE_DIR}/compressors)
-include_directories(${CMAKE_SOURCE_DIR}/compressors/BLOSC)
-include_directories(${CMAKE_SOURCE_DIR}/compressors/BigCrunch)
-include_directories(${CMAKE_SOURCE_DIR}/compressors/SZ)
-
-
 
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader/HACC)
@@ -37,26 +49,38 @@ include(CheckIncludeFileCXX)
 include(CheckIncludeFiles)
 include(ExternalProject)
 
-
-add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch")
-include_directories(${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch/include)
-
-add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/SZ")
-include_directories (
-	${CMAKE_SOURCE_DIR}/thirdparty/SZ/sz/include
-	${CMAKE_SOURCE_DIR}/thirdparty/SZ/zlib
-        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd
-        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/common
-        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/compress
-        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/decompress
-        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/deprecated
-        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/dictBuilder
-        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/dll
-        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/legacy
-        )
-
 # add libs
 set (EXTRA_LIBS "")
+
+include_directories(${CMAKE_SOURCE_DIR}/compressors)
+if(CBENCH_ENABLE_BLOSC)
+    include_directories(${CMAKE_SOURCE_DIR}/compressors/BLOSC)
+endif()
+if(CBENCH_ENABLE_BIG_CRUNCH)
+    include_directories(${CMAKE_SOURCE_DIR}/compressors/BigCrunch)
+    add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch")
+    include_directories(${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch/include)
+    add_definitions (-DCBENCH_HAS_BIG_CRUNCH)
+    set (EXTRA_LIBS ${EXTRA_LIBS} bigcrunch)
+endif()
+if(CBENCH_ENABLE_SZ)
+    include_directories(${CMAKE_SOURCE_DIR}/compressors/SZ)
+    add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/SZ")
+    include_directories (
+        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/sz/include
+        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zlib
+            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd
+            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/common
+            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/compress
+            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/decompress
+            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/deprecated
+            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/dictBuilder
+            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/dll
+            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/legacy
+            )
+    add_definitions (-DCBENCH_HAS_SZ)
+    set (EXTRA_LIBS ${EXTRA_LIBS} SZ zstd zlib)
+endif()
 
 
 # MPI
@@ -74,7 +98,7 @@ endif()
 
 # Build executable
 add_executable(CBench main.cpp)
-target_link_libraries(CBench ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO bigcrunch SZ zstd zlib)
+target_link_libraries(CBench ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO)
 
 
 # Prevent in source builds since they are evil
