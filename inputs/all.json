@@ -12,7 +12,7 @@
 
 		"parameters" :
 		{
-			"tolerance" : 0.000001
+			"tolerance" : 1e-03
 		}
 	},
 

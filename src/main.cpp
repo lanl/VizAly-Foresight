@@ -101,6 +101,11 @@ int main(int argc, char *argv[])
 	std::stringstream csvOutput;
 	writeLog(outputLogFile, debuglog.str());
 
+	csvOutput << "Compressor_field" << ", ";
+	for (int m = 0; m < metrics.size(); ++m)
+		csvOutput << metrics[m] << ", ";
+	csvOutput << "Compression Throughput" << ", " << "DeCompression Throughput" << std::endl;
+	
 	metricsInfo << "Input file: " << inputFile << std::endl;
 
 	//
@@ -143,7 +148,14 @@ int main(int argc, char *argv[])
 			continue;
 		}
 
-		
+
+		// Check if the parameters field exist
+		if (jsonInput["input"].find("parameters") != jsonInput["input"].end())
+		{
+			// insert parameter into compressor parameter list
+			for (auto it=jsonInput["input"]["parameters"].begin(); it != jsonInput["input"]["parameters"].end(); it++)
+				compressorMgr->compressorParameters[it.key()] = strConvert::toStr(it.value());	
+		}
 
 
 		// init

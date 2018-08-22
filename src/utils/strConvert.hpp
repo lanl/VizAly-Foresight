@@ -12,9 +12,18 @@ Authors:
 #define _STR_CONV_H_
 
 #include <sstream>
+#include <string>
 
 namespace strConvert
 {
+	template <class T>
+	std::string toStr(T x)
+	{
+		std::stringstream sstr;
+		sstr << x;
+		return sstr.str();
+	}
+
 	inline double to_double(std::string value)
 	{
 		std::stringstream sstr(value);

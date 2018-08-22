@@ -42,9 +42,12 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
 	Timer cTime; cTime.start();
 	SZ_Init(NULL); 
 
-	std::uint64_t csize = 0;
-	std::uint8_t *cdata = SZ_compress_args(SZ_FLOAT, static_cast<float *>(input), &csize, PW_REL, 0, 0, 1E-3, 0, 0, 0, 0, n);
+	double tol = 1E-3;
+	tol = strConvert::to_double( compressorParameters["tolerance"] );
 
+	std::uint64_t csize = 0;
+	std::uint8_t *cdata = SZ_compress_args(SZ_FLOAT, static_cast<float *>(input), &csize, PW_REL, 0, 0, tol, 0, 0, 0, 0, n);
+	
 	output = cdata;
 	cTime.stop();
 
