@@ -43,7 +43,7 @@ inline int SZCompressor::compress(void *input, void *&output, size_t dataType, s
 	SZ_Init(NULL); 
 
 	std::uint64_t csize = 0;
-	std::uint8_t *cdata = SZ_compress_args(SZ_FLOAT, static_cast<float *>(input), &csize, PW_REL, 0, 0, 1E-1, 0, 0, 0, 0, n);
+	std::uint8_t *cdata = SZ_compress_args(SZ_FLOAT, static_cast<float *>(input), &csize, PW_REL, 0, 0, 1E-3, 0, 0, 0, 0, n);
 
 	output = cdata;
 	cTime.stop();
