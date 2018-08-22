@@ -23,13 +23,10 @@ Authors:
 #include "log.hpp"
 #include "memory.hpp"
 
-// Metrics
-#include "relativeError.hpp"
-#include "absoluteError.hpp"
-
 // Interfaces
 #include "dataLoaderInterface.hpp"
 #include "compressorInterface.hpp"
+#include "metricInterface.hpp"
 
 // Readers
 #include "thirdparty/genericio/GenericIO.h"
@@ -41,6 +38,10 @@ Authors:
 #include "BigCrunchcompressor.hpp"
 #include "SZcompressor.hpp"
 
+// Metrics
+#include "relativeError.hpp"
+#include "absoluteError.hpp"
+
 int main(int argc, char *argv[])
 {
 	// Parse arguments and read json file
@@ -50,7 +51,6 @@ int main(int argc, char *argv[])
 		std::cout << "Read arguments: " << argc << std::endl;
 		return 0;
 	}
-
 
 	//
 	// init MPI
@@ -85,6 +85,9 @@ int main(int argc, char *argv[])
 	for (int j = 0; j < jsonInput["compressors"].size(); j++)
 		compressors.push_back( jsonInput["compressors"][j] );
 
+	std::vector< std::string > metrics;
+	for (int j = 0; j < jsonInput["metrics"].size(); j++)
+		metrics.push_back(jsonInput["metrics"][j]);
 
 	//
 	// Create log and metrics files
@@ -113,6 +116,7 @@ int main(int argc, char *argv[])
 	//
 	// Cycle through compressors and parameters
 	CompressorInterface *compressorMgr;
+	MetricInterface *metricsMgr;
 
 	// Loop compressors
 	for (int c = 0; c < compressors.size(); ++c)
@@ -147,7 +151,8 @@ int main(int argc, char *argv[])
 
 			memLoad.start();
 
-			assert ( ioMgr->loadData(params[i]) == 1);
+			//assert ( ioMgr->loadData(params[i]) == 1); // DEBUG
+			ioMgr->loadData(params[i]);
 
 
 			debuglog << ioMgr->getDataInfo();
@@ -178,49 +183,48 @@ int main(int argc, char *argv[])
 
 
 			//
-			// Compute metrics
-			std::vector<double> rel_err(ioMgr->getNumElements());
-			std::vector<double> abs_err(ioMgr->getNumElements());
-
-			for (std::size_t j = 0; j < ioMgr->getNumElements(); ++j)
+			// metrics
+			debuglog << "\n----- " << params[i] << " error metrics ----- " << std::endl;
+			metricsInfo << "\nField: " << params[i] << std::endl;
+			for (int m = 0; m < metrics.size(); ++m)
 			{
-				// Max set tolerence to 1
-				double err = relativeError(static_cast<float *>(ioMgr->data)[j], static_cast<float *>(decompdata)[j], 1);
-				double err2 = absoluteError(static_cast<float *>(ioMgr->data)[j], static_cast<float *>(decompdata)[j]);
-				rel_err.push_back(err);
-				abs_err.push_back(err2);
+				if (metrics[m] == "relative_error")
+					metricsMgr = new relativeError();
+				else if (metrics[m] == "absolute_error")
+					metricsMgr = new absoluteError();
+				else
+				{
+					std::cout << "Unsupported metric: " << metrics[c] << "...Skipping!" << std::endl;
+					continue;
+				}
+				metricsMgr->init(MPI_COMM_WORLD);
+				metricsMgr->execute(ioMgr->data, decompdata, ioMgr->getNumElements());
+				debuglog << metricsMgr->getLog();
+				metricsInfo << metricsMgr->getLog();
+				metricsMgr->close();
 			}
 
-			double max_rel_err = *std::max_element(rel_err.begin(), rel_err.end());
-			double max_abs_err = *std::max_element(abs_err.begin(), abs_err.end());
+			//
+			// final timings
 			double compress_time = compressClock.getDuration();
 			double decompress_time = decompressClock.getDuration();
-			double compress_throughput  =  ( (ioMgr->getNumElements() * ioMgr->getTypeSize())/(1024*1024.0) ) / compress_time;
-			double decompress_throughput = ( (ioMgr->getNumElements() * ioMgr->getTypeSize())/(1024*1024.0) ) / decompress_time;
 
-			double total_max_rel_err = 0;
-			double total_max_abs_err = 0;
+			debuglog << " Compress time: " << compress_time << std::endl;
+			debuglog << " Decompress time: " << decompress_time << std::endl;
+			debuglog << "-----------------------------\n";
+
 			double max_compress_throughput = 0;
 			double max_decompress_throughput = 0;
-
-			MPI_Reduce(&max_rel_err, &total_max_rel_err, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-			MPI_Reduce(&max_abs_err, &total_max_abs_err, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+			double compress_throughput = ((double)(ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0*1024.0) )/ compress_time;
+			double decompress_throughput = ((double)(ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0*1024.0) )/ decompress_time;
 			MPI_Reduce(&compress_throughput, &max_compress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 			MPI_Reduce(&decompress_throughput, &max_decompress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
-			debuglog << "\n ----- " << params[i] << " error metrics ----- " << std::endl;
-			debuglog << " Max Rel Error: " << max_rel_err << std::endl;
-			debuglog << " Max Abs Error: " << max_abs_err << std::endl;
-			debuglog << " Compress time: " << max_abs_err << std::endl;
-			debuglog << " Decompress time: " << max_abs_err << std::endl;
-			debuglog << "-----------------------------\n";
+			metricsInfo << "Compression Throughput: " << max_compress_throughput << " Mbytes/s" << std::endl;
+			metricsInfo << "DeCompression Throughput: " << max_decompress_throughput << " Mbytes/s" << std::endl;
 
-			metricsInfo << "\nField: " << params[i] << std::endl;
-			metricsInfo << "Max Rel Error: " << max_rel_err << std::endl;
-			metricsInfo << "Max Abs Error: " << max_abs_err << std::endl;
-			metricsInfo << "Compression Throughput: " << compress_throughput << " MB/s" << std::endl;
-			metricsInfo << "DeCompression Throughput: " << decompress_throughput << " MB/s" << std::endl;
-
+			//
+			// deallocate
 			std::free(decompdata);
 
 			debuglog << "Memory in use: " << memLoad.getMemoryInUseInMB() << " MB" << std::endl;

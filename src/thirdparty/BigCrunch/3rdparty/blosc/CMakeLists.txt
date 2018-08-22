@@ -35,9 +35,15 @@ execute_process(
 add_library(${PROJECT_NAME} STATIC IMPORTED GLOBAL)
 
 # set project properties
+if (UNIX)
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    IMPORTED_LOCATION ${BINARY_DIR}/blosc/libblosc.a
+		IMPORTED_LOCATION ${BINARY_DIR}/blosc/${CMAKE_CFG_INTDIR}/libblosc.a
 )
+else() #WIN32
+set_target_properties(${PROJECT_NAME} PROPERTIES
+		IMPORTED_LOCATION ${BINARY_DIR}/blosc/${CMAKE_CFG_INTDIR}/libblosc.lib
+)
+endif()
 
 # add external project as dependency
 add_dependencies(${PROJECT_NAME}
@@ -50,4 +56,5 @@ add_dependencies(${PROJECT_NAME}
 # add external project include directories
 target_include_directories(${PROJECT_NAME}
     INTERFACE ${SOURCE_DIR}/blosc
+
 )

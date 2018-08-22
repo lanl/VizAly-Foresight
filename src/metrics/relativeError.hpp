@@ -9,11 +9,52 @@ Authors:
  - Jesus Pulido
 ================================================================================*/
 
-#pragma once
+#ifndef _RELATIVE_ERROR_H_
+#define _RELATIVE_ERROR_H_
+
 #include <cmath>
+#include <string>
+#include <sstream>
+#include <vector>
+#include "metricInterface.hpp"
+
+class relativeError : public MetricInterface
+{
+	int numRanks;
+	int myRank;
+
+public:
+	relativeError();
+	~relativeError();
+
+	void init(MPI_Comm _comm);
+	void execute(void *original, void *approx, size_t n);
+	void close() { }
+
+};
+
+inline relativeError::relativeError()
+{
+	myRank = 0;
+	numRanks = 0;
+	metricName = "relative_error";
+}
+
+inline relativeError::~relativeError()
+{
+
+}
+
+inline void relativeError::init(MPI_Comm _comm)
+{
+	comm = _comm;
+	MPI_Comm_size(comm, &numRanks);
+	MPI_Comm_rank(comm, &myRank);
+}
+
 
 template <class T>
-inline T relativeError(T original, T approx, double tolerance)
+inline T relError(T original, T approx, double tolerance)
 {
 	double absolute_error = std::abs(original - approx);
 	if (std::abs(original) < tolerance)
@@ -23,3 +64,27 @@ inline T relativeError(T original, T approx, double tolerance)
 
 	return absolute_error / std::abs(original);
 }
+
+inline void relativeError::execute(void *original, void *approx, size_t n) {
+	std::vector<double> rel_err(n);
+
+	for (std::size_t i = 0; i < n; ++i)
+	{
+		// Max set tolerence to 1
+		double err = relError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i], 1);
+		rel_err.push_back(err);
+	}
+	double max_rel_err = *std::max_element(rel_err.begin(), rel_err.end());
+	val = max_rel_err;
+
+	double total_max_rel_err = 0;
+	MPI_Reduce(&max_rel_err, &total_max_rel_err, 1, MPI_DOUBLE, MPI_MAX, 0, comm);// MPI_COMM_WORLD);
+	total_val = total_max_rel_err;
+
+	log << " Max Rel Error: " << total_max_rel_err << std::endl;
+
+	MPI_Barrier(comm);
+	return;
+}
+
+#endif
