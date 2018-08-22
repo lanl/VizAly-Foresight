@@ -14,6 +14,7 @@ Authors:
 
 #include <sstream>
 #include <stdio.h>
+#include <string>
 
 #ifdef WIN32
 typedef signed long long __int64_t;

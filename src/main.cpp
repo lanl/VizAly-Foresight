@@ -105,7 +105,6 @@ int main(int argc, char *argv[])
 	for (int m = 0; m < metrics.size(); ++m)
 		csvOutput << metrics[m] << ", ";
 	csvOutput << "Compression Throughput" << ", " << "DeCompression Throughput" << std::endl;
-	
 	metricsInfo << "Input file: " << inputFile << std::endl;
 
 	//
