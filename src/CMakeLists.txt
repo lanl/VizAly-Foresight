@@ -12,17 +12,10 @@ option(CBENCH_ENABLE_BIG_CRUNCH
 	"Enable BigCrunch."
 	ON
 )
-if(WIN32)
-option(CBENCH_ENABLE_SZ
-	"Enable SZ."
-	OFF
-)
-else()
 option(CBENCH_ENABLE_SZ
 	"Enable SZ."
 	ON
 )
-endif()
 
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/metrics)
