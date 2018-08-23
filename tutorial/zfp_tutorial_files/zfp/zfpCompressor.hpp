@@ -67,6 +67,9 @@ inline zfp_type ZFPCompressor::getZfpType(std::string dataType)
 
 inline int ZFPCompressor::compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
 {
+    Timer cTime; 
+    cTime.start();
+
     double tolerance = 1E-3;
 	tolerance = strConvert::to_double( compressorParameters["tolerance"] );
 
@@ -104,13 +107,23 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
     stream_close(stream);
 
     zfpCompressedSize = zfpsize;
+    cbytes = zfpsize;
 
-    return zfpsize;
+    cTime.stop();
+
+
+    log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*n << ", OutputBytes: " << cbytes << ", cRatio: " << (dataTypeSize*n / (float)cbytes) << std::endl;
+    log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
+
+    return 1;
 }
 
 
 inline int ZFPCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
 {
+    Timer dTime; 
+    dTime.start();
+
 	double tolerance = strConvert::to_double( compressorParameters["tolerance"] );
     zfp_type type = getZfpType( dataType );
 
@@ -146,6 +159,10 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
     zfp_field_free(field);
     zfp_stream_close(zfp);
     stream_close(stream);
+
+    dTime.stop();
+
+    log << compressorName << " ~ DecompressTime: " << dTime.getDuration() << " s " << std::endl;
 
     return 1;
 }
