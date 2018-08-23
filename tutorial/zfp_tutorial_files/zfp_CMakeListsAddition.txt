@@ -6,7 +6,7 @@ if (USE_ZFP)
 
 	#Asks for zfp library + set that in EXTRA_LIBS
 	find_library(ZFP_LIBRARY ${ZFP_LIBRARY} CACHE STRING "ZFP library")
-	set(EXTRA_LIBS ${ZFP_LIBRARY})
+	set(EXTRA_LIBS ${EXTRA_LIBS} ${ZFP_LIBRARY})
 
 	#Asks for zfp include files + includes it in the project
 	set (ZFP_INCLUDE_PATH ${ZFP_INCLUDE_PATH} CACHE STRING "ZFP include directory")
