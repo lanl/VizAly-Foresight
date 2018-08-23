@@ -98,9 +98,13 @@ int main(int argc, char *argv[])
 	// Create log and metrics files
 	std::stringstream debuglog;
 	std::stringstream metricsInfo;
-
+	std::stringstream csvOutput;
 	writeLog(outputLogFile, debuglog.str());
 
+	csvOutput << "Compressor_field" << ", ";
+	for (int m = 0; m < metrics.size(); ++m)
+		csvOutput << metrics[m] << ", ";
+	csvOutput << "Compression Throughput, DeCompression Throughput, Compression Ratio" << std::endl;
 	metricsInfo << "Input file: " << inputFile << std::endl;
 
 	//
@@ -125,22 +129,31 @@ int main(int argc, char *argv[])
 
 	// Loop compressors
 	for (int c = 0; c < compressors.size(); ++c)
-	{
+	{	
 		// Process compressors
 		if (compressors[c] == "blosc")
 			compressorMgr = new BLOSCCompressor();
-#ifdef CBENCH_HAS_BIG_CRUNCH
+	  #ifdef CBENCH_HAS_BIG_CRUNCH
 		else if (compressors[c] == "BigCrunch")
 			compressorMgr = new BigCrunchCompressor();
-#endif
-#ifdef CBENCH_HAS_SZ
+	  #endif
+	  #ifdef CBENCH_HAS_SZ
 		else if (compressors[c] == "SZ")
 			compressorMgr = new SZCompressor();
-#endif
+	  #endif
 		else
 		{
 			std::cout << "Unsupported compressor: " << compressors[c] << "...Skipping!" << std::endl;
 			continue;
+		}
+
+
+		// Check if the parameters field exist
+		if (jsonInput["input"].find("parameters") != jsonInput["input"].end())
+		{
+			// insert parameter into compressor parameter list
+			for (auto it=jsonInput["input"]["parameters"].begin(); it != jsonInput["input"]["parameters"].end(); it++)
+				compressorMgr->compressorParameters[it.key()] = strConvert::toStr(it.value());	
 		}
 
 
@@ -160,14 +173,13 @@ int main(int argc, char *argv[])
 
 			memLoad.start();
 
-			//assert ( ioMgr->loadData(params[i]) == 1); // DEBUG
 			ioMgr->loadData(params[i]);
 
-
+			
 			debuglog << ioMgr->getDataInfo();
 			debuglog << ioMgr->getLog();
 			appendLog(outputLogFile, debuglog);
-
+			csvOutput << compressorMgr->getCompressorName() << "_" << ioMgr->getParam() << ", ";
 			MPI_Barrier(MPI_COMM_WORLD);
 
 
@@ -176,7 +188,7 @@ int main(int argc, char *argv[])
 			void * cdata = NULL;
 
 			compressClock.start();
-			compressorMgr->compress(ioMgr->data, cdata, ioMgr->getTypeSize(), ioMgr->getNumElements());
+			compressorMgr->compress(ioMgr->data, cdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getNumElements());
 			compressClock.stop();
 
 			//
@@ -184,8 +196,22 @@ int main(int argc, char *argv[])
 			void * decompdata = NULL;
 
 			decompressClock.start();
-			compressorMgr->decompress(cdata, decompdata, ioMgr->getTypeSize(), ioMgr->getNumElements() );
+			compressorMgr->decompress(cdata, decompdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getNumElements() );
 			decompressClock.stop();
+
+			// Get compression ratio
+			unsigned long totalCompressedSize;
+			unsigned long compressedSize = (unsigned long)compressorMgr->getCompressedSize();
+			debuglog << "\n\ncompressedSize: " << compressedSize << std::endl;
+			MPI_Allreduce(&compressedSize, &totalCompressedSize, 1, MPI_UNSIGNED_LONG, MPI_SUM, MPI_COMM_WORLD);
+			debuglog << "totalCompressedSize: " << totalCompressedSize << std::endl;
+
+			unsigned long totalUnCompressedSize;
+			unsigned long unCompressedSize = ioMgr->getTypeSize() * ioMgr->getNumElements();
+			debuglog << "unCompressedSize: " << unCompressedSize << std::endl;
+			MPI_Allreduce(&unCompressedSize, &totalUnCompressedSize, 1, MPI_UNSIGNED_LONG, MPI_SUM, MPI_COMM_WORLD);
+			debuglog << "totalUnCompressedSize: " << totalUnCompressedSize << std::endl;
+
 
 			writeLogApp(outputLogFile, compressorMgr->getLog());
 			compressorMgr->clearLog();
@@ -212,6 +238,7 @@ int main(int argc, char *argv[])
 				metricsMgr->execute(ioMgr->data, decompdata, ioMgr->getNumElements());
 				debuglog << metricsMgr->getLog();
 				metricsInfo << metricsMgr->getLog();
+				csvOutput << metricsMgr->getGlobalValue() << ", ";
 				metricsMgr->close();
 			}
 
@@ -231,8 +258,15 @@ int main(int argc, char *argv[])
 			MPI_Reduce(&compress_throughput, &max_compress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 			MPI_Reduce(&decompress_throughput, &max_decompress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
-			metricsInfo << "Compression Throughput: " << max_compress_throughput << " Mbytes/s" << std::endl;
-			metricsInfo << "DeCompression Throughput: " << max_decompress_throughput << " Mbytes/s" << std::endl;
+			if (myRank == 0)
+			{
+				metricsInfo << "Compression Throughput: " << max_compress_throughput << " Mbytes/s" << std::endl;
+				metricsInfo << "DeCompression Throughput: " << max_decompress_throughput << " Mbytes/s" << std::endl;
+				metricsInfo << "Compression ratio: " << totalUnCompressedSize/(float)totalCompressedSize << std::endl;
+			}
+
+			
+			csvOutput << max_compress_throughput << ", " << max_decompress_throughput << ", " << totalUnCompressedSize/(float)totalCompressedSize << "\n";
 
 			//
 			// deallocate
@@ -252,7 +286,10 @@ int main(int argc, char *argv[])
 	}
 
 	if (myRank == 0)
+	{
 		writeFile(metricsFile, metricsInfo.str());
+		writeFile(metricsFile + ".csv", csvOutput.str());
+	}
 
 	MPI_Finalize();
 
@@ -264,6 +301,6 @@ int main(int argc, char *argv[])
 /*
 
 Run:
-mpirun -np 2 CBench ../inputs/blosc.json
+mpirun -np 2 CBench ../inputs/all.json
 
 */

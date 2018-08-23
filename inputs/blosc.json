@@ -27,6 +27,5 @@
 	"metrics": [
 		"absolute_error",
 		"relative_error"
-
 	]
 }

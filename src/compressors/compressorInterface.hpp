@@ -27,19 +27,19 @@ class CompressorInterface
   protected:
     std::string compressorName;
     std::stringstream log;
+    size_t cbytes;
 
   public:
     virtual void init() = 0;
-    virtual int compress(void *input, void *&output, size_t dataType, size_t n) = 0;
-    virtual int decompress(void *&input, void *&output, size_t dataType, size_t n) = 0;
+    virtual int compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n) = 0;
+    virtual int decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n) = 0;
     virtual void close() = 0;
 
     std::string getCompressorInfo();
     std::string getCompressorName(){ return compressorName; }
     std::string getLog() { return log.str(); }
+    size_t getCompressedSize(){ return cbytes; }
 	void clearLog() { log.str(""); }
-
-	size_t cbytes;
 };
 
 

@@ -14,6 +14,7 @@ Authors:
 
 #include <sstream>
 #include <stdio.h>
+#include <string>
 
 #ifdef WIN32
 typedef signed long long __int64_t;
@@ -28,6 +29,14 @@ typedef unsigned char __uint8_t;
 
 namespace strConvert
 {
+	template <class T>
+	std::string toStr(T x)
+	{
+		std::stringstream sstr;
+		sstr << x;
+		return sstr.str();
+	}
+
 	inline double to_double(std::string value)
 	{
 		std::stringstream sstr(value);
