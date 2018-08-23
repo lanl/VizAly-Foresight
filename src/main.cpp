@@ -64,6 +64,10 @@ int main(int argc, char *argv[])
 	MPI_Comm_size(MPI_COMM_WORLD, &numRanks);
 	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
+	// For humans
+	if (myRank == 0)
+		std::cout << "Starting ... look at the log for progress update ... " << std::endl;
+
 
 	//
 	// Read input from json
@@ -94,6 +98,7 @@ int main(int argc, char *argv[])
 	for (int j = 0; j < jsonInput["metrics"].size(); j++)
 		metrics.push_back(jsonInput["metrics"][j]);
 
+
 	//
 	// Create log and metrics files
 	std::stringstream debuglog;
@@ -106,6 +111,7 @@ int main(int argc, char *argv[])
 		csvOutput << metrics[m] << ", ";
 	csvOutput << "Compression Throughput, DeCompression Throughput, Compression Ratio" << std::endl;
 	metricsInfo << "Input file: " << inputFile << std::endl;
+
 
 	//
 	// Open file
@@ -130,7 +136,6 @@ int main(int argc, char *argv[])
 	// Loop compressors
 	for (int c = 0; c < compressors.size(); ++c)
 	{	
-		// Process compressors
 		if (compressors[c] == "blosc")
 			compressorMgr = new BLOSCCompressor();
 	  #ifdef CBENCH_HAS_BIG_CRUNCH
@@ -157,13 +162,14 @@ int main(int argc, char *argv[])
 		}
 
 
-		// init
+		// log
 		compressorMgr->init();
 		metricsInfo << "\n---------------------------------------" << std::endl;
 		metricsInfo << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
 
-		debuglog << "-----------------------------------------" << std::endl;
+		debuglog << "===============================================" << std::endl;
 		debuglog << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
+
 
 		// Cycle through params
 		for (int i=0; i<params.size(); i++)
@@ -176,6 +182,7 @@ int main(int argc, char *argv[])
 			ioMgr->loadData(params[i]);
 
 			
+			// log stuff
 			debuglog << ioMgr->getDataInfo();
 			debuglog << ioMgr->getLog();
 			appendLog(outputLogFile, debuglog);
@@ -199,19 +206,20 @@ int main(int argc, char *argv[])
 			compressorMgr->decompress(cdata, decompdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getNumElements() );
 			decompressClock.stop();
 
+
 			// Get compression ratio
 			unsigned long totalCompressedSize;
 			unsigned long compressedSize = (unsigned long)compressorMgr->getCompressedSize();
-			debuglog << "\n\ncompressedSize: " << compressedSize << std::endl;
 			MPI_Allreduce(&compressedSize, &totalCompressedSize, 1, MPI_UNSIGNED_LONG, MPI_SUM, MPI_COMM_WORLD);
-			debuglog << "totalCompressedSize: " << totalCompressedSize << std::endl;
-
+			
 			unsigned long totalUnCompressedSize;
 			unsigned long unCompressedSize = ioMgr->getTypeSize() * ioMgr->getNumElements();
-			debuglog << "unCompressedSize: " << unCompressedSize << std::endl;
 			MPI_Allreduce(&unCompressedSize, &totalUnCompressedSize, 1, MPI_UNSIGNED_LONG, MPI_SUM, MPI_COMM_WORLD);
-			debuglog << "totalUnCompressedSize: " << totalUnCompressedSize << std::endl;
 
+
+			debuglog << "\n\ncompressedSize: " << compressedSize << ", totalCompressedSize: " << totalCompressedSize << std::endl;
+			debuglog << "unCompressedSize: " << unCompressedSize << ", totalUnCompressedSize: " << totalUnCompressedSize << std::endl;
+			debuglog << "Compression ratio: " << totalUnCompressedSize/(float)totalCompressedSize << std::endl;
 
 			writeLogApp(outputLogFile, compressorMgr->getLog());
 			compressorMgr->clearLog();
@@ -234,62 +242,68 @@ int main(int argc, char *argv[])
 					std::cout << "Unsupported metric: " << metrics[c] << "...Skipping!" << std::endl;
 					continue;
 				}
+
 				metricsMgr->init(MPI_COMM_WORLD);
 				metricsMgr->execute(ioMgr->data, decompdata, ioMgr->getNumElements());
+
 				debuglog << metricsMgr->getLog();
 				metricsInfo << metricsMgr->getLog();
 				csvOutput << metricsMgr->getGlobalValue() << ", ";
+
 				metricsMgr->close();
 			}
+			debuglog << "-----------------------------\n";
+			debuglog << "\nMemory in use: " << memLoad.getMemoryInUseInMB() << " MB" << std::endl;
 
 			//
 			// final timings
 			double compress_time = compressClock.getDuration();
 			double decompress_time = decompressClock.getDuration();
 
-			debuglog << " Compress time: " << compress_time << std::endl;
-			debuglog << " Decompress time: " << decompress_time << std::endl;
-			debuglog << "-----------------------------\n";
-
 			double max_compress_throughput = 0;
 			double max_decompress_throughput = 0;
+
 			double compress_throughput = ((double)(ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0*1024.0) )/ compress_time;
 			double decompress_throughput = ((double)(ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0*1024.0) )/ decompress_time;
 			MPI_Reduce(&compress_throughput, &max_compress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 			MPI_Reduce(&decompress_throughput, &max_decompress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+		
+			//
+			// deallocate
+			std::free(decompdata);
+			ioMgr->close();
+			memLoad.stop();
 
+		
+			//
+			// log stuff
+			debuglog << "\nCompress time: " << compress_time << std::endl;
+			debuglog << "Decompress time: " << decompress_time << std::endl;
+			debuglog << "\nMemory leaked: " << memLoad.getMemorySizeInMB() << " MB" << std::endl;
+			debuglog << "........................................." << std::endl << std::endl;
+
+			appendLog(outputLogFile, debuglog);
+		
 			if (myRank == 0)
 			{
 				metricsInfo << "Compression Throughput: " << max_compress_throughput << " Mbytes/s" << std::endl;
 				metricsInfo << "DeCompression Throughput: " << max_decompress_throughput << " Mbytes/s" << std::endl;
 				metricsInfo << "Compression ratio: " << totalUnCompressedSize/(float)totalCompressedSize << std::endl;
 				csvOutput << max_compress_throughput << ", " << max_decompress_throughput << ", " << totalUnCompressedSize/(float)totalCompressedSize << "\n";
+
+				writeFile(metricsFile, metricsInfo.str());
+				writeFile(metricsFile + ".csv", csvOutput.str());
 			}
-
-			
-			
-			//
-			// deallocate
-			std::free(decompdata);
-
-			debuglog << "Memory in use: " << memLoad.getMemoryInUseInMB() << " MB" << std::endl;
-			ioMgr->close();
-
-			memLoad.stop();
-			debuglog << "Memory leaked: " << memLoad.getMemorySizeInMB() << " MB \n\n" << std::endl;
-
-			appendLog(outputLogFile, debuglog);
+		
 			MPI_Barrier(MPI_COMM_WORLD);
 		}
 
 		compressorMgr->close();
 	}
 
+	
 	if (myRank == 0)
-	{
-		writeFile(metricsFile, metricsInfo.str());
-		writeFile(metricsFile + ".csv", csvOutput.str());
-	}
+		std::cout << "That's all folks!" << std::endl;
 
 	MPI_Finalize();
 
