@@ -27,8 +27,8 @@ class ZFPCompressor: public CompressorInterface
     ~ZFPCompressor();
 
     void init();
-    int compress(void *input, void *&output, size_t dataType, size_t n);
-    int decompress(void *&input, void *&output, size_t dataType, size_t n);
+    int compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
+    int decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
     void close();
 
     zfp_type getZfpType(std::string dataType);
@@ -57,7 +57,7 @@ inline zfp_type ZFPCompressor::getZfpType(std::string dataType)
 	if (dataType == "float")
 		return zfp_type_float;
 	else if (dataType == "double")
-		return zfp_type_float;
+		return zfp_type_double;
 	else if ((dataType == "int32_t") || (dataType == "int16_t"))
 		return zfp_type_int32;
 	else if (dataType == "int64_t")
@@ -65,12 +65,15 @@ inline zfp_type ZFPCompressor::getZfpType(std::string dataType)
 }
 
 
-inline int ZFPCompressor::compress(void *input, void *&output, size_t dataType, size_t n)
+inline int ZFPCompressor::compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
 {
-	double tolerance = strConvert::to_double( compressorParameters["accuracy_tolerance"] );
+    double tolerance = 1E-3;
+	tolerance = strConvert::to_double( compressorParameters["tolerance"] );
+
+	zfp_type type = getZfpType( dataType );
 
     // allocate meta data for the 1D input array
-    zfp_field* field = zfp_field_1d(input, zfp_type_float, n);
+    zfp_field* field = zfp_field_1d(input, type, n);
 
 
     // allocate meta data for a compressed stream
@@ -106,14 +109,14 @@ inline int ZFPCompressor::compress(void *input, void *&output, size_t dataType, 
 }
 
 
-inline int ZFPCompressor::decompress(void *&input, void *&output, size_t dataType, size_t n)
+inline int ZFPCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
 {
-	double tolerance = strConvert::to_double( compressorParameters["accuracy_tolerance"] );
-    zfp_type type = getZfpType( compressorParameters["dataType"] );
+	double tolerance = strConvert::to_double( compressorParameters["tolerance"] );
+    zfp_type type = getZfpType( dataType );
 
     // allocate meta data for the 1D input array of decompressed data
-    output = malloc(n*dataType);
-    zfp_field* field = zfp_field_1d(output, zfp_type_float, n);
+    output = malloc(n*dataTypeSize);
+    zfp_field* field = zfp_field_1d(output, type, n);
 
 
     // allocate meta data for a compressed stream
