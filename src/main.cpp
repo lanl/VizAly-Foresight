@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 	// Parse arguments and read json file
 	if (argc < 2)
 	{
-		std::cout << "Input argument needed. Run as: ../inputs/blosc.json" << std::endl;
+		std::cout << "Input argument needed. Run as: ../inputs/all.json" << std::endl;
 		std::cout << "Read arguments: " << argc << std::endl;
 		return 0;
 	}
