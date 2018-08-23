@@ -3,9 +3,9 @@ In this tutorial, we will go over how to a compressor to CBench. The example we 
 ## Steps:
 1. First download, build and install zfp. Once installed, the install path for zfp should have a lib and an include folder.
 2. Compressors should implement the CompressorInterface class located at src/compressors/compressorInterface.hpp
-    1. Add zfpCompressor.hpp, a class implementing the CompressorInterface for zfp to the compressor folder
+    1. Add the zfp folder containing zfpCompressor.hpp, a class implementing the CompressorInterface for zfp, to the compressors folder
 3. Modify the CMakeLists.txt file in src to allow it to link to zfp
-    1. Add the contents of zfp_CMakeListsAddition.txt to the CMakeLists.txt file in src beofre the find_package(MPI) line 
+    1. Add the contents of zfp_CMakeListsAddition.txt to the CMakeLists.txt file in src, after all the other libs but just before the find_package(MPI) line 
 4. Modify main.cpp in src by adding contents from main_modifications.diff
 5. Rerun cmake as follows ccamke ../src, turn USE_ZFP ON, a run configure. This should ask you to specify the locaton of zfp library and include path, e.g.:
     1. ZFP_LIBRARY     : /home/pascal/software/zfp-0.5.3/install/lib/libzfp.so 
