@@ -263,11 +263,11 @@ int main(int argc, char *argv[])
 				metricsInfo << "Compression Throughput: " << max_compress_throughput << " Mbytes/s" << std::endl;
 				metricsInfo << "DeCompression Throughput: " << max_decompress_throughput << " Mbytes/s" << std::endl;
 				metricsInfo << "Compression ratio: " << totalUnCompressedSize/(float)totalCompressedSize << std::endl;
+				csvOutput << max_compress_throughput << ", " << max_decompress_throughput << ", " << totalUnCompressedSize/(float)totalCompressedSize << "\n";
 			}
 
 			
-			csvOutput << max_compress_throughput << ", " << max_decompress_throughput << ", " << totalUnCompressedSize/(float)totalCompressedSize << "\n";
-
+			
 			//
 			// deallocate
 			std::free(decompdata);
