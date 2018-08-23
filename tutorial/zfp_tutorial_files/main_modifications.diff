@@ -11,13 +11,3 @@
 	else if (compressors[c] == "zfp")
 		compressorMgr = new ZFPCompressor();
 #endif
-
-
-// Add this section in the // Cycle through params loop just between appendLog(outputLogFile, debuglog); and  MPI_Barrier(MPI_COMM_WORLD);
-#ifdef HAVE_ZFP
-	if (compressors[c] == "zfp")
-	{
-		double tolerance = jsonInput["input"]["parameters"]["tolerance"];
-		compressorMgr->compressorParameters["tolerance"] = std::to_string(tolerance);
-	}
-#endif
