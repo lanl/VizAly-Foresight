@@ -17,8 +17,6 @@ class BigCrunchCompressor: public CompressorInterface
     int compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
     int decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
     void close();
-
-	size_t cbytes;
 };
 
 inline BigCrunchCompressor::BigCrunchCompressor()
@@ -59,7 +57,7 @@ inline int BigCrunchCompressor::compress(void *input, void *&output, std::string
 
 	cbytes = csize;
 
-	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*n << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*n / csize) << std::endl;
+	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*n << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*n / (float)csize) << std::endl;
 	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
 
     return 1;

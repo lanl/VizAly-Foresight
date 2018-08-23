@@ -17,8 +17,6 @@ class BLOSCCompressor: public CompressorInterface
     int compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
     int decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
     void close();
-
-	size_t cbytes;
 };
 
 inline BLOSCCompressor::BLOSCCompressor()
@@ -60,7 +58,7 @@ inline int BLOSCCompressor::compress(void *input, void *&output, std::string dat
 
 	cbytes = osize;
 
-	log << "\n" << compressorName << " ~ InputBytes: " << isize << ", OutputBytes: " << osize << ", cRatio: " << (isize/osize) << std::endl;
+	log << "\n" << compressorName << " ~ InputBytes: " << isize << ", OutputBytes: " << osize << ", cRatio: " << (isize/(float)osize) << std::endl;
 	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
 
     return 1;

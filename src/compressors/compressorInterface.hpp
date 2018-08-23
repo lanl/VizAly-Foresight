@@ -27,6 +27,7 @@ class CompressorInterface
   protected:
     std::string compressorName;
     std::stringstream log;
+    size_t cbytes;
 
   public:
     virtual void init() = 0;
@@ -37,9 +38,8 @@ class CompressorInterface
     std::string getCompressorInfo();
     std::string getCompressorName(){ return compressorName; }
     std::string getLog() { return log.str(); }
+    size_t getCompressedSize(){ return cbytes; }
 	void clearLog() { log.str(""); }
-
-	size_t cbytes;
 };
 
 

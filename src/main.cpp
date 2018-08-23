@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 	csvOutput << "Compressor_field" << ", ";
 	for (int m = 0; m < metrics.size(); ++m)
 		csvOutput << metrics[m] << ", ";
-	csvOutput << "Compression Throughput" << ", " << "DeCompression Throughput" << std::endl;
+	csvOutput << "Compression Throughput, DeCompression Throughput, Compression Ratio" << std::endl;
 	metricsInfo << "Input file: " << inputFile << std::endl;
 
 	//
@@ -199,6 +199,20 @@ int main(int argc, char *argv[])
 			compressorMgr->decompress(cdata, decompdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getNumElements() );
 			decompressClock.stop();
 
+			// Get compression ratio
+			unsigned long totalCompressedSize;
+			unsigned long compressedSize = (unsigned long)compressorMgr->getCompressedSize();
+			debuglog << "\n\ncompressedSize: " << compressedSize << std::endl;
+			MPI_Allreduce(&compressedSize, &totalCompressedSize, 1, MPI_UNSIGNED_LONG, MPI_SUM, MPI_COMM_WORLD);
+			debuglog << "totalCompressedSize: " << totalCompressedSize << std::endl;
+
+			unsigned long totalUnCompressedSize;
+			unsigned long unCompressedSize = ioMgr->getTypeSize() * ioMgr->getNumElements();
+			debuglog << "unCompressedSize: " << unCompressedSize << std::endl;
+			MPI_Allreduce(&unCompressedSize, &totalUnCompressedSize, 1, MPI_UNSIGNED_LONG, MPI_SUM, MPI_COMM_WORLD);
+			debuglog << "totalUnCompressedSize: " << totalUnCompressedSize << std::endl;
+
+
 			writeLogApp(outputLogFile, compressorMgr->getLog());
 			compressorMgr->clearLog();
 
@@ -244,10 +258,15 @@ int main(int argc, char *argv[])
 			MPI_Reduce(&compress_throughput, &max_compress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 			MPI_Reduce(&decompress_throughput, &max_decompress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
-			metricsInfo << "Compression Throughput: " << max_compress_throughput << " Mbytes/s" << std::endl;
-			metricsInfo << "DeCompression Throughput: " << max_decompress_throughput << " Mbytes/s" << std::endl;
+			if (myRank == 0)
+			{
+				metricsInfo << "Compression Throughput: " << max_compress_throughput << " Mbytes/s" << std::endl;
+				metricsInfo << "DeCompression Throughput: " << max_decompress_throughput << " Mbytes/s" << std::endl;
+				metricsInfo << "Compression ratio: " << totalUnCompressedSize/(float)totalCompressedSize << std::endl;
+			}
 
-			csvOutput << max_compress_throughput << ", " << max_decompress_throughput << "\n";
+			
+			csvOutput << max_compress_throughput << ", " << max_decompress_throughput << ", " << totalUnCompressedSize/(float)totalCompressedSize << "\n";
 
 			//
 			// deallocate
