@@ -32,6 +32,7 @@ CBench takes as input a json file (examples of input json files are in the **_in
 * Filetype (HACC or NYX)
 * Filename
 * Scalars to analyze
+* Compressor parameters
 * Log-filename
 * Metric-filename
 * Compressors to use
