@@ -14,7 +14,7 @@ option(CBENCH_ENABLE_BIG_CRUNCH
 )
 option(CBENCH_ENABLE_SZ
 	"Enable SZ."
-	OFF
+	ON
 )
 
 include_directories(${CMAKE_SOURCE_DIR})
