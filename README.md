@@ -49,7 +49,7 @@ CBench takes as input a json file (examples of input json files are in the **_in
 ### Currently Supported metrics:
 * Absolute Error
 * Relative Error
-* Runtime
+* MSE
 
 # Development
 For information on how to add new compressors and/or metrics, look at the tuutorial folder
