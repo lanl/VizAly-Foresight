@@ -42,9 +42,9 @@ CBench takes as input a json file (examples of input json files are in the **_in
 * GenericIO
 
 ### Currently Supported compressors:
-* Lossless BLOSC
-* Lossy BigCrunch
-* SZ
+* [Lossless BLOSC](http://blosc.org/)
+* [Lossy BigCrunch](https://github.com/lanl/VizAly-BigCrunch)
+* [SZ](https://collab.cels.anl.gov/display/ESR/SZ)
 
 ### Currently Supported metrics:
 * Absolute Error
