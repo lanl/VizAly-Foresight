@@ -148,7 +148,8 @@ int main(int argc, char *argv[])
 	  #endif
 		else
 		{
-			std::cout << "Unsupported compressor: " << compressors[c] << "...Skipping!" << std::endl;
+			if (myRank == 0)
+				std::cout << "Unsupported compressor: " << compressors[c] << "...Skipping!" << std::endl;
 			continue;
 		}
 
@@ -239,7 +240,8 @@ int main(int argc, char *argv[])
 					metricsMgr = new meansquareError();
 				else
 				{
-					std::cout << "Unsupported metric: " << metrics[c] << "...Skipping!" << std::endl;
+					if (myRank == 0)
+						std::cout << "Unsupported metric: " << metrics[c] << "...Skipping!" << std::endl;
 					continue;
 				}
 
