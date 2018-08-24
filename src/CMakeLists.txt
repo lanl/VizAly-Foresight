@@ -10,11 +10,11 @@ option(CBENCH_ENABLE_BLOSC
 )
 option(CBENCH_ENABLE_BIG_CRUNCH
 	"Enable BigCrunch."
-	ON
+	OFF
 )
 option(CBENCH_ENABLE_SZ
 	"Enable SZ."
-	ON
+	OFF
 )
 
 include_directories(${CMAKE_SOURCE_DIR})
@@ -46,9 +46,16 @@ include(ExternalProject)
 set (EXTRA_LIBS "")
 
 include_directories(${CMAKE_SOURCE_DIR}/compressors)
+
 if(CBENCH_ENABLE_BLOSC)
     include_directories(${CMAKE_SOURCE_DIR}/compressors/BLOSC)
+    if (NOT CBENCH_ENABLE_BIG_CRUNCH)
+        add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2)
+        include_directories(${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2/blosc)
+        set (EXTRA_LIBS ${EXTRA_LIBS} blosc)
+    endif()
 endif()
+
 if(CBENCH_ENABLE_BIG_CRUNCH)
     include_directories(${CMAKE_SOURCE_DIR}/compressors/BigCrunch)
     add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch")
@@ -56,6 +63,7 @@ if(CBENCH_ENABLE_BIG_CRUNCH)
     add_definitions (-DCBENCH_HAS_BIG_CRUNCH)
     set (EXTRA_LIBS ${EXTRA_LIBS} bigcrunch)
 endif()
+
 if(CBENCH_ENABLE_SZ)
     include_directories(${CMAKE_SOURCE_DIR}/compressors/SZ)
     add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/SZ")
@@ -104,8 +112,5 @@ endif()
 
 # Remove output files
 add_custom_target(clean-output
-	COMMAND rm -f *.vtu
-	COMMAND rm -f *.pvtu
-	COMMAND rm -f *.vts
-	COMMAND rm -f *.pvts
+	COMMAND rm -f *.log
 )
