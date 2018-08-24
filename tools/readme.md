@@ -11,4 +11,4 @@ This is a simple tool that should allow the user to plot some graphs.
  - sudo apt-get install python-tk
 
 ## Runing:
-python plotting.py metrics
+python plotting.py plotInput.json
