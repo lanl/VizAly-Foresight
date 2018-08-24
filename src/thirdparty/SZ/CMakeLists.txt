@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.1.3)
 project (sz)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -lm -fopenmp")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -lm -fopenmp")
 
 set (CMAKE_DISABLE_SOURCE_CHANGES ON)
 set (CMAKE_DISABLE_IN_SOURCE_BUILD ON)
