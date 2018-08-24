@@ -44,6 +44,7 @@ CBench takes as input a json file (examples of input json files are in the **_in
 ### Currently Supported compressors:
 * Lossless BLOSC
 * Lossy BigCrunch
+* SZ
 
 ### Currently Supported metrics:
 * Absolute Error
