@@ -78,7 +78,8 @@ inline void relativeError::execute(void *original, void *approx, size_t n) {
 	val = max_rel_err;
 
 	double total_max_rel_err = 0;
-	MPI_Reduce(&max_rel_err, &total_max_rel_err, 1, MPI_DOUBLE, MPI_MAX, 0, comm);// MPI_COMM_WORLD);
+	//MPI_Reduce(&max_rel_err, &total_max_rel_err, 1, MPI_DOUBLE, MPI_MAX, 0, comm);// MPI_COMM_WORLD);
+	MPI_Allreduce(&max_rel_err, &total_max_rel_err, 1, MPI_DOUBLE, MPI_MAX, comm);// MPI_COMM_WORLD);
 	total_val = total_max_rel_err;
 
 	log << " Max Rel Error: " << total_max_rel_err << std::endl;

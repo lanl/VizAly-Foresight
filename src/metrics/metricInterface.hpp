@@ -19,7 +19,11 @@ Authors:
 
 class MetricInterface
 {
+
   protected:
+    double val;
+    double total_val;
+
     std::string metricName;
     std::stringstream log;
 
@@ -30,12 +34,13 @@ class MetricInterface
     virtual void close() = 0;
 
     std::string getMetricInfo();
+    double getLocalValue(){ return val; }
+    double getGlobalValue(){ return total_val; }
     std::string getMetricName(){ return metricName; }
     std::string getLog() { return log.str(); }
 	void clearLog() { log.str(""); }
 
-	double val;
-	double total_val;
+	
 };
 
 

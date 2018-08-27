@@ -6,7 +6,7 @@ if [ "$#" -ne 1 ]; then
 else 
   buildDir=$1 
 fi 
- 
+
 # Create build directory 
 mkdir $buildDir 
 cd $buildDir 

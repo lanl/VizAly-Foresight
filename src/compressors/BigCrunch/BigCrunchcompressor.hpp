@@ -14,11 +14,9 @@ class BigCrunchCompressor: public CompressorInterface
     ~BigCrunchCompressor();
 
     void init();
-    int compress(void *input, void *&output, size_t dataType, size_t n);
-    int decompress(void *&input, void *&output, size_t dataType, size_t n);
+    int compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
+    int decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
     void close();
-
-	size_t cbytes;
 };
 
 inline BigCrunchCompressor::BigCrunchCompressor()
@@ -37,11 +35,11 @@ inline void BigCrunchCompressor::init()
 	 
 }
 
-inline int BigCrunchCompressor::compress(void *input, void *&output, size_t dataType, size_t n)
+inline int BigCrunchCompressor::compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
 {
 	// Default Params { Error:-3, Tolerance:1, BLOSC_NTHREADS: 1, BLOSCFILTER:SHUFFLE, BLOSC_COMPRESSOR:ZSTD }
 	bigcrunch::setting_t settings = { {bigcrunch::config_t::ERR, -3},
-				 {bigcrunch::config_t::TOLERANCE, 1},
+				 {bigcrunch::config_t::TOLERANCE, 0},
 				 {bigcrunch::config_t::BLOSC_NTHREADS, 1},
 				 {bigcrunch::config_t::BLOSC_COMPRESSOR, bigcrunch::blosc_compressor_t::ZSTD},
 				 {bigcrunch::config_t::BLOSC_CLEVEL, 9},
@@ -59,13 +57,13 @@ inline int BigCrunchCompressor::compress(void *input, void *&output, size_t data
 
 	cbytes = csize;
 
-	log << "\n" << compressorName << " ~ InputBytes: " << dataType*n << ", OutputBytes: " << csize << ", cRatio: " << (dataType*n / csize) << std::endl;
+	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*n << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*n / (float)csize) << std::endl;
 	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
 
     return 1;
 }
 
-inline int BigCrunchCompressor::decompress(void *&input, void *&output, size_t dataType, size_t n)
+inline int BigCrunchCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
 {
 	bigcrunch::setting_t settings = { {bigcrunch::config_t::ERR, -3},
 				 {bigcrunch::config_t::TOLERANCE, 1},

@@ -8,7 +8,12 @@
 		"filename": "../testing/data/m000.full.mpicosmo.50",
 
 		"scalars-comment" : "which scalars to test",
-		"scalars" : ["x", "y", "z", "vx", "vy", "vz"]
+		"scalars" : ["x", "y", "z", "vx", "vy", "vz"],
+
+		"parameters" :
+		{
+			"tolerance" : 1e-03
+		}
 	},
 
 	"output" :
@@ -21,12 +26,13 @@
 	},
 
 	"compressor-comment" : "which compressors to test",
-	"compressors" : ["blosc", "BigCrunch"],
+	"compressors" : ["blosc", "SZ" ],
+	"compressors-backup" : ["blosc", "BigCrunch", "SZ" ],
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [
 		"absolute_error",
 		"relative_error",
-        "mse"
+		"mse"
 	]
 }
