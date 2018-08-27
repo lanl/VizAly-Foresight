@@ -156,16 +156,15 @@ inline int NYXDataLoader::loadData(std::string paramName)
 	try {
 		H5::H5File file(filename, H5F_ACC_RDONLY);
 		H5::Group group(file.openGroup("native_fields"));
-		for (int grps = 0; grps < group.getNumObjs(); grps++)
+		/*for (int grps = 0; grps < group.getNumObjs(); grps++)
 		{
 			std::cout << "Field: " << group.getObjnameByIdx(grps) << "\n";
 			std::string name = group.getObjnameByIdx(grps);
 		}
-
-		std::cout << "Detected " << group.getNumObjs() << " variables in file.\n";
+		std::cout << "Detected " << group.getNumObjs() << " variables in file.\n";*/
 
 		H5::Group group_meta(file.openGroup("universe"));
-		for (int grps = 0; grps < group_meta.getNumAttrs(); grps++)
+		/*for (int grps = 0; grps < group_meta.getNumAttrs(); grps++)
 		{
 			H5::Attribute attr = group_meta.openAttribute(grps);
 			std::cout << "Universe: " << attr.getName() << " : ";
@@ -175,31 +174,27 @@ inline int NYXDataLoader::loadData(std::string paramName)
 			attr.read(type, &val);
 			std::cout << val << std::endl;
 		}
-		std::cout << "Detected " << group_meta.getNumAttrs() << " universe attributes.\n";
+		std::cout << "Detected " << group_meta.getNumAttrs() << " universe attributes.\n";*/
 
-		//fields=1;
 		int fields = group.getNumObjs();
-
 
 		H5::DataSet dataset(group.openDataSet(paramName));
 		H5::DataSpace dataspace(dataset.getSpace());
 		H5::DataSpace memspace(dataset.getSpace()); //This would define rank and local rank extent
 		hsize_t dims[3];
 		dataspace.getSimpleExtentDims(dims);
-		std::cout << "Data dimensions: " << dims[0] << " " << dims[1] << " " << dims[2] << "\n";
-		size_t numElements = dims[0] * dims[1] * dims[2];
+		//std::cout << "Data dimensions: " << dims[0] << " " << dims[1] << " " << dims[2] << "\n";
+		numElements = dims[0] * dims[1] * dims[2];
+			
+		totalNumberOfElements = numElements; // Temporary 
 
 		dataType = "float";
 		// Set-up data stream
 		allocateMem(dataType, numElements, 0);
 
-		std::cout << "Buffer allocated..";
-		std::cout.flush();
 		// Data buffer stream, data_type, memory_space, file_space
 		// H%::PredType::NATIVE_DOUBLE
 		dataset.read(data, H5::PredType::NATIVE_FLOAT, memspace, dataspace);
-		std::cout << "..data read." << std::endl;
-		std::cout.flush();
 
 		dataset.close();
 		file.close();

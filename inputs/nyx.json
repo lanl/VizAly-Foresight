@@ -1,0 +1,31 @@
+{
+  "input": {
+    "filetype-comment": "type of file to load; HACC or NYX",
+    "filetype": "NYX",
+
+    "filename-comment": "name of input file",
+    "filename": "../testing/data/z255_32.h5",
+
+    "scalars-comment": "which scalars to test",
+    "scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ]
+  },
+
+	"output" :
+	{
+		"logfname-comment": "name of output log file",
+		"logfname" : "runlog",
+
+		"metricsfname-comment": "name of file with output",
+		"metricsfname" : "metrics"
+	},
+
+	"compressor-comment" : "which compressors to test",
+	"compressors" : ["blosc", "BigCrunch", "SZ" ],
+
+	"metrics-comment" : "which metrics to use",
+	"metrics": [
+		"absolute_error",
+    "relative_error",
+    "mse"
+	]
+}
