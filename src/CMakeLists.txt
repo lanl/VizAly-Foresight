@@ -15,11 +15,11 @@ set (CBENCH_ENABLE_BLOSC 1)
 #)
 option(CBENCH_ENABLE_BIG_CRUNCH
 	"Enable BigCrunch."
-	OFF
+	ON
 )
 option(CBENCH_ENABLE_SZ
 	"Enable SZ."
-	OFF
+	ON
 )
 
 option(CBENCH_ENABLE_NYX

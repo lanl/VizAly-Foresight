@@ -25,7 +25,7 @@
 	"metrics-comment" : "which metrics to use",
 	"metrics": [
 		"absolute_error",
-    "relative_error",
-    "mse"
+        "relative_error",
+        "mse"
 	]
 }
