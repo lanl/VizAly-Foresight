@@ -4,17 +4,27 @@ project(CBench)
 
 set (CMAKE_CXX_STANDARD 11)
 
-option(CBENCH_ENABLE_BLOSC
-	"Enable BLOSC."
-	ON
-)
+# add libs
+set (EXTRA_LIBS "")
+
+# Blosc will always be enabled now
+set (CBENCH_ENABLE_BLOSC 1)
+#option(CBENCH_ENABLE_BLOSC
+#	"Enable BLOSC."
+#	ON
+#)
 option(CBENCH_ENABLE_BIG_CRUNCH
 	"Enable BigCrunch."
 	OFF
 )
 option(CBENCH_ENABLE_SZ
 	"Enable SZ."
-	ON
+	OFF
+)
+
+option(CBENCH_ENABLE_NYX
+	"Enables the reading of NyX HDF5 data"
+	OFF
 )
 
 include_directories(${CMAKE_SOURCE_DIR})
@@ -23,10 +33,19 @@ include_directories(${CMAKE_SOURCE_DIR}/utils)
 
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader/HACC)
-# something for nyx here
+if(CBENCH_ENABLE_NYX)
+	include_directories(${CMAKE_SOURCE_DIR}/dataLoader/NYX)
+endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty/genericio)
-# something for nyx here
+if(CBENCH_ENABLE_NYX)
+	find_package(HDF5 REQUIRED)
+	if(HDF5_FOUND)
+		include_directories(${HDF5_INCLUDE_DIRS})
+		set (EXTRA_LIBS ${EXTRA_LIBS} HDF5_CXX_LIBRARIES )
+		add_definitions (-DCBENCH_HAS_NYX)
+	endif()
+endif()
 
 
 # HACC Params
@@ -42,9 +61,6 @@ include(CheckIncludeFileCXX)
 include(CheckIncludeFiles)
 include(ExternalProject)
 
-# add libs
-set (EXTRA_LIBS "")
-
 include_directories(${CMAKE_SOURCE_DIR}/compressors)
 
 if(CBENCH_ENABLE_BLOSC)
@@ -53,6 +69,7 @@ if(CBENCH_ENABLE_BLOSC)
         add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2)
         include_directories(${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2/blosc)
         set (EXTRA_LIBS ${EXTRA_LIBS} blosc)
+		message(STATUS "--Using external BLOSC--")
     endif()
 endif()
 
@@ -62,6 +79,7 @@ if(CBENCH_ENABLE_BIG_CRUNCH)
     include_directories(${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch/include)
     add_definitions (-DCBENCH_HAS_BIG_CRUNCH)
     set (EXTRA_LIBS ${EXTRA_LIBS} bigcrunch)
+	message(STATUS "--Using BigCrunchs Internal BLOSC--")
 endif()
 
 if(CBENCH_ENABLE_SZ)
