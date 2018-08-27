@@ -5,11 +5,6 @@ services:
 
 jobs:
   include:
-    #- stage: push docker image
-    #  script:
-    #  - docker build -t cbench .
-    #  - docker tag cbench:latest cmbiwer/vizaly-cbench:v0
-    #  - docker push cmbiwer/vizaly-cbench
     - stage: test build
       script:
       # pull container

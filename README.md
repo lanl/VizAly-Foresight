@@ -54,6 +54,8 @@ CBench takes as input a json file (examples of input json files are in the **_in
 # Development
 For information on how to add new compressors and/or metrics, look at the [tutorial folder](https://github.com/lanl/VizAly-CBench/tree/master/tutorial)
 
+For information on how to develop the Travis CI and Docker image, look at the [travis folder](https://github.com/lanl/VizAly-CBench/tree/master/testing/travis)
+
 # Copyright and license
 LANS has asserted copyright on the software package C17078, entitled Framework for Analysis and Visualization of Simulation Data.   
 
