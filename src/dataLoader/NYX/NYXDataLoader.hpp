@@ -12,6 +12,7 @@ Authors:
 #define _NYX_LOADER_H_
 
 #include <sstream>
+#include <string>
 #include "dataLoaderInterface.hpp"
 #include "timer.hpp"
 #include "H5Cpp.h"
@@ -158,8 +159,7 @@ inline int NYXDataLoader::loadData(std::string paramName)
 		for (int grps = 0; grps < group.getNumObjs(); grps++)
 		{
 			std::cout << "Field: " << group.getObjnameByIdx(grps) << "\n";
-			string name = group.getObjnameByIdx(grps);
-			field_name.push_back(name);
+			std::string name = group.getObjnameByIdx(grps);
 		}
 
 		std::cout << "Detected " << group.getNumObjs() << " variables in file.\n";
@@ -169,13 +169,11 @@ inline int NYXDataLoader::loadData(std::string paramName)
 		{
 			H5::Attribute attr = group_meta.openAttribute(grps);
 			std::cout << "Universe: " << attr.getName() << " : ";
-			string name = attr.getName();
+			std::string name = attr.getName();
 			double val = 0.0;
 			H5::DataType type = attr.getDataType();
 			attr.read(type, &val);
-			cout << val << endl;
-			attr_name.push_back(name);
-			attr_val.push_back(val);
+			std::cout << val << std::endl;
 		}
 		std::cout << "Detected " << group_meta.getNumAttrs() << " universe attributes.\n";
 
@@ -191,8 +189,9 @@ inline int NYXDataLoader::loadData(std::string paramName)
 		std::cout << "Data dimensions: " << dims[0] << " " << dims[1] << " " << dims[2] << "\n";
 		size_t numElements = dims[0] * dims[1] * dims[2];
 
+		dataType = "float";
 		// Set-up data stream
-		allocateMem("float", numElements, 0);
+		allocateMem(dataType, numElements, 0);
 
 		std::cout << "Buffer allocated..";
 		std::cout.flush();

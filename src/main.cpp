@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
 	if (inputFileType == "HACC")
 		ioMgr = new HACCDataLoader();
   #ifdef CBENCH_HAS_NYX
-	else if (inputFIleTYpe == "NYX")
+	else if (inputFileType == "NYX")
 		ioMgr = new NYXDataLoader();
   #endif
 	else

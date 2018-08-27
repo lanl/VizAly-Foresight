@@ -24,7 +24,7 @@ option(CBENCH_ENABLE_SZ
 
 option(CBENCH_ENABLE_NYX
 	"Enables the reading of NyX HDF5 data"
-	OFF
+	ON
 )
 
 include_directories(${CMAKE_SOURCE_DIR})
@@ -39,10 +39,12 @@ endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty/genericio)
 if(CBENCH_ENABLE_NYX)
-	find_package(HDF5 REQUIRED)
+    set(HDF5_USE_STATIC_LIBRARIES ON)
+	find_package(HDF5 COMPONENTS CXX REQUIRED)
 	if(HDF5_FOUND)
 		include_directories(${HDF5_INCLUDE_DIRS})
-		set (EXTRA_LIBS ${EXTRA_LIBS} HDF5_CXX_LIBRARIES )
+		set (EXTRA_LIBS ${EXTRA_LIBS} ${HDF5_CXX_LIBRARIES} )
+		message(STATUS ${HDF5_CXX_LIBRARIES})
 		add_definitions (-DCBENCH_HAS_NYX)
 	endif()
 endif()
