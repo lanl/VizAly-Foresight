@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
 
 	ioMgr->init(inputFile, MPI_COMM_WORLD);
 
-
+	
 	//
 	// Cycle through compressors and parameters
 	CompressorInterface *compressorMgr;
