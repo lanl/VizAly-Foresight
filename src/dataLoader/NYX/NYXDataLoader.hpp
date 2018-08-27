@@ -153,6 +153,7 @@ inline int NYXDataLoader::loadData(std::string paramName)
 
 	clock.start();
 	
+	// Note: hdf5-cxx not compatible with parallel
 	try {
 		H5::H5File file(filename, H5F_ACC_RDONLY);
 		H5::Group group(file.openGroup("native_fields"));

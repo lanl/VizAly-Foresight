@@ -13,18 +13,19 @@ set (CBENCH_ENABLE_BLOSC 1)
 #	"Enable BLOSC."
 #	ON
 #)
+
 option(CBENCH_ENABLE_BIG_CRUNCH
 	"Enable BigCrunch."
-	ON
+	OFF
 )
 option(CBENCH_ENABLE_SZ
 	"Enable SZ."
 	ON
 )
 
-option(CBENCH_ENABLE_NYX
+option(CBENCH_ENABLE_NYX_LOADER
 	"Enables the reading of NyX HDF5 data"
-	ON
+	OFF
 )
 
 include_directories(${CMAKE_SOURCE_DIR})
@@ -33,12 +34,19 @@ include_directories(${CMAKE_SOURCE_DIR}/utils)
 
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader/HACC)
-if(CBENCH_ENABLE_NYX)
+if(CBENCH_ENABLE_NYX_LOADER)
 	include_directories(${CMAKE_SOURCE_DIR}/dataLoader/NYX)
 endif()
 
+# HACC Loader
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty/genericio)
-if(CBENCH_ENABLE_NYX)
+add_definitions(-DGENERICIO_NO_MPI)
+add_definitions(-DGENERICIO_NO_COMPRESSION)
+add_library(GenericIO STATIC "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO.cxx")
+set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
+
+# NYX Loader
+if(CBENCH_ENABLE_NYX_LOADER)
     set(HDF5_USE_STATIC_LIBRARIES ON)
 	find_package(HDF5 COMPONENTS CXX REQUIRED)
 	if(HDF5_FOUND)
@@ -47,14 +55,6 @@ if(CBENCH_ENABLE_NYX)
 		add_definitions (-DCBENCH_HAS_NYX)
 	endif()
 endif()
-
-
-# HACC Params
-add_definitions(-DGENERICIO_NO_MPI)
-add_definitions(-DGENERICIO_NO_COMPRESSION)
-add_library(GenericIO STATIC "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO.cxx")
-set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
-
 
 # Add Compressors
 include(CheckIncludeFile)
@@ -70,7 +70,7 @@ if(CBENCH_ENABLE_BLOSC)
         add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2)
         include_directories(${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2/blosc)
         set (EXTRA_LIBS ${EXTRA_LIBS} blosc)
-		message(STATUS "--Using external BLOSC--")
+		message(STATUS "--Using external BLOSC--") #dynamic
     endif()
 endif()
 
@@ -80,8 +80,7 @@ if(CBENCH_ENABLE_BIG_CRUNCH)
     include_directories(${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch/include)
     add_definitions (-DCBENCH_HAS_BIG_CRUNCH)
     set (EXTRA_LIBS ${EXTRA_LIBS} bigcrunch)
-	set (EXTRA_LIBS ${EXTRA_LIBS} blosc)
-	message(STATUS "--Using BigCrunchs BLOSC--")
+	message(STATUS "--Using BigCrunchs BLOSC--") #static
 endif()
 
 if(CBENCH_ENABLE_SZ)
