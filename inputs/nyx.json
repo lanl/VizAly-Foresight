@@ -13,10 +13,10 @@
 	"output" :
 	{
 		"logfname-comment": "name of output log file",
-		"logfname" : "runlog",
+		"logfname" : "runlogNYX",
 
 		"metricsfname-comment": "name of file with output",
-		"metricsfname" : "metrics"
+		"metricsfname" : "metricsNYX"
 	},
 
 	"compressor-comment" : "which compressors to test",

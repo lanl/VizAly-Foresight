@@ -7,22 +7,6 @@ set (CMAKE_CXX_STANDARD 11)
 # add libs
 set (EXTRA_LIBS "")
 
-# Blosc will always be enabled now
-set (CBENCH_ENABLE_BLOSC 1)
-#option(CBENCH_ENABLE_BLOSC
-#	"Enable BLOSC."
-#	ON
-#)
-
-option(CBENCH_ENABLE_BIG_CRUNCH
-	"Enable BigCrunch."
-	OFF
-)
-option(CBENCH_ENABLE_SZ
-	"Enable SZ."
-	ON
-)
-
 option(CBENCH_ENABLE_NYX_LOADER
 	"Enables the reading of NyX HDF5 data"
 	OFF
@@ -58,7 +42,6 @@ endif()
 
 
 # Add external compressors
-set(EXTRA_LIBS "")
 include_directories(${CMAKE_SOURCE_DIR}/compressors)
 file(GLOB subdir "${CMAKE_SOURCE_DIR}/compressors/*")
 foreach (dir ${subdir})

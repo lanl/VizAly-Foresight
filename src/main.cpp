@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
   #endif
 	else
 	{
-		std::cout << "Unsupported file!!!" << std::endl;
+		std::cout << "Unsupported format " << inputFileType << "!!!" << std::endl;
 		return 0;
 	}
 
