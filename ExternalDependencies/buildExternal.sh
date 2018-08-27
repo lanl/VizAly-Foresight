@@ -36,6 +36,3 @@ make -j
 make install
 cd ..
 cd ..
-
-
-

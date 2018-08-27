@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
 		else
 		{
 			if (myRank == 0)
-				std::cout << "Unsupported compressor: " << compressors[c] << "...Skipping!" << std::endl;
+				std::cout << "Unsupported compressor: " << compressors[c] << " ... Skipping!" << std::endl;
 			continue;
 		}
 
