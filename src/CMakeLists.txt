@@ -4,10 +4,16 @@ project(CBench)
 
 set (CMAKE_CXX_STANDARD 11)
 
-option(CBENCH_ENABLE_BLOSC
-	"Enable BLOSC."
-	ON
-)
+# add libs
+set (EXTRA_LIBS "")
+
+# Blosc will always be enabled now
+set (CBENCH_ENABLE_BLOSC 1)
+#option(CBENCH_ENABLE_BLOSC
+#	"Enable BLOSC."
+#	ON
+#)
+
 option(CBENCH_ENABLE_BIG_CRUNCH
 	"Enable BigCrunch."
 	OFF
@@ -17,33 +23,44 @@ option(CBENCH_ENABLE_SZ
 	ON
 )
 
+option(CBENCH_ENABLE_NYX_LOADER
+	"Enables the reading of NyX HDF5 data"
+	OFF
+)
+
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/metrics)
 include_directories(${CMAKE_SOURCE_DIR}/utils)
 
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader/HACC)
-# something for nyx here
+if(CBENCH_ENABLE_NYX_LOADER)
+	include_directories(${CMAKE_SOURCE_DIR}/dataLoader/NYX)
+endif()
 
+# HACC Loader
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty/genericio)
-# something for nyx here
-
-
-# HACC Params
 add_definitions(-DGENERICIO_NO_MPI)
 add_definitions(-DGENERICIO_NO_COMPRESSION)
 add_library(GenericIO STATIC "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO.cxx")
 set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
 
+# NYX Loader
+if(CBENCH_ENABLE_NYX_LOADER)
+    set(HDF5_USE_STATIC_LIBRARIES ON)
+	find_package(HDF5 COMPONENTS CXX REQUIRED)
+	if(HDF5_FOUND)
+		include_directories(${HDF5_INCLUDE_DIRS})
+		set (EXTRA_LIBS ${EXTRA_LIBS} ${HDF5_LIBRARIES} )
+		add_definitions (-DCBENCH_HAS_NYX)
+	endif()
+endif()
 
 # Add Compressors
 include(CheckIncludeFile)
 include(CheckIncludeFileCXX)
 include(CheckIncludeFiles)
 include(ExternalProject)
-
-# add libs
-set (EXTRA_LIBS "")
 
 include_directories(${CMAKE_SOURCE_DIR}/compressors)
 
@@ -53,6 +70,7 @@ if(CBENCH_ENABLE_BLOSC)
         add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2)
         include_directories(${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2/blosc)
         set (EXTRA_LIBS ${EXTRA_LIBS} blosc)
+		message(STATUS "--Using external BLOSC--") #dynamic
     endif()
 endif()
 
@@ -62,6 +80,7 @@ if(CBENCH_ENABLE_BIG_CRUNCH)
     include_directories(${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch/include)
     add_definitions (-DCBENCH_HAS_BIG_CRUNCH)
     set (EXTRA_LIBS ${EXTRA_LIBS} bigcrunch)
+	message(STATUS "--Using BigCrunchs BLOSC--") #static
 endif()
 
 if(CBENCH_ENABLE_SZ)

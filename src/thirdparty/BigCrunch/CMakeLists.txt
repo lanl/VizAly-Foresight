@@ -78,11 +78,11 @@ set(PROJECT_INTERFACE_HEADER_FILES
 
 # 3rdparty libraries
 add_subdirectory(3rdparty/openmp)
-#if (NOT TARGET blosc)
-   #add_subdirectory(3rdparty/blosc)
-   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../c-blosc-1.10.2 ${CMAKE_CURRENT_BINARY_DIR}../c-blosc-1.10.2)
-   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../c-blosc-1.10.2/blosc)
-#endif() 
+if (NOT TARGET blosc)
+   add_subdirectory(3rdparty/blosc)
+   #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../c-blosc-1.10.2 ${CMAKE_CURRENT_BINARY_DIR}../c-blosc-1.10.2)
+   #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../c-blosc-1.10.2/blosc)
+endif() 
 
 
 # test targets
