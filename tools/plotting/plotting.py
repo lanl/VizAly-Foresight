@@ -7,8 +7,7 @@ import itertools
 import matplotlib.pyplot as plt
 
 
-
-def drawScatter(oufputFileName, compressorsToPlot, metricsToPlot, rows, fields):
+def drawScatter(oufputFileName, title, compressorsToPlot, metricsToPlot, rows, fields, liveDisplay):
 
 	#Find rows to plot
 	dataRowLocation = []
@@ -52,12 +51,14 @@ def drawScatter(oufputFileName, compressorsToPlot, metricsToPlot, rows, fields):
            fontsize=10)
 
 	plt.savefig(oufputFileName)
-	plt.show()
+
+	if (liveDisplay):
+		plt.show()
 
 
 
-def drawBar(oufputFileName, compressorsToPlot, metricToPlot, rows, fields):	
-
+def drawBar(oufputFileName, title, compressorsToPlot, metricToPlot, rows, fields, liveDisplay):	
+	
 	# Find rows to plot
 	dataRowLocation = []
 	for c in compressorsToPlot:
@@ -95,7 +96,9 @@ def drawBar(oufputFileName, compressorsToPlot, metricToPlot, rows, fields):
 
 
 	plt.savefig(oufputFileName)
-	plt.show()
+
+	if (liveDisplay):
+		plt.show()
 
 
 # Read a csv file
@@ -140,21 +143,16 @@ def main(argv):
 	for c in jsonData["x-axis"]:
 		compressorsToPlot.append(c)
 
-	#metricToPlot = "Compression Ratio"
-	#metricsToPlot = ["Compression Throughput", "Compression Ratio"]
 
 
 	if (jsonData["plot-type"] == "scatter"):
 		metricsToPlot = jsonData["metrics"]
-		drawScatter(jsonData["outputFileName"], compressorsToPlot, metricsToPlot, rows, fields)
+		drawScatter(jsonData["outputFileName"], jsonData["plot-title"], compressorsToPlot, metricsToPlot, rows, fields, jsonData["live-display"])
 
 	if (jsonData["plot-type"] == "barchart"):
 		metricToPlot = jsonData["metrics"]
-		drawBar(jsonData["outputFileName"], compressorsToPlot, metricToPlot, rows, fields)
-	
-	
-	#
-	
+		drawBar(jsonData["outputFileName"], jsonData["plot-title"], compressorsToPlot, metricToPlot, rows, fields, jsonData["live-display"])
+
 	
 
 if __name__ == "__main__":
