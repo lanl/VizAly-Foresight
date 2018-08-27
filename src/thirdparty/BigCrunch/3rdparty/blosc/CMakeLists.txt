@@ -14,6 +14,7 @@ ExternalProject_Add(
     ${PROJECT_NAME}-external
     #URL https://github.com/Blosc/c-blosc/archive/master.zip
 	GIT_REPOSITORY https://github.com/Blosc/c-blosc.git
+    GIT_TAG v1.14.4
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-external
     # disable install step
     INSTALL_COMMAND ""
