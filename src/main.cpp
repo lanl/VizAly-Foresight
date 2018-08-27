@@ -31,7 +31,9 @@ Authors:
 // Readers
 #include "thirdparty/genericio/GenericIO.h"
 #include "HACCDataLoader.hpp"
-
+#ifdef CBENCH_HAS_NYX
+#include "NYXDataLoader.hpp"
+#endif
 
 // Compressors
 #include "blosccompressor.hpp"
@@ -119,6 +121,10 @@ int main(int argc, char *argv[])
 
 	if (inputFileType == "HACC")
 		ioMgr = new HACCDataLoader();
+  #ifdef CBENCH_HAS_NYX
+	else if (inputFileType == "NYX")
+		ioMgr = new NYXDataLoader();
+  #endif
 	else
 	{
 		std::cout << "Unsupported file!!!" << std::endl;
@@ -127,7 +133,7 @@ int main(int argc, char *argv[])
 
 	ioMgr->init(inputFile, MPI_COMM_WORLD);
 
-
+	
 	//
 	// Cycle through compressors and parameters
 	CompressorInterface *compressorMgr;
