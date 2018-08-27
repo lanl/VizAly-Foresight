@@ -12,9 +12,3 @@ mpirun -np 2 --allow-run-as-root ./CBench ../inputs/all.json
 
 # view output
 cat metrics
-
-# run nyx example
-./CBench ../inputs/nyx.json
-
-# view output
-cat metrics
