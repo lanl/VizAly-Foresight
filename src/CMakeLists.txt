@@ -4,18 +4,6 @@ project(CBench)
 
 set (CMAKE_CXX_STANDARD 11)
 
-option(CBENCH_ENABLE_BLOSC
-	"Enable BLOSC."
-	ON
-)
-option(CBENCH_ENABLE_BIG_CRUNCH
-	"Enable BigCrunch."
-	OFF
-)
-option(CBENCH_ENABLE_SZ
-	"Enable SZ."
-	ON
-)
 
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/metrics)
@@ -36,51 +24,60 @@ add_library(GenericIO STATIC "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO
 set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 
-# Add Compressors
-include(CheckIncludeFile)
-include(CheckIncludeFileCXX)
-include(CheckIncludeFiles)
-include(ExternalProject)
-
 # add libs
 set (EXTRA_LIBS "")
 
 include_directories(${CMAKE_SOURCE_DIR}/compressors)
 
+option(CBENCH_ENABLE_BLOSC "Enable BLOSC." ON)
 if(CBENCH_ENABLE_BLOSC)
     include_directories(${CMAKE_SOURCE_DIR}/compressors/BLOSC)
-    if (NOT CBENCH_ENABLE_BIG_CRUNCH)
-        add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2)
-        include_directories(${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2/blosc)
-        set (EXTRA_LIBS ${EXTRA_LIBS} blosc)
-    endif()
+
+    #Asks for zfp library + set that in EXTRA_LIBS
+    find_library(BLOSC_LIBRARY ${BLOSC_LIBRARY} CACHE STRING "BLOSC_LIBRARY library")
+    set(EXTRA_LIBS ${EXTRA_LIBS} ${BLOSC_LIBRARY})
+
+    #Asks for zfp include files + includes it in the project
+    set (BLOSC_INCLUDE_PATH ${BLOSC_INCLUDE_PATH} CACHE STRING "BLOSC include directory")
+    include_directories(${BLOSC_INCLUDE_PATH})
+
+    add_definitions (-DCBENCH_HAS_BLOSC)
 endif()
 
+
+option(CBENCH_ENABLE_BIG_CRUNCH "Enable BigCrunch." OFF)
 if(CBENCH_ENABLE_BIG_CRUNCH)
     include_directories(${CMAKE_SOURCE_DIR}/compressors/BigCrunch)
-    add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch")
-    include_directories(${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch/include)
+
+    #Asks for zfp library + set that in EXTRA_LIBS
+    find_library(BIGCRUNCH_LIBRARY ${BIGCRUNCH_LIBRARY} CACHE STRING "BIGCRUNCH_LIBRARY library")
+    find_library(BIGCRUNCH_BLOSC_LIBRARY ${BIGCRUNCH_BLOSC_LIBRARY} CACHE STRING "BIGCRUNCH_LIBRARY library")
+    set(EXTRA_LIBS ${EXTRA_LIBS} ${BIGCRUNCH_LIBRARY} ${BIGCRUNCH_BLOSC_LIBRARY})
+
+    #Asks for zfp include files + includes it in the project
+    set (BIGCRUNCH_INCLUDE_PATH ${BIGCRUNCH_INCLUDE_PATH} CACHE STRING "BIGCRUNCH include directory")
+    include_directories(${BIGCRUNCH_INCLUDE_PATH})
+
     add_definitions (-DCBENCH_HAS_BIG_CRUNCH)
-    set (EXTRA_LIBS ${EXTRA_LIBS} bigcrunch)
+    set (EXTRA_LIBS ${EXTRA_LIBS} ${BIGCRUNCH_LIBRARY} -fopenmp)
 endif()
 
+
+option(CBENCH_ENABLE_SZ "Enable SZ." ON)
 if(CBENCH_ENABLE_SZ)
     include_directories(${CMAKE_SOURCE_DIR}/compressors/SZ)
-    add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/SZ")
-    include_directories (
-        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/sz/include
-        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zlib
-            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd
-            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/common
-            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/compress
-            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/decompress
-            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/deprecated
-            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/dictBuilder
-            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/dll
-            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/legacy
-            )
+
+    #Asks for zfp library + set that in EXTRA_LIBS
+    find_library(SZ_LIBRARY ${SZ_LIBRARY} CACHE STRING "SZ library")
+    find_library(ZLIB_LIBRARY ${ZLIB_LIBRARY} CACHE STRING "ZLIB library")
+    find_library(ZSTD_LIBRARY ${ZSTD_LIBRARY} CACHE STRING "SZ library")
+    set(EXTRA_LIBS ${EXTRA_LIBS} ${SZ_LIBRARY} ${ZLIB_LIBRARY} ${ZSTD_LIBRARY})
+
+    #Asks for zfp include files + includes it in the project
+    set (SZ_INCLUDE_PATH ${SZ_INCLUDE_PATH} CACHE STRING "SZ include directory")
+    include_directories(${SZ_INCLUDE_PATH})
+
     add_definitions (-DCBENCH_HAS_SZ)
-    set (EXTRA_LIBS ${EXTRA_LIBS} SZ zstd zlib)
 endif()
 
 
