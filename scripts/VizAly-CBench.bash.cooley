@@ -1,4 +1,4 @@
-soft add +git
+soft add +git-2.10.0
 soft add +cmake-3.8.1
 soft add +gcc-7.1.0 
 soft add +mvapich2-2.1
