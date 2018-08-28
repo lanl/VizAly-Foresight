@@ -8,10 +8,11 @@ cd /src/VizAly-CBench
 projectPath=$(pwd)
 
 
-source buildAll.sh
+source buildDependencies.sh	# build dependencies
+source build.sh				# build the code
 
 # run example
 mpirun -np 2 --allow-run-as-root ./CBench ../inputs/all.json
 
 # view output
-cat metrics
+cat metrics_HACC_all_

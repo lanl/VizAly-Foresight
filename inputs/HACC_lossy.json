@@ -19,14 +19,14 @@
 	"output" :
 	{
 		"logfname-comment": "name of output log file",
-		"logfname" : "runlog",
+		"logfname" : "runlog_HACC_lossy_",
 
 		"metricsfname-comment": "name of file with output",
-		"metricsfname" : "metrics"
+		"metricsfname" : "metrics_HACC_lossy_"
 	},
 
 	"compressor-comment" : "which compressors to test",
-	"compressors" : ["blosc", "BigCrunch", "SZ"],
+	"compressors" : ["BigCrunch", "SZ"],
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [

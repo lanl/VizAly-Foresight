@@ -1,14 +1,3 @@
-This is a simple tool that should allow the user to plot some graphs.
-
-## Requirements:
- - python 2
- - matplotlib for python
-
-## Setup on ubuntu
- - sudo apt install python-pip
- - sudo apt-get install python-setuptools
- - pip install matplotlib
- - sudo apt-get install python-tk
-
-## Runing:
-python plotting.py plotInput.json
+The folder contains some useful tools for CBench
+ - plotting: has a python plotting program that should allow you to easily graph the csv results
+ - scripts: has scripts that allow you to build external dependencies
