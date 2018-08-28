@@ -3,7 +3,7 @@
 # HDF5
 echo "Building HDF5 ... "
 
-git https://bitbucket.hdfgroup.org/scm/hdffv/hdf5.git
+git clone https://bitbucket.hdfgroup.org/scm/hdffv/hdf5.git
 cd hdf5
 git checkout hdf5-1_10_3
 mkdir install

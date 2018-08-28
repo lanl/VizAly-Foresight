@@ -6,7 +6,7 @@ mkdir ExternalDependencies
 cd ExternalDependencies
 
 # copy the scripts into that folder and run 
-cp tools/scripts/*.sh .
+cp ../tools/scripts/*.sh .
 source buildExternal.sh
 cd ..
  
