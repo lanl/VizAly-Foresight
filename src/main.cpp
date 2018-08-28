@@ -323,6 +323,6 @@ int main(int argc, char *argv[])
 /*
 
 Run:
-mpirun -np 2 CBench ../inputs/all.json
+mpirun -np 2 CBench ../inputs/HACC_all.json
 
 */

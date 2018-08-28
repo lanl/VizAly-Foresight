@@ -1,4 +1,4 @@
 #!/bin/bash 
 
-rm -f build
+rm -rf build
 rm -rf ExternalDependencies
