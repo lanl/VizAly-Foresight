@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
   #endif
 	else
 	{
-		std::cout << "Unsupported file!!!" << std::endl;
+		std::cout << "Unsupported format " << inputFileType << "!!!" << std::endl;
 		return 0;
 	}
 
@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 		else
 		{
 			if (myRank == 0)
-				std::cout << "Unsupported compressor: " << compressors[c] << "...Skipping!" << std::endl;
+				std::cout << "Unsupported compressor: " << compressors[c] << " ... Skipping!" << std::endl;
 			continue;
 		}
 
@@ -323,6 +323,6 @@ int main(int argc, char *argv[])
 /*
 
 Run:
-mpirun -np 2 CBench ../inputs/all.json
+mpirun -np 2 CBench ../inputs/HACC_all.json
 
 */

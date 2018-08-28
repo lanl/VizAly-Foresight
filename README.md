@@ -18,14 +18,20 @@ The folder **_scripts_** contains scripts to load modules on Cooley @ ANL and Da
 $ git clone https://github.com/lanl/VizAly-CBench.git
 
 $ cd VizAly-CBench
+$ source buildDependencies.sh
 $ source build.sh
 ```
 
 ## Running:
 ```
-$ mpirun -np 2 ./CBench ../inputs/all.json
-$ cat metrics
+$ mpirun -np 2 ./CBench ../inputs/HACC_all.json
+$ cat metrics_HACC_all_
 ```
+
+**Note:**  The above will only run a toy dataset meant for testing if the code runs. The results should **NOT** be used as an indicator for the performance of the compressors!
+
+### Tools:
+tools/plotting contains a python porgram for easy graphing on the csv results
 
 # Usage
 CBench takes as input a json file (examples of input json files are in the **_inputs_** folder) that specifies the input parameters. The list of parameters to specify are:
@@ -40,6 +46,7 @@ CBench takes as input a json file (examples of input json files are in the **_in
 
 ### Currently Supported file formats:
 * GenericIO
+* NYX(HDF5)
 
 ### Currently Supported compressors:
 * [Lossless BLOSC](http://blosc.org/)
