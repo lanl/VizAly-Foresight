@@ -1,10 +1,4 @@
 Compressor_field, absolute_error, relative_error, mse, Compression Throughput, DeCompression Throughput, Compression Ratio
-BLOSC_x, 0, 0, 0, 396.267, 2249.76, 1.80091
-BLOSC_y, 0, 0, 0, 396.677, 2220.6, 1.86599
-BLOSC_z, 0, 0, 0, 374.007, 1934.07, 1.89842
-BLOSC_vx, 0, 0, 0, 223.63, 1071.72, 1.16082
-BLOSC_vy, 0, 0, 0, 227.175, 1109.65, 1.17503
-BLOSC_vz, 0, 0, 0, 218.978, 1043.13, 1.17598
 BigCrunch_x, 0.125, 0.000976562, 0.00287192, 3.57735, 76.985, 14.3136
 BigCrunch_y, 0.125, 0.000976562, 0.00328473, 2.7623, 75.4096, 16.9896
 BigCrunch_z, 0.125, 0.000976562, 0.00505583, 1.96706, 68.3707, 17.0182

@@ -30,6 +30,9 @@ $ cat metrics_HACC_all_
 
 **Note:**  The above will only run a toy dataset meant for testing if the code runs. The results should **NOT** be used as an indicator for the performance of the compressors!
 
+### Tools:
+tools/plotting contains a python porgram for easy graphing on the csv results
+
 # Usage
 CBench takes as input a json file (examples of input json files are in the **_inputs_** folder) that specifies the input parameters. The list of parameters to specify are:
 * Filetype (HACC or NYX)
