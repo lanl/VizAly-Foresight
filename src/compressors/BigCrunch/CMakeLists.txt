@@ -1,4 +1,4 @@
-option(CBENCH_ENABLE_BIG_CRUNCH "Enable BigCrunch." ON)
+option(CBENCH_ENABLE_BIG_CRUNCH "Enable BigCrunch." OFF)
 
 if (CBENCH_ENABLE_BIG_CRUNCH)
 	set(MY_LIBS "")

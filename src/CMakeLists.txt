@@ -68,8 +68,6 @@ foreach (dir ${subdir})
         # add defintions
         get_property(def GLOBAL PROPERTY definitions)
         add_definitions (${def})
-
-        message ("incDir: " ${incDir})
     endif()
 endforeach()
 
