@@ -42,8 +42,6 @@ class CompressorInterface
 	void clearLog() { log.str(""); }
 };
 
-
-
 inline std::string CompressorInterface::getCompressorInfo()
 {
     std::stringstream dataInfo;
