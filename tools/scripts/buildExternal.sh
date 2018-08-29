@@ -3,9 +3,9 @@
 # Builds dependencies
 currentDir=$(pwd)
 
-for file in build_*.sh; 
+for file in build_*.sh;
 do
-	source $file; 
-	cd $currentDir # to guard against build failure
+    pushd "$currentDir"  # to guard against build failure
+    	source $file;
+    popd
 done
-
