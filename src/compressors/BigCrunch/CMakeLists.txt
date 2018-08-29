@@ -10,12 +10,7 @@ if (CBENCH_ENABLE_BIG_CRUNCH)
     	message(FATAL_ERROR "Could NOT find BigCrunch")
     else()
     	set(MY_LIBS ${MY_LIBS} ${BIGCRUNCH_LIBRARY})
-
-	    find_library(BIGCRUNCH_BLOSC_LIBRARY ${BIGCRUNCH_BLOSC_LIBRARY} CACHE STRING "BIGCRUNCH_LIBRARY library")
-	    set(MY_LIBS ${MY_LIBS} ${BIGCRUNCH_BLOSC_LIBRARY})
-
 	    set(MY_LIBS ${MY_LIBS} -fopenmp)
-
 	   
 	    #Asks for BigCrunch include files and includes it in the project
 	    set (BIGCRUNCH_INCLUDE_PATH ${BIGCRUNCH_INCLUDE_PATH} CACHE STRING "BIGCRUNCH include directory")

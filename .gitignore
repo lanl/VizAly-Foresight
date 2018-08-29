@@ -6,7 +6,8 @@
 **/build/
 **/genericio.build/
 *_build*
-
+build-*
+ExternalDependencies/
 
 # garbage files
 *.swp

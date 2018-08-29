@@ -8,7 +8,7 @@ cd VizAly-BigCrunch/
 mkdir install
 mkdir build
 cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=../install
+cmake .. -DCMAKE_INSTALL_PREFIX=../install -DBIGCRUNCH_BUILD_STATIC:BOOL=false
 make -j
 make install
 cd ..
