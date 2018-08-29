@@ -41,6 +41,8 @@ if(CBENCH_ENABLE_NYX_LOADER)
 endif()
 
 
+
+
 # Add external compressors
 include_directories(${CMAKE_SOURCE_DIR}/compressors)
 file(GLOB subdir "${CMAKE_SOURCE_DIR}/compressors/*")

@@ -1,0 +1,39 @@
+/*================================================================================
+This software is open source software available under the BSD-3 license.
+
+Copyright (c) 2017, Los Alamos National Security, LLC.
+All rights reserved.
+
+Authors:
+ - Pascal Grosset
+ - Jesus Pulido
+================================================================================*/
+
+#ifndef _COMPRESSOR_FACTORY_H_
+#define _COMPRESSOR_FACTORY_H_
+
+#include "compressorIncludes.h"
+#include "compressorInterface.hpp"
+
+class CompressorFactory
+{
+  public:
+    static CompressorInterface * createCompressor(std::string compressorName)
+    {
+        if (compressorName == "blosc")
+          return new BLOSCCompressor();
+      #ifdef CBENCH_HAS_BIG_CRUNCH
+        else if (compressorName == "BigCrunch")
+          return new BigCrunchCompressor();
+      #endif
+      #ifdef CBENCH_HAS_SZ
+        else if (compressorName == "SZ")
+          return new SZCompressor();
+      #endif
+        else
+          return NULL;
+    }
+};
+
+
+#endif
