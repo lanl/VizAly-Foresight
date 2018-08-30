@@ -19,6 +19,7 @@ Authors:
 #include "memory.hpp"
 #include "strConvert.hpp"
 
+
 class CompressorInterface
 {
   public:
