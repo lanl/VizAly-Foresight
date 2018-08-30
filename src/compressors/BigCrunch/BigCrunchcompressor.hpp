@@ -1,3 +1,5 @@
+#ifdef CBENCH_HAS_BIG_CRUNCH
+
 #ifndef _BIGCRUNCH_COMPRESSOR_H_
 #define _BIGCRUNCH_COMPRESSOR_H_
 
@@ -91,4 +93,5 @@ inline void BigCrunchCompressor::close()
 	
 }
 
-#endif
+#endif // _BIGCRUNCH_COMPRESSOR_H_
+#endif // CBENCH_HAS_BIG_CRUNCH

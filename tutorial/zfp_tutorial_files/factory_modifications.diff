@@ -1,8 +1,3 @@
-// Add this section before int main(int argc, char *argv[]) at the //compressors include 
-#ifdef CBENCH_HAS_ZFP
-    #include "zfpCompressor.hpp"
-#endif
-
 
 // Add this section "// Loop compressors" section just below
 // if (compressors[c] == "blosc")

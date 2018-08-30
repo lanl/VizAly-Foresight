@@ -4,7 +4,7 @@ In this tutorial, we will go over how to a compressor to CBench. The example we 
 1. You first need to download, build and install zfp. Use the build_zfp.sh script for that. 
 2. Compressors should implement the CompressorInterface class located at src/compressors/compressorInterface.hpp
     1. Add the zfp folder containing zfpCompressor.hpp, a class implementing the CompressorInterface for zfp and a CMakeLists.txt file to the compressors folder
-3. Modify main.cpp in src by adding contents from main_modifications.diff
+3. Modify compressorFactory.hpp by adding contents from factory_modifications.diff
 4. Rerun cmake as follows ccamke ../src, turn USE_ZFP ON, a run configure. This should ask you to specify the locaton of zfp library and include path, e.g.:
     1. ZFP_LIBRARY     : ../ExternalDependencies/zfp/install/lib/libzfp.so 
     2. ZFP_INCLUDE_PATH: ../ExternalDependencies/zfp/install/include

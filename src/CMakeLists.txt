@@ -39,12 +39,32 @@ if(CBENCH_ENABLE_NYX_LOADER)
 		add_definitions (-DCBENCH_HAS_NYX)
 	endif()
 endif()
+    
+
+# Creates header file, compressorIncludes.h, with all available compressors
+file(GLOB_RECURSE header_files "${CMAKE_SOURCE_DIR}/compressors/*/*.hpp")
+foreach(f ${header_files})
+    file(RELATIVE_PATH fr "${CMAKE_CURRENT_SOURCE_DIR}/compressors/" ${f})
+    list(APPEND incls "#include \"${fr}\"\n")
+endforeach()
+file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/compressors/compressorIncludes.h ${incls})
 
 
 # Add external compressors
 include_directories(${CMAKE_SOURCE_DIR}/compressors)
 file(GLOB subdir "${CMAKE_SOURCE_DIR}/compressors/*")
 foreach (dir ${subdir})
+    # Skip files ending in .h
+    if ("${dir}" MATCHES "\\.h$")
+        continue()
+    endif()
+
+    # Skip files ending in .hpp
+    if ("${dir}" MATCHES "\\.hpp$")
+        continue()
+    endif()
+
+
     include_directories(${dir})
 
     if (NOT EXISTS ${dir}/CMakeLists.txt)
