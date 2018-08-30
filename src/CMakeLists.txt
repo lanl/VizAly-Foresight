@@ -63,6 +63,11 @@ foreach (dir ${subdir})
     if ("${dir}" MATCHES "\\.hpp$")
         continue()
     endif()
+    
+    # Skip files ending in .md
+    if ("${dir}" MATCHES "\\.md$")
+        continue()
+    endif()
 
 
     include_directories(${dir})
