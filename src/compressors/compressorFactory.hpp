@@ -6,7 +6,6 @@ All rights reserved.
 
 Authors:
  - Pascal Grosset
- - Jesus Pulido
 ================================================================================*/
 
 #ifndef _COMPRESSOR_FACTORY_H_

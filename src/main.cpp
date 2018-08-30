@@ -122,7 +122,8 @@ int main(int argc, char *argv[])
   #endif
 	else
 	{
-		std::cout << "Unsupported format " << inputFileType << "!!!" << std::endl;
+		if (myRank == 0)
+			std::cout << "Unsupported format " << inputFileType << "!!!" << std::endl;
 		return 0;
 	}
 
@@ -140,7 +141,8 @@ int main(int argc, char *argv[])
 		compressorMgr = CompressorFactory::createCompressor(compressors[c]);
 		if (compressorMgr == NULL)
 		{
-			std::cout << "Unsupported compressor: " << compressors[c] << " ... Skipping!" << std::endl;
+			if (myRank == 0)
+				std::cout << "Unsupported compressor: " << compressors[c] << " ... Skipping!" << std::endl;
 			continue;
 		}
 
