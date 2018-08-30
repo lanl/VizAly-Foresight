@@ -68,7 +68,7 @@ inline int BigCrunchCompressor::compress(void *input, void *&output, std::string
 inline int BigCrunchCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
 {
 	bigcrunch::setting_t settings = { {bigcrunch::config_t::ERR, -3},
-				 {bigcrunch::config_t::TOLERANCE, 1},
+				 {bigcrunch::config_t::TOLERANCE, 0},
 				 {bigcrunch::config_t::BLOSC_NTHREADS, 1},
 				 {bigcrunch::config_t::BLOSC_COMPRESSOR, bigcrunch::blosc_compressor_t::ZSTD},
 				 {bigcrunch::config_t::BLOSC_CLEVEL, 9},
