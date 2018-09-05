@@ -1,0 +1,1 @@
+To add a new compressor, add it to the compressorFactory.hpp file and put the code into a folder with the compressor's name.

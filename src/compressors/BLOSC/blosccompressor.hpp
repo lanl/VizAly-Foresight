@@ -85,4 +85,4 @@ inline void BLOSCCompressor::close()
 	blosc_destroy();
 }
 
-#endif
+#endif //_BLOSC_COMPRESSOR_H_

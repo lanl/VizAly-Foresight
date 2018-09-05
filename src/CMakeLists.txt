@@ -7,22 +7,6 @@ set (CMAKE_CXX_STANDARD 11)
 # add libs
 set (EXTRA_LIBS "")
 
-# Blosc will always be enabled now
-set (CBENCH_ENABLE_BLOSC 1)
-#option(CBENCH_ENABLE_BLOSC
-#	"Enable BLOSC."
-#	ON
-#)
-
-option(CBENCH_ENABLE_BIG_CRUNCH
-	"Enable BigCrunch."
-	OFF
-)
-option(CBENCH_ENABLE_SZ
-	"Enable SZ."
-	ON
-)
-
 option(CBENCH_ENABLE_NYX_LOADER
 	"Enables the reading of NyX HDF5 data"
 	OFF
@@ -55,64 +39,75 @@ if(CBENCH_ENABLE_NYX_LOADER)
 		add_definitions (-DCBENCH_HAS_NYX)
 	endif()
 endif()
+    
 
-# Add Compressors
-include(CheckIncludeFile)
-include(CheckIncludeFileCXX)
-include(CheckIncludeFiles)
-include(ExternalProject)
+# Creates header file, compressorIncludes.h, with all available compressors
+file(GLOB_RECURSE header_files "${CMAKE_SOURCE_DIR}/compressors/*/*.hpp")
+foreach(f ${header_files})
+    file(RELATIVE_PATH fr "${CMAKE_CURRENT_SOURCE_DIR}/compressors/" ${f})
+    list(APPEND incls "#include \"${fr}\"\n")
+endforeach()
+file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/compressors/compressorIncludes.h ${incls})
 
+
+# Add external compressors
 include_directories(${CMAKE_SOURCE_DIR}/compressors)
-
-if(CBENCH_ENABLE_BLOSC)
-    include_directories(${CMAKE_SOURCE_DIR}/compressors/BLOSC)
-    if (NOT CBENCH_ENABLE_BIG_CRUNCH)
-        add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2)
-        include_directories(${CMAKE_SOURCE_DIR}/thirdparty/c-blosc-1.10.2/blosc)
-        set (EXTRA_LIBS ${EXTRA_LIBS} blosc)
-		message(STATUS "--Using external BLOSC--") #dynamic
+file(GLOB subdir "${CMAKE_SOURCE_DIR}/compressors/*")
+foreach (dir ${subdir})
+    # Skip files ending in .h
+    if ("${dir}" MATCHES "\\.h$")
+        continue()
     endif()
-endif()
 
-if(CBENCH_ENABLE_BIG_CRUNCH)
-    include_directories(${CMAKE_SOURCE_DIR}/compressors/BigCrunch)
-    add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch")
-    include_directories(${CMAKE_SOURCE_DIR}/thirdparty/BigCrunch/include)
-    add_definitions (-DCBENCH_HAS_BIG_CRUNCH)
-    set (EXTRA_LIBS ${EXTRA_LIBS} bigcrunch)
-	message(STATUS "--Using BigCrunchs BLOSC--") #static
-endif()
+    # Skip files ending in .hpp
+    if ("${dir}" MATCHES "\\.hpp$")
+        continue()
+    endif()
+    
+    # Skip files ending in .md
+    if ("${dir}" MATCHES "\\.md$")
+        continue()
+    endif()
 
-if(CBENCH_ENABLE_SZ)
-    include_directories(${CMAKE_SOURCE_DIR}/compressors/SZ)
-    add_subdirectory("${CMAKE_SOURCE_DIR}/thirdparty/SZ")
-    include_directories (
-        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/sz/include
-        ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zlib
-            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd
-            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/common
-            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/compress
-            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/decompress
-            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/deprecated
-            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/dictBuilder
-            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/dll
-            ${CMAKE_SOURCE_DIR}/thirdparty/SZ/zstd/legacy
-            )
-    add_definitions (-DCBENCH_HAS_SZ)
-    set (EXTRA_LIBS ${EXTRA_LIBS} SZ zstd zlib)
-endif()
+
+    include_directories(${dir})
+
+    if (NOT EXISTS ${dir}/CMakeLists.txt)
+        continue()
+    else()
+        # Only process folders with a CMakelists.txt
+        set_property(GLOBAL PROPERTY includeDirectories "")
+        set_property(GLOBAL PROPERTY linkLibraries "")
+        set_property(GLOBAL PROPERTY definitions "")
+        
+        add_subdirectory(${dir})
+
+        #include directories to add
+        get_property(incDir GLOBAL PROPERTY includeDirectories)
+        include_directories(${incDir})
+
+        #link libraries to add directories to add
+        get_property(linkLibs GLOBAL PROPERTY linkLibraries)
+        set(EXTRA_LIBS ${EXTRA_LIBS}  ${linkLibs})
+
+        # add defintions
+        get_property(def GLOBAL PROPERTY definitions)
+        add_definitions (${def})
+    endif()
+endforeach()
+
 
 
 # MPI
 find_package(MPI)
 if (MPI_FOUND)
-	include_directories(${MPI_INCLUDE_PATH})
-	set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
-	set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
-	SET(CMAKE_C_COMPILER mpicc)
-	SET(CMAKE_CXX_COMPILER mpicxx)
+    include_directories(${MPI_INCLUDE_PATH})
+    set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
+    set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
+    SET(CMAKE_C_COMPILER mpicc)
+    SET(CMAKE_CXX_COMPILER mpicxx)
 else()
-	message(FATAL_ERROR "Could not find any MPI installation!!!") 
+    message(FATAL_ERROR "Could not find any MPI installation!!!") 
 endif()
 
 
@@ -123,13 +118,13 @@ target_link_libraries(CBench ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO)
 
 # Prevent in source builds since they are evil
 if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
-	message(FATAL_ERROR "In source build is not supported, please restore modified files, 
-						delete CMake generated things (CMakeFiles folder and CMakeCache.txt)
-						, and build out of source")	
+    message(FATAL_ERROR "In source build is not supported, please restore modified files, 
+                        delete CMake generated things (CMakeFiles folder and CMakeCache.txt)
+                        , and build out of source") 
 endif()
 
 
 # Remove output files
 add_custom_target(clean-output
-	COMMAND rm -f *.log
+    COMMAND rm -f *.log
 )

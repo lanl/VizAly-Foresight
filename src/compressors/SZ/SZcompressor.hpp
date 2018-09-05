@@ -1,3 +1,5 @@
+#ifdef CBENCH_HAS_SZ
+
 #ifndef _SZ_COMPRESSOR_H_
 #define _SZ_COMPRESSOR_H_
 
@@ -75,4 +77,6 @@ inline void SZCompressor::close()
 	SZ_Finalize();
 }
 
-#endif
+#endif // _SZ_COMPRESSOR_H_
+#endif // CBENCH_HAS_SZ
+

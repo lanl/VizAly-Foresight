@@ -2,11 +2,15 @@
 /binary/
 /data/
 
+# Generated source files
+src/compressors/compressorIncludes.h
+
 # build folders
 **/build/
 **/genericio.build/
 *_build*
-*build*
+build-*
+ExternalDependencies/
 
 # garbage files
 *.swp

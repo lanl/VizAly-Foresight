@@ -19,6 +19,7 @@ Authors:
 #include "memory.hpp"
 #include "strConvert.hpp"
 
+
 class CompressorInterface
 {
   public:
@@ -41,8 +42,6 @@ class CompressorInterface
     size_t getCompressedSize(){ return cbytes; }
 	void clearLog() { log.str(""); }
 };
-
-
 
 inline std::string CompressorInterface::getCompressorInfo()
 {
