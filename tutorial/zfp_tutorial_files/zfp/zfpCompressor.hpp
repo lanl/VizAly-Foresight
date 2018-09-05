@@ -7,14 +7,13 @@ All rights reserved.
 Authors:
  - Pascal Grosset
 ================================================================================*/
+#ifdef CBENCH_HAS_ZFP
 
 #ifndef _ZFP_COMPRESSOR_H_
 #define _ZFP_COMPRESSOR_H_
 
 #include <sstream>
 #include "compressorInterface.hpp"
-
-#ifdef HAVE_ZFP
 
 #include <zfp.h>
 
@@ -172,5 +171,5 @@ inline void ZFPCompressor::close()
 
 }
 
-#endif //HAVE_ZFP
-#endif
+#endif // _ZFP_COMPRESSOR_H_
+#endif // CBENCH_HAS_ZFP

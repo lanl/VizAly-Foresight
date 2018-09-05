@@ -28,21 +28,16 @@ Authors:
 #include "compressorInterface.hpp"
 #include "metricInterface.hpp"
 
+// Facotries
+#include "compressorFactory.hpp"
+
 // Readers
 #include "thirdparty/genericio/GenericIO.h"
 #include "HACCDataLoader.hpp"
 #ifdef CBENCH_HAS_NYX
-#include "NYXDataLoader.hpp"
+	#include "NYXDataLoader.hpp"
 #endif
 
-// Compressors
-#include "blosccompressor.hpp"
-#ifdef CBENCH_HAS_BIG_CRUNCH
-#include "BigCrunchcompressor.hpp"
-#endif
-#ifdef CBENCH_HAS_SZ
-#include "SZcompressor.hpp"
-#endif
 
 // Metrics
 #include "relativeError.hpp"
@@ -127,7 +122,8 @@ int main(int argc, char *argv[])
   #endif
 	else
 	{
-		std::cout << "Unsupported file!!!" << std::endl;
+		if (myRank == 0)
+			std::cout << "Unsupported format " << inputFileType << "!!!" << std::endl;
 		return 0;
 	}
 
@@ -142,23 +138,13 @@ int main(int argc, char *argv[])
 	// Loop compressors
 	for (int c = 0; c < compressors.size(); ++c)
 	{	
-		if (compressors[c] == "blosc")
-			compressorMgr = new BLOSCCompressor();
-	  #ifdef CBENCH_HAS_BIG_CRUNCH
-		else if (compressors[c] == "BigCrunch")
-			compressorMgr = new BigCrunchCompressor();
-	  #endif
-	  #ifdef CBENCH_HAS_SZ
-		else if (compressors[c] == "SZ")
-			compressorMgr = new SZCompressor();
-	  #endif
-		else
+		compressorMgr = CompressorFactory::createCompressor(compressors[c]);
+		if (compressorMgr == NULL)
 		{
 			if (myRank == 0)
-				std::cout << "Unsupported compressor: " << compressors[c] << "...Skipping!" << std::endl;
+				std::cout << "Unsupported compressor: " << compressors[c] << " ... Skipping!" << std::endl;
 			continue;
 		}
-
 
 		// Check if the parameters field exist
 		if (jsonInput["input"].find("parameters") != jsonInput["input"].end())
@@ -323,6 +309,6 @@ int main(int argc, char *argv[])
 /*
 
 Run:
-mpirun -np 2 CBench ../inputs/all.json
+mpirun -np 2 CBench ../inputs/HACC_all.json
 
 */
