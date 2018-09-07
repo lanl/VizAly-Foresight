@@ -6,17 +6,22 @@ We expect that developers who contribute to this project will add new compressor
 * ``execute`` executes the metrics
 * ``close`` does cleanup
 
-
+### Metrics Definition
 The following error metrics being used are defined as:
   - absolute error
-	- | actual_value - approx_value |
+  	```
+	  | actual_value - approx_value |
+	```
   - relative error
-	- (| actual_value - approx_value |) / actual_value
-	- if  actual_value == 0
-	  - ...
+  	```
+	(| actual_value - approx_value |) / actual_value
+	if  actual_value == 0
+	   ...
+	```
   - mean square error
-	- absolute error ^ 2
-
+  	```
+	absolute error ^ 2
+	```
 
 Static Metric computed for all compressors:
   - Compression Ration
