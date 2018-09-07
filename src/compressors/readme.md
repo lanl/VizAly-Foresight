@@ -15,12 +15,9 @@ We expect that developers who contribute to this project will add new compressor
 2. Compressors should implement the CompressorInterface class located at src/compressors/compressorInterface.hpp and have a CMakeLists.txt file. Look at the BLOSC example located at src/compressors/SZ.
 3. Modify src/compressors/compressorFactory.hpp to add your new compressor. 
  ``
-	#ifdef NEW_COMPRESSOR
-	
+ 	#ifdef NEW_COMPRESSOR
         else if (compressorName == "NewCompressor")
-	
           return new NewCompressor();
-	  
       #endif
  ``
 4. Rerun cmake as follows ccamke ../src, turn USE_NEW_COMPRESSOR ON, a run configure. This should ask you to specify the locaton of your new compressor's library and include path, e.g.:
