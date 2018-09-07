@@ -19,7 +19,6 @@ Authors:
 
 class MetricInterface
 {
-
   protected:
     double val;
     double total_val;
@@ -39,8 +38,6 @@ class MetricInterface
     std::string getMetricName(){ return metricName; }
     std::string getLog() { return log.str(); }
 	void clearLog() { log.str(""); }
-
-	
 };
 
 

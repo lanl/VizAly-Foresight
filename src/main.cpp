@@ -28,21 +28,16 @@ Authors:
 #include "compressorInterface.hpp"
 #include "metricInterface.hpp"
 
-// Facotries
+// Factories
 #include "compressorFactory.hpp"
+#include "metricsFactory.hpp"
 
 // Readers
-#include "thirdparty/genericio/GenericIO.h"
 #include "HACCDataLoader.hpp"
 #ifdef CBENCH_HAS_NYX
 	#include "NYXDataLoader.hpp"
 #endif
 
-
-// Metrics
-#include "relativeError.hpp"
-#include "absoluteError.hpp"
-#include "meansquareError.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -138,6 +133,7 @@ int main(int argc, char *argv[])
 	// Loop compressors
 	for (int c = 0; c < compressors.size(); ++c)
 	{	
+		// initialize compressor
 		compressorMgr = CompressorFactory::createCompressor(compressors[c]);
 		if (compressorMgr == NULL)
 		{
@@ -224,16 +220,11 @@ int main(int argc, char *argv[])
 			metricsInfo << "\nField: " << params[i] << std::endl;
 			for (int m = 0; m < metrics.size(); ++m)
 			{
-				if (metrics[m] == "relative_error")
-					metricsMgr = new relativeError();
-				else if (metrics[m] == "absolute_error")
-					metricsMgr = new absoluteError(); 
-				else if (metrics[m] == "mse")
-					metricsMgr = new meansquareError();
-				else
+				metricsMgr = MetricsFactory::createMetric(metrics[m]);
+				if (metricsMgr == NULL)
 				{
 					if (myRank == 0)
-						std::cout << "Unsupported metric: " << metrics[c] << "...Skipping!" << std::endl;
+						std::cout << "Unsupported metric: " << metrics[m] << " ... Skipping!" << std::endl;
 					continue;
 				}
 
