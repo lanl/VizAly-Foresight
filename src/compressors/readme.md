@@ -16,8 +16,11 @@ We expect that developers who contribute to this project will add new compressor
 3. Modify src/compressors/compressorFactory.hpp to add your new compressor. 
  ``
 	#ifdef NEW_COMPRESSOR
+	
         else if (compressorName == "NewCompressor")
+	
           return new NewCompressor();
+	  
       #endif
  ``
 4. Rerun cmake as follows ccamke ../src, turn USE_NEW_COMPRESSOR ON, a run configure. This should ask you to specify the locaton of your new compressor's library and include path, e.g.:
