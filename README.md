@@ -60,9 +60,9 @@ CBench takes as input a json file (examples of input json files are in the **_in
 * Mean Square Error (MSE)
 
 # Development
-For information on how to add new compressors and/or metrics, look at the [readme in src/compressors](https://github.com/lanl/VizAly-CBench/blob/metric_factory/src/compressors/readme.md) and [src/metrics](https://github.com/lanl/VizAly-CBench/tree/metric_factory/src/metrics) respectively
+For information on how to add new compressors and/or metrics, look at the [readme in src/compressors](https://github.com/lanl/VizAly-CBench/blob/metric_factory/src/compressors/readme.md) and [src/metrics](https://github.com/lanl/VizAly-CBench/tree/metric_factory/src/metrics) respectively.
 
-For information on how to develop the Travis CI and Docker image, look at the [travis folder](https://github.com/lanl/VizAly-CBench/tree/master/testing/travis)
+For information on Travis CI and Docker image, look at the [travis folder](https://github.com/lanl/VizAly-CBench/tree/master/testing/travis)
 
 # Copyright and license
 LANS has asserted copyright on the software package C17078, entitled Framework for Analysis and Visualization of Simulation Data.   
