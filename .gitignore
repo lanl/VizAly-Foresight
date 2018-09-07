@@ -87,3 +87,10 @@ ExternalDependencies/
 # Debug files
 *.dSYM/
 *.su
+
+# visual studio code files
+.vscode/
+
+# sublime text
+*-sublime-project
+*-sublime-project.sublime-workspace

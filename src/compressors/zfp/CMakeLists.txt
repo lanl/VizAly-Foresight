@@ -1,4 +1,4 @@
-option(USE_ZFP "use the zfp compressor" OFF)
+option(CBENCH_ENABLE_ZFP "use the zfp compressor" OFF)
 
 if(CBENCH_ENABLE_ZFP)
 	set(MY_LIBS "")
@@ -6,7 +6,7 @@ if(CBENCH_ENABLE_ZFP)
     #Asks for zfp library + set that in EXTRA_LIBS
     find_library(ZFP_LIBRARY ${ZFP_LIBRARY} CACHE STRING "ZFP_LIBRARY library")
 
-    if (NOT BLOSC_LIBRARY)
+    if (NOT ZFP_LIBRARY)
     	message(FATAL_ERROR "Could NOT find ZFP")
     else()
     	set(MY_LIBS ${MY_LIBS} ${ZFP_LIBRARY})
