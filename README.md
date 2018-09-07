@@ -52,14 +52,15 @@ CBench takes as input a json file (examples of input json files are in the **_in
 * [Lossless BLOSC](http://blosc.org/)
 * [Lossy BigCrunch](https://github.com/lanl/VizAly-BigCrunch)
 * [SZ](https://collab.cels.anl.gov/display/ESR/SZ)
+* [zfp](https://computation.llnl.gov/projects/floating-point-compression)
 
 ### Currently Supported metrics:
 * Absolute Error
 * Relative Error
-* MSE
+* Mean Square Error (MSE)
 
 # Development
-For information on how to add new compressors and/or metrics, look at the [tutorial folder](https://github.com/lanl/VizAly-CBench/tree/master/tutorial)
+For information on how to add new compressors and/or metrics, look at the readme in src/compressors and src/metrics respectively
 
 For information on how to develop the Travis CI and Docker image, look at the [travis folder](https://github.com/lanl/VizAly-CBench/tree/master/testing/travis)
 

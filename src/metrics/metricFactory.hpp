@@ -11,7 +11,7 @@ Authors:
 #ifndef _METRICS_FACTORY_H_
 #define _METRICS_FACTORY_H_
 
-#include "metricsIncludes.h"
+#include "metricIncludes.h"
 #include "metricInterface.hpp"
 
 class MetricsFactory

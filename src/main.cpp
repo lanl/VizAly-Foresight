@@ -12,7 +12,6 @@ Authors:
 
 #include <iostream>
 #include <sstream>
-#include <fstream>
 #include <vector>
 
 #include <mpi.h>
@@ -30,7 +29,7 @@ Authors:
 
 // Factories
 #include "compressorFactory.hpp"
-#include "metricsFactory.hpp"
+#include "metricFactory.hpp"
 
 // Readers
 #include "HACCDataLoader.hpp"
@@ -101,8 +100,11 @@ int main(int argc, char *argv[])
 	csvOutput << "Compressor_field" << ", ";
 	for (int m = 0; m < metrics.size(); ++m)
 		csvOutput << metrics[m] << ", ";
-	csvOutput << "Compression Throughput, DeCompression Throughput, Compression Ratio" << std::endl;
+
+	csvOutput << "Max Compression Throughput, Max DeCompression Throughput, ";
+	csvOutput << "Min Compression Throughput, Min DeCompression Throughput, Compression Ratio" << std::endl;
 	metricsInfo << "Input file: " << inputFile << std::endl;
+
 
 
 	//
@@ -240,19 +242,28 @@ int main(int argc, char *argv[])
 			debuglog << "-----------------------------\n";
 			debuglog << "\nMemory in use: " << memLoad.getMemoryInUseInMB() << " MB" << std::endl;
 
+
 			//
-			// final timings
+			// Metrics Computation
 			double compress_time = compressClock.getDuration();
 			double decompress_time = decompressClock.getDuration();
 
-			double max_compress_throughput = 0;
-			double max_decompress_throughput = 0;
-
 			double compress_throughput = ((double)(ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0*1024.0) )/ compress_time;
 			double decompress_throughput = ((double)(ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0*1024.0) )/ decompress_time;
+
+
+			double max_compress_throughput = 0;
+			double max_decompress_throughput = 0;
+			double min_compress_throughput = 0;
+			double min_decompress_throughput = 0;
+
 			MPI_Reduce(&compress_throughput, &max_compress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 			MPI_Reduce(&decompress_throughput, &max_decompress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+			MPI_Reduce(&compress_throughput, &min_compress_throughput, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+			MPI_Reduce(&decompress_throughput, &min_decompress_throughput, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
 		
+
 			//
 			// deallocate
 			std::free(decompdata);
@@ -271,10 +282,14 @@ int main(int argc, char *argv[])
 		
 			if (myRank == 0)
 			{
-				metricsInfo << "Compression Throughput: " << max_compress_throughput << " Mbytes/s" << std::endl;
-				metricsInfo << "DeCompression Throughput: " << max_decompress_throughput << " Mbytes/s" << std::endl;
+				metricsInfo << "Max Compression Throughput: " << max_compress_throughput << " Mbytes/s" << std::endl;
+				metricsInfo << "Max DeCompression Throughput: " << max_decompress_throughput << " Mbytes/s" << std::endl;
+				metricsInfo << "Min Compression Throughput: " << min_compress_throughput << " Mbytes/s" << std::endl;
+				metricsInfo << "Min DeCompression Throughput: " << min_decompress_throughput << " Mbytes/s" << std::endl;
 				metricsInfo << "Compression ratio: " << totalUnCompressedSize/(float)totalCompressedSize << std::endl;
-				csvOutput << max_compress_throughput << ", " << max_decompress_throughput << ", " << totalUnCompressedSize/(float)totalCompressedSize << "\n";
+				csvOutput << max_compress_throughput << ", " << max_decompress_throughput << ", " 
+						  << min_compress_throughput << ", " << min_decompress_throughput << ", " 
+						  << totalUnCompressedSize/(float)totalCompressedSize << "\n";
 
 				writeFile(metricsFile, metricsInfo.str());
 				writeFile(metricsFile + ".csv", csvOutput.str());
@@ -282,24 +297,20 @@ int main(int argc, char *argv[])
 		
 			MPI_Barrier(MPI_COMM_WORLD);
 		}
-
 		compressorMgr->close();
 	}
 
-	
+	// for humans
 	if (myRank == 0)
 		std::cout << "That's all folks!" << std::endl;
 
 	MPI_Finalize();
-
 
 	return 0;
 }
 
 
 /*
-
 Run:
 mpirun -np 2 CBench ../inputs/HACC_all.json
-
 */

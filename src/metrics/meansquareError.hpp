@@ -66,11 +66,9 @@ inline void meansquareError::execute(void *original, void *approx, size_t n) {
 
 	double total_mse = 0;
 	size_t total_n = 0;
-	//MPI_Reduce(&mse, &total_mse, 1, MPI_DOUBLE, MPI_SUM, 0, comm);// MPI_COMM_WORLD);
-	//MPI_Reduce(&n, &total_n, 1, MPI_UNSIGNED_LONG_LONG, MPI_SUM, 0, comm);// MPI_COMM_WORLD);
 
-	MPI_Allreduce(&mse, &total_mse, 1, MPI_DOUBLE, MPI_SUM, comm);// MPI_COMM_WORLD);
-	MPI_Allreduce(&n, &total_n, 1, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);// MPI_COMM_WORLD);
+	MPI_Allreduce(&mse, &total_mse, 1, MPI_DOUBLE, MPI_SUM, comm);
+	MPI_Allreduce(&n, &total_n, 1, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
 	total_val = total_mse/(double)total_n;
 	
 	log << " MSE: " << total_val << std::endl;
