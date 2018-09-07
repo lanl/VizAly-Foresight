@@ -13,7 +13,7 @@ The default master branch should always point to the latest working version. How
 * OpenMPI 2 or higher
 
 ## Building:
-The folder **_scripts_** contains scripts to load modules on Cooley @ ANL and Darwin @ LANL
+The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @ ANL and Darwin @ LANL
 ```
 $ git clone https://github.com/lanl/VizAly-CBench.git
 
@@ -31,10 +31,10 @@ $ cat metrics_HACC_all_
 **Note:**  The above will only run a toy dataset meant for testing if the code runs. The results should **NOT** be used as an indicator for the performance of the compressors!
 
 ### Tools:
-tools/plotting contains a python porgram for easy graphing on the csv results
+[tools/plotting](tools/plotting) contains a python porgram for easy graphing on the csv results
 
 # Usage
-CBench takes as input a json file (examples of input json files are in the **_inputs_** folder) that specifies the input parameters. The list of parameters to specify are:
+CBench takes as input a json file (examples of input json files are in the **_[inputs](inputs)_** folder) that specifies the input parameters. The list of parameters to specify are:
 * Filetype (HACC or NYX)
 * Filename
 * Scalars to analyze
@@ -60,9 +60,9 @@ CBench takes as input a json file (examples of input json files are in the **_in
 * Mean Square Error (MSE)
 
 # Development
-For information on how to add new compressors and/or metrics, look at the [readme in src/compressors](https://github.com/lanl/VizAly-CBench/blob/metric_factory/src/compressors/readme.md) and [src/metrics](https://github.com/lanl/VizAly-CBench/tree/metric_factory/src/metrics) respectively.
+For information on how to add new compressors and/or metrics, look at the [readme in src/compressors](src/compressors/readme.md) and [src/metrics](src/metrics) respectively.
 
-For information on Travis CI and Docker image, look at the [travis folder](https://github.com/lanl/VizAly-CBench/tree/master/testing/travis)
+For information on Travis CI and Docker image, look at the [travis folder](testing/travis)
 
 # Copyright and license
 LANS has asserted copyright on the software package C17078, entitled Framework for Analysis and Visualization of Simulation Data.   
