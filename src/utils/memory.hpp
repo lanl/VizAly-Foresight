@@ -77,7 +77,7 @@ inline void Memory::stop()
 }
 
 
-double Memory::getMemoryInUseInB()
+inline double Memory::getMemoryInUseInB()
 {
 	unsigned long after_size, after_rss;
 	GetMemorySize(after_size, after_rss);
@@ -85,7 +85,7 @@ double Memory::getMemoryInUseInB()
 	return (after_size - before_size);
 }
 
-double Memory::getMemoryInUseInKB()
+inline double Memory::getMemoryInUseInKB()
 {
 	unsigned long after_size, after_rss;
 	GetMemorySize(after_size, after_rss);
@@ -94,7 +94,7 @@ double Memory::getMemoryInUseInKB()
 }
 
 
-double Memory::getMemoryInUseInMB()
+inline double Memory::getMemoryInUseInMB()
 {
 	unsigned long after_size, after_rss;
 	GetMemorySize(after_size, after_rss);
