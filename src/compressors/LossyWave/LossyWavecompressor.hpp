@@ -39,16 +39,21 @@ inline void LossyWaveCompressor::init()
 
 inline int LossyWaveCompressor::compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
 {
-	// Default Params 
+	// Set compression parameters
+	int args[13] = { 303, 0, 128, 0,
+					n, n, n,
+					n, n, n,
+					dataTypeSize, 50, 0 };
+
+	lossywave::lossywave lw(args);
+	
 	Timer cTime; cTime.start();
 
-	lossywave::lossywave lw;
-	
 	std::uint64_t csize = lw.compress(input, dataTypeSize, output);
 
 	cTime.stop();
 
-	cbytes = csize;
+	cbytes = csize+4; //4 byte header
 
 	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*n << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*n / (float)csize) << std::endl;
 	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
@@ -58,7 +63,17 @@ inline int LossyWaveCompressor::compress(void *input, void *&output, std::string
 
 inline int LossyWaveCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
 {
+	// Set compression parameters
+	int args[13] = { 303, 0, 128, 0,
+					n, n, n,
+					n, n, n,
+					dataTypeSize, 50, 0 };
+
+	lossywave::lossywave lw(args);
+
 	Timer dTime; dTime.start();
+
+	std::uint64_t dsize = lw.decompress(input, output);
 
 	dTime.stop();
 	dTime.stop(); log << compressorName << " ~ DecompressTime: " << dTime.getDuration() << " s " << std::endl;
