@@ -1,8 +1,0 @@
-
-// Add this section "// Loop compressors" section just below
-// if (compressors[c] == "blosc")
-//     compressorMgr = new BLOSCCompressor();
-#ifdef CBENCH_HAS_ZFP
-	else if (compressors[c] == "zfp")
-		compressorMgr = new ZFPCompressor();
-#endif

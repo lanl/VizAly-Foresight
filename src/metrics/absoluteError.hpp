@@ -72,7 +72,6 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
 	val = max_abs_err;
 
 	double total_max_abs_err = 0;
-	//MPI_Reduce(&max_abs_err, &total_max_abs_err, 1, MPI_DOUBLE, MPI_MAX, 0, comm);// MPI_COMM_WORLD);
 	MPI_Allreduce(&max_abs_err, &total_max_abs_err, 1, MPI_DOUBLE, MPI_MAX, comm);// MPI_COMM_WORLD);
 	total_val = total_max_abs_err;
 
