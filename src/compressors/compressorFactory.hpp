@@ -25,6 +25,10 @@ class CompressorFactory
         else if (compressorName == "BigCrunch")
           return new BigCrunchCompressor();
       #endif
+      #ifdef CBENCH_HAS_ZFP
+	      else if (compressorName == "zfp")
+		      return new ZFPCompressor();
+      #endif
       #ifdef CBENCH_HAS_SZ
         else if (compressorName == "SZ")
           return new SZCompressor();
