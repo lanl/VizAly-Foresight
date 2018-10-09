@@ -1,4 +1,4 @@
-option(CBENCH_ENABLE_LOSSY_WAVE "Enable LossyWave." ON)
+option(CBENCH_ENABLE_LOSSY_WAVE "Enable LossyWave." OFF)
 
 if (CBENCH_ENABLE_LOSSY_WAVE)
 	set(MY_LIBS "")
