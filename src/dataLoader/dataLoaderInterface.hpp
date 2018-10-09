@@ -14,6 +14,7 @@ Authors:
 #include <string>
 #include <mpi.h>
 #include <sstream>
+#include <unordered_map>
 
 
 class DataLoaderInterface
@@ -22,6 +23,7 @@ class DataLoaderInterface
 	std::string loader;
 	std::string filename;
 	size_t totalNumberOfElements;
+	size_t dims[5]{ 0,0,0,0,0 };
 
 	std::string dataType;
 	std::string param;
@@ -34,6 +36,7 @@ class DataLoaderInterface
 
   public:   // TO_CHANGE
 	void *data;
+	std::unordered_map<std::string, std::string> loaderParams;
 
   public:
 	virtual void init(std::string _filename, MPI_Comm _comm) = 0;
@@ -47,6 +50,7 @@ class DataLoaderInterface
 
 	std::string getDataInfo();
 	std::string getLog() { return log.str(); }
+
 };
 
 

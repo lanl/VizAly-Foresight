@@ -232,6 +232,7 @@ inline int HACCDataLoader::loadData(std::string paramName)
 
 	allocateMem(dataType, numElements, 0);
 
+	dims[0] = numElements;
 
 	//
 	// Actually load the data

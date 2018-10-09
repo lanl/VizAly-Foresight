@@ -40,7 +40,7 @@ inline void LossyWaveCompressor::init()
 inline int LossyWaveCompressor::compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
 {
 	// Set compression parameters
-	int args[13] = { 303, 0, 128, 0,
+	int args[13] = { 404, 0, 128, 0,
 					n, n, n,
 					n, n, n,
 					dataTypeSize, 50, 0 };
@@ -64,7 +64,7 @@ inline int LossyWaveCompressor::compress(void *input, void *&output, std::string
 inline int LossyWaveCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
 {
 	// Set compression parameters
-	int args[13] = { 303, 0, 128, 0,
+	int args[13] = { 404, 0, 128, 0,
 					n, n, n,
 					n, n, n,
 					dataTypeSize, 50, 0 };

@@ -17,6 +17,7 @@ include_directories(${CMAKE_SOURCE_DIR}/metrics)
 include_directories(${CMAKE_SOURCE_DIR}/utils)
 
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader)
+include_directories(${CMAKE_SOURCE_DIR}/dataLoader/Binary)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader/HACC)
 if(CBENCH_ENABLE_NYX_LOADER)
 	include_directories(${CMAKE_SOURCE_DIR}/dataLoader/NYX)

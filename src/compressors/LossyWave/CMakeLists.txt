@@ -15,13 +15,7 @@ if (CBENCH_ENABLE_LOSSY_WAVE)
        
 	    #Asks for LossyWave include files and includes it in the project
 	    set (LOSSYWAVE_INCLUDE_PATH ${LOSSYWAVE_INCLUDE_PATH} CACHE STRING "LOSSYWAVE include directory")
-        
-        # Find GSL dependency
-        find_library(LOSSYWAVE_GSL_LIBRARY ${LOSSYWAVE_LZ4_LIBRARY} CACHE STRING "LOSSYWAVE_GSL_LIBRARY library")
-        set(MY_LIBS ${MY_LIBS} ${LOSSYWAVE_GSL_LIBRARY})
-        set(LOSSYWAVE_GSL_INCLUDE_PATH ${LOSSYWAVE_GSL_INCLUDE_PATH} CACHE STRING "LOSSYWAVE GSL include directory")
-        set(LOSSYWAVE_INCLUDE_PATH ${LOSSYWAVE_INCLUDE_PATH} ${LOSSYWAVE_GSL_INCLUDE_PATH})
-        
+               
         # Find lz4 dependency
         find_library(LOSSYWAVE_LZ4_LIBRARY ${LOSSYWAVE_LZ4_LIBRARY} CACHE STRING "LOSSYWAVE_LZ4_LIBRARY library")
         set(MY_LIBS ${MY_LIBS} ${LOSSYWAVE_LZ4_LIBRARY})

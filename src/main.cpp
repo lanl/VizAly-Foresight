@@ -32,6 +32,7 @@ Authors:
 #include "metricFactory.hpp"
 
 // Readers
+#include "BinaryDataLoader.hpp"
 #include "HACCDataLoader.hpp"
 #ifdef CBENCH_HAS_NYX
 	#include "NYXDataLoader.hpp"
@@ -111,7 +112,9 @@ int main(int argc, char *argv[])
 	// Open file
 	DataLoaderInterface *ioMgr;
 
-	if (inputFileType == "HACC")
+	if (inputFileType == "Binary")
+		ioMgr = new BinaryDataLoader();
+	else if (inputFileType == "HACC")
 		ioMgr = new HACCDataLoader();
   #ifdef CBENCH_HAS_NYX
 	else if (inputFileType == "NYX")
@@ -124,9 +127,18 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
+	// Check if the datainfo field exist for a dataset
+	if (jsonInput["input"].find("datainfo") != jsonInput["input"].end())
+	{
+		// insert datainfo into loader parameter list
+		for (auto it = jsonInput["input"]["datainfo"].begin(); it != jsonInput["input"]["datainfo"].end(); it++)
+			ioMgr->loaderParams[it.key()] = strConvert::toStr(it.value());
+	}
+
 	ioMgr->init(inputFile, MPI_COMM_WORLD);
 
 	
+
 	//
 	// Cycle through compressors and parameters
 	CompressorInterface *compressorMgr;

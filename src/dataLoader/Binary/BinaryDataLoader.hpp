@@ -8,25 +8,30 @@ Authors:
  - Jesus Pulido
 ================================================================================*/
 
-#ifndef _NYX_LOADER_H_
-#define _NYX_LOADER_H_
+#ifndef _BINARY_LOADER_H_
+#define _BINARY_LOADER_H_
 
 #include <sstream>
 #include <string>
 #include "dataLoaderInterface.hpp"
-#include "timer.hpp"
-#include "H5Cpp.h"
 
-class NYXDataLoader: public DataLoaderInterface
+// Helper Functions
+#include "json.hpp"
+#include "timer.hpp"
+#include <unordered_map>
+
+class BinaryDataLoader: public DataLoaderInterface
 {
 	int numRanks;
 	int myRank;
+	size_t headerSize;
 
   public:
-	NYXDataLoader();
-	~NYXDataLoader();
+	BinaryDataLoader();
+	~BinaryDataLoader();
 	int allocateMem(std::string dataType, size_t numElements, int offset);
 	int deAllocateMem();
+	size_t findByteAddress(size_t x, size_t y, size_t z, size_t field);
 
 	void init(std::string _filename, MPI_Comm _comm);
 	int loadData(std::string paramName);
@@ -34,31 +39,51 @@ class NYXDataLoader: public DataLoaderInterface
 };
 
 
-inline NYXDataLoader::NYXDataLoader()
+inline BinaryDataLoader::BinaryDataLoader()
 {
 	myRank = 0;
 	numRanks = 0;
-	loader = "NYX";
+	loader = "Binary";
+	
 }
 
-inline NYXDataLoader::~NYXDataLoader()
+inline BinaryDataLoader::~BinaryDataLoader()
 {
 	deAllocateMem();
 }
 
 
-inline void NYXDataLoader::init(std::string _filename, MPI_Comm _comm)
+inline void BinaryDataLoader::init(std::string _filename, MPI_Comm _comm)
 {
 	filename = _filename;
 	comm = _comm;
+	headerSize = 0;
 
 	MPI_Comm_size(comm, &numRanks);
 	MPI_Comm_rank(comm, &myRank);
+
+	if (loaderParams["datainfo"].find("dims") != loaderParams["datainfo"].end())
+	{
+		int cnt = 0;
+		// insert datainfo into loader parameter list
+		for (auto it = loaderParams["datainfo"]["dims"].begin(); it != loaderParams["datainfo"]["dims"].end(); it++)
+		{
+			dims[cnt] = it.value();
+			cnt++;
+		}
+	}
+
+	if (loaderParams["datainfo"].find("header") != loaderParams["datainfo"].end())
+	{
+		headerSize = loaderParams["datainfo"]["header"];
+	}
+
+	std::cout << "Dims: " << dims[0] << "," << dims[1] << "," << dims[2] << ", header: " << headerSize << std::endl;
 }
 
 
 
-inline int NYXDataLoader::allocateMem(std::string dataType, size_t numElements, int offset)
+inline int BinaryDataLoader::allocateMem(std::string dataType, size_t numElements, int offset)
 {
 	// Allocate mem
 	if (dataType == "float")
@@ -112,7 +137,7 @@ inline int NYXDataLoader::allocateMem(std::string dataType, size_t numElements, 
 }
 
 
-inline int NYXDataLoader::deAllocateMem()
+inline int BinaryDataLoader::deAllocateMem()
 {
 	if (data == NULL) // already deallocated!
 		return 1;
@@ -146,92 +171,112 @@ inline int NYXDataLoader::deAllocateMem()
 }
 
 
-inline int NYXDataLoader::loadData(std::string paramName)
+inline int BinaryDataLoader::loadData(std::string paramName)
 {
 	Timer clock;
 	log.str("");
 
 	clock.start();
+	param = paramName;
+
+	int field = 0;
+
+	// Set Dims
+	size_t dimx=dims[0];
+	size_t dimy=dims[1];
+	size_t dimz=dims[2];
+
+	std::ifstream f;
+
+	// Try opening the file
+	f.open(filename, std::ifstream::binary);
+	if (f.fail()) {
+		std::cout << "Error opening file" << std::endl;
+		return -1;
+	}
+
+	f.seekg(0, std::ios::end);
+	double file_len = f.tellg();
+	f.seekg(0, std::ios::beg);
+
+	size_t field_len = dimx*dimy*dimz*elemSize;
+
+	size_t xl = 0; size_t yl = 0; size_t zl = 0;
+	size_t xu = dimx - 1; size_t yu = dimy - 1; size_t zu = dimz - 1;
+
+	float * fdata; double * ddata;
 	
-	// Note: hdf5-cxx not compatible with parallel
-	try {
-		H5::H5File file(filename, H5F_ACC_RDONLY);
-		H5::Group group(file.openGroup("native_fields"));
-		/*for (int grps = 0; grps < group.getNumObjs(); grps++)
+	if (dataType == "float")
+		fdata = static_cast<float*>(data);
+	else if (dataType == "double")
+		ddata = static_cast<double*>(data);
+	else
+	{
+		std::cout << "Error: Unsupported binary dataType!" << std::endl; return -1;
+	}
+
+	size_t cnt = 0;
+	for (size_t z = zl; z <= zu; z++)
+	{
+		for (size_t y = yl; y <= yu; y++)
 		{
-			std::cout << "Field: " << group.getObjnameByIdx(grps) << "\n";
-			std::string name = group.getObjnameByIdx(grps);
+			std::streampos seekVal = findByteAddress(xl, y, z, field);
+			f.seekg(seekVal);
+
+			if (dataType == "float")
+			{
+				float value;
+				for (size_t x = xl; x <= xu; x++)
+				{
+					f.read(reinterpret_cast<char*>(&value), sizeof(float));
+					fdata[cnt] = value; cnt++;
+				}
+			}
+			else if (dataType == "double")
+			{
+				double value;
+				for (size_t x = xl; x <= xu; x++)
+				{
+					f.read(reinterpret_cast<char*>(&value), sizeof(double));
+					ddata[cnt] = value; cnt++;
+				}
+			}
+			else
+			{
+				
+			}
+
 		}
-		std::cout << "Detected " << group.getNumObjs() << " variables in file.\n";*/
-
-		H5::Group group_meta(file.openGroup("universe"));
-		/*for (int grps = 0; grps < group_meta.getNumAttrs(); grps++)
-		{
-			H5::Attribute attr = group_meta.openAttribute(grps);
-			std::cout << "Universe: " << attr.getName() << " : ";
-			std::string name = attr.getName();
-			double val = 0.0;
-			H5::DataType type = attr.getDataType();
-			attr.read(type, &val);
-			std::cout << val << std::endl;
-		}
-		std::cout << "Detected " << group_meta.getNumAttrs() << " universe attributes.\n";*/
-
-		int fields = group.getNumObjs();
-
-		H5::DataSet dataset(group.openDataSet(paramName));
-		H5::DataSpace dataspace(dataset.getSpace());
-		H5::DataSpace memspace(dataset.getSpace()); //This would define rank and local rank extent
-		hsize_t tdims[3];
-		dataspace.getSimpleExtentDims(tdims);
-		//std::cout << "Data dimensions: " << dims[0] << " " << dims[1] << " " << dims[2] << "\n";
-		numElements = tdims[0] * tdims[1] * tdims[2];
-		dims[0] = tdims[0];
-		dims[1] = tdims[1];
-		dims[2] = tdims[2];
-			
-		totalNumberOfElements = numElements; // Temporary 
-
-		dataType = "float";
-		// Set-up data stream
-		allocateMem(dataType, numElements, 0);
-
-		// Data buffer stream, data_type, memory_space, file_space
-		// H%::PredType::NATIVE_DOUBLE
-		dataset.read(data, H5::PredType::NATIVE_FLOAT, memspace, dataspace);
-
-		dataset.close();
-		file.close();
-	}
-	catch (H5::FileIException error)
-	{
-		//error.printError();
-		return -1;
-	}
-	// catch failure caused by the DataSet operations
-	catch (H5::DataSetIException error)
-	{
-		//error.printError();
-		return -1;
-	}
-	// catch failure caused by the DataSpace operations
-	catch (H5::DataSpaceIException error)
-	{
-		//error.printError();
-		return -1;
-	}
-	// catch failure caused by the DataSpace operations
-	catch (H5::DataTypeIException error)
-	{
-		//error.printError();
-		return -1;
 	}
 
+	f.close();
 
 	clock.stop();
 	log << "Loading data took " << clock.getDuration() << " s" << std::endl;
 
 	return 1; // All good
+}
+
+// Given x,y,z coordinates and current scalar field, this will find the
+// byte location of the data within a binary file
+size_t BinaryDataLoader::findByteAddress(size_t x, size_t y, size_t z, size_t field)
+{
+	// add the header
+	size_t byteLocation = headerSize;
+
+	// first look at the scalar_field
+	byteLocation += field*dims[0]*dims[1]*dims[2]*elemSize;
+
+	// Look at z
+	byteLocation += z*dims[0]*dims[1]*elemSize;
+
+	// look at y
+	byteLocation += y*dims[0]*elemSize;
+
+	// look at x
+	byteLocation += x*elemSize;
+
+	return byteLocation;
 }
 
 #endif
