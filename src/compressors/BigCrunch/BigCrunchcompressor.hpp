@@ -16,8 +16,8 @@ class BigCrunchCompressor: public CompressorInterface
     ~BigCrunchCompressor();
 
     void init();
-    int compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
-    int decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
+    int compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n);
+    int decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n);
     void close();
 };
 
@@ -37,8 +37,13 @@ inline void BigCrunchCompressor::init()
 	 
 }
 
-inline int BigCrunchCompressor::compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
+inline int BigCrunchCompressor::compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
+	size_t numel = n[0];
+	for (int i = 1; i < 5; i++)
+		if (n[i] != 0)
+			numel *= n[i];
+
 	// Default Params { Error:-3, Tolerance:1, BLOSC_NTHREADS: 1, BLOSCFILTER:SHUFFLE, BLOSC_COMPRESSOR:ZSTD }
 	bigcrunch::setting_t settings = { {bigcrunch::config_t::ERR, -3},
 				 {bigcrunch::config_t::TOLERANCE, 0},
@@ -52,20 +57,20 @@ inline int BigCrunchCompressor::compress(void *input, void *&output, std::string
 	bigcrunch::bigcrunch bc(settings);
 
 	std::uint8_t *cdata = nullptr;
-	std::uint64_t csize = bc.compress(bigcrunch::darray(static_cast<float *>(input), n), &cdata);
+	std::uint64_t csize = bc.compress(bigcrunch::darray(static_cast<float *>(input), numel), &cdata);
 
 	output = cdata;
 	cTime.stop();
 
 	cbytes = csize;
 
-	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*n << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*n / (float)csize) << std::endl;
+	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*numel / (float)csize) << std::endl;
 	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
 
     return 1;
 }
 
-inline int BigCrunchCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
+inline int BigCrunchCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
 	bigcrunch::setting_t settings = { {bigcrunch::config_t::ERR, -3},
 				 {bigcrunch::config_t::TOLERANCE, 0},

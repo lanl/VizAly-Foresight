@@ -44,6 +44,7 @@ class DataLoaderInterface
 	virtual int close() = 0;
 
 	size_t getNumElements() { return numElements; }
+	size_t * getDims() { return dims; }
 	size_t getTypeSize() { return elemSize; }
 	std::string getType(){ return dataType; }
 	std::string getParam(){ return param; }
@@ -63,6 +64,7 @@ inline std::string DataLoaderInterface::getDataInfo()
 	dataInfo << "Param: " << param << std::endl;
 	dataInfo << "dataType: " << dataType << std::endl;
 	dataInfo << "numElements: " << numElements << std::endl;
+	dataInfo << "dims: " << dims[0] << " " << dims[1] << " " << dims[2] << " " << dims[3] << " " << dims[4] << std::endl;
 
 	return dataInfo.str();
 }

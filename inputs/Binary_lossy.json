@@ -5,17 +5,19 @@
 		"filetype" : "Binary",
 
 		"filename-comment" : "name of input file",
-		"filename": "D:/Data/rstrt.0009.bin",
+		"filename" : "D:/Data/rstrt.0009.bin",
 
 		"scalars-comment" : "which scalars to test",
-		"scalars" : ["1","2","3","4"],
+		"scalars" : ["0"],
 
         "datainfo-comment" : "info passthrough to binary reader",
         "datainfo" :
         {
+            "type" : "double",
             "dims" : [256, 256, 256],
             "header" : 192
-        }
+        },
+        
 		"parameters" :
 		{
 			"tolerance" : 1e-03
@@ -32,7 +34,7 @@
 	},
 
 	"compressor-comment" : "which compressors to test",
-	"compressors" : ["LossyWave", "BigCrunch"],
+	"compressors" : ["LossyWave", "blosc"],
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [

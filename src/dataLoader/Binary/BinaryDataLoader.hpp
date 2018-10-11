@@ -62,23 +62,45 @@ inline void BinaryDataLoader::init(std::string _filename, MPI_Comm _comm)
 	MPI_Comm_size(comm, &numRanks);
 	MPI_Comm_rank(comm, &myRank);
 
-	if (loaderParams["datainfo"].find("dims") != loaderParams["datainfo"].end())
+	std::unordered_map<std::string, std::string>::const_iterator got = loaderParams.find("dims");
+
+	// parse and set dims
+	if (got != loaderParams.end())
 	{
 		int cnt = 0;
-		// insert datainfo into loader parameter list
-		for (auto it = loaderParams["datainfo"]["dims"].begin(); it != loaderParams["datainfo"]["dims"].end(); it++)
-		{
-			dims[cnt] = it.value();
+		size_t pos = 0;
+		std::string token; std::string s = loaderParams["dims"];
+
+		// delete "[" and "]"
+		s.erase(0, 1); s.erase(s.size()-1, s.size());
+
+		// extract dims using delimiter
+		while ((pos = s.find(",")) != std::string::npos) {
+			token = s.substr(0, pos);
+			dims[cnt] = strConvert::to_uint64(token);
+			s.erase(0, pos + 1);
 			cnt++;
 		}
+		dims[cnt] = strConvert::to_uint64(token);
 	}
 
-	if (loaderParams["datainfo"].find("header") != loaderParams["datainfo"].end())
+	got = loaderParams.find("header");
+	if (got != loaderParams.end())
 	{
-		headerSize = loaderParams["datainfo"]["header"];
+		headerSize = strConvert::to_uint64(got->second);
 	}
 
-	std::cout << "Dims: " << dims[0] << "," << dims[1] << "," << dims[2] << ", header: " << headerSize << std::endl;
+	got = loaderParams.find("type");
+	if (got != loaderParams.end())
+	{
+		std::string s = got->second;
+		// delete " and "
+		s.erase(0, 1); s.erase(s.size() - 1, s.size());
+
+		dataType = s;
+	}
+
+	std::cout << "Dims: " << dims[0] << "," << dims[1] << "," << dims[2] << ", header: " << headerSize << ", type: " << dataType << std::endl;
 }
 
 
@@ -180,11 +202,15 @@ inline int BinaryDataLoader::loadData(std::string paramName)
 	param = paramName;
 
 	int field = 0;
+	field = strConvert::to_int(paramName);
 
 	// Set Dims
 	size_t dimx=dims[0];
 	size_t dimy=dims[1];
 	size_t dimz=dims[2];
+
+	totalNumberOfElements = dimx * dimy * dimz;
+	numElements = totalNumberOfElements;
 
 	std::ifstream f;
 
@@ -203,6 +229,8 @@ inline int BinaryDataLoader::loadData(std::string paramName)
 
 	size_t xl = 0; size_t yl = 0; size_t zl = 0;
 	size_t xu = dimx - 1; size_t yu = dimy - 1; size_t zu = dimz - 1;
+
+	allocateMem(dataType, numElements, 0);
 
 	float * fdata; double * ddata;
 	
@@ -250,6 +278,8 @@ inline int BinaryDataLoader::loadData(std::string paramName)
 	}
 
 	f.close();
+
+	numElements = cnt;
 
 	clock.stop();
 	log << "Loading data took " << clock.getDuration() << " s" << std::endl;

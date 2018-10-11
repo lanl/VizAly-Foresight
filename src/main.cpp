@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
 			void * cdata = NULL;
 
 			compressClock.start();
-			compressorMgr->compress(ioMgr->data, cdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getNumElements());
+			compressorMgr->compress(ioMgr->data, cdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getDims());
 			compressClock.stop();
 
 			//
@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
 			void * decompdata = NULL;
 
 			decompressClock.start();
-			compressorMgr->decompress(cdata, decompdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getNumElements() );
+			compressorMgr->decompress(cdata, decompdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getDims() );
 			decompressClock.stop();
 
 

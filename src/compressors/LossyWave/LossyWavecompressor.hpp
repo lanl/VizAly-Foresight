@@ -16,8 +16,8 @@ class LossyWaveCompressor: public CompressorInterface
     ~LossyWaveCompressor();
 
     void init();
-    int compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
-    int decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
+    int compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n);
+    int decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n);
     void close();
 };
 
@@ -37,12 +37,17 @@ inline void LossyWaveCompressor::init()
 	 
 }
 
-inline int LossyWaveCompressor::compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
+inline int LossyWaveCompressor::compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
+	size_t numel = n[0];
+	for (int i = 1; i < 5; i++)
+		if (n[i] != 0)
+			numel *= n[i];
+
 	// Set compression parameters
 	int args[13] = { 404, 0, 128, 0,
-					n, n, n,
-					n, n, n,
+					n[0], n[1], n[2],
+					n[0], n[1], n[2],
 					dataTypeSize, 50, 0 };
 
 	lossywave::lossywave lw(args);
@@ -55,18 +60,18 @@ inline int LossyWaveCompressor::compress(void *input, void *&output, std::string
 
 	cbytes = csize+4; //4 byte header
 
-	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*n << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*n / (float)csize) << std::endl;
+	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*numel / (float)csize) << std::endl;
 	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
 
     return 1;
 }
 
-inline int LossyWaveCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
+inline int LossyWaveCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
 	// Set compression parameters
 	int args[13] = { 404, 0, 128, 0,
-					n, n, n,
-					n, n, n,
+					n[0], n[1], n[2],
+					n[0], n[1], n[2],
 					dataTypeSize, 50, 0 };
 
 	lossywave::lossywave lw(args);
