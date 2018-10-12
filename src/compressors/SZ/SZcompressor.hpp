@@ -51,7 +51,7 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
 	tol = strConvert::to_double( compressorParameters["tolerance"] );
 
 	std::uint64_t csize = 0;
-	std::uint8_t *cdata = SZ_compress_args(SZ_FLOAT, static_cast<float *>(input), &csize, PW_REL, 0, 0, tol, 0, 0, 0, 0, numel);
+	std::uint8_t *cdata = SZ_compress_args(SZ_FLOAT, static_cast<float *>(input), &csize, PW_REL, 0, 0, tol, n[4], n[3], n[2], n[1], n[0]);
 	
 	output = cdata;
 	cTime.stop();
@@ -72,7 +72,7 @@ inline int SZCompressor::decompress(void *&input, void *&output, std::string dat
 			numel *= n[i];
 
 	Timer dTime; dTime.start();
-	output = SZ_decompress(SZ_FLOAT, static_cast<std::uint8_t *>(input), cbytes, 0, 0, 0, 0, numel);
+	output = SZ_decompress(SZ_FLOAT, static_cast<std::uint8_t *>(input), cbytes, n[4], n[3], n[2], n[1], n[0]);
 	dTime.stop(); 
 
 	std::free(input);

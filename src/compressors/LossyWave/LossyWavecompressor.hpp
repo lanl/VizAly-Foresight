@@ -44,21 +44,27 @@ inline int LossyWaveCompressor::compress(void *input, void *&output, std::string
 		if (n[i] != 0)
 			numel *= n[i];
 
+	int quant = 0;
+	quant = strConvert::to_int(compressorParameters["quant"]);
+	int pcnt = 50;
+	pcnt = strConvert::to_int(compressorParameters["pcnt"]);
+
 	// Set compression parameters
-	int args[13] = { 404, 0, 128, 0,
+	int args[13] = { 404, 0, 128+quant, 0,
 					n[0], n[1], n[2],
 					n[0], n[1], n[2],
-					dataTypeSize, 50, 0 };
+					dataTypeSize, pcnt, 0 };
 
 	lossywave::lossywave lw(args);
 	
 	Timer cTime; cTime.start();
 
+	output = std::malloc(numel*dataTypeSize);
 	std::uint64_t csize = lw.compress(input, dataTypeSize, output);
 
 	cTime.stop();
 
-	cbytes = csize+4; //4 byte header
+	cbytes = csize+4; //add 4 byte header for lz4
 
 	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*numel / (float)csize) << std::endl;
 	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
@@ -68,16 +74,26 @@ inline int LossyWaveCompressor::compress(void *input, void *&output, std::string
 
 inline int LossyWaveCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
+	size_t numel = n[0];
+	for (int i = 1; i < 5; i++)
+		if (n[i] != 0)
+			numel *= n[i];
+
+	int quant = 0;
+	quant = strConvert::to_int(compressorParameters["quant"]);
+	int pcnt = 50;
+	pcnt = strConvert::to_int(compressorParameters["pcnt"]);
+
 	// Set compression parameters
-	int args[13] = { 404, 0, 128, 0,
+	int args[13] = { 404, 0, 128+quant, 0,
 					n[0], n[1], n[2],
 					n[0], n[1], n[2],
-					dataTypeSize, 50, 0 };
+					dataTypeSize, pcnt, 0 };
 
 	lossywave::lossywave lw(args);
 
 	Timer dTime; dTime.start();
-
+	output = std::malloc(numel*dataTypeSize);
 	std::uint64_t dsize = lw.decompress(input, output);
 
 	dTime.stop();

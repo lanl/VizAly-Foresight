@@ -25,6 +25,7 @@ class BinaryDataLoader: public DataLoaderInterface
 	int numRanks;
 	int myRank;
 	size_t headerSize;
+	std::string dataTarget;
 
   public:
 	BinaryDataLoader();
@@ -98,6 +99,16 @@ inline void BinaryDataLoader::init(std::string _filename, MPI_Comm _comm)
 		s.erase(0, 1); s.erase(s.size() - 1, s.size());
 
 		dataType = s;
+	}
+
+	got = loaderParams.find("target");
+	if (got != loaderParams.end())
+	{
+		std::string s = got->second;
+		// delete " and "
+		s.erase(0, 1); s.erase(s.size() - 1, s.size());
+
+		dataTarget = s;
 	}
 
 	std::cout << "Dims: " << dims[0] << "," << dims[1] << "," << dims[2] << ", header: " << headerSize << ", type: " << dataType << std::endl;
@@ -230,52 +241,80 @@ inline int BinaryDataLoader::loadData(std::string paramName)
 	size_t xl = 0; size_t yl = 0; size_t zl = 0;
 	size_t xu = dimx - 1; size_t yu = dimy - 1; size_t zu = dimz - 1;
 
-	allocateMem(dataType, numElements, 0);
+	allocateMem(dataTarget, numElements, 0);
 
 	float * fdata; double * ddata;
 	
-	if (dataType == "float")
+	size_t cnt = 0;
+	if (dataTarget == "float")
+	{
 		fdata = static_cast<float*>(data);
-	else if (dataType == "double")
+		for (size_t z = zl; z <= zu; z++)
+		{
+			for (size_t y = yl; y <= yu; y++)
+			{
+				std::streampos seekVal = findByteAddress(xl, y, z, field);
+				f.seekg(seekVal);
+
+				if (dataType == "float")
+				{
+					float value;
+					for (size_t x = xl; x <= xu; x++)
+					{
+						f.read(reinterpret_cast<char*>(&value), sizeof(float));
+						fdata[cnt] = value; cnt++;
+					}
+				}
+				else if (dataType == "double")
+				{
+					double value;
+					for (size_t x = xl; x <= xu; x++)
+					{
+						f.read(reinterpret_cast<char*>(&value), sizeof(double));
+						fdata[cnt] = value; cnt++;
+					}
+				}
+				else {}
+			}
+		}
+	}
+	else if (dataTarget == "double")
+	{
 		ddata = static_cast<double*>(data);
+		for (size_t z = zl; z <= zu; z++)
+		{
+			for (size_t y = yl; y <= yu; y++)
+			{
+				std::streampos seekVal = findByteAddress(xl, y, z, field);
+				f.seekg(seekVal);
+
+				if (dataType == "float")
+				{
+					float value;
+					for (size_t x = xl; x <= xu; x++)
+					{
+						f.read(reinterpret_cast<char*>(&value), sizeof(float));
+						ddata[cnt] = value; cnt++;
+					}
+				}
+				else if (dataType == "double")
+				{
+					double value;
+					for (size_t x = xl; x <= xu; x++)
+					{
+						f.read(reinterpret_cast<char*>(&value), sizeof(double));
+						ddata[cnt] = value; cnt++;
+					}
+				}
+				else {}
+			}
+		}
+	}
 	else
 	{
 		std::cout << "Error: Unsupported binary dataType!" << std::endl; return -1;
 	}
 
-	size_t cnt = 0;
-	for (size_t z = zl; z <= zu; z++)
-	{
-		for (size_t y = yl; y <= yu; y++)
-		{
-			std::streampos seekVal = findByteAddress(xl, y, z, field);
-			f.seekg(seekVal);
-
-			if (dataType == "float")
-			{
-				float value;
-				for (size_t x = xl; x <= xu; x++)
-				{
-					f.read(reinterpret_cast<char*>(&value), sizeof(float));
-					fdata[cnt] = value; cnt++;
-				}
-			}
-			else if (dataType == "double")
-			{
-				double value;
-				for (size_t x = xl; x <= xu; x++)
-				{
-					f.read(reinterpret_cast<char*>(&value), sizeof(double));
-					ddata[cnt] = value; cnt++;
-				}
-			}
-			else
-			{
-				
-			}
-
-		}
-	}
 
 	f.close();
 
