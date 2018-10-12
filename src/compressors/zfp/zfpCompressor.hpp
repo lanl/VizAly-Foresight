@@ -125,6 +125,11 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
 
 inline int ZFPCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
+	size_t numel = n[0];
+	for (int i = 1; i < 5; i++)
+		if (n[i] != 0)
+			numel *= n[i];
+
     Timer dTime; 
     dTime.start();
 
@@ -132,7 +137,7 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
     zfp_type type = getZfpType( dataType );
 
     // allocate meta data for the 1D input array of decompressed data
-    output = malloc(n*dataTypeSize);
+    output = malloc(numel*dataTypeSize);
     zfp_field* field = zfp_field_1d(output, type, numel);
 
 
