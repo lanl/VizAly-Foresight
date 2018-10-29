@@ -90,6 +90,13 @@ int main(int argc, char *argv[])
 	for (int j = 0; j < jsonInput["metrics"].size(); j++)
 		metrics.push_back(jsonInput["metrics"][j]);
 
+	bool writeData = false;
+	std::string outputFile = "";
+	if (jsonInput["output"].find("filename") != jsonInput["output"].end())
+	{
+		outputFile = jsonInput["output"]["filename"];
+		writeData = true;
+	}
 
 	//
 	// Create log and metrics files
@@ -278,7 +285,10 @@ int main(int argc, char *argv[])
 
 			//
 			// deallocate
-			std::free(decompdata);
+			if (writeData)
+				ioMgr->saveCompData(params[i], decompdata);
+			else
+				std::free(decompdata);
 			ioMgr->close();
 			memLoad.stop();
 
@@ -309,6 +319,14 @@ int main(int argc, char *argv[])
 		
 			MPI_Barrier(MPI_COMM_WORLD);
 		}
+
+		if (writeData)
+		{
+			ioMgr->writeData(outputFile + compressorMgr->getCompressorName());
+			debuglog << ioMgr->getLog();
+			appendLog(outputLogFile, debuglog );
+		}
+
 		compressorMgr->close();
 	}
 

@@ -6,6 +6,7 @@ All rights reserved.
 
 Authors:
  - Pascal Grosset
+ - Jesus Pulido
 ================================================================================*/
 
 #ifndef _HACC_LOADER_H_
@@ -30,6 +31,8 @@ class HACCDataLoader: public DataLoaderInterface
 
 	void init(std::string _filename, MPI_Comm _comm);
 	int loadData(std::string paramName);
+	int saveCompData(std::string paramName, void * cData);
+	int writeData(std::string _filename);
 	int close() { return deAllocateMem(); }
 };
 
@@ -39,11 +42,19 @@ inline HACCDataLoader::HACCDataLoader()
 	myRank = 0;
 	numRanks = 0;
 	loader = "HACC";
+	saveData = false;
 }
 
 inline HACCDataLoader::~HACCDataLoader()
 {
 	deAllocateMem();
+
+	// If write() wasnt called to flush compFullData, free it here
+	for (std::pair<std::string, void *> element : compFullData)
+	{
+		if(element.second != NULL)
+			std::free(element.second);
+	}
 }
 
 
@@ -51,6 +62,7 @@ inline void HACCDataLoader::init(std::string _filename, MPI_Comm _comm)
 {
 	filename = _filename;
 	comm = _comm;
+	saveData = false;
 
 	MPI_Comm_size(comm, &numRanks);
 	MPI_Comm_rank(comm, &myRank);
@@ -276,6 +288,86 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	log << "Loading data took " << clock.getDuration() << " s" << std::endl;
 
 	return 1; // All good
+}
+
+inline int HACCDataLoader::saveCompData(std::string paramName, void * cData)
+{
+	compFullData.insert({ paramName, cData });
+	return 1;
+}
+
+inline int HACCDataLoader::writeData(std::string _filename)
+{
+	Timer clock;
+	log.str("");
+
+	gio::GenericIO *gioWriter;
+
+	// Init GenericIO writer + open file
+#ifndef GENERICIO_NO_MPI
+	gioWriter = new gio::GenericIO(comm, _filename);// , gio::GenericIO::FileIOMPI);
+#else
+	gioWriter = new gio::GenericIO(_filename, gio::GenericIO::FileIOPOSIX);
+#endif
+
+	gioWriter->setNumElems(numElements);
+
+	// Init physical parameters
+	int physOrigin[3] = { 0, 0, 0 };
+	int physScale[3] = { 256, 256, 256 };
+	for (int d = 0; d < 3; ++d)
+	{
+		gioWriter->setPhysOrigin(physOrigin[d], d);
+		gioWriter->setPhysScale(physScale[d], d);
+	}
+
+	// Populate parameters
+	for (std::pair<std::string, void *> element : compFullData)
+	{
+		float * fdata = static_cast<float *>(element.second);
+
+		std::vector<float> var;
+		var.resize(numElements + gioWriter->requestedExtraSpace() / sizeof(float));
+		for (uint64_t i = 0; i < numElements; i++)
+		{
+			var[i] = fdata[i];
+		}
+
+		if (element.first == "x")
+		{
+			gioWriter->addVariable("x", var, gio::GenericIO::VarIsPhysCoordX | gio::GenericIO::VarHasExtraSpace);
+		}
+		else if (element.first == "y")
+		{
+			gioWriter->addVariable("y", var, gio::GenericIO::VarIsPhysCoordY | gio::GenericIO::VarHasExtraSpace);
+		}
+		else if (element.first == "z")
+		{
+			gioWriter->addVariable("z", var, gio::GenericIO::VarIsPhysCoordZ | gio::GenericIO::VarHasExtraSpace);
+		}
+		else
+		{
+			gioWriter->addVariable(element.first, var, gio::GenericIO::VarHasExtraSpace);
+		}
+
+		// Free data
+		std::free(element.second);
+		element.second = NULL;
+	}
+
+	//gioWriter->useOctree(true, 2, true);
+#ifndef GENERICIO_NO_MPI
+	gioWriter->write();
+
+	MPI_Barrier(comm);
+#endif
+
+	gioWriter->clearVariables();
+	gioWriter->close();
+
+	clock.stop();
+	log << "Writing data took " << clock.getDuration() << " s" << std::endl;
+	return 1;
 }
 
 #endif

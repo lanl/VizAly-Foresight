@@ -30,6 +30,8 @@ class NYXDataLoader: public DataLoaderInterface
 
 	void init(std::string _filename, MPI_Comm _comm);
 	int loadData(std::string paramName);
+	int saveCompData(std::string paramName, void * cData);
+	int writeData(std::string _filename);
 	int close() { return deAllocateMem(); }
 };
 
@@ -39,6 +41,7 @@ inline NYXDataLoader::NYXDataLoader()
 	myRank = 0;
 	numRanks = 0;
 	loader = "NYX";
+	saveData = false;
 }
 
 inline NYXDataLoader::~NYXDataLoader()
@@ -51,6 +54,7 @@ inline void NYXDataLoader::init(std::string _filename, MPI_Comm _comm)
 {
 	filename = _filename;
 	comm = _comm;
+	saveData = false;
 
 	MPI_Comm_size(comm, &numRanks);
 	MPI_Comm_rank(comm, &myRank);
@@ -232,6 +236,17 @@ inline int NYXDataLoader::loadData(std::string paramName)
 	log << "Loading data took " << clock.getDuration() << " s" << std::endl;
 
 	return 1; // All good
+}
+
+inline int NYXDataLoader::saveCompData(std::string paramName, void * cData)
+{
+	compFullData.insert({ paramName, cData });
+	return 1;
+}
+
+inline int NYXDataLoader::writeData(std::string _filename)
+{
+	return 1;
 }
 
 #endif

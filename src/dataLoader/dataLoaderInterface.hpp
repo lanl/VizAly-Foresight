@@ -24,6 +24,7 @@ class DataLoaderInterface
 	std::string filename;
 	size_t totalNumberOfElements;
 	size_t dims[5]{ 0,0,0,0,0 };
+	bool saveData;
 
 	std::string dataType;
 	std::string param;
@@ -37,21 +38,25 @@ class DataLoaderInterface
   public:   // TO_CHANGE
 	void *data;
 	std::unordered_map<std::string, std::string> loaderParams;
+	std::unordered_map<std::string, void *> compFullData;
 
   public:
 	virtual void init(std::string _filename, MPI_Comm _comm) = 0;
 	virtual int loadData(std::string paramName) = 0;
+	virtual int saveCompData(std::string paramName, void * cData) = 0;
+	virtual int writeData(std::string _filename) = 0;
 	virtual int close() = 0;
 
 	size_t getNumElements() { return numElements; }
 	size_t * getDims() { return dims; }
 	size_t getTypeSize() { return elemSize; }
-	std::string getType(){ return dataType; }
-	std::string getParam(){ return param; }
-
+	std::string getType() { return dataType; }
+	std::string getParam() { return param; }
 	std::string getDataInfo();
 	std::string getLog() { return log.str(); }
 
+	void setSave(bool state) { saveData = state; }
+	
 };
 
 

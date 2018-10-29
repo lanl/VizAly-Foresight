@@ -36,6 +36,8 @@ class BinaryDataLoader: public DataLoaderInterface
 
 	void init(std::string _filename, MPI_Comm _comm);
 	int loadData(std::string paramName);
+	int saveCompData(std::string paramName, void * cData);
+	int writeData(std::string _filename);
 	int close() { return deAllocateMem(); }
 };
 
@@ -45,7 +47,7 @@ inline BinaryDataLoader::BinaryDataLoader()
 	myRank = 0;
 	numRanks = 0;
 	loader = "Binary";
-	
+	saveData = false;
 }
 
 inline BinaryDataLoader::~BinaryDataLoader()
@@ -59,6 +61,7 @@ inline void BinaryDataLoader::init(std::string _filename, MPI_Comm _comm)
 	filename = _filename;
 	comm = _comm;
 	headerSize = 0;
+	saveData = false;
 
 	MPI_Comm_size(comm, &numRanks);
 	MPI_Comm_rank(comm, &myRank);
@@ -114,8 +117,6 @@ inline void BinaryDataLoader::init(std::string _filename, MPI_Comm _comm)
 	std::cout << "Dims: " << dims[0] << "," << dims[1] << "," << dims[2] << ", header: " << headerSize << ", type: " << dataType << std::endl;
 }
 
-
-
 inline int BinaryDataLoader::allocateMem(std::string dataType, size_t numElements, int offset)
 {
 	// Allocate mem
@@ -169,7 +170,6 @@ inline int BinaryDataLoader::allocateMem(std::string dataType, size_t numElement
 	return 1;
 }
 
-
 inline int BinaryDataLoader::deAllocateMem()
 {
 	if (data == NULL) // already deallocated!
@@ -202,7 +202,6 @@ inline int BinaryDataLoader::deAllocateMem()
 
 	return 1;
 }
-
 
 inline int BinaryDataLoader::loadData(std::string paramName)
 {
@@ -324,6 +323,17 @@ inline int BinaryDataLoader::loadData(std::string paramName)
 	log << "Loading data took " << clock.getDuration() << " s" << std::endl;
 
 	return 1; // All good
+}
+
+inline int BinaryDataLoader::saveCompData(std::string paramName, void * cData)
+{
+	compFullData.insert({ paramName, cData });
+	return 1;
+}
+
+inline int BinaryDataLoader::writeData(std::string _filename)
+{
+	return 1;
 }
 
 // Given x,y,z coordinates and current scalar field, this will find the
