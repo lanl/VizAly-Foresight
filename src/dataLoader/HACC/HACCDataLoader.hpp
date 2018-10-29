@@ -351,8 +351,8 @@ inline int HACCDataLoader::writeData(std::string _filename)
 		}
 
 		// Free data
-		std::free(element.second);
-		element.second = NULL;
+		//std::free(element.second);
+		//element.second = NULL;
 	}
 
 	//gioWriter->useOctree(true, 2, true);
