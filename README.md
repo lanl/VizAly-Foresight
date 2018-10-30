@@ -39,6 +39,7 @@ CBench takes as input a json file (examples of input json files are in the **_[i
 * Filename
 * Scalars to analyze
 * Compressor parameters
+* Filename (For optional output)
 * Log-filename
 * Metric-filename
 * Compressors to use
@@ -47,6 +48,7 @@ CBench takes as input a json file (examples of input json files are in the **_[i
 ### Currently Supported file formats:
 * GenericIO
 * NYX(HDF5)
+* Binary
 
 ### Currently Supported compressors:
 * [Lossless BLOSC](http://blosc.org/)
@@ -58,6 +60,7 @@ CBench takes as input a json file (examples of input json files are in the **_[i
 * Absolute Error
 * Relative Error
 * Mean Square Error (MSE)
+* Peak Signal-to-Noise Ratio (PSNR)
 
 # Development
 For information on how to add new compressors and/or metrics, look at the [readme in src/compressors](src/compressors/readme.md) and [src/metrics](src/metrics) respectively.

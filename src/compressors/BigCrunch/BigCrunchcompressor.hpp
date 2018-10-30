@@ -50,8 +50,8 @@ inline int BigCrunchCompressor::compress(void *input, void *&output, std::string
 				 {bigcrunch::config_t::BLOSC_NTHREADS, 1},
 				 {bigcrunch::config_t::BLOSC_COMPRESSOR, bigcrunch::blosc_compressor_t::ZSTD},
 				 {bigcrunch::config_t::BLOSC_CLEVEL, 9},
-				 {bigcrunch::config_t::BLOSC_FILTER, bigcrunch::blosc_filter_t::SHUFFLE},
-				  };
+				 {bigcrunch::config_t::BLOSC_FILTER, bigcrunch::blosc_filter_t::SHUFFLE}
+	};
 	Timer cTime; cTime.start();
 
 	bigcrunch::bigcrunch bc(settings);
@@ -77,14 +77,14 @@ inline int BigCrunchCompressor::decompress(void *&input, void *&output, std::str
 				 {bigcrunch::config_t::BLOSC_NTHREADS, 1},
 				 {bigcrunch::config_t::BLOSC_COMPRESSOR, bigcrunch::blosc_compressor_t::ZSTD},
 				 {bigcrunch::config_t::BLOSC_CLEVEL, 9},
-				 {bigcrunch::config_t::BLOSC_FILTER, bigcrunch::blosc_filter_t::SHUFFLE},
+				 {bigcrunch::config_t::BLOSC_FILTER, bigcrunch::blosc_filter_t::SHUFFLE}
 	};
 	Timer dTime; dTime.start();
 	bigcrunch::bigcrunch bc(settings);
 
 	auto rdata_array = bc.decompress(static_cast<std::uint8_t *>(input), cbytes);
 
-	std::free(input);
+	std::free(input);  input = NULL;
 	output = rdata_array.data<float>();
 
 	dTime.stop();

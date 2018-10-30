@@ -289,6 +289,7 @@ int main(int argc, char *argv[])
 				ioMgr->saveCompData(params[i], decompdata);
 			else
 				std::free(decompdata);
+
 			ioMgr->close();
 			memLoad.stop();
 

@@ -32,6 +32,7 @@
 	"metrics": [
 		"absolute_error",
 		"relative_error",
-		"mse"
+    "mse",
+    "psnr"
 	]
 }

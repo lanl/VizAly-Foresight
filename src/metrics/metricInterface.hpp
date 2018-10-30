@@ -20,8 +20,8 @@ Authors:
 class MetricInterface
 {
   protected:
-    double val;
-    double total_val;
+    double val; // Local Quantity (MPI)
+    double total_val; // Global Quantity (MPI)
 
     std::string metricName;
     std::stringstream log;
