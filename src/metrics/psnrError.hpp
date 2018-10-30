@@ -71,7 +71,7 @@ inline void psnrError::execute(void *original, void *approx, size_t n) {
 	double local_mse = 0;
 	for (std::size_t i = 0; i < n; ++i)
 	{
-		if (static_cast<float *>(original)[i] > max)
+		if (static_cast<float *>(original)[i] > local_max)
 			local_max = static_cast<float *>(original)[i];
 
 		local_mse += (pow(static_cast<float *>(original)[i] - static_cast<float *>(approx)[i], (double)2.0));
