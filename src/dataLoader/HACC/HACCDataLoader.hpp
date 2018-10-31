@@ -168,7 +168,11 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	param = paramName;
 
 	// Init GenericIO reader + open file
+#ifndef GENERICIO_NO_MPI
+	gioReader = new gio::GenericIO(comm, filename);
+#else
 	gioReader = new gio::GenericIO(filename, gio::GenericIO::FileIOPOSIX);
+#endif
 
 	// Open file
 	gioReader->openAndReadHeader(gio::GenericIO::MismatchRedistribute);
