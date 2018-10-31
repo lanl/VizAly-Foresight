@@ -18,18 +18,20 @@
 
 	"output" :
 	{
-        "filename-comment" : "name of output file",
+    "filename-comment" : "name of output file",
 		"filename" : "m000.full.mpicosmo.50_",
         
 		"logfname-comment": "name of output log file",
 		"logfname" : "runlog_HACC_all_",
-
+    
 		"metricsfname-comment": "name of file with output",
 		"metricsfname" : "metrics_HACC_all_"
 	},
 
 	"compressor-comment" : "which compressors to test",
-	"compressors" : ["blosc", "BigCrunch", "SZ", "zfp"],
+  "compressors": [ "BigCrunch" ],
+
+  
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [
