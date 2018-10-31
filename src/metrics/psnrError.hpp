@@ -101,6 +101,7 @@ inline void psnrError::execute(void *original, void *approx, size_t n) {
 
 	total_val = global_psnr;
 
+	log << " local_psnr: " << local_psnr << std::endl;
 	// Currently only report Global PSNR
 	log << " psnr: " << global_psnr << std::endl;
 
