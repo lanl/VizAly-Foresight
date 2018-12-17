@@ -5,6 +5,7 @@ echo "Building BigCrunch ... "
 
 git clone https://github.com/lanl/VizAly-BigCrunch.git
 cd VizAly-BigCrunch/
+git checkout v1.1
 mkdir install
 mkdir build
 cd build
