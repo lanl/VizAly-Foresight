@@ -50,7 +50,7 @@ CBench takes as input a json file (examples of input json files are in the **_[i
 
 ### Currently Supported compressors:
 * [Lossless BLOSC](http://blosc.org/) - version 1.10.2
-* [Lossy BigCrunch](https://github.com/lanl/VizAly-BigCrunch) - version 1.0
+* [Lossy BigCrunch](https://github.com/lanl/VizAly-BigCrunch) - version 1.1
 * [SZ](https://collab.cels.anl.gov/display/ESR/SZ) - version 2.0.2.2
 * [zfp](https://computation.llnl.gov/projects/floating-point-compression) - version 0.5.3
 
