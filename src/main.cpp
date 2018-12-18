@@ -39,6 +39,8 @@ Authors:
 #endif
 
 
+#include "gioData.hpp"
+
 int main(int argc, char *argv[])
 {
 	// Parse arguments and read json file
@@ -96,6 +98,7 @@ int main(int argc, char *argv[])
 	{
 		outputFile = jsonInput["output"]["filename"];
 		writeData = true;
+		std::cout << "Output" << std::endl;
 	}
 
 	//
@@ -180,6 +183,11 @@ int main(int argc, char *argv[])
 		debuglog << "===============================================" << std::endl;
 		debuglog << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
 
+
+		if (writeData)
+		{
+
+		}
 
 		// Cycle through params
 		for (int i=0; i<params.size(); i++)
@@ -326,6 +334,7 @@ int main(int argc, char *argv[])
 			ioMgr->writeData(outputFile + compressorMgr->getCompressorName());
 			debuglog << ioMgr->getLog();
 			appendLog(outputLogFile, debuglog );
+			std::cout << "wtiring data" << std::endl;
 		}
 
 		compressorMgr->close();

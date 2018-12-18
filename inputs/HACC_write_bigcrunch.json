@@ -29,7 +29,7 @@
 	},
 
 	"compressor-comment" : "which compressors to test",
-  "compressors": [ "BigCrunch" ],
+  "compressors": [ "blosc" ],
 
   
 

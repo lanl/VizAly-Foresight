@@ -23,6 +23,8 @@ class HACCDataLoader: public DataLoaderInterface
 	int numRanks;
 	int myRank;
 
+	std::vector<GioData> inOutData;
+
   public:
 	HACCDataLoader();
 	~HACCDataLoader();
@@ -168,11 +170,11 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	param = paramName;
 
 	// Init GenericIO reader + open file
-#ifndef GENERICIO_NO_MPI
+  #ifndef GENERICIO_NO_MPI
 	gioReader = new gio::GenericIO(comm, filename);
-#else
+  #else
 	gioReader = new gio::GenericIO(filename, gio::GenericIO::FileIOPOSIX);
-#endif
+  #endif
 
 	// Open file
 	gioReader->openAndReadHeader(gio::GenericIO::MismatchRedistribute);
@@ -199,6 +201,7 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	readInData.resize(numVars);
 
 	int paramToLoadPos = -1;
+	inOutData.clear();
 	for (int i = 0; i < numVars; i++)
 	{
 		readInData[i].id = i;
@@ -218,6 +221,8 @@ inline int HACCDataLoader::loadData(std::string paramName)
 			readInData[i].loadData = true;
 			paramToLoadPos = i;
 		}
+
+		inOutData.push_back( readInData[i] );
 	}
 
 	if (paramToLoadPos == -1)
@@ -296,23 +301,35 @@ inline int HACCDataLoader::loadData(std::string paramName)
 
 inline int HACCDataLoader::saveCompData(std::string paramName, void * cData)
 {
-	compFullData.insert({ paramName, cData });
+	//compFullData.insert({ paramName, cData });
+	//std::cout << "paramName: " << paramName << std::endl;
+	for (int i=0; i<inOutData.size(); i++)
+	{
+		//std::cout << "inOutData[i].name: " << inOutData[i].name << std::endl;
+		if (inOutData[i].name == paramName)
+		{
+			inOutData[i].data = cData;
+			std::cout << "Found: " << paramName << std::endl;
+			inOutData[i].doWrite = true;
+		}
+	}
 	return 1;
 }
 
 inline int HACCDataLoader::writeData(std::string _filename)
 {
+	std::cout << "HACCDataLoader::writeData " << _filename << std::endl;
 	Timer clock;
 	log.str("");
 
 	gio::GenericIO *gioWriter;
 
 	// Init GenericIO writer + open file
-#ifndef GENERICIO_NO_MPI
+  #ifndef GENERICIO_NO_MPI
 	gioWriter = new gio::GenericIO(comm, _filename);// , gio::GenericIO::FileIOMPI);
-#else
+  #else
 	gioWriter = new gio::GenericIO(_filename, gio::GenericIO::FileIOPOSIX);
-#endif
+  #endif
 
 	gioWriter->setNumElems(numElements);
 
@@ -326,45 +343,78 @@ inline int HACCDataLoader::writeData(std::string _filename)
 	}
 
 	// Populate parameters
-	for (std::pair<std::string, void *> element : compFullData)
+	//for (std::pair<std::string, void *> element : compFullData)
+	for (int i=0; i<inOutData.size(); i++)
 	{
-		float * fdata = static_cast<float *>(element.second);
+		if (inOutData[i].doWrite)
+		{
+			std::cout << "inOutData[i].name: " << inOutData[i].name << std::endl;
 
-		std::vector<float> var;
-		var.resize(numElements + gioWriter->requestedExtraSpace() / sizeof(float));
-		for (uint64_t i = 0; i < numElements; i++)
-		{
-			var[i] = fdata[i];
-		}
+			unsigned flag = gio::GenericIO::VarHasExtraSpace;
+			if (inOutData[i].xVar)
+				flag = flag | gio::GenericIO::VarIsPhysCoordX;
+			else if (inOutData[i].xVar)
+				flag = flag | gio::GenericIO::VarIsPhysCoordY;
+			else if (inOutData[i].xVar)
+				flag = flag | gio::GenericIO::VarIsPhysCoordZ;
 
-		if (element.first == "x")
-		{
-			gioWriter->addVariable("x", var, gio::GenericIO::VarIsPhysCoordX | gio::GenericIO::VarHasExtraSpace);
+			if (inOutData[i].dataType == "float")
+              	gioWriter->addVariable( (inOutData[i].name).c_str(), (float*)inOutData[i].data,    flag );
+            else if (inOutData[i].dataType == "double")
+              	gioWriter->addVariable( (inOutData[i].name).c_str(), (double*)inOutData[i].data,   flag );
+            else if (inOutData[i].dataType == "int8_t")
+              	gioWriter->addVariable(  (inOutData[i].name).c_str(), (int8_t*)inOutData[i].data,   flag);
+            else if (inOutData[i].dataType == "int16_t")
+              	gioWriter->addVariable( (inOutData[i].name).c_str(), (int16_t*)inOutData[i].data,   flag);
+            else if (inOutData[i].dataType == "int32_t")
+              	gioWriter->addVariable( (inOutData[i].name).c_str(), (int32_t*)inOutData[i].data,   flag);
+            else if (inOutData[i].dataType == "int64_t")
+              	gioWriter->addVariable( (inOutData[i].name).c_str(), (int64_t*)inOutData[i].data,   flag);
+            else if (inOutData[i].dataType == "uint8_t")
+              	gioWriter->addVariable( (inOutData[i].name).c_str(), (uint8_t*)inOutData[i].data,   flag);
+            else if (inOutData[i].dataType == "uint16_t")
+              	gioWriter->addVariable(  (inOutData[i].name).c_str(), (uint16_t*)inOutData[i].data, flag);
+            else if (inOutData[i].dataType == "uint32_t")
+              	gioWriter->addVariable( (inOutData[i].name).c_str(), (uint32_t*)inOutData[i].data,  flag);
+            else if (inOutData[i].dataType == "uint64_t")
+              	gioWriter->addVariable( (inOutData[i].name).c_str(), (uint64_t*)inOutData[i].data,  flag);
+            else
+              	std::cout << " = data type undefined!!!" << std::endl;
 		}
-		else if (element.first == "y")
-		{
-			gioWriter->addVariable("y", var, gio::GenericIO::VarIsPhysCoordY | gio::GenericIO::VarHasExtraSpace);
-		}
-		else if (element.first == "z")
-		{
-			gioWriter->addVariable("z", var, gio::GenericIO::VarIsPhysCoordZ | gio::GenericIO::VarHasExtraSpace);
-		}
-		else
-		{
-			gioWriter->addVariable(element.first, var, gio::GenericIO::VarHasExtraSpace);
-		}
+		//float * fdata = static_cast<float *>(element.second);
 
-		// Free data
-		//std::free(element.second);
-		//element.second = NULL;
+		// std::vector<float> var;
+		// var.resize(numElements + gioWriter->requestedExtraSpace() / sizeof(float));
+		// for (uint64_t i = 0; i < numElements; i++)
+		// {
+		// 	var[i] = fdata[i];
+		// }
+
+		// if (element.first == "x")
+		// {
+		// 	gioWriter->addVariable("x", fdata, gio::GenericIO::VarIsPhysCoordX | gio::GenericIO::VarHasExtraSpace);
+		// }
+		// else if (element.first == "y")
+		// {
+		// 	gioWriter->addVariable("y", fdata, gio::GenericIO::VarIsPhysCoordY | gio::GenericIO::VarHasExtraSpace);
+		// }
+		// else if (element.first == "z")
+		// {
+		// 	gioWriter->addVariable("z", fdata, gio::GenericIO::VarIsPhysCoordZ | gio::GenericIO::VarHasExtraSpace);
+		// }
+		// else
+		// {
+		// 	gioWriter->addVariable(element.first, fdata, gio::GenericIO::VarHasExtraSpace);
+		// }
+
+		
 	}
 
-	//gioWriter->useOctree(true, 2, true);
-#ifndef GENERICIO_NO_MPI
+  #ifndef GENERICIO_NO_MPI
 	gioWriter->write();
-
+	std::cout << "HACCDataLoader::writeData " << _filename << "  gioWriter->write() " << std::endl;
 	MPI_Barrier(comm);
-#endif
+  #endif
 
 	gioWriter->clearVariables();
 	gioWriter->close();
