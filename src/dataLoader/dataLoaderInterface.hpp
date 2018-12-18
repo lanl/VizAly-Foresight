@@ -23,7 +23,7 @@ class DataLoaderInterface
 	std::string loader;
 	std::string filename;
 	size_t totalNumberOfElements;
-	size_t dims[5]{ 0,0,0,0,0 };
+	size_t dims[5]{ 0,0,0,0,0 };	/// ??? what is dims????
 	bool saveData;
 
 	std::string dataType;
@@ -45,6 +45,7 @@ class DataLoaderInterface
 	virtual int loadData(std::string paramName) = 0;
 	virtual int saveCompData(std::string paramName, void * cData) = 0;
 	virtual int writeData(std::string _filename) = 0;
+	virtual int saveInputFileParameters() = 0;
 	virtual int close() = 0;
 
 	size_t getNumElements() { return numElements; }
@@ -56,7 +57,6 @@ class DataLoaderInterface
 	std::string getLog() { return log.str(); }
 
 	void setSave(bool state) { saveData = state; }
-	
 };
 
 

@@ -98,8 +98,8 @@ int main(int argc, char *argv[])
 	{
 		outputFile = jsonInput["output"]["filename"];
 		writeData = true;
-		std::cout << "Output" << std::endl;
 	}
+
 
 	//
 	// Create log and metrics files
@@ -134,6 +134,7 @@ int main(int argc, char *argv[])
 	{
 		if (myRank == 0)
 			std::cout << "Unsupported format " << inputFileType << "!!!" << std::endl;
+
 		return 0;
 	}
 
@@ -146,13 +147,18 @@ int main(int argc, char *argv[])
 	}
 
 	ioMgr->init(inputFile, MPI_COMM_WORLD);
-
+	ioMgr->setSave(writeData);
 	
+	// Save parameters of input file to facilitate rewrite
+	if (writeData)
+		ioMgr->saveInputFileParameters();
+
 
 	//
 	// Cycle through compressors and parameters
 	CompressorInterface *compressorMgr;
 	MetricInterface *metricsMgr;
+
 
 	// Loop compressors
 	for (int c = 0; c < compressors.size(); ++c)
@@ -184,11 +190,7 @@ int main(int argc, char *argv[])
 		debuglog << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
 
 
-		if (writeData)
-		{
-
-		}
-
+		
 		// Cycle through params
 		for (int i=0; i<params.size(); i++)
 		{
@@ -215,6 +217,7 @@ int main(int argc, char *argv[])
 			compressClock.start();
 			compressorMgr->compress(ioMgr->data, cdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getDims());
 			compressClock.stop();
+
 
 			//
 			// decompress
@@ -257,9 +260,9 @@ int main(int argc, char *argv[])
 					continue;
 				}
 
+
 				metricsMgr->init(MPI_COMM_WORLD);
 				metricsMgr->execute(ioMgr->data, decompdata, ioMgr->getNumElements());
-
 				debuglog << metricsMgr->getLog();
 				metricsInfo << metricsMgr->getLog();
 				csvOutput << metricsMgr->getGlobalValue() << ", ";
@@ -268,6 +271,7 @@ int main(int argc, char *argv[])
 			}
 			debuglog << "-----------------------------\n";
 			debuglog << "\nMemory in use: " << memLoad.getMemoryInUseInMB() << " MB" << std::endl;
+
 
 
 			//
@@ -295,8 +299,8 @@ int main(int argc, char *argv[])
 			// deallocate
 			if (writeData)
 				ioMgr->saveCompData(params[i], decompdata);
-			else
-				std::free(decompdata);
+			//else
+			std::free(decompdata);
 
 			ioMgr->close();
 			memLoad.stop();
@@ -328,15 +332,30 @@ int main(int argc, char *argv[])
 		
 			MPI_Barrier(MPI_COMM_WORLD);
 		}
+		
+		/*
+		
+		for (int i=0; i<params.size(); i++)
+		{
+			ioMgr->loadData(params[i]);
 
+			std::cout << " ioMgr->getType(): " <<  ioMgr->getType() << std::endl;
+			std::cout << " ioMgr->getTypeSize(): " <<  ioMgr->getTypeSize() << std::endl;
+			std::cout << " ioMgr->getNumElements(): " <<  ioMgr->getNumElements() << std::endl;
+
+			ioMgr->saveCompData(params[i], ioMgr->data);
+			ioMgr->close();
+		}
+		*/
+		
 		if (writeData)
 		{
 			ioMgr->writeData(outputFile + compressorMgr->getCompressorName());
+
 			debuglog << ioMgr->getLog();
 			appendLog(outputLogFile, debuglog );
-			std::cout << "wtiring data" << std::endl;
 		}
-
+		
 		compressorMgr->close();
 	}
 

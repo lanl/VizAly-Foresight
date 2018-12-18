@@ -34,16 +34,16 @@ class GioData
 
   public:
     GioData();
-    GioData(int _id, std::string _name, int _size, bool _isFloat, bool _isSigned, void* _data);
+    GioData(int _id, std::string _name, int _size, bool _isFloat, bool _isSigned, bool _xVar, bool _yVar, bool _zVar, void* _data=NULL);
     ~GioData();
 
-    void init(int _id, std::string _name, int _size, bool _isFloat, bool _isSigned);
+    void init(int _id, std::string _name, int _size, bool _isFloat, bool _isSigned, bool _xVar, bool _yVar, bool _zVar);
     void setNumElements(size_t _numElements) { numElements = _numElements; }
 
     int determineDataType();
 
-  	//int allocateMem(int offset = 1);
-  	//int deAllocateMem();
+  	int allocateMem(int offset = 1);
+  	int deAllocateMem();
 };
 
 
@@ -57,11 +57,13 @@ inline GioData::GioData()
     data = NULL;
 }
 
-inline GioData::GioData(int _id, std::string _name, int _size, bool _isFloat, bool _isSigned, void* _data)
+inline GioData::GioData(int _id, std::string _name, int _size, bool _isFloat, bool _isSigned, bool _xVar, bool _yVar, bool _zVar, void* _data)
 {
-	init(_id, _name, _size, _isFloat, _isSigned);
+    init(_id, _name, _size, _isFloat, _isSigned, _xVar, _yVar, _zVar);
     data = _data;
+    doWrite = false;
 }
+
 
 inline GioData::~GioData()
 {
@@ -69,13 +71,16 @@ inline GioData::~GioData()
     numElements = 0;
 }
 
-inline void GioData::init(int _id, std::string _name, int _size, bool _isFloat, bool _isSigned)
+inline void GioData::init(int _id, std::string _name, int _size, bool _isFloat, bool _isSigned, bool _xVar, bool _yVar, bool _zVar)
 {
     id = _id;
     name = _name;
     size = _size;
     isFloat = _isFloat;
     isSigned = _isSigned;
+    xVar = _xVar;
+    yVar = _yVar;
+    zVar = _zVar;
 }
 
 inline int GioData::determineDataType()
@@ -122,7 +127,7 @@ inline int GioData::determineDataType()
     return 1;
 }
 
-/*
+
 inline int GioData::allocateMem(int offset)
 {
     determineDataType();
@@ -186,6 +191,6 @@ inline int GioData::deAllocateMem()
 
     return 1;
 }
-*/
+
 
 #endif

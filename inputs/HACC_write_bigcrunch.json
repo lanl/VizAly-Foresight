@@ -18,7 +18,7 @@
 
 	"output" :
 	{
-    "filename-comment" : "name of output file",
+    	"filename-comment" : "name of output file",
 		"filename" : "m000.full.mpicosmo.50_",
         
 		"logfname-comment": "name of output log file",
@@ -29,7 +29,7 @@
 	},
 
 	"compressor-comment" : "which compressors to test",
-  "compressors": [ "blosc" ],
+  	"compressors": [ "SZ" ],
 
   
 
@@ -37,7 +37,7 @@
 	"metrics": [
 		"absolute_error",
 		"relative_error",
-    "mse",
-    "psnr"
+    	"mse",
+    	"psnr"
 	]
 }

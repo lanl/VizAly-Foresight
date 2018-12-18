@@ -25,7 +25,6 @@ endif()
 
 # HACC Loader
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty/genericio)
-#add_definitions(-DGENERICIO_NO_MPI)
 add_definitions(-DGENERICIO_NO_COMPRESSION)
 add_library(GenericIO STATIC "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO.cxx")
 set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)

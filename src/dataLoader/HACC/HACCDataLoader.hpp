@@ -30,11 +30,13 @@ class HACCDataLoader: public DataLoaderInterface
 	~HACCDataLoader();
 	int allocateMem(std::string dataType, size_t numElements, int offset);
 	int deAllocateMem();
+	
 
 	void init(std::string _filename, MPI_Comm _comm);
 	int loadData(std::string paramName);
 	int saveCompData(std::string paramName, void * cData);
 	int writeData(std::string _filename);
+	int saveInputFileParameters();
 	int close() { return deAllocateMem(); }
 };
 
@@ -45,6 +47,8 @@ inline HACCDataLoader::HACCDataLoader()
 	numRanks = 0;
 	loader = "HACC";
 	saveData = false;
+
+	inOutData.clear();
 }
 
 inline HACCDataLoader::~HACCDataLoader()
@@ -160,16 +164,10 @@ inline int HACCDataLoader::deAllocateMem()
 }
 
 
-inline int HACCDataLoader::loadData(std::string paramName)
+
+inline int HACCDataLoader::saveInputFileParameters()
 {
-	Timer clock;
-	log.str("");
-
-	clock.start();
 	gio::GenericIO *gioReader;
-	param = paramName;
-
-	// Init GenericIO reader + open file
   #ifndef GENERICIO_NO_MPI
 	gioReader = new gio::GenericIO(comm, filename);
   #else
@@ -186,46 +184,81 @@ inline int HACCDataLoader::loadData(std::string paramName)
 		return -1;
 	}
 
+	// Read in the scalars information
+	std::vector<gio::GenericIO::VariableInfo> VI;
+	gioReader->getVariableInfo(VI);
+	int numVars = static_cast<int>(VI.size());
+
+	
+	for (int i = 0; i < numVars; i++)
+	{
+		GioData readInData(i, VI[i].Name, static_cast<int>(VI[i].Size), VI[i].IsFloat, VI[i].IsSigned, VI[i].IsPhysCoordX, VI[i].IsPhysCoordY, VI[i].IsPhysCoordZ);
+		readInData.determineDataType();
+
+		inOutData.push_back(readInData);
+	}
+
+	return 1;
+}
+
+inline int HACCDataLoader::loadData(std::string paramName)
+{
+	Timer clock;
+	log.str("");
+
+	clock.start();
+	gio::GenericIO *gioReader;
+	param = paramName;
+
+	// Init GenericIO reader + open file
+  #ifndef GENERICIO_NO_MPI
+	gioReader = new gio::GenericIO(comm, filename);
+  #else
+	gioReader = new gio::GenericIO(filename, gio::GenericIO::FileIOPOSIX);
+  #endif
+
+
+	// Open file
+	gioReader->openAndReadHeader(gio::GenericIO::MismatchRedistribute);
+	int numDataRanks = gioReader->readNRanks();
+
+	if (numRanks > numDataRanks)
+	{
+		std::cout << "Num data ranks: " << numDataRanks << "Use <= MPI ranks than data ranks" << std::endl;
+		return -1;
+	}
+
+	//std::cout << "numDataRanks: " << numDataRanks << std::endl;
+
 	// Count number of elements
 	totalNumberOfElements = 0;
 	for (int i = 0; i < numDataRanks; ++i)
 		totalNumberOfElements += gioReader->readNumElems(i);
+
+	//std::cout << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
 
 	// Read in the scalars information
 	std::vector<gio::GenericIO::VariableInfo> VI;
 	gioReader->getVariableInfo(VI);
 	int numVars = static_cast<int>(VI.size());
 
-	// Store scalar info
-	std::vector<GioData> readInData;
-	readInData.resize(numVars);
 
-	int paramToLoadPos = -1;
-	inOutData.clear();
+	bool paramToLoad = false;
+	GioData readInData;
 	for (int i = 0; i < numVars; i++)
 	{
-		readInData[i].id = i;
-		readInData[i].name = VI[i].Name;
-		readInData[i].size = static_cast<int>(VI[i].Size);
-		readInData[i].isFloat = VI[i].IsFloat;
-		readInData[i].isSigned = VI[i].IsSigned;
-		readInData[i].ghost = VI[i].MaybePhysGhost;
-		readInData[i].xVar = VI[i].IsPhysCoordX;
-		readInData[i].yVar = VI[i].IsPhysCoordY;
-		readInData[i].zVar = VI[i].IsPhysCoordZ;
-		readInData[i].determineDataType();
+		if (VI[i].Name == paramName)
+			paramToLoad = true;
+		else
+			continue;
 
-		// Check if this is one of the scalars to read
-		if (readInData[i].name == paramName)
-		{
-			readInData[i].loadData = true;
-			paramToLoadPos = i;
-		}
-
-		inOutData.push_back( readInData[i] );
+		readInData.init(i, VI[i].Name, static_cast<int>(VI[i].Size), VI[i].IsFloat, VI[i].IsSigned, VI[i].IsPhysCoordX, VI[i].IsPhysCoordY, VI[i].IsPhysCoordZ);
+		readInData.determineDataType();
+		dataType = readInData.dataType;
 	}
 
-	if (paramToLoadPos == -1)
+
+	if (!paramToLoad)
 	{
 		std::cout << "Cannot find that parameter, exiting now!";
 		return -2;
@@ -244,77 +277,95 @@ inline int HACCDataLoader::loadData(std::string paramName)
 
 	//
 	// Determine memory size and allocate memory
-	readInData[paramToLoadPos].determineDataType();
-	dataType = readInData[paramToLoadPos].dataType;
-
+	size_t maxNumElementsPerRank = 0;
 	numElements = 0;
 	for (int i = loadRange[0]; i < loadRange[1]; i++)
+	{
 		numElements += gioReader->readNumElems(i);
+		maxNumElementsPerRank = std::max(maxNumElementsPerRank,numElements);
+	}
+
+	//std::cout << "numElements: " << numElements << std::endl;
 
 	allocateMem(dataType, numElements, 0);
 
+	readInData.setNumElements(maxNumElementsPerRank);
+	readInData.allocateMem(1);
+
+
+	// WHY ???????
 	dims[0] = numElements;
 
+	
 	//
 	// Actually load the data
 	size_t offset = 0;
-	size_t offsetSize = readInData[paramToLoadPos].size;
-
-
 	for (int i = loadRange[0]; i < loadRange[1]; i++) // for each rank
 	{
 		size_t Np = gioReader->readNumElems(i);
 
-		if (readInData[paramToLoadPos].dataType == "float")
-			gioReader->addVariable( (readInData[paramToLoadPos].name).c_str(), (float*)data + offset, true);
-		else if (readInData[paramToLoadPos].dataType == "double")
-			gioReader->addVariable( (readInData[paramToLoadPos].name).c_str(), (double*)data + offset, true);
-		else if (readInData[paramToLoadPos].dataType == "int8_t")
-			gioReader->addVariable((readInData[paramToLoadPos].name).c_str(), (int8_t*)data + offset, true);
-		else if (readInData[paramToLoadPos].dataType == "int16_t")
-			gioReader->addVariable((readInData[paramToLoadPos].name).c_str(), (int16_t*)data + offset, true);
-		else if (readInData[paramToLoadPos].dataType == "int32_t")
-			gioReader->addVariable((readInData[paramToLoadPos].name).c_str(), (int32_t*)data + offset, true);
-		else if (readInData[paramToLoadPos].dataType == "int64_t")
-			gioReader->addVariable((readInData[paramToLoadPos].name).c_str(), (int64_t*)data + offset, true);
-		else if (readInData[paramToLoadPos].dataType == "uint8_t")
-			gioReader->addVariable((readInData[paramToLoadPos].name).c_str(), (uint8_t*)data + offset, true);
-		else if (readInData[paramToLoadPos].dataType == "uint16_t")
-			gioReader->addVariable((readInData[paramToLoadPos].name).c_str(), (uint16_t*)data + offset, true);
-		else if (readInData[paramToLoadPos].dataType == "uint32_t")
-			gioReader->addVariable((readInData[paramToLoadPos].name).c_str(), (uint32_t*)data + offset, true);
-		else if (readInData[paramToLoadPos].dataType == "uint64_t")
-			gioReader->addVariable((readInData[paramToLoadPos].name).c_str(), (uint64_t*)data + offset, true);
-
-		else
-			std::cout << " = data type undefined!!!" << std::endl;
+		if (readInData.dataType == "float")
+			gioReader->addVariable( (readInData.name).c_str(), (float*)readInData.data, true);
+		else if (readInData.dataType == "double")
+			gioReader->addVariable( (readInData.name).c_str(), (double*)readInData.data, true);
+		else if (readInData.dataType == "int8_t")
+			gioReader->addVariable((readInData.name).c_str(), (int8_t*)readInData.data, true);
+		else if (readInData.dataType == "int16_t")
+			gioReader->addVariable((readInData.name).c_str(), (int16_t*)readInData.data, true);
+		else if (readInData.dataType == "int32_t")
+			gioReader->addVariable((readInData.name).c_str(), (int32_t*)readInData.data, true);
+		else if (readInData.dataType == "int64_t")
+			gioReader->addVariable((readInData.name).c_str(), (int64_t*)readInData.data, true);
+		else if (readInData.dataType == "uint8_t")
+			gioReader->addVariable((readInData.name).c_str(), (uint8_t*)readInData.data, true);
+		else if (readInData.dataType == "uint16_t")
+			gioReader->addVariable((readInData.name).c_str(), (uint16_t*)readInData.data, true);
+		else if (readInData.dataType == "uint32_t")
+			gioReader->addVariable((readInData.name).c_str(), (uint32_t*)readInData.data, true);
+		else if (readInData.dataType == "uint64_t")
+			gioReader->addVariable((readInData.name).c_str(), (uint64_t*)readInData.data, true);
 
 		gioReader->readDataSection(0, Np, i, false); // reading the whole file
 
+		memcpy( &((float*)data)[offset],  readInData.data, Np*readInData.size);		
+		
 		offset = offset + Np;
 	}
 	clock.stop();
-	log << "Loading data took " << clock.getDuration() << " s" << std::endl;
+
+	readInData.deAllocateMem();
 
 	return 1; // All good
 }
 
+
+
 inline int HACCDataLoader::saveCompData(std::string paramName, void * cData)
 {
-	//compFullData.insert({ paramName, cData });
-	//std::cout << "paramName: " << paramName << std::endl;
 	for (int i=0; i<inOutData.size(); i++)
 	{
-		//std::cout << "inOutData[i].name: " << inOutData[i].name << std::endl;
 		if (inOutData[i].name == paramName)
 		{
-			inOutData[i].data = cData;
-			std::cout << "Found: " << paramName << std::endl;
+			//std::cout << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
+			inOutData[i].setNumElements(totalNumberOfElements);
+			inOutData[i].allocateMem();
+			memcpy(inOutData[i].data, cData, 4*totalNumberOfElements);
+
+			//std::cout << "Found: " << paramName << std::endl;
 			inOutData[i].doWrite = true;
 		}
 	}
+
+	// for (int i=0; i<inOutData.size(); i++)
+	// {
+	// 	if (inOutData[i].doWrite)
+	// 		std::cout << "Found: " << inOutData[i].name << std::endl;
+	// }
+	// std::cout << "\n\n";
+
 	return 1;
 }
+
 
 inline int HACCDataLoader::writeData(std::string _filename)
 {
@@ -323,6 +374,10 @@ inline int HACCDataLoader::writeData(std::string _filename)
 	log.str("");
 
 	gio::GenericIO *gioWriter;
+
+	// int dims[3]= {2, 2, 2};		// 8
+	// int periods[3] = { 0, 0, 0 };
+	// MPI_Cart_create(comm, 3, dims, periods, 0, &comm);
 
 	// Init GenericIO writer + open file
   #ifndef GENERICIO_NO_MPI
@@ -333,9 +388,11 @@ inline int HACCDataLoader::writeData(std::string _filename)
 
 	gioWriter->setNumElems(numElements);
 
+
+
 	// Init physical parameters
-	int physOrigin[3] = { 0, 0, 0 };
-	int physScale[3] = { 256, 256, 256 };
+	int physOrigin[3] = { 0,    0,    0 };
+	int physScale[3]  = { 256, 256, 256 };
 	for (int d = 0; d < 3; ++d)
 	{
 		gioWriter->setPhysOrigin(physOrigin[d], d);
@@ -348,15 +405,16 @@ inline int HACCDataLoader::writeData(std::string _filename)
 	{
 		if (inOutData[i].doWrite)
 		{
-			std::cout << "inOutData[i].name: " << inOutData[i].name << std::endl;
+			//std::cout << "inOutData[i].name: " << inOutData[i].name << ", " << inOutData[i].dataType << std::endl;
 
 			unsigned flag = gio::GenericIO::VarHasExtraSpace;
 			if (inOutData[i].xVar)
-				flag = flag | gio::GenericIO::VarIsPhysCoordX;
-			else if (inOutData[i].xVar)
-				flag = flag | gio::GenericIO::VarIsPhysCoordY;
-			else if (inOutData[i].xVar)
-				flag = flag | gio::GenericIO::VarIsPhysCoordZ;
+				flag |= gio::GenericIO::VarIsPhysCoordX;
+			else if (inOutData[i].yVar)
+				flag |= gio::GenericIO::VarIsPhysCoordY;
+			else if (inOutData[i].zVar)
+				flag |= gio::GenericIO::VarIsPhysCoordZ;
+
 
 			if (inOutData[i].dataType == "float")
               	gioWriter->addVariable( (inOutData[i].name).c_str(), (float*)inOutData[i].data,    flag );
@@ -381,33 +439,6 @@ inline int HACCDataLoader::writeData(std::string _filename)
             else
               	std::cout << " = data type undefined!!!" << std::endl;
 		}
-		//float * fdata = static_cast<float *>(element.second);
-
-		// std::vector<float> var;
-		// var.resize(numElements + gioWriter->requestedExtraSpace() / sizeof(float));
-		// for (uint64_t i = 0; i < numElements; i++)
-		// {
-		// 	var[i] = fdata[i];
-		// }
-
-		// if (element.first == "x")
-		// {
-		// 	gioWriter->addVariable("x", fdata, gio::GenericIO::VarIsPhysCoordX | gio::GenericIO::VarHasExtraSpace);
-		// }
-		// else if (element.first == "y")
-		// {
-		// 	gioWriter->addVariable("y", fdata, gio::GenericIO::VarIsPhysCoordY | gio::GenericIO::VarHasExtraSpace);
-		// }
-		// else if (element.first == "z")
-		// {
-		// 	gioWriter->addVariable("z", fdata, gio::GenericIO::VarIsPhysCoordZ | gio::GenericIO::VarHasExtraSpace);
-		// }
-		// else
-		// {
-		// 	gioWriter->addVariable(element.first, fdata, gio::GenericIO::VarHasExtraSpace);
-		// }
-
-		
 	}
 
   #ifndef GENERICIO_NO_MPI
@@ -416,8 +447,8 @@ inline int HACCDataLoader::writeData(std::string _filename)
 	MPI_Barrier(comm);
   #endif
 
-	gioWriter->clearVariables();
-	gioWriter->close();
+	//gioWriter->clearVariables();
+	//gioWriter->close();
 
 	clock.stop();
 	log << "Writing data took " << clock.getDuration() << " s" << std::endl;
