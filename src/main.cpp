@@ -297,9 +297,9 @@ int main(int argc, char *argv[])
 
 			//
 			// deallocate
-			if (writeData)
-				ioMgr->saveCompData(params[i], decompdata);
-			//else
+			//if (writeData)
+			//	ioMgr->saveCompData(params[i], decompdata);
+
 			std::free(decompdata);
 
 			ioMgr->close();
@@ -334,20 +334,6 @@ int main(int argc, char *argv[])
 		}
 		
 		/*
-		
-		for (int i=0; i<params.size(); i++)
-		{
-			ioMgr->loadData(params[i]);
-
-			std::cout << " ioMgr->getType(): " <<  ioMgr->getType() << std::endl;
-			std::cout << " ioMgr->getTypeSize(): " <<  ioMgr->getTypeSize() << std::endl;
-			std::cout << " ioMgr->getNumElements(): " <<  ioMgr->getNumElements() << std::endl;
-
-			ioMgr->saveCompData(params[i], ioMgr->data);
-			ioMgr->close();
-		}
-		*/
-		
 		if (writeData)
 		{
 			ioMgr->writeData(outputFile + compressorMgr->getCompressorName());
@@ -355,7 +341,7 @@ int main(int argc, char *argv[])
 			debuglog << ioMgr->getLog();
 			appendLog(outputLogFile, debuglog );
 		}
-		
+		*/
 		compressorMgr->close();
 	}
 
@@ -372,4 +358,5 @@ int main(int argc, char *argv[])
 /*
 Run:
 mpirun -np 2 CBench ../inputs/HACC_all.json
+mpirun -np 8 ./CBench ../inputs/HACC_write_bigcrunch.json
 */
