@@ -171,7 +171,9 @@ inline int HACCDataLoader::loadData(std::string paramName)
 
 		readInData.init(i, VI[i].Name, static_cast<int>(VI[i].Size), VI[i].IsFloat, VI[i].IsSigned, VI[i].IsPhysCoordX, VI[i].IsPhysCoordY, VI[i].IsPhysCoordZ);
 		readInData.determineDataType();
+		
 		dataType = readInData.dataType;
+		elemSize = readInData.size;
 	}
 
 

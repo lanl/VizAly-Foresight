@@ -231,6 +231,7 @@ int main(int argc, char *argv[])
 		debuglog << "===============================================" << std::endl;
 		debuglog << "Compressor: " << compressorMgr->getCompressorName() << std::endl;		
 		
+		
 		// Cycle through params
 		for (int i=0; i<params.size(); i++)
 		{
@@ -242,6 +243,7 @@ int main(int argc, char *argv[])
 			// Check if parameter is valid before proceding
 			if ( !ioMgr->loadData(params[i]) )
 			{
+				ioMgr->close();
 				memLoad.stop();
 				continue;
 			}
@@ -253,7 +255,7 @@ int main(int argc, char *argv[])
 			appendLog(outputLogFile, debuglog);
 			csvOutput << compressorMgr->getCompressorName() << "_" << params[i] << ", ";
 			MPI_Barrier(MPI_COMM_WORLD);
-
+			
 
 			//
 			// compress
@@ -262,6 +264,7 @@ int main(int argc, char *argv[])
 			compressClock.start();
 			compressorMgr->compress(ioMgr->data, cdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getDims());
 			compressClock.stop();
+
 
 			//
 			// decompress
@@ -338,18 +341,23 @@ int main(int argc, char *argv[])
 			MPI_Reduce(&compress_throughput, &min_compress_throughput, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
 			MPI_Reduce(&decompress_throughput, &min_decompress_throughput, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
 		
+			
 
 			//
 			// deallocate
 			if (writeData)
 				ioMgr->saveCompData(params[i], decompdata);
 
+			
 			std::free(decompdata);
+			
+			
 
 			ioMgr->close();
 			memLoad.stop();
 
-		
+			
+
 			//
 			// log stuff
 			debuglog << "\nCompress time: " << compress_time << std::endl;
@@ -373,7 +381,9 @@ int main(int argc, char *argv[])
 				writeFile(metricsFile, metricsInfo.str());
 				writeFile(metricsFile + ".csv", csvOutput.str());
 			}
-		
+			
+			
+
 			MPI_Barrier(MPI_COMM_WORLD);
 		}
 		
@@ -388,8 +398,6 @@ int main(int argc, char *argv[])
 		
 		
 		compressorMgr->close();
-
-
 	}
 
 	// for humans

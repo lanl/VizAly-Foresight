@@ -26,13 +26,13 @@
 	},
 
 	"compressor-comment" : "which compressors to test",
-	"compressors" : ["BigCrunch", "SZ", "zfp"],
+	"compressors" : ["blosc", "BigCrunch", "SZ", "zfp"],
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [
 		"absolute_error",
 		"relative_error",
-    	"mse",
-    	"psnr"
+		"mse",
+		"psnr"
 	]
 }
