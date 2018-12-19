@@ -62,8 +62,6 @@ int main(int argc, char *argv[])
 
 
 
-
-
 	// Check if input file provided exists
 	if ( !fileExisits(argv[1]) )
 	{
@@ -88,7 +86,9 @@ int main(int argc, char *argv[])
 	catch (nlohmann::json::parse_error& e)
     {
        	if (myRank == 0)
-        	std::cerr << "input JSON file " << argv[1] << " is invalid!\n" << e.what() << std::endl;
+        	std::cerr << "input JSON file " << argv[1] << " is invalid!\n" 
+        			  << e.what() << "\n"
+        			  << "Validate your JSON file using e.g. https://jsonformatter.curiousconcept.com/ " << std::endl;
 
         MPI_Finalize();
         return 0;
@@ -229,37 +229,7 @@ int main(int argc, char *argv[])
 		metricsInfo << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
 
 		debuglog << "===============================================" << std::endl;
-		debuglog << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
-
-
-		/*
-		for (int i=0; i<params.size(); i++)
-		{
-			ioMgr->loadData(params[i]);
-
-			
-			// log stuff
-			debuglog << ioMgr->getDataInfo();
-			debuglog << ioMgr->getLog();
-
-
-			if (writeData)
-				ioMgr->saveCompData(params[i], ioMgr->data);
-
-			ioMgr->close();
-			MPI_Barrier(MPI_COMM_WORLD);
-		}
-
-		if (writeData)
-		{
-			ioMgr->writeData(outputFile + compressorMgr->getCompressorName());
-
-			debuglog << ioMgr->getLog();
-			appendLog(outputLogFile, debuglog );
-		}
-		*/
-
-		
+		debuglog << "Compressor: " << compressorMgr->getCompressorName() << std::endl;		
 		
 		// Cycle through params
 		for (int i=0; i<params.size(); i++)
@@ -269,14 +239,19 @@ int main(int argc, char *argv[])
 
 			memLoad.start();
 
-			ioMgr->loadData(params[i]);
+			// Check if parameter is valid before proceding
+			if ( !ioMgr->loadData(params[i]) )
+			{
+				memLoad.stop();
+				continue;
+			}
 
 			
 			// log stuff
 			debuglog << ioMgr->getDataInfo();
 			debuglog << ioMgr->getLog();
 			appendLog(outputLogFile, debuglog);
-			csvOutput << compressorMgr->getCompressorName() << "_" << ioMgr->getParam() << ", ";
+			csvOutput << compressorMgr->getCompressorName() << "_" << params[i] << ", ";
 			MPI_Barrier(MPI_COMM_WORLD);
 
 
