@@ -26,7 +26,7 @@
 	},
 
 	"compressor-comment" : "which compressors to test",
-	"compressors" : ["blosc", "BigCrunch", "SZ", "zfp"],
+	"compressors" : ["BigCrunch", "SZ", "zfp"],
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [

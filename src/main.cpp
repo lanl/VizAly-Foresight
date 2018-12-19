@@ -263,7 +263,6 @@ int main(int argc, char *argv[])
 			compressorMgr->compress(ioMgr->data, cdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getDims());
 			compressClock.stop();
 
-
 			//
 			// decompress
 			void * decompdata = NULL;

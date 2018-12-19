@@ -86,7 +86,8 @@ inline int BLOSCCompressor::decompress(void *&input, void *&output, std::string 
 	
 	std::free(input); input = NULL;
 
-	dTime.stop(); log << compressorName << " ~ DecompressTime: " << dTime.getDuration() << " s " << std::endl;
+	dTime.stop(); 
+	log << compressorName << " ~ DecompressTime: " << dTime.getDuration() << " s " << std::endl;
 
     return 1;
 }
