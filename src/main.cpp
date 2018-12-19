@@ -21,6 +21,7 @@ Authors:
 #include "timer.hpp"
 #include "log.hpp"
 #include "memory.hpp"
+#include "utils.hpp"
 
 // Interfaces
 #include "dataLoaderInterface.hpp"
@@ -43,34 +44,57 @@ Authors:
 
 int main(int argc, char *argv[])
 {
-	// Parse arguments and read json file
+	// Check if we have the right number of arguments
 	if (argc < 2)
 	{
-		std::cout << "Input argument needed. Run as: ../inputs/all.json" << std::endl;
-		std::cout << "Read arguments: " << argc << std::endl;
+		std::cerr << "Input argument needed. Run as: ../inputs/all.json" << std::endl;
+		std::cerr << "Read arguments: " << argc << std::endl;
+
 		return 0;
 	}
+	
 
-	//
 	// init MPI
 	int myRank, numRanks, threadSupport;
 	MPI_Init_thread(NULL, NULL, MPI_THREAD_MULTIPLE, &threadSupport);
 	MPI_Comm_size(MPI_COMM_WORLD, &numRanks);
 	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
-	// For humans
-	if (myRank == 0)
-		std::cout << "Starting ... look at the log for progress update ... " << std::endl;
 
 
-	//
-	// Read input from json
+
+
+	// Check if input file provided exists
+	if ( !fileExisits(argv[1]) )
+	{
+		if (myRank == 0)
+			std::cerr << "Could not find input file " << argv[1] << std::endl;
+
+		MPI_Finalize();
+		return 0;
+	}
+
+
+	// Pass json file to json parser
 	nlohmann::json jsonInput;
 	std::ifstream jsonFile(argv[1]);
-	jsonFile >> jsonInput;
 
 
-	//
+	// Check validity of input json file
+	try
+    {
+		jsonFile >> jsonInput;
+	}
+	catch (nlohmann::json::parse_error& e)
+    {
+       	if (myRank == 0)
+        	std::cerr << "input JSON file " << argv[1] << " is invalid!\n" << e.what() << std::endl;
+
+        MPI_Finalize();
+        return 0;
+     }
+
+
 	// Load in the parameters
 	std::string inputFileType = jsonInput["input"]["filetype"];
 	std::string inputFile = jsonInput["input"]["filename"];
@@ -94,11 +118,29 @@ int main(int argc, char *argv[])
 
 	bool writeData = false;
 	std::string outputFile = "";
-	if (jsonInput["output"].find("filename") != jsonInput["output"].end())
+	if (jsonInput["output"].find("output-decompressed") != jsonInput["output"].end())
 	{
-		outputFile = jsonInput["output"]["filename"];
+		outputFile = extractFileName(inputFile) + "__";
 		writeData = true;
 	}
+
+
+
+	// Check if powers of 2 number of ranks
+	if ( writeData && !isPowerOfTwo(numRanks) )
+	{
+		if (myRank == 0)
+			std::cerr << "Please run with powers of 2 number of ranks. e.g. 4, 8, 16, 32, ..." << std::endl;
+
+		MPI_Finalize();
+		return 0;
+	}
+
+
+	//
+	// All seems valid, let's start ...
+	if (myRank == 0)
+		std::cout << "Starting ... \nLook at the log for progress update ... \n" << std::endl;
 
 
 	//
@@ -190,6 +232,34 @@ int main(int argc, char *argv[])
 		debuglog << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
 
 
+		/*
+		for (int i=0; i<params.size(); i++)
+		{
+			ioMgr->loadData(params[i]);
+
+			
+			// log stuff
+			debuglog << ioMgr->getDataInfo();
+			debuglog << ioMgr->getLog();
+
+
+			if (writeData)
+				ioMgr->saveCompData(params[i], ioMgr->data);
+
+			ioMgr->close();
+			MPI_Barrier(MPI_COMM_WORLD);
+		}
+
+		if (writeData)
+		{
+			ioMgr->writeData(outputFile + compressorMgr->getCompressorName());
+
+			debuglog << ioMgr->getLog();
+			appendLog(outputLogFile, debuglog );
+		}
+		*/
+
+		
 		
 		// Cycle through params
 		for (int i=0; i<params.size(); i++)
@@ -297,8 +367,8 @@ int main(int argc, char *argv[])
 
 			//
 			// deallocate
-			//if (writeData)
-			//	ioMgr->saveCompData(params[i], decompdata);
+			if (writeData)
+				ioMgr->saveCompData(params[i], decompdata);
 
 			std::free(decompdata);
 
@@ -333,7 +403,7 @@ int main(int argc, char *argv[])
 			MPI_Barrier(MPI_COMM_WORLD);
 		}
 		
-		/*
+		
 		if (writeData)
 		{
 			ioMgr->writeData(outputFile + compressorMgr->getCompressorName());
@@ -341,13 +411,16 @@ int main(int argc, char *argv[])
 			debuglog << ioMgr->getLog();
 			appendLog(outputLogFile, debuglog );
 		}
-		*/
+		
+		
 		compressorMgr->close();
+
+
 	}
 
 	// for humans
 	if (myRank == 0)
-		std::cout << "That's all folks!" << std::endl;
+		std::cout << "\nThat's all folks!" << std::endl;
 
 	MPI_Finalize();
 

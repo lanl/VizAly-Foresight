@@ -22,15 +22,16 @@ class DataLoaderInterface
   protected:
 	std::string loader;
 	std::string filename;
-	size_t totalNumberOfElements;
-	size_t dims[5]{ 0,0,0,0,0 };	/// ??? what is dims????
 	bool saveData;
+	
+	size_t dims[5]{ 0,0,0,0,0 };	/// ??? what is dims????
 
 	std::string dataType;
 	std::string param;
+	size_t elemSize;				// size in bytes of that parameter
 
-	size_t numElements;
-	size_t elemSize;
+	size_t totalNumberOfElements;	// total number of particles for input file
+	size_t numElements;				// number of particles for that mpi rank
 
 	MPI_Comm comm;
 	std::stringstream log;

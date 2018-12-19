@@ -18,17 +18,17 @@
 
 	"output" :
 	{
-		"output-file" : true,
+		"output-decompressed" : true,
         
 		"logfname-comment": "name of output log file",
-		"logfname" : "runlog_write_blosc",
+		"logfname" : "runlog_write_BigCrunch",
     
 		"metricsfname-comment": "name of file with output",
-		"metricsfname" : "runlog_write_blosc"
+		"metricsfname" : "metric_write_BigCrunch"
 	},
 
 	"compressor-comment" : "which compressors to test",
-  	"compressors": [ "blosc" ],
+  	"compressors": [ "BigCrunch" ],
 
   
 

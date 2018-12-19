@@ -16,10 +16,10 @@ Pascal Grosset
 // Stores the genericIO data being read in
 class GioData
 {
-  public: // coz too lazy to do private!
+  public:               // coz too lazy to do private!
     int id;
     std::string name;
-    int size; // in bytes
+    int size;           // in bytes
     bool isFloat;
     bool isSigned;
     bool ghost;

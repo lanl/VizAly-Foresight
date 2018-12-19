@@ -12,6 +12,7 @@ Authors:
 #ifndef _HACC_LOADER_H_
 #define _HACC_LOADER_H_
 
+#include <algorithm>
 #include <sstream>
 #include "thirdparty/genericio/GenericIO.h"
 #include "gioData.hpp"
@@ -23,7 +24,11 @@ class HACCDataLoader: public DataLoaderInterface
 	int numRanks;
 	int myRank;
 
+	// For output
 	std::vector<GioData> inOutData;
+	double physOrigin[3];
+	double physScale[3];
+	int mpiCartPartitions[3];
 
   public:
 	HACCDataLoader();
@@ -184,6 +189,12 @@ inline int HACCDataLoader::saveInputFileParameters()
 		return -1;
 	}
 
+
+	// Get dimensions of the input file
+	gioReader->readPhysOrigin(physOrigin);
+    gioReader->readPhysScale(physScale);
+
+
 	// Read in the scalars information
 	std::vector<gio::GenericIO::VariableInfo> VI;
 	gioReader->getVariableInfo(VI);
@@ -265,15 +276,16 @@ inline int HACCDataLoader::loadData(std::string paramName)
 
 	//
 	// Split ranks among data
-	int splitDims[3];
-	gioReader->readDims(splitDims);
-
 	int numDataRanksPerMPIRank = numDataRanks / numRanks;
 	int loadRange[2];
 	loadRange[0] = myRank * numDataRanksPerMPIRank;
 	loadRange[1] = (myRank + 1) * numDataRanksPerMPIRank;
 	if (myRank == numRanks - 1)
 		loadRange[1] = numDataRanks;
+
+	int splitDims[3];
+	gioReader->readDims(splitDims);
+	log << "splitDims: " << splitDims[0] << "," << splitDims[1] << "," << splitDims[2] << std::endl;
 
 
 
@@ -296,17 +308,45 @@ inline int HACCDataLoader::loadData(std::string paramName)
 
 	// WHY ???????
 	dims[0] = numElements;
-	std::cout << "totalNumberOfElements" << totalNumberOfElements << std::endl;
-	std::cout << "numElements" << numElements << std::endl;
+
+
+	log << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
+	log << "numElements: " << numElements << std::endl;
 
 	
 	//
 	// Actually load the data
+	int minmaxX[2] = {INT_MAX, INT_MIN};
+	int minmaxY[2] = {INT_MAX, INT_MIN};
+	int minmaxZ[2] = {INT_MAX, INT_MIN};
+
 	size_t offset = 0;
 	for (int i = loadRange[0]; i < loadRange[1]; i++) // for each rank
 	{
 		size_t Np = gioReader->readNumElems(i);
 
+		int coords[3];
+		gioReader->readCoords(coords, i);
+		log << "Coord indices: " << coords[0] << ", " << coords[1] << ", " << coords[2] << " | ";
+
+		log << "coordinates: (" << (float)coords[0] / splitDims[0] * physScale[0] + physOrigin[0] << ", "
+                          << (float)coords[1] / splitDims[1] * physScale[1] + physOrigin[1] << ", "
+                          << (float)coords[2] / splitDims[2] * physScale[2] + physOrigin[2] << ") -> ("
+                          << (float)(coords[0] + 1) / splitDims[0] * physScale[0] + physOrigin[0] << ", "
+                          << (float)(coords[1] + 1) / splitDims[1] * physScale[1] + physOrigin[1] << ", "
+                          << (float)(coords[2] + 1) / splitDims[2] * physScale[2] + physOrigin[2] << ")" << std::endl;
+
+        if (saveData)
+        {
+        	minmaxX[0] = std::min( (int) ((float)coords[0] / splitDims[0] * physScale[0] + physOrigin[0]), minmaxX[0] );
+        	minmaxY[0] = std::min( (int) ((float)coords[1] / splitDims[1] * physScale[1] + physOrigin[1]), minmaxY[0] );
+        	minmaxZ[0] = std::min( (int) ((float)coords[2] / splitDims[2] * physScale[2] + physOrigin[2]), minmaxZ[0] );
+
+        	minmaxX[1] = std::max( (int) ((float)(coords[0] + 1) / splitDims[0] * physScale[0] + physOrigin[0]), minmaxX[1] );
+        	minmaxY[1] = std::max( (int) ((float)(coords[1] + 1) / splitDims[1] * physScale[1] + physOrigin[1]), minmaxY[1] );
+        	minmaxZ[1] = std::max( (int) ((float)(coords[2] + 1) / splitDims[2] * physScale[2] + physOrigin[2]), minmaxZ[1] );
+        }
+		
 	
 		if (readInData.dataType == "float")
 			gioReader->addVariable( (readInData.name).c_str(), (float*)readInData.data, true);
@@ -359,9 +399,22 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	}
 	clock.stop();
 
-	readInData.deAllocateMem();
 
-	std::cout << "HACCDataLoader::loadData " << paramName << " done!"  << std::endl;
+	if (saveData)
+	{
+		int rangeX = minmaxX[1]-minmaxX[0];
+		int rangeY = minmaxY[1]-minmaxY[0];
+		int rangeZ = minmaxZ[1]-minmaxZ[0];
+
+		mpiCartPartitions[0] = physScale[0]/rangeX;
+		mpiCartPartitions[1] = physScale[1]/rangeY;
+		mpiCartPartitions[2] = physScale[2]/rangeZ;
+
+		log << "mpiCartPartitions: " << mpiCartPartitions[0] << ", " << mpiCartPartitions[1] << ", " << mpiCartPartitions[2] << std::endl;
+	}
+	
+
+	readInData.deAllocateMem();
 
 	return 1; // All good
 }
@@ -370,14 +423,13 @@ inline int HACCDataLoader::loadData(std::string paramName)
 
 inline int HACCDataLoader::saveCompData(std::string paramName, void * cData)
 {
-	std::cout << "HACCDataLoader::saveCompData " << paramName << std::endl;
 	for (int i=0; i<inOutData.size(); i++)
 	{
 		if (inOutData[i].name == paramName)
 		{
-			inOutData[i].setNumElements(totalNumberOfElements);
+			inOutData[i].setNumElements(numElements);
 			inOutData[i].allocateMem();
-			memcpy(inOutData[i].data, cData, 4*totalNumberOfElements);
+			memcpy(inOutData[i].data, cData, inOutData[i].size*numElements);
 
 			inOutData[i].doWrite = true;
 		}
@@ -389,15 +441,16 @@ inline int HACCDataLoader::saveCompData(std::string paramName, void * cData)
 
 inline int HACCDataLoader::writeData(std::string _filename)
 {
-	std::cout << "HACCDataLoader::writeData " << _filename << std::endl;
 	Timer clock;
 	log.str("");
 
 	gio::GenericIO *gioWriter;
 
-	int dims[3]= {2, 2, 2};		// 8
-	int periods[3] = { 0, 0, 0 };
-	MPI_Cart_create(comm, 3, dims, periods, 0, &comm);
+
+	// Create setup
+	int periods[3] = { 0, 0, 0 };	
+	MPI_Cart_create(comm, 3, mpiCartPartitions, periods, 0, &comm);
+
 
 	// Init GenericIO writer + open file
   #ifndef GENERICIO_NO_MPI
@@ -411,16 +464,14 @@ inline int HACCDataLoader::writeData(std::string _filename)
 
 
 	// Init physical parameters
-	int physOrigin[3] = { 0,    0,    0 };
-	int physScale[3]  = { 256, 256, 256 };
 	for (int d = 0; d < 3; ++d)
 	{
 		gioWriter->setPhysOrigin(physOrigin[d], d);
 		gioWriter->setPhysScale(physScale[d], d);
 	}
 
+
 	// Populate parameters
-	//for (std::pair<std::string, void *> element : compFullData)
 	for (int i=0; i<inOutData.size(); i++)
 	{
 		if (inOutData[i].doWrite)
@@ -461,13 +512,14 @@ inline int HACCDataLoader::writeData(std::string _filename)
 
   #ifndef GENERICIO_NO_MPI
 	gioWriter->write();
-	std::cout << "HACCDataLoader::writeData " << _filename << "  gioWriter->write() " << std::endl;
+
+	log << "HACCDataLoader::writeData " << _filename << "  gioWriter->write() " << std::endl;
 	MPI_Barrier(comm);
   #endif
 
-
 	clock.stop();
 	log << "Writing data took " << clock.getDuration() << " s" << std::endl;
+
 	return 1;
 }
 
