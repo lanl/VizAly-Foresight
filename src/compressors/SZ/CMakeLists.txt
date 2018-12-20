@@ -20,8 +20,6 @@ if (CBENCH_ENABLE_SZ)
     	#Asks for zfp include files + includes it in the project
     	set (SZ_INCLUDE_PATH ${SZ_INCLUDE_PATH} CACHE STRING "SZ include directory")
 
-
-
     	set_property(GLOBAL APPEND PROPERTY definitions "-DCBENCH_HAS_SZ")
     	set_property(GLOBAL APPEND PROPERTY includeDirectories ${SZ_INCLUDE_PATH})
     	set_property(GLOBAL APPEND PROPERTY linkLibraries ${MY_LIBS})

@@ -46,6 +46,7 @@ inline int BLOSCCompressor::compress(void *input, void *&output, std::string dat
 	Timer cTime; cTime.start();
 
 	// Default Input Params: {clevel=9, shuffle=1, sizeof(data), idatasize, input, output, odatasize);
+
 	size_t isize = dataTypeSize*numel;
 	size_t osize = isize + BLOSC_MAX_OVERHEAD;
 
@@ -86,7 +87,8 @@ inline int BLOSCCompressor::decompress(void *&input, void *&output, std::string 
 	
 	std::free(input); input = NULL;
 
-	dTime.stop(); log << compressorName << " ~ DecompressTime: " << dTime.getDuration() << " s " << std::endl;
+	dTime.stop(); 
+	log << compressorName << " ~ DecompressTime: " << dTime.getDuration() << " s " << std::endl;
 
     return 1;
 }

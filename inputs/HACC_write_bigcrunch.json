@@ -18,18 +18,17 @@
 
 	"output" :
 	{
-    "filename-comment" : "name of output file",
-		"filename" : "m000.full.mpicosmo.50_",
+		"output-file" : true,
         
 		"logfname-comment": "name of output log file",
-		"logfname" : "runlog_HACC_all_",
+		"logfname" : "runlog_write_blosc",
     
 		"metricsfname-comment": "name of file with output",
-		"metricsfname" : "metrics_HACC_all_"
+		"metricsfname" : "runlog_write_blosc"
 	},
 
 	"compressor-comment" : "which compressors to test",
-  "compressors": [ "BigCrunch" ],
+  	"compressors": [ "blosc" ],
 
   
 
@@ -37,7 +36,7 @@
 	"metrics": [
 		"absolute_error",
 		"relative_error",
-    "mse",
-    "psnr"
+    	"mse",
+    	"psnr"
 	]
 }
