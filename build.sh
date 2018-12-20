@@ -14,7 +14,8 @@ mkdir $buildDir
 cd $buildDir 
  
 # build 
-cmake ../src -DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
+cmake ../src \
+    -DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
 	-DBLOSC_LIBRARY=$projectPath/ExternalDependencies/c-blosc/install/lib/libblosc.so \
 	-DSZ_INCLUDE_PATH=$projectPath/ExternalDependencies/SZ/sz/include \
 	-DSZ_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libSZ.so \

@@ -14,8 +14,8 @@ class BLOSCCompressor: public CompressorInterface
     ~BLOSCCompressor();
 
     void init();
-    int compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
-    int decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
+    int compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n);
+    int decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n);
     void close();
 };
 
@@ -35,12 +35,19 @@ inline void BLOSCCompressor::init()
 	blosc_init();
 }
 
-inline int BLOSCCompressor::compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
+inline int BLOSCCompressor::compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
+	size_t numel = n[0];
+	for (int i = 1; i < 5; i++)
+		if (n[i] != 0)
+			numel *= n[i];
+
 	// compress
 	Timer cTime; cTime.start();
+
 	// Default Input Params: {clevel=9, shuffle=1, sizeof(data), idatasize, input, output, odatasize);
-	size_t isize = dataTypeSize*n;
+
+	size_t isize = dataTypeSize*numel;
 	size_t osize = isize + BLOSC_MAX_OVERHEAD;
 
 	output = std::malloc(isize); //byte array;
@@ -64,10 +71,15 @@ inline int BLOSCCompressor::compress(void *input, void *&output, std::string dat
     return 1;
 }
 
-inline int BLOSCCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
+inline int BLOSCCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
+	size_t numel = n[0];
+	for (int i = 1; i < 5; i++)
+		if (n[i] != 0)
+			numel *= n[i];
+
 	Timer dTime; dTime.start();
-	size_t osize = dataTypeSize*n;
+	size_t osize = dataTypeSize*numel;
 	output = std::malloc(osize);
 	size_t sz = blosc_decompress(input, output, osize);
 	if (sz < 0)
@@ -75,7 +87,8 @@ inline int BLOSCCompressor::decompress(void *&input, void *&output, std::string 
 	
 	std::free(input); input = NULL;
 
-	dTime.stop(); log << compressorName << " ~ DecompressTime: " << dTime.getDuration() << " s " << std::endl;
+	dTime.stop(); 
+	log << compressorName << " ~ DecompressTime: " << dTime.getDuration() << " s " << std::endl;
 
     return 1;
 }

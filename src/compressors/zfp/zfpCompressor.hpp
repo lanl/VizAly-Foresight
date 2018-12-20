@@ -26,8 +26,8 @@ class ZFPCompressor: public CompressorInterface
     ~ZFPCompressor();
 
     void init();
-    int compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
-    int decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n);
+    int compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n);
+    int decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n);
     void close();
 
     zfp_type getZfpType(std::string dataType);
@@ -64,8 +64,13 @@ inline zfp_type ZFPCompressor::getZfpType(std::string dataType)
 }
 
 
-inline int ZFPCompressor::compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
+inline int ZFPCompressor::compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
+	size_t numel = n[0];
+	for (int i = 1; i < 5; i++)
+		if (n[i] != 0)
+			numel *= n[i];
+
     Timer cTime; 
     cTime.start();
 
@@ -75,7 +80,7 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
 	zfp_type type = getZfpType( dataType );
 
     // allocate meta data for the 1D input array
-    zfp_field* field = zfp_field_1d(input, type, n);
+    zfp_field* field = zfp_field_1d(input, type, numel);
 
 
     // allocate meta data for a compressed stream
@@ -111,15 +116,20 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
     cTime.stop();
 
 
-    log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*n << ", OutputBytes: " << cbytes << ", cRatio: " << (dataTypeSize*n / (float)cbytes) << std::endl;
+    log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << cbytes << ", cRatio: " << (dataTypeSize*numel / (float)cbytes) << std::endl;
     log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
 
     return 1;
 }
 
 
-inline int ZFPCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t n)
+inline int ZFPCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
+	size_t numel = n[0];
+	for (int i = 1; i < 5; i++)
+		if (n[i] != 0)
+			numel *= n[i];
+
     Timer dTime; 
     dTime.start();
 
@@ -127,8 +137,8 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
     zfp_type type = getZfpType( dataType );
 
     // allocate meta data for the 1D input array of decompressed data
-    output = malloc(n*dataTypeSize);
-    zfp_field* field = zfp_field_1d(output, type, n);
+    output = malloc(numel*dataTypeSize);
+    zfp_field* field = zfp_field_1d(output, type, numel);
 
 
     // allocate meta data for a compressed stream

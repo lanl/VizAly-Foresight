@@ -3,12 +3,14 @@
 #SBATCH --ntasks-per-node 8
 #SBATCH -p scaling
 
+projectPath=/projects/exasky/VizAly-CBench/
+
 # load modules
-source /projects/exasky/VizAly-CBench/scripts/VizAly-CBench.bash.darwin
+source $projectPath/scripts/VizAly-CBench.bash.darwin
 
 # go to folder 
-cd /projects/exasky/VizAly-CBench/build
+cd $projectPath/build
 
 # Run:
-mpirun /projects/exasky/VizAly-CBench/build/CBench /projects/exasky/VizAly-CBench/inputs/all_step499.json
+mpirun $projectPath/build/CBench $projectPath/inputs/darwin_step499.json
 

@@ -18,21 +18,25 @@
 
 	"output" :
 	{
+		"output-decompressed" : true,
+        
 		"logfname-comment": "name of output log file",
-		"logfname" : "runlog_HACC_all_",
-
+		"logfname" : "runlog_write_BigCrunch",
+    
 		"metricsfname-comment": "name of file with output",
-		"metricsfname" : "metrics_HACC_all_"
+		"metricsfname" : "metric_write_BigCrunch"
 	},
 
 	"compressor-comment" : "which compressors to test",
-	"compressors" : ["blosc", "BigCrunch", "SZ", "zfp"],
+  	"compressors": [ "BigCrunch" ],
+
+  
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [
 		"absolute_error",
 		"relative_error",
-		"mse",
-		"psnr"
+    	"mse",
+    	"psnr"
 	]
 }

@@ -8,7 +8,7 @@
 		"filename": "../testing/data/m000.full.mpicosmo.50",
 
 		"scalars-comment" : "which scalars to test",
-		"scalars" : ["x", "y", "z", "vx", "vy", "vz"],
+		"scalars" : ["x"],
 
 		"parameters" :
 		{
@@ -19,20 +19,19 @@
 	"output" :
 	{
 		"logfname-comment": "name of output log file",
-		"logfname" : "runlog_HACC_all_",
+		"logfname" : "runlog",
 
 		"metricsfname-comment": "name of file with output",
-		"metricsfname" : "metrics_HACC_all_"
+		"metricsfname" : "metrics"
 	},
 
 	"compressor-comment" : "which compressors to test",
-	"compressors" : ["blosc", "BigCrunch", "SZ", "zfp"],
+	"compressors" : ["LossyWave", "BigCrunch"],
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [
 		"absolute_error",
 		"relative_error",
-		"mse",
-		"psnr"
+		"mse"
 	]
 }

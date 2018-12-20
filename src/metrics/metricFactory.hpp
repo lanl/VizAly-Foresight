@@ -6,6 +6,7 @@ All rights reserved.
 
 Authors:
  - Pascal Grosset
+ - Jesus Pulido
 ================================================================================*/
 
 #ifndef _METRICS_FACTORY_H_
@@ -19,12 +20,14 @@ class MetricsFactory
   public:
     static MetricInterface * createMetric(std::string metricName)
     {
-        if (metricName == "absolute_error")
-            return new absoluteError();
-        else if (metricName == "relative_error")
-            return new relativeError();
-        else if (metricName == "mse")
-            return new meansquareError();
+		if (metricName == "absolute_error")
+			return new absoluteError();
+		else if (metricName == "relative_error")
+			return new relativeError();
+		else if (metricName == "mse")
+			return new meansquareError();
+		else if (metricName == "psnr")
+			return new psnrError();
         else
             return NULL;
     }

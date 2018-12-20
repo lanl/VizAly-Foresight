@@ -33,6 +33,10 @@ class CompressorFactory
         else if (compressorName == "SZ")
           return new SZCompressor();
       #endif
+	  #ifdef CBENCH_HAS_LOSSY_WAVE
+		else if (compressorName == "LossyWave")
+				return new LossyWaveCompressor();
+	  #endif
         else
           return NULL;
     }

@@ -30,6 +30,9 @@ class NYXDataLoader: public DataLoaderInterface
 
 	void init(std::string _filename, MPI_Comm _comm);
 	int loadData(std::string paramName);
+	int saveCompData(std::string paramName, void * cData);
+	int writeData(std::string _filename);
+	int saveInputFileParameters(){ };
 	int close() { return deAllocateMem(); }
 };
 
@@ -39,6 +42,7 @@ inline NYXDataLoader::NYXDataLoader()
 	myRank = 0;
 	numRanks = 0;
 	loader = "NYX";
+	saveData = false;
 }
 
 inline NYXDataLoader::~NYXDataLoader()
@@ -51,6 +55,7 @@ inline void NYXDataLoader::init(std::string _filename, MPI_Comm _comm)
 {
 	filename = _filename;
 	comm = _comm;
+	saveData = false;
 
 	MPI_Comm_size(comm, &numRanks);
 	MPI_Comm_rank(comm, &myRank);
@@ -182,10 +187,13 @@ inline int NYXDataLoader::loadData(std::string paramName)
 		H5::DataSet dataset(group.openDataSet(paramName));
 		H5::DataSpace dataspace(dataset.getSpace());
 		H5::DataSpace memspace(dataset.getSpace()); //This would define rank and local rank extent
-		hsize_t dims[3];
-		dataspace.getSimpleExtentDims(dims);
+		hsize_t tdims[3];
+		dataspace.getSimpleExtentDims(tdims);
 		//std::cout << "Data dimensions: " << dims[0] << " " << dims[1] << " " << dims[2] << "\n";
-		numElements = dims[0] * dims[1] * dims[2];
+		numElements = tdims[0] * tdims[1] * tdims[2];
+		dims[0] = tdims[0];
+		dims[1] = tdims[1];
+		dims[2] = tdims[2];
 			
 		totalNumberOfElements = numElements; // Temporary 
 
@@ -229,6 +237,17 @@ inline int NYXDataLoader::loadData(std::string paramName)
 	log << "Loading data took " << clock.getDuration() << " s" << std::endl;
 
 	return 1; // All good
+}
+
+inline int NYXDataLoader::saveCompData(std::string paramName, void * cData)
+{
+	compFullData.insert({ paramName, cData });
+	return 1;
+}
+
+inline int NYXDataLoader::writeData(std::string _filename)
+{
+	return 1;
 }
 
 #endif

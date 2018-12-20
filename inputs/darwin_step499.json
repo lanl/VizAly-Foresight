@@ -5,7 +5,7 @@
 		"filetype" : "HACC",
 
 		"filename-comment": "name of input file",
-		"filename": "../testing/data/m000.full.mpicosmo.50",
+		"filename": "/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP499/m000.full.mpicosmo.499",
 
 		"scalars-comment" : "which scalars to test",
 		"scalars" : ["x", "y", "z", "vx", "vy", "vz"],
@@ -19,10 +19,10 @@
 	"output" :
 	{
 		"logfname-comment": "name of output log file",
-		"logfname" : "runlog_HACC_all_",
+		"logfname" : "runlog_HACC_mpicosmo.499_all_",
 
 		"metricsfname-comment": "name of file with output",
-		"metricsfname" : "metrics_HACC_all_"
+		"metricsfname" : "metrics_HACC_mpicosmo.499_all_"
 	},
 
 	"compressor-comment" : "which compressors to test",
