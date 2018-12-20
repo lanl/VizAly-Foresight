@@ -413,6 +413,17 @@ int main(int argc, char *argv[])
 		
 		if (writeData)
 		{
+			// Pass data that was not compressed
+			for (int i=0; i<ioMgr->inOutData.size(); i++)
+			{
+				if ( !ioMgr->inOutData[i].doWrite )
+				{
+					ioMgr->loadData(ioMgr->inOutData[i].name);
+					ioMgr->saveCompData(ioMgr->inOutData[i].name, ioMgr->data);
+					ioMgr->close();
+				}
+			}
+
 			ioMgr->writeData(outputFile + compressorMgr->getCompressorName());
 
 			debuglog << ioMgr->getLog();

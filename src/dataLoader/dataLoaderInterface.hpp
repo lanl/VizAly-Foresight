@@ -16,6 +16,8 @@ Authors:
 #include <sstream>
 #include <unordered_map>
 
+#include "gioData.hpp"
+
 
 class DataLoaderInterface
 {
@@ -38,8 +40,10 @@ class DataLoaderInterface
 
   public:   // TO_CHANGE
 	void *data;
+	
 	std::unordered_map<std::string, std::string> loaderParams;
 	std::unordered_map<std::string, void *> compFullData;
+	std::vector<GioData> inOutData;
 
   public:
 	virtual void init(std::string _filename, MPI_Comm _comm) = 0;
