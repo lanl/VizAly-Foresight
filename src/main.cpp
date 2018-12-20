@@ -366,12 +366,18 @@ int main(int argc, char *argv[])
 		
 			
 			if (writeData)
+			{
 				ioMgr->saveCompData(params[i], decompdata);
+				debuglog << ioMgr->getLog();
+			}
+
+			
 
 			//
 			// deallocate
 			std::free(decompdata);
 			
+
 			ioMgr->close();
 			memLoad.stop();
 

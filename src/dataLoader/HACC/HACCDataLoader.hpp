@@ -207,9 +207,7 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	readInData.setNumElements(maxNumElementsPerRank);
 	readInData.allocateMem(1);
 
-
-	// WHY ???????
-	sizePerDim[0] = numElements;
+	sizePerDim[0] = numElements;	// For compression
 
 
 	log << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
@@ -462,6 +460,7 @@ inline int HACCDataLoader::loadData(std::string paramName, void *& _data)
 
 inline int HACCDataLoader::saveCompData(std::string paramName, void * cData)
 {
+
 	for (int i=0; i<inOutData.size(); i++)
 	{
 		if (inOutData[i].name == paramName)
@@ -471,6 +470,10 @@ inline int HACCDataLoader::saveCompData(std::string paramName, void * cData)
 			memcpy(inOutData[i].data, cData, inOutData[i].size*numElements);
 
 			inOutData[i].doWrite = true;
+
+			log.str("");
+			log << "\nHACCDataLoader::saveCompData" << std::endl;
+			log << paramName << " found. It has " << inOutData[i].numElements << " elements of size " << inOutData[i].size << std::endl;
 		}
 	}
 
@@ -482,7 +485,7 @@ inline int HACCDataLoader::writeData(std::string _filename)
 {
 	Timer clock;
 	log.str("");
-
+	
 	gio::GenericIO *gioWriter;
 
 	// Create setup
@@ -510,7 +513,12 @@ inline int HACCDataLoader::writeData(std::string _filename)
 	{
 		// If data that has not gone through compression, load it now
 		if (!inOutData[i].doWrite)
+		{
 			loadData(inOutData[i].name, inOutData[i].data);
+			std::cout << myRank << " ~ " << inOutData[i].name << " is unchanged!" << std::endl;
+		}
+		else
+			std::cout << myRank << " ~ " << inOutData[i].name << " was compressed!" << std::endl;
 
 
 		unsigned flag = gio::GenericIO::VarHasExtraSpace;
@@ -547,7 +555,7 @@ inline int HACCDataLoader::writeData(std::string _filename)
 	}
 
 	gioWriter->write();
-	log << "HACCDataLoader::writeData " << _filename << "  gioWriter->write() " << std::endl;
+	log << "HACCDataLoader::writeData " << _filename << std::endl;
 
 	MPI_Barrier(comm);
 
