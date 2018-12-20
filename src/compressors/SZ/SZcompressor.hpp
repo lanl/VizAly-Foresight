@@ -75,7 +75,7 @@ inline int SZCompressor::decompress(void *&input, void *&output, std::string dat
 	output = SZ_decompress(SZ_FLOAT, static_cast<std::uint8_t *>(input), cbytes, n[4], n[3], n[2], n[1], n[0]);
 	dTime.stop(); 
 
-	std::free(input);
+	std::free(input);	input=NULL;
 
 	log << compressorName << " ~ DecompressTime: " << dTime.getDuration() << " s " << std::endl;
 

@@ -40,45 +40,38 @@ Authors:
 #endif
 
 
-#include "gioData.hpp"
 
-int main(int argc, char *argv[])
+
+// Function to validate whatever could be wrong with the input
+int validateInput(int argc, char *argv[], int myRank, int numRanks)
 {
 	// Check if we have the right number of arguments
 	if (argc < 2)
 	{
-		std::cerr << "Input argument needed. Run as: ../inputs/all.json" << std::endl;
-		std::cerr << "Read arguments: " << argc << std::endl;
+		if (myRank == 0)
+		{
+			std::cerr << "Input argument needed. Run as: ../inputs/all.json" << std::endl;
+			std::cerr << "Read arguments: " << argc << std::endl;
+		}
 
 		return 0;
 	}
-	
-
-	// init MPI
-	int myRank, numRanks, threadSupport;
-	MPI_Init_thread(NULL, NULL, MPI_THREAD_MULTIPLE, &threadSupport);
-	MPI_Comm_size(MPI_COMM_WORLD, &numRanks);
-	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
-
-
 
 	// Check if input file provided exists
 	if ( !fileExisits(argv[1]) )
 	{
 		if (myRank == 0)
-			std::cerr << "Could not find input file " << argv[1] << std::endl;
+			std::cerr << "Could not find input JSON file " << argv[1] << "." << std::endl;
 
-		MPI_Finalize();
 		return 0;
 	}
 
 
-	// Pass json file to json parser
+
+	// Validate JSON file
 	nlohmann::json jsonInput;
 	std::ifstream jsonFile(argv[1]);
 
-
-	// Check validity of input json file
 	try
     {
 		jsonFile >> jsonInput;
@@ -86,14 +79,55 @@ int main(int argc, char *argv[])
 	catch (nlohmann::json::parse_error& e)
     {
        	if (myRank == 0)
-        	std::cerr << "input JSON file " << argv[1] << " is invalid!\n" 
+        	std::cerr << "Input JSON file " << argv[1] << " is invalid!\n" 
         			  << e.what() << "\n"
         			  << "Validate your JSON file using e.g. https://jsonformatter.curiousconcept.com/ " << std::endl;
-
-        MPI_Finalize();
         return 0;
-     }
+    }
 
+
+
+    // Check if powers of 2 number of ranks
+    if (jsonInput["output"].find("output-decompressed") != jsonInput["output"].end())
+		if ( !isPowerOfTwo(numRanks) )
+		{
+			if (myRank == 0)
+				std::cerr << "Please run with powers of 2 number of ranks. e.g. 4, 8, 16, 32, ... when writing out HACC files." << std::endl;
+
+			return 0;
+		}
+
+	return 1;
+}
+
+
+
+int main(int argc, char *argv[])
+{
+	//
+	// init MPI
+	int myRank, numRanks, threadSupport;
+	MPI_Init_thread(NULL, NULL, MPI_THREAD_MULTIPLE, &threadSupport);
+	MPI_Comm_size(MPI_COMM_WORLD, &numRanks);
+	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
+
+
+	//
+	// Validate input params
+	if ( !validateInput(argc, argv, myRank, numRanks) )
+	{
+		MPI_Finalize();
+        return 0;
+	}
+	
+
+	//
+	// Load input
+
+	// Pass JSON file to json parser and 
+	nlohmann::json jsonInput;
+	std::ifstream jsonFile(argv[1]);
+	jsonFile >> jsonInput;
 
 	// Load in the parameters
 	std::string inputFileType = jsonInput["input"]["filetype"];
@@ -125,29 +159,16 @@ int main(int argc, char *argv[])
 	}
 
 
-
-	// Check if powers of 2 number of ranks
-	if ( writeData && !isPowerOfTwo(numRanks) )
-	{
-		if (myRank == 0)
-			std::cerr << "Please run with powers of 2 number of ranks. e.g. 4, 8, 16, 32, ..." << std::endl;
-
-		MPI_Finalize();
-		return 0;
-	}
-
-
 	//
-	// All seems valid, let's start ...
+	// For humans; all seems valid, let's start ...
 	if (myRank == 0)
 		std::cout << "Starting ... \nLook at the log for progress update ... \n" << std::endl;
 
 
+
 	//
 	// Create log and metrics files
-	std::stringstream debuglog;
-	std::stringstream metricsInfo;
-	std::stringstream csvOutput;
+	std::stringstream debuglog, metricsInfo, csvOutput;
 	writeLog(outputLogFile, debuglog.str());
 
 	csvOutput << "Compressor_field" << ", ";
@@ -174,11 +195,14 @@ int main(int argc, char *argv[])
   #endif
 	else
 	{
+		// Exit if no input file is provided
 		if (myRank == 0)
 			std::cout << "Unsupported format " << inputFileType << "!!!" << std::endl;
 
+		MPI_Finalize();
 		return 0;
 	}
+
 
 	// Check if the datainfo field exist for a dataset
 	if (jsonInput["input"].find("datainfo") != jsonInput["input"].end())
@@ -191,6 +215,7 @@ int main(int argc, char *argv[])
 	ioMgr->init(inputFile, MPI_COMM_WORLD);
 	ioMgr->setSave(writeData);
 	
+
 	// Save parameters of input file to facilitate rewrite
 	if (writeData)
 		ioMgr->saveInputFileParameters();
@@ -201,8 +226,6 @@ int main(int argc, char *argv[])
 	CompressorInterface *compressorMgr;
 	MetricInterface *metricsMgr;
 
-
-	// Loop compressors
 	for (int c = 0; c < compressors.size(); ++c)
 	{	
 		// initialize compressor
@@ -243,7 +266,6 @@ int main(int argc, char *argv[])
 			// Check if parameter is valid before proceding
 			if ( !ioMgr->loadData(params[i]) )
 			{
-				ioMgr->close();
 				memLoad.stop();
 				continue;
 			}
@@ -254,6 +276,7 @@ int main(int argc, char *argv[])
 			debuglog << ioMgr->getLog();
 			appendLog(outputLogFile, debuglog);
 			csvOutput << compressorMgr->getCompressorName() << "_" << params[i] << ", ";
+
 			MPI_Barrier(MPI_COMM_WORLD);
 			
 
@@ -262,7 +285,7 @@ int main(int argc, char *argv[])
 			void * cdata = NULL;
 
 			compressClock.start();
-			compressorMgr->compress(ioMgr->data, cdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getDims());
+			compressorMgr->compress(ioMgr->data, cdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim());
 			compressClock.stop();
 
 
@@ -271,7 +294,7 @@ int main(int argc, char *argv[])
 			void * decompdata = NULL;
 
 			decompressClock.start();
-			compressorMgr->decompress(cdata, decompdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getDims() );
+			compressorMgr->decompress(cdata, decompdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim() );
 			decompressClock.stop();
 
 
@@ -342,21 +365,16 @@ int main(int argc, char *argv[])
 			MPI_Reduce(&decompress_throughput, &min_decompress_throughput, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
 		
 			
-
-			//
-			// deallocate
 			if (writeData)
 				ioMgr->saveCompData(params[i], decompdata);
 
-			
+			//
+			// deallocate
 			std::free(decompdata);
 			
-			
-
 			ioMgr->close();
 			memLoad.stop();
 
-			
 
 			//
 			// log stuff
@@ -383,7 +401,6 @@ int main(int argc, char *argv[])
 			}
 			
 			
-
 			MPI_Barrier(MPI_COMM_WORLD);
 		}
 		
@@ -396,11 +413,11 @@ int main(int argc, char *argv[])
 			appendLog(outputLogFile, debuglog );
 		}
 		
-		
 		compressorMgr->close();
 	}
 
-	// for humans
+
+	// For humans
 	if (myRank == 0)
 		std::cout << "\nThat's all folks!" << std::endl;
 

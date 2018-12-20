@@ -82,11 +82,11 @@ inline void BinaryDataLoader::init(std::string _filename, MPI_Comm _comm)
 		// extract dims using delimiter
 		while ((pos = s.find(",")) != std::string::npos) {
 			token = s.substr(0, pos);
-			dims[cnt] = strConvert::to_uint64(token);
+			sizePerDim[cnt] = strConvert::to_uint64(token);
 			s.erase(0, pos + 1);
 			cnt++;
 		}
-		dims[cnt] = strConvert::to_uint64(token);
+		sizePerDim[cnt] = strConvert::to_uint64(token);
 	}
 
 	got = loaderParams.find("header");
@@ -115,7 +115,7 @@ inline void BinaryDataLoader::init(std::string _filename, MPI_Comm _comm)
 		dataTarget = s;
 	}
 
-	std::cout << "Dims: " << dims[0] << "," << dims[1] << "," << dims[2] << ", header: " << headerSize << ", type: " << dataType << std::endl;
+	std::cout << "sizePerDim: " << sizePerDim[0] << "," << sizePerDim[1] << "," << sizePerDim[2] << ", header: " << headerSize << ", type: " << dataType << std::endl;
 }
 
 inline int BinaryDataLoader::allocateMem(std::string dataType, size_t numElements, int offset)
@@ -216,9 +216,9 @@ inline int BinaryDataLoader::loadData(std::string paramName)
 	field = strConvert::to_int(paramName);
 
 	// Set Dims
-	size_t dimx=dims[0];
-	size_t dimy=dims[1];
-	size_t dimz=dims[2];
+	size_t dimx=sizePerDim[0];
+	size_t dimy=sizePerDim[1];
+	size_t dimz=sizePerDim[2];
 
 	totalNumberOfElements = dimx * dimy * dimz;
 	numElements = totalNumberOfElements;
@@ -345,13 +345,13 @@ size_t BinaryDataLoader::findByteAddress(size_t x, size_t y, size_t z, size_t fi
 	size_t byteLocation = headerSize;
 
 	// first look at the scalar_field
-	byteLocation += field*dims[0]*dims[1]*dims[2]*elemSize;
+	byteLocation += field*sizePerDim[0]*sizePerDim[1]*sizePerDim[2]*elemSize;
 
 	// Look at z
-	byteLocation += z*dims[0]*dims[1]*elemSize;
+	byteLocation += z*sizePerDim[0]*sizePerDim[1]*elemSize;
 
 	// look at y
-	byteLocation += y*dims[0]*elemSize;
+	byteLocation += y*sizePerDim[0]*elemSize;
 
 	// look at x
 	byteLocation += x*elemSize;

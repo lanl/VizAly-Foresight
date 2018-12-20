@@ -21,4 +21,4 @@ echo $run_path
 
 
 # Run Halo finder
-
+$path_to_HACC_exe/$path_to_HACC_exe $path_to_HALO_script

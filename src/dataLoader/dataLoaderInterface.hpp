@@ -24,7 +24,7 @@ class DataLoaderInterface
 	std::string filename;
 	bool saveData;
 	
-	size_t dims[5]{ 0,0,0,0,0 };	/// ??? what is dims????
+	size_t sizePerDim[5]{ 0,0,0,0,0 };	// For compression
 
 	std::string dataType;
 	std::string param;
@@ -50,7 +50,7 @@ class DataLoaderInterface
 	virtual int close() = 0;
 
 	size_t getNumElements() { return numElements; }
-	size_t * getDims() { return dims; }
+	size_t * getSizePerDim() { return sizePerDim; }
 	size_t getTypeSize() { return elemSize; }
 	std::string getType() { return dataType; }
 	std::string getParam() { return param; }
@@ -70,7 +70,7 @@ inline std::string DataLoaderInterface::getDataInfo()
 	dataInfo << "Param: " << param << std::endl;
 	dataInfo << "dataType: " << dataType << std::endl;
 	dataInfo << "numElements: " << numElements << std::endl;
-	dataInfo << "dims: " << dims[0] << " " << dims[1] << " " << dims[2] << " " << dims[3] << " " << dims[4] << std::endl;
+	dataInfo << "sizePerDim: " << sizePerDim[0] << " " << sizePerDim[1] << " " << sizePerDim[2] << " " << sizePerDim[3] << " " << sizePerDim[4] << std::endl;
 
 	return dataInfo.str();
 }

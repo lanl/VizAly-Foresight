@@ -80,11 +80,7 @@ inline void HACCDataLoader::init(std::string _filename, MPI_Comm _comm)
 inline int HACCDataLoader::saveInputFileParameters()
 {
 	gio::GenericIO *gioReader;
-  #ifndef GENERICIO_NO_MPI
 	gioReader = new gio::GenericIO(comm, filename);
-  #else
-	gioReader = new gio::GenericIO(filename, gio::GenericIO::FileIOPOSIX);
-  #endif
 
 	// Open file
 	gioReader->openAndReadHeader(gio::GenericIO::MismatchRedistribute);
@@ -130,11 +126,8 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	param = paramName;
 
 	// Init GenericIO reader + open file
-  #ifndef GENERICIO_NO_MPI
 	gioReader = new gio::GenericIO(comm, filename);
-  #else
-	gioReader = new gio::GenericIO(filename, gio::GenericIO::FileIOPOSIX);
-  #endif
+
 
 
 	// Open file
@@ -163,21 +156,20 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	bool paramToLoad = false;
 	GioData readInData;
 	for (int i = 0; i < numVars; i++)
-	{
 		if (VI[i].Name == paramName)
+		{
 			paramToLoad = true;
-		else
-			continue;
-
-		readInData.init(i, VI[i].Name, static_cast<int>(VI[i].Size), VI[i].IsFloat, VI[i].IsSigned, VI[i].IsPhysCoordX, VI[i].IsPhysCoordY, VI[i].IsPhysCoordZ);
-		readInData.determineDataType();
+			readInData.init(i, VI[i].Name, static_cast<int>(VI[i].Size), VI[i].IsFloat, VI[i].IsSigned, VI[i].IsPhysCoordX, VI[i].IsPhysCoordY, VI[i].IsPhysCoordZ);
+			readInData.determineDataType();
 		
-		dataType = readInData.dataType;
-		elemSize = readInData.size;
-	}
+			dataType = readInData.dataType;
+			elemSize = readInData.size;
+
+			break;
+		}
 
 
-	if (!paramToLoad)
+	if ( !paramToLoad )
 	{
 		std::cout << "Cannot find that parameter, exiting now!";
 		return -2;
@@ -217,7 +209,7 @@ inline int HACCDataLoader::loadData(std::string paramName)
 
 
 	// WHY ???????
-	dims[0] = numElements;
+	sizePerDim[0] = numElements;
 
 
 	log << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
@@ -339,11 +331,8 @@ inline int HACCDataLoader::loadData(std::string paramName, void *& _data)
 	gio::GenericIO *gioReader;
 
 	// Init GenericIO reader + open file
-  #ifndef GENERICIO_NO_MPI
+
 	gioReader = new gio::GenericIO(comm, filename);
-  #else
-	gioReader = new gio::GenericIO(filename, gio::GenericIO::FileIOPOSIX);
-  #endif
 
 
 	// Open file
@@ -366,15 +355,17 @@ inline int HACCDataLoader::loadData(std::string paramName, void *& _data)
 	bool paramToLoad = false;
 	GioData readInData;
 	for (int i = 0; i < numVars; i++)
-	{
 		if (VI[i].Name == paramName)
+		{
 			paramToLoad = true;
-		else
-			continue;
+			readInData.init(i, VI[i].Name, static_cast<int>(VI[i].Size), VI[i].IsFloat, VI[i].IsSigned, VI[i].IsPhysCoordX, VI[i].IsPhysCoordY, VI[i].IsPhysCoordZ);
+			readInData.determineDataType();
+		
+			dataType = readInData.dataType;
+			elemSize = readInData.size;
 
-		readInData.init(i, VI[i].Name, static_cast<int>(VI[i].Size), VI[i].IsFloat, VI[i].IsSigned, VI[i].IsPhysCoordX, VI[i].IsPhysCoordY, VI[i].IsPhysCoordZ);
-		readInData.determineDataType();
-	}
+			break;
+		}
 
 
 	//
@@ -500,11 +491,8 @@ inline int HACCDataLoader::writeData(std::string _filename)
 
 
 	// Init GenericIO writer + open file
-  #ifndef GENERICIO_NO_MPI
 	gioWriter = new gio::GenericIO(comm, _filename);// , gio::GenericIO::FileIOMPI);
-  #else
-	gioWriter = new gio::GenericIO(_filename, gio::GenericIO::FileIOPOSIX);
-  #endif
+
 
 	gioWriter->setNumElems(numElements);
 
@@ -558,14 +546,10 @@ inline int HACCDataLoader::writeData(std::string _filename)
           	std::cout << " = data type undefined!!!" << std::endl;		
 	}
 
-	MPI_Barrier(comm);
-  #ifndef GENERICIO_NO_MPI
 	gioWriter->write();
-
 	log << "HACCDataLoader::writeData " << _filename << "  gioWriter->write() " << std::endl;
-	MPI_Barrier(comm);
-  #endif
 
+	MPI_Barrier(comm);
 
 	clock.stop();
 	log << "Writing data took " << clock.getDuration() << " s" << std::endl;
