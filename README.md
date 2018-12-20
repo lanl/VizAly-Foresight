@@ -47,14 +47,14 @@ CBench takes as input a json file (examples of input json files are in the **_[i
 
 ### Currently Supported file formats:
 * GenericIO
-* NYX(HDF5)
+* NYX(HDF5 version hdf5-1_10_3) 
 * Binary
 
 ### Currently Supported compressors:
-* [Lossless BLOSC](http://blosc.org/)
-* [Lossy BigCrunch](https://github.com/lanl/VizAly-BigCrunch)
-* [SZ](https://collab.cels.anl.gov/display/ESR/SZ)
-* [zfp](https://computation.llnl.gov/projects/floating-point-compression)
+* [Lossless BLOSC](http://blosc.org/) - version 1.10.2
+* [Lossy BigCrunch](https://github.com/lanl/VizAly-BigCrunch) - version 1.1
+* [SZ](https://collab.cels.anl.gov/display/ESR/SZ) - version 2.0.2.2
+* [zfp](https://computation.llnl.gov/projects/floating-point-compression) - version 0.5.3
 
 ### Currently Supported metrics:
 * Absolute Error
