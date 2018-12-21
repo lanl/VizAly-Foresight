@@ -168,6 +168,7 @@ int main(int argc, char *argv[])
 
 	//
 	// Create log and metrics files
+	Timer overallClock;
 	std::stringstream debuglog, metricsInfo, csvOutput;
 	writeLog(outputLogFile, debuglog.str());
 
@@ -178,6 +179,8 @@ int main(int argc, char *argv[])
 	csvOutput << "Max Compression Throughput, Max DeCompression Throughput, ";
 	csvOutput << "Min Compression Throughput, Min DeCompression Throughput, Compression Ratio" << std::endl;
 	metricsInfo << "Input file: " << inputFile << std::endl;
+
+	overallClock.start();
 
 
 
@@ -411,8 +414,12 @@ int main(int argc, char *argv[])
 		}
 		
 		
+		
 		if (writeData)
 		{
+			Timer clockWrite;
+			clockWrite.start();
+
 			// Pass data that was not compressed
 			for (int i=0; i<ioMgr->inOutData.size(); i++)
 			{
@@ -426,13 +433,19 @@ int main(int argc, char *argv[])
 
 			ioMgr->writeData(outputFile + compressorMgr->getCompressorName());
 
+			clockWrite.stop();
+
 			debuglog << ioMgr->getLog();
+			debuglog << "Write output took: " <<  clockWrite.getDuration() << " s " << std::endl;
 			appendLog(outputLogFile, debuglog );
 		}
 		
 		compressorMgr->close();
 	}
 
+	overallClock.stop();
+	debuglog << "\nTotal run time: " <<  overallClock.getDuration() << " s " << std::endl;
+	appendLog(outputLogFile, debuglog );
 
 	// For humans
 	if (myRank == 0)
