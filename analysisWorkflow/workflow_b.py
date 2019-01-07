@@ -4,9 +4,11 @@ import sys, json, os
 from gioSqlite import *
 
 
+def output_file(file, directory, result):
+	if not os.path.exists(directory):
+		os.makedirs(directory)
 
-def output_file(file, result):
-	run_script_file = open(file, "w") 
+	run_script_file = open((directory + "/" + file), "w") 
 	run_script_file.write(result)
 	run_script_file.close()
 
@@ -21,14 +23,11 @@ def analysis(query_mgr, json_data):
 		# Query each file
 		for halo_file in entry["halo-files"]:
 			count = count + 1
-
 			print("Running analysis on: " + halo_file_path + halo_file)
 
 			# Load dataset
 			table_name = "foo_" + str(count)
 			query_mgr.createTable(table_name, (halo_file_path + halo_file) )
-
-			
 
 			# Execute Queries
 			query_count = 0
@@ -41,7 +40,7 @@ def analysis(query_mgr, json_data):
 				result = query_mgr.runQueryOutputString(query)
 
 				# Saving the output
-				output_file(result_filename, result)
+				output_file(result_filename, "results", result)
 				output_files.append(result_filename)
 
 				query_count = query_count + 1
@@ -63,8 +62,15 @@ if __name__ == "__main__":
 
 	# Initialize query tool
 	query_mgr = GioSqlite3()
-	query_mgr.loadGIOSqlite(json_data["analysis-prams"]["sqlite-path"])
+	if query_mgr.loadGIOSqlite(json_data["analysis-prams"]["sqlite-path"]) == -1:
+		exit()
 
 
 	# Run analysis
 	output_files = analysis(query_mgr, json_data)
+
+
+# Run as:
+# python workflow_b.py workflow_input.json
+
+# Results will be in subdirectory results

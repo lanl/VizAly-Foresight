@@ -53,26 +53,10 @@
 
 			"queries" : [
 				"select count(*) from __TABLE__", 
-				"select fof_halo_tag from __TABLE__ ORDER BY cast(fof_halo_mass as REAL) DESC LIMIT 10",
-				"select fof_halo_center_x, fof_halo_center_y, fof_halo_center_z from __TABLE__ ORDER BY cast(fof_halo_mass as REAL) DESC LIMIT 10",
-				"select fof_halo_tag from __TABLE__ ORDER BY cast(fof_halo_count as INTEGER) DESC LIMIT 10",
-				"select fof_halo_center_x, fof_halo_center_y, fof_halo_center_z from __TABLE__ ORDER BY cast(fof_halo_count as INTEGER) DESC LIMIT 10"
-			]
-		},
-
-		{
-			"halo-files" : [
-				"m001-499.sodproperties", 
-				"__BigCrunch__m001-499.sodproperties", 
-				"__SZ__m001-499.sodproperties"
-			],
-
-			"queries" : [
-				"select count(*) from ",
-				"select fof_halo_tag from __TABLE__ ORDER BY fof_halo_mass DESC LIMIT 10",
-				"select fof_halo_center_x, fof_halo_center_y, fof_halo_center_z from __TABLE__ ORDER BY fof_halo_mass DESC LIMIT 10",
-				"select fof_halo_tag from __TABLE__ ORDER BY fof_halo_count DESC LIMIT 10",
-				"select fof_halo_center_x, fof_halo_center_y, fof_halo_center_z from __TABLE__ ORDER BY fof_halo_count DESC LIMIT 10"
+				"select fof_halo_tag, fof_halo_mass from __TABLE__ ORDER BY fof_halo_mass DESC LIMIT 10",
+				"select fof_halo_center_x, fof_halo_center_y, fof_halo_center_z, fof_halo_mass from __TABLE__ ORDER BY fof_halo_mass DESC LIMIT 10",
+				"select fof_halo_tag, fof_halo_count from __TABLE__ ORDER BY fof_halo_count DESC LIMIT 10",
+				"select fof_halo_center_x, fof_halo_center_y, fof_halo_center_z, fof_halo_count from __TABLE__ ORDER BY fof_halo_count DESC LIMIT 10"
 			]
 		}
 	],

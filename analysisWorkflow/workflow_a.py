@@ -96,3 +96,6 @@ if __name__ == "__main__":
 	
 		# run script file
 		os.system('sbatch ' + jobscript)
+
+# Run as:
+# python workflow_a.py workflow_input.json

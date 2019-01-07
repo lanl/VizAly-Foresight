@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
 	std::string outputFile = "";
 	if (jsonInput["output"].find("output-decompressed") != jsonInput["output"].end())
 	{
-		outputFile = extractFileName(inputFile) + "__";
+		outputFile = extractFileName(inputFile);
 		writeData = true;
 	}
 
@@ -431,7 +431,7 @@ int main(int argc, char *argv[])
 				}
 			}
 
-			ioMgr->writeData(outputFile + compressorMgr->getCompressorName());
+			ioMgr->writeData("__" + compressorMgr->getCompressorName() + "__" + outputFile);
 
 			clockWrite.stop();
 
