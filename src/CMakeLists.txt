@@ -23,6 +23,10 @@ if(CBENCH_ENABLE_NYX_LOADER)
 	include_directories(${CMAKE_SOURCE_DIR}/dataLoader/NYX)
 endif()
 
+if(WIN32)
+	add_definitions(-DNOMINMAX)
+endif()
+
 # HACC Loader
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty/genericio)
 add_definitions(-DGENERICIO_NO_COMPRESSION)

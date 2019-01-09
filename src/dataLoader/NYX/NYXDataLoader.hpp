@@ -32,7 +32,7 @@ class NYXDataLoader: public DataLoaderInterface
 	int loadData(std::string paramName);
 	int saveCompData(std::string paramName, void * cData);
 	int writeData(std::string _filename);
-	int saveInputFileParameters(){ };
+	int saveInputFileParameters();
 	int close() { return deAllocateMem(); }
 };
 
@@ -61,7 +61,12 @@ inline void NYXDataLoader::init(std::string _filename, MPI_Comm _comm)
 	MPI_Comm_rank(comm, &myRank);
 }
 
+inline int NYXDataLoader::saveInputFileParameters()
+{
+    // 
 
+    return 1;
+}
 
 inline int NYXDataLoader::allocateMem(std::string dataType, size_t numElements, int offset)
 {
