@@ -597,3 +597,9 @@ MAX_FOR_CENTER_FINDING 10000 # run center finder for halos with this maximum num
 **Again, this will not be everything, so only for testing useful**
  
 * Also, for a test, do you have a much earlier time step?
+
+## Using SQLLite3 python wrapper
+* Installing userspace apsw using Python3
+~~~~
+python -m pip install --user apsw
+~~~~
