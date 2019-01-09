@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
 	std::string outputFile = "";
 	if (jsonInput["output"].find("output-decompressed") != jsonInput["output"].end())
 	{
-		outputFile = extractFileName(inputFile) + "__";
+		outputFile = extractFileName(inputFile);
 		writeData = true;
 	}
 
@@ -168,6 +168,7 @@ int main(int argc, char *argv[])
 
 	//
 	// Create log and metrics files
+	Timer overallClock;
 	std::stringstream debuglog, metricsInfo, csvOutput;
 	writeLog(outputLogFile, debuglog.str());
 
@@ -178,6 +179,8 @@ int main(int argc, char *argv[])
 	csvOutput << "Max Compression Throughput, Max DeCompression Throughput, ";
 	csvOutput << "Min Compression Throughput, Min DeCompression Throughput, Compression Ratio" << std::endl;
 	metricsInfo << "Input file: " << inputFile << std::endl;
+
+	overallClock.start();
 
 
 
@@ -366,12 +369,18 @@ int main(int argc, char *argv[])
 		
 			
 			if (writeData)
+			{
 				ioMgr->saveCompData(params[i], decompdata);
+				debuglog << ioMgr->getLog();
+			}
+
+			
 
 			//
 			// deallocate
 			std::free(decompdata);
 			
+
 			ioMgr->close();
 			memLoad.stop();
 
@@ -405,17 +414,38 @@ int main(int argc, char *argv[])
 		}
 		
 		
+		
 		if (writeData)
 		{
-			ioMgr->writeData(outputFile + compressorMgr->getCompressorName());
+			Timer clockWrite;
+			clockWrite.start();
+
+			// Pass data that was not compressed
+			for (int i=0; i<ioMgr->inOutData.size(); i++)
+			{
+				if ( !ioMgr->inOutData[i].doWrite )
+				{
+					ioMgr->loadData(ioMgr->inOutData[i].name);
+					ioMgr->saveCompData(ioMgr->inOutData[i].name, ioMgr->data);
+					ioMgr->close();
+				}
+			}
+
+			ioMgr->writeData("__" + compressorMgr->getCompressorName() + "__" + outputFile);
+
+			clockWrite.stop();
 
 			debuglog << ioMgr->getLog();
+			debuglog << "Write output took: " <<  clockWrite.getDuration() << " s " << std::endl;
 			appendLog(outputLogFile, debuglog );
 		}
 		
 		compressorMgr->close();
 	}
 
+	overallClock.stop();
+	debuglog << "\nTotal run time: " <<  overallClock.getDuration() << " s " << std::endl;
+	appendLog(outputLogFile, debuglog );
 
 	// For humans
 	if (myRank == 0)

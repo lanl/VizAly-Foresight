@@ -3,7 +3,7 @@
 #SBATCH --ntasks-per-node 8
 #SBATCH -p scaling
 
-projectPath=/projects/exasky/VizAly-CBench/
+projectPath=/projects/exasky/pascal-projects/VizAly-CBench/
 
 # load modules
 source $projectPath/scripts/VizAly-CBench.bash.darwin
