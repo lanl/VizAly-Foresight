@@ -30,8 +30,6 @@
 	"compressor-comment" : "which compressors to test",
   	"compressors": [ "BigCrunch" ],
 
-  
-
 	"metrics-comment" : "which metrics to use",
 	"metrics": [
 		"absolute_error",

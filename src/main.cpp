@@ -154,8 +154,9 @@ int main(int argc, char *argv[])
 	std::string outputFile = "";
 	if (jsonInput["output"].find("output-decompressed") != jsonInput["output"].end())
 	{
-		outputFile = extractFileName(inputFile);
-		writeData = true;
+		writeData = jsonInput["output"]["output-decompressed"];
+        if(writeData)
+            outputFile = extractFileName(inputFile);
 	}
 
 
