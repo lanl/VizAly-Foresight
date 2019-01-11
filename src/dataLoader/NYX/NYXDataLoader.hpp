@@ -196,9 +196,9 @@ inline int NYXDataLoader::loadData(std::string paramName)
 		dataspace.getSimpleExtentDims(tdims);
 		//std::cout << "Data dimensions: " << dims[0] << " " << dims[1] << " " << dims[2] << "\n";
 		numElements = tdims[0] * tdims[1] * tdims[2];
-		dims[0] = tdims[0];
-		dims[1] = tdims[1];
-		dims[2] = tdims[2];
+        sizePerDim[0] = tdims[0];
+        sizePerDim[1] = tdims[1];
+        sizePerDim[2] = tdims[2];
 			
 		totalNumberOfElements = numElements; // Temporary 
 

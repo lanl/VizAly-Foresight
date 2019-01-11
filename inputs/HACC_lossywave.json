@@ -12,7 +12,8 @@
 
 		"parameters" :
 		{
-			"tolerance" : 1e-03
+			"tolerance" : 1e-03,
+			"pcnt" : 100
 		}
 	},
 
@@ -32,6 +33,7 @@
 	"metrics": [
 		"absolute_error",
 		"relative_error",
-		"mse"
+		"mse",
+		"psnr"
 	]
 }

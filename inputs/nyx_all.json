@@ -12,6 +12,8 @@
 
 	"output" :
 	{
+		"output-decompressed": false,
+		
 		"logfname-comment": "name of output log file",
 		"logfname" : "runlog_NYX_all_",
 
@@ -20,12 +22,13 @@
 	},
 
 	"compressor-comment" : "which compressors to test",
-	"compressors" : ["blosc", "BigCrunch", "SZ" ],
+	"compressors" : ["blosc", "BigCrunch", "SZ", "zfp", "LossyWave" ],
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [
 		"absolute_error",
-        "relative_error",
-        "mse"
+		"relative_error",
+		"mse",
+		"psnr"
 	]
 }

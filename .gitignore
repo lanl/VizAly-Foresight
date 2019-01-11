@@ -94,3 +94,7 @@ ExternalDependencies/
 # sublime text
 *-sublime-project
 *-sublime-project.sublime-workspace
+
+CMakeCache\.txt
+
+CMakeFiles/cmake\.check_cache
