@@ -13,13 +13,22 @@ The default master branch should always point to the latest working version. How
 * OpenMPI 2 or higher
 
 ## Building:
-The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @ ANL and Darwin @ LANL
+The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @ ANL and Darwin @ LANL . These build a base version of CBench:
 ```
 $ git clone https://github.com/lanl/VizAly-CBench.git
 
 $ cd VizAly-CBench
 $ source buildDependencies.sh
 $ source build.sh
+```
+
+To build a master (all) version of CBench, run the following scripts:
+```
+$ git clone https://github.com/lanl/VizAly-CBench.git
+
+$ cd VizAly-CBench
+$ source buildAllDependencies.sh
+$ source buildAll.sh
 ```
 
 ## Running:
@@ -53,6 +62,7 @@ CBench takes as input a json file (examples of input json files are in the **_[i
 ### Currently Supported compressors:
 * [Lossless BLOSC](http://blosc.org/) - version 1.10.2
 * [Lossy BigCrunch](https://github.com/lanl/VizAly-BigCrunch) - version 1.1
+* [Lossy LossyWave](https://github.com/lanl/VizAly-LossyWave) - version 0.1
 * [SZ](https://collab.cels.anl.gov/display/ESR/SZ) - version 2.0.2.2
 * [zfp](https://computation.llnl.gov/projects/floating-point-compression) - version 0.5.3
 
