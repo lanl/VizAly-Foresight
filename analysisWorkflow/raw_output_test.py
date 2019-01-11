@@ -29,15 +29,16 @@ def analysis(query_mgr):
 		query_mgr.createTable(table_name, entry )
 
 		# Query
-		query = "select count(*) from __TABLE__"
+		query = "select * from __TABLE__ ORDER BY id DESC"
 		query = query.replace("__TABLE__", table_name)
+		query_type = "all_particles_query"
 
 		# Run query
 		result = query_mgr.runQueryOutputString(query)
 
 		# Save output
 		filename = (entry.split("/")[-1])	# extract the filename
-		result_filename = filename + '_' + str(count)
+		result_filename = '_' + filename + '__' + query_type 
 
 		output_file(result_filename, "raw_results", result)
 
