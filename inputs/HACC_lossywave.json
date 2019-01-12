@@ -10,11 +10,10 @@
 		"scalars-comment" : "which scalars to test",
 		"scalars" : ["x"],
 
-		"parameters" :
-		{
-			"tolerance" : 1e-03,
-			"pcnt" : 100
-		}
+    "parameters": {
+      "pcnt": 30.0,
+      "tolerance": 1e-03
+    }
 	},
 
 	"output" :

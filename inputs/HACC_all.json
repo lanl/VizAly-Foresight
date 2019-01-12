@@ -10,10 +10,10 @@
 		"scalars-comment" : "which scalars to test",
 		"scalars" : ["x", "y", "z", "vx", "vy", "vz"],
 
-		"parameters" :
-		{
-			"tolerance" : 1e-03
-		}
+    "parameters": 
+    {
+      "tolerance": 1e-03
+    }
 	},
 
 	"output": 
