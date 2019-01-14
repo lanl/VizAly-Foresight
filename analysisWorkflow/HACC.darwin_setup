@@ -28,4 +28,3 @@ export HACC_MPI_LDFLAGS="-lm -fopenmp"
 
 ## Propagate GenericIO env variables
 export GIO_MPICXX="${HACC_MPI_CXX}"
-
