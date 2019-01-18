@@ -5,7 +5,7 @@ echo "Building LossyWave ... "
 
 git clone https://github.com/lanl/VizAly-LossyWave.git
 cd VizAly-LossyWave/
-git checkout v0.1
+git checkout v0.2
 mkdir install
 mkdir build
 cd build
