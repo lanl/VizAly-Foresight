@@ -62,8 +62,7 @@ inline int LossyWaveCompressor::compress(void *input, void *&output, std::string
 					n[0], n[1], n[2],
 					dataTypeSize, pcnt, 0 };
 
-	lossywave::lossywave lw(args);//,false);
-    lw.printParams();
+	lossywave::lossywave lw(args,false);
 
 	Timer cTime; cTime.start();
 
@@ -105,7 +104,7 @@ inline int LossyWaveCompressor::decompress(void *&input, void *&output, std::str
 					n[0], n[1], n[2],
 					dataTypeSize, pcnt, 0 };
 
-	lossywave::lossywave lw(args);//,false);
+	lossywave::lossywave lw(args,false);
 
 	Timer dTime; dTime.start();
 	output = std::malloc(numel*dataTypeSize);

@@ -11,8 +11,9 @@
 		"scalars" : ["x"],
 
     "parameters": {
-      "pcnt": 30.0,
-      "tolerance": 1e-03
+		"pcnt": 100.0,
+		"quant": 2.0,
+		"tolerance": 1e-03
     }
 	},
 

@@ -1,13 +1,20 @@
 {
-  "input": {
-    "filetype-comment": "type of file to load; HACC or NYX",
-    "filetype": "NYX",
+	"input": 
+	{
+		"filetype-comment": "type of file to load; HACC or NYX",
+		"filetype": "NYX",
 
-    "filename-comment": "name of input file",
-    "filename": "../testing/data/z255_32.h5",
+		"filename-comment": "name of input file",
+		"filename": "../testing/data/z255_32.h5",
 
-    "scalars-comment": "which scalars to test",
-    "scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ]
+		"scalars-comment": "which scalars to test",
+		"scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ],
+		
+		"parameters": {
+			"pcnt": 50.0,
+			"quant": 1.0,
+			"tolerance": 1e-03
+		}
   },
 
 	"output" :
@@ -27,8 +34,8 @@
 	"metrics-comment" : "which metrics to use",
 	"metrics": [
 		"absolute_error",
-        "relative_error",
-        "mse",
+		"relative_error",
+		"mse",
 		"psnr"
 	]
 }
