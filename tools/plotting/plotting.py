@@ -130,28 +130,42 @@ def main(argv):
 	# parse command line arguments
 	inputFileName = jsonData["inputFileName"]
 
+	# check if we're making a single plot
+	if len(inputFileName) == 1:
 
-	#initialize data storage
-	fields = []	# field names
-	rows = []	# data
+		#initialize data storage
+		fields = []	# field names
+		rows = []	# data
 
-	# read file
-	fields, row = readCSV(inputFileName, fields, rows)
-
-
-	compressorsToPlot = []
-	for c in jsonData["x-axis"]:
-		compressorsToPlot.append(c)
+		# read file
+		fields, row = readCSV(inputFileName, fields, rows)
 
 
+		compressorsToPlot = []
+		for c in jsonData["x-axis"]:
+			compressorsToPlot.append(c)
 
-	if (jsonData["plot-type"] == "scatter"):
-		metricsToPlot = jsonData["metrics"]
-		drawScatter(jsonData["outputFileName"], jsonData["plot-title"], compressorsToPlot, metricsToPlot, rows, fields, jsonData["live-display"])
 
-	if (jsonData["plot-type"] == "barchart"):
-		metricToPlot = jsonData["metrics"]
-		drawBar(jsonData["outputFileName"], jsonData["plot-title"], compressorsToPlot, metricToPlot, rows, fields, jsonData["live-display"])
+
+		if (jsonData["plot-type"] == "scatter"):
+			metricsToPlot = jsonData["metrics"]
+			drawScatter(jsonData["outputFileName"], jsonData["plot-title"], compressorsToPlot, metricsToPlot, rows, fields, jsonData["live-display"])
+
+		if (jsonData["plot-type"] == "barchart"):
+			metricToPlot = jsonData["metrics"]
+			drawBar(jsonData["outputFileName"], jsonData["plot-title"], compressorsToPlot, metricToPlot, rows, fields, jsonData["live-display"])
+	# make a temporal Plot
+	else:
+		for inputFile in inputFileName:
+
+			#initialize data storage
+			fields = []	# field names
+			rows = []	# data
+
+			fields, row = readCSV(inputFile, fields, rows)
+
+			# Do Stuff
+
 
 	
 
