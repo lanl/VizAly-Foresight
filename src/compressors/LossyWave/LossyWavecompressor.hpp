@@ -58,9 +58,9 @@ inline int LossyWaveCompressor::compress(void *input, void *&output, std::string
 
 	// Set compression parameters
 	int args[13] = { 404, 0, 128+quant, 0,
-					n[0], n[1], n[2],
-					n[0], n[1], n[2],
-					dataTypeSize, pcnt, 0 };
+                    (int)n[0], (int)n[1], (int)n[2],
+                    (int)n[0], (int)n[1], (int)n[2],
+                    (int)dataTypeSize, pcnt, 0 };
 
 	lossywave::lossywave lw(args,false);
 
@@ -100,9 +100,9 @@ inline int LossyWaveCompressor::decompress(void *&input, void *&output, std::str
 
 	// Set compression parameters
 	int args[13] = { 404, 0, 128+quant, 0,
-					n[0], n[1], n[2],
-					n[0], n[1], n[2],
-					dataTypeSize, pcnt, 0 };
+                    (int)n[0], (int)n[1], (int)n[2],
+                    (int)n[0], (int)n[1], (int)n[2],
+                    (int)dataTypeSize, pcnt, 0 };
 
 	lossywave::lossywave lw(args,false);
 
