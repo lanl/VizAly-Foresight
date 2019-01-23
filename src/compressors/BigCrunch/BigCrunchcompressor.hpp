@@ -44,14 +44,33 @@ inline int BigCrunchCompressor::compress(void *input, void *&output, std::string
 		if (n[i] != 0)
 			numel *= n[i];
 
+	// Read in json compression parameters
+	double tol = 1E-3;
+	std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("tolerance");
+	if( got != compressorParameters.end() )
+		if (compressorParameters["tolerance"] != "")
+			tol = strConvert::to_double( compressorParameters["tolerance"] );
+
+	// Convert tol for BigCrunch input
+	int tolErr=0;
+	if(tol < 1)
+	{
+		while(tol < 1)
+		{
+			tolErr -=1;
+			tol*=10;
+		}
+	}
+
 	// Default Params { Error:-3, Tolerance:1, BLOSC_NTHREADS: 1, BLOSCFILTER:SHUFFLE, BLOSC_COMPRESSOR:ZSTD }
-	bigcrunch::setting_t settings = { {bigcrunch::config_t::ERR, -3},
+	bigcrunch::setting_t settings = { {bigcrunch::config_t::ERR, tolErr},
 				 {bigcrunch::config_t::TOLERANCE, 0},
 				 {bigcrunch::config_t::BLOSC_NTHREADS, 1},
 				 {bigcrunch::config_t::BLOSC_COMPRESSOR, bigcrunch::blosc_compressor_t::ZSTD},
 				 {bigcrunch::config_t::BLOSC_CLEVEL, 9},
 				 {bigcrunch::config_t::BLOSC_FILTER, bigcrunch::blosc_filter_t::SHUFFLE}
 	};
+
 	Timer cTime; cTime.start();
 
 	bigcrunch::bigcrunch bc(settings);
@@ -72,7 +91,25 @@ inline int BigCrunchCompressor::compress(void *input, void *&output, std::string
 
 inline int BigCrunchCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
-	bigcrunch::setting_t settings = { {bigcrunch::config_t::ERR, -3},
+	// Read in json compression parameters
+	double tol = 1E-3;
+	std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("tolerance");
+	if( got != compressorParameters.end() )
+		if (compressorParameters["tolerance"] != "")
+			tol = strConvert::to_double( compressorParameters["tolerance"] );
+
+	// Convert tol for BigCrunch input
+	int tolErr=0;
+	if(tol < 1)
+	{
+		while(tol < 1)
+		{
+			tolErr -=1;
+			tol*=10;
+		}
+	}
+
+	bigcrunch::setting_t settings = { {bigcrunch::config_t::ERR, tolErr},
 				 {bigcrunch::config_t::TOLERANCE, 0},
 				 {bigcrunch::config_t::BLOSC_NTHREADS, 1},
 				 {bigcrunch::config_t::BLOSC_COMPRESSOR, bigcrunch::blosc_compressor_t::ZSTD},
