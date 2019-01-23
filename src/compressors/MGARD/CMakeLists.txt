@@ -3,7 +3,7 @@ option(CBENCH_ENABLE_MGARD "Enable MGARD." OFF)
 if (CBENCH_ENABLE_MGARD)
 	set(MY_LIBS "")
 
-    #Asks for LossyWave library
+    #Asks for MGARD library
     find_library(MGARD_LIBRARY ${MGARD_LIBRARY} CACHE STRING "MGARD_LIBRARY library")
 
     if (NOT MGARD_LIBRARY)
@@ -13,7 +13,7 @@ if (CBENCH_ENABLE_MGARD)
     	set(MY_LIBS ${MY_LIBS} ${MGARD_LIBRARY})
 	    set(MY_LIBS ${MY_LIBS} -fopenmp)
        
-	    #Asks for LossyWave include files and includes it in the project
+	    #Asks for MGARD include files and includes it in the project
 	    set (MGARD_INCLUDE_PATH ${MGARD_INCLUDE_PATH} CACHE STRING "MGARD include directory")
 
 	    set_property(GLOBAL APPEND PROPERTY definitions "-DCBENCH_HAS_MGARD")
