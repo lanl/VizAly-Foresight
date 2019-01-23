@@ -13,7 +13,7 @@ if (CBENCH_ENABLE_BIG_CRUNCH)
 	    set(MY_LIBS ${MY_LIBS} -fopenmp)
 	   
 	    #Asks for BigCrunch include files and includes it in the project
-	    set (BIGCRUNCH_INCLUDE_PATH ${BIGCRUNCH_INCLUDE_PATH} CACHE STRING "BIGCRUNCH include directory")
+	    set (BIGCRUNCH_INCLUDE_PATH ${BIGCRUNCH_INCLUDE_PATH} CACHE PATH "BIGCRUNCH include directory")
 
 
 	    set_property(GLOBAL APPEND PROPERTY definitions "-DCBENCH_HAS_BIG_CRUNCH")

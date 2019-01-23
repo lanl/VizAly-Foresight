@@ -12,7 +12,7 @@ if(CBENCH_ENABLE_ZFP)
     	set(MY_LIBS ${MY_LIBS} ${ZFP_LIBRARY})
 
     	#Asks for zfp include files + includes it in the project
-    	set (ZFP_INCLUDE_PATH ${ZFP_INCLUDE_PATH} CACHE STRING "ZFP include directory")
+    	set (ZFP_INCLUDE_PATH ${ZFP_INCLUDE_PATH} CACHE PATH "ZFP include directory")
 
     	set_property(GLOBAL APPEND PROPERTY definitions "-DCBENCH_HAS_ZFP")
     	set_property(GLOBAL APPEND PROPERTY includeDirectories ${ZFP_INCLUDE_PATH})

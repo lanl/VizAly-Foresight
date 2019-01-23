@@ -14,7 +14,7 @@ if (CBENCH_ENABLE_MGARD)
 	    set(MY_LIBS ${MY_LIBS} -fopenmp)
        
 	    #Asks for MGARD include files and includes it in the project
-	    set (MGARD_INCLUDE_PATH ${MGARD_INCLUDE_PATH} CACHE STRING "MGARD include directory")
+	    set (MGARD_INCLUDE_PATH ${MGARD_INCLUDE_PATH} CACHE PATH "MGARD include directory")
 
 	    set_property(GLOBAL APPEND PROPERTY definitions "-DCBENCH_HAS_MGARD")
 	   	set_property(GLOBAL APPEND PROPERTY includeDirectories ${MGARD_INCLUDE_PATH})

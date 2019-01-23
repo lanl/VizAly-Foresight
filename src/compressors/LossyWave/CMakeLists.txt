@@ -14,7 +14,7 @@ if (CBENCH_ENABLE_LOSSY_WAVE)
 	    set(MY_LIBS ${MY_LIBS} -fopenmp)
        
 	    #Asks for LossyWave include files and includes it in the project
-	    set (LOSSYWAVE_INCLUDE_PATH ${LOSSYWAVE_INCLUDE_PATH} CACHE STRING "LOSSYWAVE include directory")
+	    set (LOSSYWAVE_INCLUDE_PATH ${LOSSYWAVE_INCLUDE_PATH} CACHE PATH "LOSSYWAVE include directory")
 
 	    set_property(GLOBAL APPEND PROPERTY definitions "-DCBENCH_HAS_LOSSY_WAVE")
 	   	set_property(GLOBAL APPEND PROPERTY includeDirectories ${LOSSYWAVE_INCLUDE_PATH})
