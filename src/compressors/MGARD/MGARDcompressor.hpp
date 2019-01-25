@@ -45,7 +45,7 @@ inline int MGARDCompressor::compress(void *input, void *&output, std::string dat
 			numel *= n[i];
 
 	// Read in json compression parameters
-	double tol = 1E-3;
+	float tol = 1E-3;
 	std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("tolerance");
 	if( got != compressorParameters.end() )
 		if (compressorParameters["tolerance"] != "")
@@ -66,7 +66,8 @@ inline int MGARDCompressor::compress(void *input, void *&output, std::string dat
 	memcpy (in_buff, input, numel*dataTypeSize);
 
 	//mgard_compress(flag, in_buff, &out_size, nrow, ncol, nfib, &tol)
-    output = mgard_compress(iflag, in_buff, &out_size, n[0], n[1], n[2], &tol );
+    // Note: "tol" must be of same "type" as set iflag
+    output = mgard_compress(iflag, in_buff, out_size, n[0], n[1], n[2], &tol );
 	std::uint64_t csize = out_size;
 	cbytes = csize;
 
@@ -84,13 +85,6 @@ inline int MGARDCompressor::decompress(void *&input, void *&output, std::string 
 	for (int i = 1; i < 5; i++)
 		if (n[i] != 0)
 			numel *= n[i];
-
-	// Read in json compression parameters
-	double tol = 1E-3;
-	std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("tolerance");
-	if( got != compressorParameters.end() )
-		if (compressorParameters["tolerance"] != "")
-			tol = strConvert::to_double( compressorParameters["tolerance"] );
 
 	// Set compression parameters
 	int iflag = 0; //0 -> float, 1 -> double
