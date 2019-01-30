@@ -42,6 +42,14 @@ class CompressorFactory
         else if (compressorName == "MGARD")
           return new MGARDCompressor();
       #endif
+      #ifdef CBENCH_HAS_ISABELA
+        else if (compressorName == "Isabela")
+          return new IsabelaCompressor();
+      #endif
+      #ifdef CBENCH_HAS_FPZIP
+        else if (compressorName == "fpzip")
+            return new FPZIPCompressor();
+      #endif
         else
           return NULL;
     }

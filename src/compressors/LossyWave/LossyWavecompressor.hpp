@@ -50,7 +50,7 @@ inline int LossyWaveCompressor::compress(void *input, void *&output, std::string
         if (compressorParameters["quant"] != "")
 	        quant = strConvert::to_int(compressorParameters["quant"]);
 
-	int pcnt = 50;
+	int pcnt = 30;
     got = compressorParameters.find("pcnt");
     if (got != compressorParameters.end())
         if (compressorParameters["pcnt"] != "")
@@ -92,7 +92,7 @@ inline int LossyWaveCompressor::decompress(void *&input, void *&output, std::str
         if (compressorParameters["quant"] != "")
             quant = strConvert::to_int(compressorParameters["quant"]);
 
-	int pcnt = 50;
+	int pcnt = 30;
     got = compressorParameters.find("pcnt");
     if (got != compressorParameters.end())
         if (compressorParameters["pcnt"] != "")

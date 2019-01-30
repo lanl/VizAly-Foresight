@@ -3,7 +3,7 @@ option(CBENCH_ENABLE_SZ "Enable SZ." ON)
 if (CBENCH_ENABLE_SZ)
 	set(MY_LIBS "")
 
-    #Asks for zfp library + set that in EXTRA_LIBS
+    #Asks for SZ library + set that in EXTRA_LIBS
     find_library(SZ_LIBRARY ${SZ_LIBRARY} CACHE STRING "SZ library")
     if (NOT SZ_LIBRARY)
     	message(FATAL_ERROR "Could NOT find SZ")

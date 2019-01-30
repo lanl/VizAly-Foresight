@@ -35,6 +35,12 @@ cmake ../src \
 	-DZFP_INCLUDE_PATH=$projectPath/ExternalDependencies/zfp/install/include \
 	-DZFP_LIBRARY=$projectPath/ExternalDependencies/zfp/install/lib/libzfp.so \
 	-DCBENCH_ENABLE_NYX_LOADER=ON \
-	-DHDF5_DIR=$projectPath/ExternalDependencies/hdf5/install/share/cmake/hdf5
+	-DHDF5_DIR=$projectPath/ExternalDependencies/hdf5/install/share/cmake/hdf5 \
+	-DCBENCH_ENABLE_FPZIP=ON \
+	-DFPZIP_INCLUDE_PATH=$projectPath/ExternalDependencies/fpzip-1.2.0/inc/ \
+	-DFPZIP_LIBRARY=$projectPath/ExternalDependencies/fpzip-1.2.0/lib/libfpzip.a \
+	-DCBENCH_ENABLE_ISABELA=ON \
+	-DISABELA_INCLUDE_PATH=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/include \
+	-DISABELA_LIBRARY_PATH=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a
 make -j
 
