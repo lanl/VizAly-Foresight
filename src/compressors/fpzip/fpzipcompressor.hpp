@@ -46,11 +46,15 @@ inline void FPZIPCompressor::init()
 
 inline int FPZIPCompressor::compress(void* input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
+    size_t numel = n[0];
+    for (int i = 1; i < 5; i++)
+        if (n[i] != 0)
+            numel *= n[i];
+
 	Timer cTime; 
     cTime.start();
   	//fprintf(stderr, "compressing to %s\n", "memory");
   	//double t = now();
-    size_t numel = n[0];
     output = malloc(1024 + dataTypeSize*numel);
 
   	FPZ* fpz = fpzip_write_to_buffer(output, 1024 + dataTypeSize*numel);
@@ -60,15 +64,20 @@ inline int FPZIPCompressor::compress(void* input, void *&output, std::string dat
   	else
   		fpz->type = FPZIP_TYPE_DOUBLE;
 
-  	fpz->prec = 8;
-  	fpz->nx = numel;
-  	fpz->ny = 1;
-  	fpz->nz = 1;
-  	fpz->nf = 1;
+    fpz->prec = 27; // Number of bits of precision (input param) (of 32 for float)
+    std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("bits");
+    if (got != compressorParameters.end())
+        if (compressorParameters["bits"] != "")
+            fpz->prec = strConvert::to_int(compressorParameters["bits"]);
+
+  	fpz->nx = n[0];
+    fpz->ny = (n[1] != 0 ? n[1] : 1);
+  	fpz->nz = (n[2] != 0 ? n[2] : 1);
+    fpz->nf = (n[3] != 0 ? n[3] : 1);
 
 
   	// perform actual compression
-  	size_t cbytes = fpzip_write(fpz, input);
+  	cbytes = fpzip_write(fpz, input);
   	if (!cbytes) 
   	{
     	fprintf(stderr, "compression failed: %s\n", fpzip_errstr[fpzip_errno]);
@@ -92,12 +101,12 @@ inline int FPZIPCompressor::compress(void* input, void *&output, std::string dat
 
 inline int FPZIPCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
-    Timer dTime; dTime.start();
-
 	size_t numel = n[0];
     for (int i = 1; i < 5; i++)
 		if (n[i] != 0)
             numel *= n[i];
+
+    Timer dTime; dTime.start();
 
 	output = malloc(dataTypeSize*numel);
 
@@ -107,11 +116,15 @@ inline int FPZIPCompressor::decompress(void *&input, void *&output, std::string 
   	else
   		fpz->type = FPZIP_TYPE_DOUBLE;
 
-  	fpz->prec = 8;
-  	fpz->nx = numel;
-  	fpz->ny = 1;
-  	fpz->nz = 1;
-  	fpz->nf = 1;
+  	fpz->prec = 27;
+    std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("bits");
+    if (got != compressorParameters.end())
+        if (compressorParameters["bits"] != "")
+            fpz->prec = strConvert::to_int(compressorParameters["bits"]);
+    fpz->nx = n[0];
+    fpz->ny = (n[1] != 0 ? n[1] : 1);
+    fpz->nz = (n[2] != 0 ? n[2] : 1);
+    fpz->nf = (n[3] != 0 ? n[3] : 1);
 
 
 	if (!fpzip_read(fpz, output)) 

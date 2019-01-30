@@ -10,10 +10,15 @@
 		"scalars-comment" : "which scalars to test",
 		"scalars" : ["x", "y", "z", "vx", "vy", "vz"],
 
-    "parameters": 
-    {
-      "tolerance": 1e-03
-    }
+		"parameters": 
+		{
+			"tolerance-comment": "used by BigCrunch SZ zfp",
+			"tolerance": 1e-03,
+
+			"bits-comment": "used by fpzip",
+			"bits" : 27
+		}
+
 	},
 
 	"output": 

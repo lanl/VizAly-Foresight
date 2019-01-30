@@ -55,8 +55,6 @@ inline int IsabelaCompressor::compress(void *input, void *&output, std::string d
 
 	output = malloc(dataTypeSize * numel);
 
-
-	
 	enum ISABELA_status status;
     struct isabela_stream i_strm;
     struct isabela_config config;
@@ -69,7 +67,7 @@ inline int IsabelaCompressor::compress(void *input, void *&output, std::string d
 
     // Relative error between approximate and original values should be
     // no more than 5%
-    config.error_rate = 1;
+    config.error_rate = 1E-3;
 
     // Size of each element
     config.element_byte_size = dataTypeSize;
@@ -85,7 +83,6 @@ inline int IsabelaCompressor::compress(void *input, void *&output, std::string d
     i_strm.next_in = input;
     i_strm.avail_in = dataTypeSize * numel;
     i_strm.next_out = output;
-
 
     // Perform compression
     status = isabelaDeflate (&i_strm, ISABELA_FINISH);
@@ -106,7 +103,6 @@ inline int IsabelaCompressor::compress(void *input, void *&output, std::string d
 
 	std::uint64_t csize = 0;
 	std::uint8_t *cdata = SZ_compress_args(SZ_FLOAT, static_cast<float *>(input), &csize, PW_REL, 0, 0, tol, n[4], n[3], n[2], n[1], n[0]);
-	
 
   */
 	cTime.stop();
