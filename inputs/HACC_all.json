@@ -12,11 +12,14 @@
 
 		"parameters": 
 		{
-			"tolerance-comment": "used by BigCrunch SZ zfp",
+			"tolerance-comment": "used by BigCrunch SZ zfp Isa",
 			"tolerance": 1e-03,
 
 			"bits-comment": "used by fpzip",
-			"bits" : 27
+			"bits" : 27,
+
+			"pcnt-comment": "used by Isa, LW",
+			"pcnt" : 30
 		}
 
 	},

@@ -59,15 +59,27 @@ inline int IsabelaCompressor::compress(void *input, void *&output, std::string d
     struct isabela_stream i_strm;
     struct isabela_config config;
 
+    double tol = 1E-3;
+    std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("tolerance");
+    if (got != compressorParameters.end())
+        if (compressorParameters["tolerance"] != "")
+            tol = strConvert::to_double(compressorParameters["tolerance"]);
+
+    int pcnt = 30;
+    got = compressorParameters.find("pcnt");
+    if (got != compressorParameters.end())
+        if (compressorParameters["pcnt"] != "")
+            pcnt = strConvert::to_int(compressorParameters["pcnt"]);
+
     // Compress 1024 elements at a time
     config.window_size = 1024;
 
     // Approximate each window with 30 coefficients
-    config.ncoefficients = 30;
+    config.ncoefficients = pcnt;
 
     // Relative error between approximate and original values should be
-    // no more than 5%
-    config.error_rate = 1;
+    // no more than 5%, default = 1;
+    config.error_rate = tol;
 
     // Size of each element
     config.element_byte_size = dataTypeSize;
@@ -93,18 +105,7 @@ inline int IsabelaCompressor::compress(void *input, void *&output, std::string d
     // Cleanup
     status = isabelaDeflateEnd (&i_strm);
     assert (status == ISABELA_SUCCESS);
-  /*
-	SZ_Init(NULL); 
-	double tol = 1E-3;
-	std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("tolerance");
-	if( got != compressorParameters.end() )
-		if (compressorParameters["tolerance"] != "")
-			tol = strConvert::to_double( compressorParameters["tolerance"] );
 
-	std::uint64_t csize = 0;
-	std::uint8_t *cdata = SZ_compress_args(SZ_FLOAT, static_cast<float *>(input), &csize, PW_REL, 0, 0, tol, n[4], n[3], n[2], n[1], n[0]);
-
-  */
 	cTime.stop();
 
 	cbytes = csize;
@@ -124,14 +125,28 @@ inline int IsabelaCompressor::decompress(void *&input, void *&output, std::strin
 
 	Timer dTime; dTime.start();
 
-
 	output = malloc(dataTypeSize * numel);
-
 
 	enum ISABELA_status status;
     struct isabela_stream i_strm;
     struct isabela_config config;
 
+    double tol = 1E-3;
+    std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("tolerance");
+    if (got != compressorParameters.end())
+        if (compressorParameters["tolerance"] != "")
+            tol = strConvert::to_double(compressorParameters["tolerance"]);
+    int pcnt = 30;
+    got = compressorParameters.find("pcnt");
+    if (got != compressorParameters.end())
+        if (compressorParameters["pcnt"] != "")
+            pcnt = strConvert::to_int(compressorParameters["pcnt"]);
+
+    config.window_size = 1024;
+    config.ncoefficients = pcnt;
+    config.error_rate = tol;
+    config.element_byte_size = dataTypeSize;
+    config.transform = ISABELA_BSPLINES;
 
     // Setup compression (deflate) with isabela_config
     status = isabelaInflateInit (&i_strm, dataTypeSize, &config);
@@ -140,21 +155,14 @@ inline int IsabelaCompressor::decompress(void *&input, void *&output, std::strin
     i_strm.avail_in = dataTypeSize * numel;
     i_strm.next_out = output;
 
-
     // Perform Decompression
     status = isabelaInflate (&i_strm, ISABELA_FINISH);
     assert (status == ISABELA_SUCCESS);
 
-
     // Cleanup
     status = isabelaInflateEnd (&i_strm);
     assert (status == ISABELA_SUCCESS);
-
-/*
-	output = SZ_decompress(SZ_FLOAT, static_cast<std::uint8_t *>(input), cbytes, n[4], n[3], n[2], n[1], n[0]);
-	dTime.stop(); 
-*/
-
+    
 	std::free(input);	input=NULL;
 
 	log << compressorName << " ~ DecompressTime: " << dTime.getDuration() << " s " << std::endl;
