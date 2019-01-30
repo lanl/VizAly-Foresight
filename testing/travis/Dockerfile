@@ -3,7 +3,7 @@ FROM centos:7
 
 # install packages
 RUN yum install -y epel-release && \
-    yum install -y doxygen git hdf5-devel help2man make perl-CPAN \
+    yum install -y doxygen git gsl-devel hdf5-devel help2man make perl-CPAN \
                    perl-Thread-Queue perl-devel selinux-policy sudo wget
 
 ## install gcc
