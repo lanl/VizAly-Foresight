@@ -67,7 +67,7 @@ inline int IsabelaCompressor::compress(void *input, void *&output, std::string d
 
     // Relative error between approximate and original values should be
     // no more than 5%
-    config.error_rate = 1E-3;
+    config.error_rate = 1;
 
     // Size of each element
     config.element_byte_size = dataTypeSize;

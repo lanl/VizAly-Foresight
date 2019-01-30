@@ -33,7 +33,7 @@
 	},
 
 	"compressor-comment" : "which compressors to test",
-	"compressors" : ["blosc", "BigCrunch", "SZ", "zfp", "Isabela", "fpzip"],
+	"compressors" : ["blosc", "BigCrunch", "SZ", "zfp", "fpzip", "Isabela"],
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [
