@@ -1,0 +1,48 @@
+{
+	"input" :
+	{
+		"filetype-comment" : "type of file to load; HACC or NYX",
+		"filetype" : "HACC",
+
+		"filename-comment": "name of input file",
+		"filename": "/mnt/c/Data/m000.full.mpicosmo.400.gio",
+
+		"scalars-comment" : "which scalars to test",
+		"scalars" : ["x", "y", "z", "vx", "vy", "vz"],
+
+		"parameters": 
+		{
+			"tolerance-comment": "used by BigCrunch SZ zfp Isa",
+			"tolerance": 1e-03,
+
+			"bits-comment": "used by fpzip",
+			"bits" : 27,
+
+			"pcnt-comment": "used by Isa, LW",
+			"pcnt" : 30
+		}
+
+	},
+
+	"output": 
+	{
+		"output-decompressed" : false,
+
+		"logfname-comment": "name of output log file",
+		"logfname": "runlog_HACC_all_",
+
+		"metricsfname-comment": "name of file with output",
+		"metricsfname": "metrics_HACC_all_"
+	},
+
+	"compressor-comment" : "which compressors to test",
+	"compressors" : ["Isabela"],
+
+	"metrics-comment" : "which metrics to use",
+	"metrics": [
+		"absolute_error",
+		"relative_error",
+		"mse",
+		"psnr"
+	]
+}
