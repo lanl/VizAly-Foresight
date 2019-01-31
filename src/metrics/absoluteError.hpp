@@ -62,11 +62,13 @@ inline T absError(T original, T approx)
 inline void absoluteError::execute(void *original, void *approx, size_t n) {
 	std::vector<double> abs_err(n);
 
+    double sum_abs_err = 0;
 	for (std::size_t i = 0; i < n; ++i)
 	{
 		// Max set tolerence to 1
 		double err = absError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i]);
 		abs_err.push_back(err);
+        sum_abs_err += err;
 	}
 	double max_abs_err = *std::max_element(abs_err.begin(), abs_err.end());
 	val = max_abs_err;
@@ -75,7 +77,21 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
 	MPI_Allreduce(&max_abs_err, &total_max_abs_err, 1, MPI_DOUBLE, MPI_MAX, comm);// MPI_COMM_WORLD);
 	total_val = total_max_abs_err;
 
-	log << " Max Abs Error: " << total_max_abs_err << std::endl;
+	log << "-Max Abs Error: " << total_max_abs_err << std::endl;
+
+    // Additional debug metrics, only in run_log
+    // Global total sum of error
+    double glob_sum_abs_err = 0;
+    MPI_Allreduce(&sum_abs_err, &glob_sum_abs_err, 1, MPI_DOUBLE, MPI_SUM, comm);
+
+    // Global number of values
+    size_t global_n = 0;
+    MPI_Allreduce(&n, &global_n, 1, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
+
+    // Compute mean
+    double mean_abs_err = glob_sum_abs_err / global_n;
+    log << " Total Abs Error: " << glob_sum_abs_err << std::endl;
+    log << " Mean Abs Error: " << mean_abs_err << std::endl;
 
 	MPI_Barrier(comm);
 	return;

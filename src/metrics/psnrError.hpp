@@ -93,17 +93,17 @@ inline void psnrError::execute(void *original, void *approx, size_t n) {
 	MPI_Allreduce(&local_mse, &global_mse, 1, MPI_DOUBLE, MPI_SUM, comm);
 
 	// Global number of values
-	double global_n = 0;
-	MPI_Allreduce(&n, &global_n, 1, MPI_DOUBLE, MPI_SUM, comm);
+	size_t global_n = 0;
+	MPI_Allreduce(&n, &global_n, 1, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
 
 	global_mse /= global_n;
 	double global_psnr = 10 * log10(pow(global_max, 2.0) / (global_mse));
 
 	total_val = global_psnr;
-
+    
 	log << " local_psnr: " << local_psnr << std::endl;
 	// Currently only report Global PSNR
-	log << " psnr: " << global_psnr << std::endl;
+	log << "-psnr: " << global_psnr << std::endl;
 
 	MPI_Barrier(comm);
 	return;

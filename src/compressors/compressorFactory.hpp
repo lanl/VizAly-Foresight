@@ -6,6 +6,7 @@ All rights reserved.
 
 Authors:
  - Pascal Grosset
+ - Jesus Pulido
 ================================================================================*/
 
 #ifndef _COMPRESSOR_FACTORY_H_
@@ -26,17 +27,29 @@ class CompressorFactory
           return new BigCrunchCompressor();
       #endif
       #ifdef CBENCH_HAS_ZFP
-	      else if (compressorName == "zfp")
-		      return new ZFPCompressor();
+        else if (compressorName == "zfp")
+         return new ZFPCompressor();
       #endif
       #ifdef CBENCH_HAS_SZ
         else if (compressorName == "SZ")
           return new SZCompressor();
       #endif
-	  #ifdef CBENCH_HAS_LOSSY_WAVE
-		else if (compressorName == "LossyWave")
-				return new LossyWaveCompressor();
-	  #endif
+      #ifdef CBENCH_HAS_LOSSY_WAVE
+        else if (compressorName == "LossyWave")
+          return new LossyWaveCompressor();
+      #endif
+      #ifdef CBENCH_HAS_MGARD
+        else if (compressorName == "MGARD")
+          return new MGARDCompressor();
+      #endif
+      #ifdef CBENCH_HAS_ISABELA
+        else if (compressorName == "Isabela")
+          return new IsabelaCompressor();
+      #endif
+      #ifdef CBENCH_HAS_FPZIP
+        else if (compressorName == "fpzip")
+            return new FPZIPCompressor();
+      #endif
         else
           return NULL;
     }

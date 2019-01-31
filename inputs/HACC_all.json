@@ -10,23 +10,33 @@
 		"scalars-comment" : "which scalars to test",
 		"scalars" : ["x", "y", "z", "vx", "vy", "vz"],
 
-		"parameters" :
+		"parameters": 
 		{
-			"tolerance" : 1e-03
+			"tolerance-comment": "used by BigCrunch SZ zfp Isa",
+			"tolerance": 1e-03,
+
+			"bits-comment": "used by fpzip",
+			"bits" : 27,
+
+			"pcnt-comment": "used by Isa, LW",
+			"pcnt" : 30
 		}
+
 	},
 
-	"output" :
+	"output": 
 	{
+		"output-decompressed" : false,
+
 		"logfname-comment": "name of output log file",
-		"logfname" : "runlog_HACC_all_",
+		"logfname": "runlog_HACC_all_",
 
 		"metricsfname-comment": "name of file with output",
-		"metricsfname" : "metrics_HACC_all_"
+		"metricsfname": "metrics_HACC_all_"
 	},
 
 	"compressor-comment" : "which compressors to test",
-	"compressors" : ["blosc", "BigCrunch", "SZ", "zfp"],
+	"compressors" : ["blosc", "BigCrunch", "SZ", "zfp", "fpzip", "Isabela"],
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [

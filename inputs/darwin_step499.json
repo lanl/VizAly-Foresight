@@ -18,6 +18,8 @@
 
 	"output" :
 	{
+		"output-decompressed" : true,
+
 		"logfname-comment": "name of output log file",
 		"logfname" : "runlog_HACC_mpicosmo.499_all_",
 

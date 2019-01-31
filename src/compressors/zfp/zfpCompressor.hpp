@@ -71,11 +71,15 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
 		if (n[i] != 0)
 			numel *= n[i];
 
+    // Read in json compression parameters
+    double tolerance = 1E-3;
+    std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("tolerance");
+    if( got != compressorParameters.end() )
+        if (compressorParameters["tolerance"] != "")
+            tolerance = strConvert::to_double( compressorParameters["tolerance"] );
+
     Timer cTime; 
     cTime.start();
-
-    double tolerance = 1E-3;
-	tolerance = strConvert::to_double( compressorParameters["tolerance"] );
 
 	zfp_type type = getZfpType( dataType );
 
@@ -130,10 +134,16 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
 		if (n[i] != 0)
 			numel *= n[i];
 
+    // Read in json compression parameters
+	double tolerance = 1E-3;
+    std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("tolerance");
+    if( got != compressorParameters.end() )
+        if (compressorParameters["tolerance"] != "")
+            tolerance = strConvert::to_double( compressorParameters["tolerance"] );
+
     Timer dTime; 
     dTime.start();
-
-	double tolerance = strConvert::to_double( compressorParameters["tolerance"] );
+    
     zfp_type type = getZfpType( dataType );
 
     // allocate meta data for the 1D input array of decompressed data

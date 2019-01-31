@@ -16,21 +16,19 @@
 		}
 	},
 
-	"output" :
-	{
-		"output-file" : true,
-        
-		"logfname-comment": "name of output log file",
-		"logfname" : "runlog_write_blosc",
-    
-		"metricsfname-comment": "name of file with output",
-		"metricsfname" : "runlog_write_blosc"
-	},
+  "output": 
+  {
+    "output-decompressed": true,
+
+    "logfname-comment": "name of output log file",
+    "logfname": "runlog_write_BigCrunch",
+
+    "metricsfname-comment": "name of file with output",
+    "metricsfname": "runlog_write_BigCrunchc"
+  },
 
 	"compressor-comment" : "which compressors to test",
-  	"compressors": [ "blosc" ],
-
-  
+  	"compressors": [ "BigCrunch" ],
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [

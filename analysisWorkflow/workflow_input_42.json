@@ -1,0 +1,83 @@
+{
+	"input-files" : 
+	[
+		{
+			"name" : "/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP42/m000.full.mpicosmo",
+			"alias" : "original"
+		},
+
+		{
+			"name" : "/projects/exasky/jesus-projects/VizAly-CBench/build/__BLOSC__m000.full.mpicosmo",
+			"alias" : "BLOSC"
+		},
+
+		{
+			"name" : "/projects/exasky/jesus-projects/VizAly-CBench/build/__BigCrunch__m000.full.mpicosmo",
+			"alias" : "BigCrunch"
+		},
+
+		{
+			"name" : "/projects/exasky/jesus-projects/VizAly-CBench/build/__SZ__m000.full.mpicosmo",
+			"alias" : "SZ"
+		},
+		{
+			"name" : "/projects/exasky/jesus-projects/VizAly-CBench/build/__zfp__m000.full.mpicosmo",
+			"alias" : "zfp"
+		}
+	],
+
+
+	"input-files-alias" : [
+		"original",
+		"BLOSC",
+		"BigCrunch",
+		"SZ",
+		"zfp"
+	],
+
+
+	"halo-finder-setup" : {
+		"timesteps" : "/projects/exasky/data/study/inputs/timesteps.dat",
+		"config" : "/projects/exasky/data/study/inputs/cosmotools-config.dat",
+		"params" : "/projects/exasky/data/study/inputs/indat.params"
+	},
+
+
+	"job-running-params" : {
+		"path-to-environment-setup" : "/projects/exasky/HACC.darwin_setup",
+		"running-path" : "/projects/exasky/data/study/",
+		"path-hacc-exe" : "/projects/exasky/HACC/trunk/Darwin/mpi/bin/cosmotools-driver",
+		"num-nodes" : 16,
+		"num-ranks-per-nodes" : 16,
+		"partition" : "scaling"
+	},
+
+
+	"analysis" :
+	[
+		{
+			"halo-files" : [
+				"m001-42.fofproperties", 
+				"__BLOSC__m001-42.fofproperties",
+				"__BigCrunch__m001-42.fofproperties", 
+				"__SZ__m001-42.fofproperties",
+				"__zfp__m001-42.fofproperties"
+			],
+
+			"queries" : [
+				"select count(*) from __TABLE__", 
+				"select fof_halo_tag, fof_halo_mass from __TABLE__ ORDER BY fof_halo_mass DESC LIMIT 10",
+				"select fof_halo_center_x, fof_halo_center_y, fof_halo_center_z, fof_halo_mass from __TABLE__ ORDER BY fof_halo_mass DESC LIMIT 10",
+				"select fof_halo_tag, fof_halo_count from __TABLE__ ORDER BY fof_halo_count DESC LIMIT 10",
+				"select fof_halo_center_x, fof_halo_center_y, fof_halo_center_z, fof_halo_count from __TABLE__ ORDER BY fof_halo_count DESC LIMIT 10"
+			]
+		}
+	],
+
+	"analysis-prams" : {
+		"halo-output-path" : "/projects/exasky/data/study/output/Halos/b0168/",
+		"sqlite-path" : "/projects/exasky/VizAly_genericio/genericio/frontend/GenericIOSQLite.so"
+	}
+
+}
+ 

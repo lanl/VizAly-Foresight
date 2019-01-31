@@ -1,0 +1,19 @@
+{
+	"inputFileName-comment" : "csv filenames for files with same inputs, multiple time steps",
+	"inputFileName" : [ "metrics_HACC_mpicosmo.42_all_.csv" , "metrics_HACC_mpicosmo.155_all_.csv" ] ,
+
+	"scalars" : [ "x" , "y", "z" ],
+	
+	"plot-title" : "metrics overview",
+
+	"plot-type-comment" : "options are scatter or barchart",
+    "plot-type" : "barchart",
+
+    "metrics-comment" : "y axis",
+    "metrics" : "Compression Ratio",
+
+    "live-display-comment" : "display popup window with graph",
+    "live-display" : true,
+   
+    "outputFileName" : "temporal_pos_CRatio.png"
+}

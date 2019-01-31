@@ -3,7 +3,7 @@ option(CBENCH_ENABLE_SZ "Enable SZ." ON)
 if (CBENCH_ENABLE_SZ)
 	set(MY_LIBS "")
 
-    #Asks for zfp library + set that in EXTRA_LIBS
+    #Asks for SZ library + set that in EXTRA_LIBS
     find_library(SZ_LIBRARY ${SZ_LIBRARY} CACHE STRING "SZ library")
     if (NOT SZ_LIBRARY)
     	message(FATAL_ERROR "Could NOT find SZ")
@@ -18,7 +18,7 @@ if (CBENCH_ENABLE_SZ)
     	set(MY_LIBS ${MY_LIBS} ${ZSTD_LIBRARY})
 
     	#Asks for zfp include files + includes it in the project
-    	set (SZ_INCLUDE_PATH ${SZ_INCLUDE_PATH} CACHE STRING "SZ include directory")
+    	set (SZ_INCLUDE_PATH ${SZ_INCLUDE_PATH} CACHE PATH "SZ include directory")
 
     	set_property(GLOBAL APPEND PROPERTY definitions "-DCBENCH_HAS_SZ")
     	set_property(GLOBAL APPEND PROPERTY includeDirectories ${SZ_INCLUDE_PATH})

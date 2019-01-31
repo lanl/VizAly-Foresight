@@ -27,7 +27,6 @@ class HACCDataLoader: public DataLoaderInterface
 	int myRank;
 
 	// For output
-	std::vector<GioData> inOutData;
 	double physOrigin[3];
 	double physScale[3];
 	int mpiCartPartitions[3];
@@ -207,9 +206,7 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	readInData.setNumElements(maxNumElementsPerRank);
 	readInData.allocateMem(1);
 
-
-	// WHY ???????
-	sizePerDim[0] = numElements;
+	sizePerDim[0] = numElements;	// For compression
 
 
 	log << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
@@ -322,146 +319,9 @@ inline int HACCDataLoader::loadData(std::string paramName)
 
 
 
-inline int HACCDataLoader::loadData(std::string paramName, void *& _data)
-{
-	Timer clock;
-	log.str("");
-
-	clock.start();
-	gio::GenericIO *gioReader;
-
-	// Init GenericIO reader + open file
-
-	gioReader = new gio::GenericIO(comm, filename);
-
-
-	// Open file
-	gioReader->openAndReadHeader(gio::GenericIO::MismatchRedistribute);
-	int numDataRanks = gioReader->readNRanks();
-
-	if (numRanks > numDataRanks)
-	{
-		std::cerr << "Num data ranks: " << numDataRanks << "Use <= MPI ranks than data ranks" << std::endl;
-		return -1;
-	}
-
-
-	// Read in the scalars information
-	std::vector<gio::GenericIO::VariableInfo> VI;
-	gioReader->getVariableInfo(VI);
-	int numVars = static_cast<int>(VI.size());
-
-
-	bool paramToLoad = false;
-	GioData readInData;
-	for (int i = 0; i < numVars; i++)
-		if (VI[i].Name == paramName)
-		{
-			paramToLoad = true;
-			readInData.init(i, VI[i].Name, static_cast<int>(VI[i].Size), VI[i].IsFloat, VI[i].IsSigned, VI[i].IsPhysCoordX, VI[i].IsPhysCoordY, VI[i].IsPhysCoordZ);
-			readInData.determineDataType();
-		
-			dataType = readInData.dataType;
-			elemSize = readInData.size;
-
-			break;
-		}
-
-
-	//
-	// Split ranks among data
-	int numDataRanksPerMPIRank = numDataRanks / numRanks;
-	int loadRange[2];
-	loadRange[0] = myRank * numDataRanksPerMPIRank;
-	loadRange[1] = (myRank + 1) * numDataRanksPerMPIRank;
-	if (myRank == numRanks - 1)
-		loadRange[1] = numDataRanks;
-
-
-	//
-	// Determine memory size and allocate memory
-	size_t maxNumElementsPerRank = 0;
-	size_t numElements = 0;
-	for (int i = loadRange[0]; i < loadRange[1]; i++)
-	{
-		numElements += gioReader->readNumElems(i);
-		maxNumElementsPerRank = std::max(maxNumElementsPerRank, numElements);
-	}
-
-
-	allocateMem(readInData.dataType, numElements, 0, _data);
-
-	readInData.setNumElements(maxNumElementsPerRank);
-	readInData.allocateMem(1);
-
-
-
-	size_t offset = 0;
-	for (int i = loadRange[0]; i < loadRange[1]; i++) // for each rank
-	{
-		size_t Np = gioReader->readNumElems(i);
-
-
-		if (readInData.dataType == "float")
-			gioReader->addVariable( (readInData.name).c_str(), (float*)readInData.data, true);
-		else if (readInData.dataType == "double")
-			gioReader->addVariable( (readInData.name).c_str(), (double*)readInData.data, true);
-		else if (readInData.dataType == "int8_t")
-			gioReader->addVariable((readInData.name).c_str(), (int8_t*)readInData.data, true);
-		else if (readInData.dataType == "int16_t")
-			gioReader->addVariable((readInData.name).c_str(), (int16_t*)readInData.data, true);
-		else if (readInData.dataType == "int32_t")
-			gioReader->addVariable((readInData.name).c_str(), (int32_t*)readInData.data, true);
-		else if (readInData.dataType == "int64_t")
-			gioReader->addVariable((readInData.name).c_str(), (int64_t*)readInData.data, true);
-		else if (readInData.dataType == "uint8_t")
-			gioReader->addVariable((readInData.name).c_str(), (uint8_t*)readInData.data, true);
-		else if (readInData.dataType == "uint16_t")
-			gioReader->addVariable((readInData.name).c_str(), (uint16_t*)readInData.data, true);
-		else if (readInData.dataType == "uint32_t")
-			gioReader->addVariable((readInData.name).c_str(), (uint32_t*)readInData.data, true);
-		else if (readInData.dataType == "uint64_t")
-			gioReader->addVariable((readInData.name).c_str(), (uint64_t*)readInData.data, true);
-	
-		gioReader->readDataSection(0, Np, i, false); // reading the whole file
-
-		
-
-		if (readInData.dataType == "float")
-			memcpy( &((float*)_data)[offset],  readInData.data, Np*readInData.size);
-		else if (readInData.dataType == "double")
-			memcpy( &((double*)_data)[offset],  readInData.data, Np*readInData.size);
-		else if (readInData.dataType == "int8_t")
-			memcpy( &((int8_t*)_data)[offset],  readInData.data, Np*readInData.size);
-		else if (readInData.dataType == "int16_t")
-			memcpy( &((int16_t*)_data)[offset],  readInData.data, Np*readInData.size);
-		else if (readInData.dataType == "int32_t")
-			memcpy( &((int32_t*)_data)[offset],  readInData.data, Np*readInData.size);
-		else if (readInData.dataType == "int64_t")
-			memcpy( &((int64_t*)_data)[offset],  readInData.data, Np*readInData.size);
-		else if (readInData.dataType == "uint8_t")
-			memcpy( &((uint8_t*)_data)[offset],  readInData.data, Np*readInData.size);
-		else if (readInData.dataType == "uint16_t")
-			memcpy( &((uint16_t*)_data)[offset],  readInData.data, Np*readInData.size);
-		else if (readInData.dataType == "uint32_t")
-			memcpy( &((uint32_t*)_data)[offset],  readInData.data, Np*readInData.size);
-		else if (readInData.dataType == "uint64_t")
-			memcpy( &((uint64_t*)_data)[offset],  readInData.data, Np*readInData.size);
-		
-		
-		offset = offset + Np;
-	}
-	clock.stop();
-
-
-	readInData.deAllocateMem();
-
-	return 1; // All good
-}
-
-
 inline int HACCDataLoader::saveCompData(std::string paramName, void * cData)
 {
+
 	for (int i=0; i<inOutData.size(); i++)
 	{
 		if (inOutData[i].name == paramName)
@@ -471,6 +331,10 @@ inline int HACCDataLoader::saveCompData(std::string paramName, void * cData)
 			memcpy(inOutData[i].data, cData, inOutData[i].size*numElements);
 
 			inOutData[i].doWrite = true;
+
+			log.str("");
+			log << "\nHACCDataLoader::saveCompData" << std::endl;
+			log << paramName << " found. It has " << inOutData[i].numElements << " elements of size " << inOutData[i].size << std::endl;
 		}
 	}
 
@@ -482,7 +346,7 @@ inline int HACCDataLoader::writeData(std::string _filename)
 {
 	Timer clock;
 	log.str("");
-
+	
 	gio::GenericIO *gioWriter;
 
 	// Create setup
@@ -491,9 +355,7 @@ inline int HACCDataLoader::writeData(std::string _filename)
 
 
 	// Init GenericIO writer + open file
-	gioWriter = new gio::GenericIO(comm, _filename);// , gio::GenericIO::FileIOMPI);
-
-
+	gioWriter = new gio::GenericIO(comm, _filename);
 	gioWriter->setNumElems(numElements);
 
 
@@ -508,11 +370,6 @@ inline int HACCDataLoader::writeData(std::string _filename)
 	// Populate parameters
 	for (int i=0; i<inOutData.size(); i++)
 	{
-		// If data that has not gone through compression, load it now
-		if (!inOutData[i].doWrite)
-			loadData(inOutData[i].name, inOutData[i].data);
-
-
 		unsigned flag = gio::GenericIO::VarHasExtraSpace;
 		if (inOutData[i].xVar)
 			flag |= gio::GenericIO::VarIsPhysCoordX;
@@ -547,7 +404,7 @@ inline int HACCDataLoader::writeData(std::string _filename)
 	}
 
 	gioWriter->write();
-	log << "HACCDataLoader::writeData " << _filename << "  gioWriter->write() " << std::endl;
+	log << "HACCDataLoader::writeData " << _filename << std::endl;
 
 	MPI_Barrier(comm);
 

@@ -44,19 +44,26 @@ inline int LossyWaveCompressor::compress(void *input, void *&output, std::string
 		if (n[i] != 0)
 			numel *= n[i];
 
-	int quant = 0;
-	quant = strConvert::to_int(compressorParameters["quant"]);
-	int pcnt = 50;
-	pcnt = strConvert::to_int(compressorParameters["pcnt"]);
+    int quant = 0;
+    std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("quant");
+    if( got != compressorParameters.end() )
+        if (compressorParameters["quant"] != "")
+	        quant = strConvert::to_int(compressorParameters["quant"]);
+
+	int pcnt = 30;
+    got = compressorParameters.find("pcnt");
+    if (got != compressorParameters.end())
+        if (compressorParameters["pcnt"] != "")
+            pcnt = strConvert::to_int(compressorParameters["pcnt"]);
 
 	// Set compression parameters
 	int args[13] = { 404, 0, 128+quant, 0,
-					n[0], n[1], n[2],
-					n[0], n[1], n[2],
-					dataTypeSize, pcnt, 0 };
+                    (int)n[0], (int)n[1], (int)n[2],
+                    (int)n[0], (int)n[1], (int)n[2],
+                    (int)dataTypeSize, pcnt, 0 };
 
-	lossywave::lossywave lw(args);
-	
+	lossywave::lossywave lw(args,false);
+
 	Timer cTime; cTime.start();
 
 	output = std::malloc(numel*dataTypeSize);
@@ -80,17 +87,24 @@ inline int LossyWaveCompressor::decompress(void *&input, void *&output, std::str
 			numel *= n[i];
 
 	int quant = 0;
-	quant = strConvert::to_int(compressorParameters["quant"]);
-	int pcnt = 50;
-	pcnt = strConvert::to_int(compressorParameters["pcnt"]);
+    std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("quant");
+    if (got != compressorParameters.end())
+        if (compressorParameters["quant"] != "")
+            quant = strConvert::to_int(compressorParameters["quant"]);
+
+	int pcnt = 30;
+    got = compressorParameters.find("pcnt");
+    if (got != compressorParameters.end())
+        if (compressorParameters["pcnt"] != "")
+            pcnt = strConvert::to_int(compressorParameters["pcnt"]);
 
 	// Set compression parameters
 	int args[13] = { 404, 0, 128+quant, 0,
-					n[0], n[1], n[2],
-					n[0], n[1], n[2],
-					dataTypeSize, pcnt, 0 };
+                    (int)n[0], (int)n[1], (int)n[2],
+                    (int)n[0], (int)n[1], (int)n[2],
+                    (int)dataTypeSize, pcnt, 0 };
 
-	lossywave::lossywave lw(args);
+	lossywave::lossywave lw(args,false);
 
 	Timer dTime; dTime.start();
 	output = std::malloc(numel*dataTypeSize);

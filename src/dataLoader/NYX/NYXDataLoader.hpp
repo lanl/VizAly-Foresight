@@ -32,7 +32,7 @@ class NYXDataLoader: public DataLoaderInterface
 	int loadData(std::string paramName);
 	int saveCompData(std::string paramName, void * cData);
 	int writeData(std::string _filename);
-	int saveInputFileParameters(){ };
+	int saveInputFileParameters();
 	int close() { return deAllocateMem(); }
 };
 
@@ -61,7 +61,12 @@ inline void NYXDataLoader::init(std::string _filename, MPI_Comm _comm)
 	MPI_Comm_rank(comm, &myRank);
 }
 
+inline int NYXDataLoader::saveInputFileParameters()
+{
+    // 
 
+    return 1;
+}
 
 inline int NYXDataLoader::allocateMem(std::string dataType, size_t numElements, int offset)
 {
@@ -191,9 +196,9 @@ inline int NYXDataLoader::loadData(std::string paramName)
 		dataspace.getSimpleExtentDims(tdims);
 		//std::cout << "Data dimensions: " << dims[0] << " " << dims[1] << " " << dims[2] << "\n";
 		numElements = tdims[0] * tdims[1] * tdims[2];
-		dims[0] = tdims[0];
-		dims[1] = tdims[1];
-		dims[2] = tdims[2];
+        sizePerDim[0] = tdims[0];
+        sizePerDim[1] = tdims[1];
+        sizePerDim[2] = tdims[2];
 			
 		totalNumberOfElements = numElements; // Temporary 
 
