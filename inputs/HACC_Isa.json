@@ -29,10 +29,10 @@
 		"output-decompressed" : false,
 
 		"logfname-comment": "name of output log file",
-		"logfname": "runlog_HACC_all_",
+		"logfname": "runlog_HACC_isa_",
 
 		"metricsfname-comment": "name of file with output",
-		"metricsfname": "metrics_HACC_all_"
+		"metricsfname": "metrics_HACC_isa_"
 	},
 
 	"compressor-comment" : "which compressors to test",
