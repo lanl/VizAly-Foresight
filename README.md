@@ -65,12 +65,16 @@ CBench takes as input a json file (examples of input json files are in the **_[i
 * [Lossy LossyWave](https://github.com/lanl/VizAly-LossyWave) - version 0.1
 * [SZ](https://collab.cels.anl.gov/display/ESR/SZ) - version 2.0.2.2
 * [zfp](https://computation.llnl.gov/projects/floating-point-compression) - version 0.5.3
+* [fpzip](https://computation.llnl.gov/projects/floating-point-compression) - version 1.2.0
+* [ISABELA](http://freescience.org/cs/ISABELA/ISABELA.html) - version 0.2.1
 
 ### Currently Supported metrics:
 * Absolute Error
 * Relative Error
 * Mean Square Error (MSE)
 * Peak Signal-to-Noise Ratio (PSNR)
+* Memory Usage
+* Compute times
 
 # Development
 For information on how to add new compressors and/or metrics, look at the [readme in src/compressors](src/compressors/readme.md) and [src/metrics](src/metrics) respectively.
