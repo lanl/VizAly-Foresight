@@ -53,6 +53,8 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
 		if (compressorParameters["tolerance"] != "")
 			tol = strConvert::to_double( compressorParameters["tolerance"] );
 
+
+
 	std::uint64_t csize = 0;
 	std::uint8_t *cdata = SZ_compress_args(SZ_FLOAT, static_cast<float *>(input), &csize, PW_REL, 0, 0, tol, n[4], n[3], n[2], n[1], n[0]);
 	
