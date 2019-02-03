@@ -39,11 +39,13 @@ inline absoluteError::absoluteError()
 	myRank = 0;
 	numRanks = 0;
 	metricName = "absolute_error";
+	numBins = 512;
+	histogramComputed = false;
 }
 
 inline absoluteError::~absoluteError()
 {
-
+	histogramComputed = false;
 }
 
 inline void absoluteError::init(MPI_Comm _comm)
@@ -94,6 +96,49 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
     log << " Mean Abs Error: " << mean_abs_err << std::endl;
 
 	MPI_Barrier(comm);
+
+
+
+	// Compute histogram of values
+	if (total_max_abs_err != 0)
+	{
+		std::vector<int> localHistogram(numBins,0);
+		double binSize = total_max_abs_err / (numBins-1);
+
+		// std::cout << "total_max_abs_err: " << total_max_abs_err << std::endl;
+		// std::cout << "binSize: " << binSize << std::endl;
+		// std::cout << "numBins: " << numBins << std::endl;
+
+
+		for (std::size_t i = 0; i < n; ++i)
+		{
+			// Max set tolerence to 1
+			double err = absError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i]);
+
+			int binPos = err/binSize;
+
+			if (binPos > numBins)
+				std::cout << "Error; binPos " <<  binPos << std::endl;
+			else
+			{
+				localHistogram[binPos]++;
+				//std::cout << "err: " << err << ", binPos: " << binPos << std::endl;
+
+			}
+		}
+
+		histogram.resize(numBins);
+
+		std::vector<int> globalHistogram(numBins,0);
+		MPI_Allreduce(&localHistogram[0], &globalHistogram[0], numBins, MPI_INT, MPI_SUM, comm);
+
+
+		for (std::size_t i=0; i<numBins; ++i)
+			histogram[i] = ((float)globalHistogram[i])/global_n;
+		histogramComputed = true;
+	}
+	
+
 	return;
 }
 

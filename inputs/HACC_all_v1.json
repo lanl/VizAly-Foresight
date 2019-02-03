@@ -41,9 +41,6 @@
 	"compressor-comment" : "which compressors to test and parameters for that compressor",
 	"compressors" : 
 	[
-		{
-			"name" : "blosc"
-		},
 
 		{
 			"name" : "BigCrunch",
