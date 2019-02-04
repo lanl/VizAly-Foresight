@@ -33,7 +33,7 @@ cmake ../src \
 	-DMGARD_LIBRARY=$projectPath/ExternalDependencies/MGARD/install/lib/libmgard.so \
 	-DCBENCH_ENABLE_ZFP=ON \
 	-DZFP_INCLUDE_PATH=$projectPath/ExternalDependencies/zfp/install/include \
-	-DZFP_LIBRARY=$projectPath/ExternalDependencies/zfp/install/lib/libzfp.so \
+	-DZFP_LIBRARY=$projectPath/ExternalDependencies/zfp/install/lib64/libzfp.so \
 	-DCBENCH_ENABLE_NYX_LOADER=ON \
 	-DHDF5_DIR=$projectPath/ExternalDependencies/hdf5/install/share/cmake/hdf5 \
 	-DCBENCH_ENABLE_FPZIP=ON \

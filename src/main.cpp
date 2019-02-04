@@ -380,7 +380,7 @@ int main(int argc, char *argv[])
 				if (metrics[m] == "absolute_error")
 				{
 					if (metricsMgr->hasHistogram())
-						writeFile( compressors[c].name + "_" + params[i] + "_" + metrics[m] + "_hist.csv", metricsMgr->getHistogramCSV());
+						writeFile( extractFileName(inputFile) + "_" + compressors[c].name + "_" + params[i] + "_" + metrics[m] + "_" + compressors[c].getParamsInfo() + "_hist.csv", metricsMgr->getHistogramCSV());
 				}
 				metricsMgr->close();
 			}
