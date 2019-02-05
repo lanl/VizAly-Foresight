@@ -5,6 +5,9 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 
+def splitIntoParts(number, parts):
+    return np.linspace(0, number, parts+1)[1:]
+
 # Read a csv file
 def readCSV(inputFileName):
 	rows = []
@@ -23,23 +26,22 @@ def readCSV(inputFileName):
 	return myList
 
 
-def plotHistogram(val, plotName, oufputFileName):
-	x = range( len(val) )
+def plotHistogram(y, plotName, maxVal, liveDisplay):
+	# Create the x values
+	numVals = len(y)
+	x = splitIntoParts(maxVal, numVals)
 
-	plt.bar(x, val, width = 1.0, align='edge')
+	# What to draw
+	plt.plot(x,y)
 
 	plt.title(plotName)
-	plt.xlabel("Absolute Error")
 	plt.ylabel("Frequency")
-	plt.xlim(0, len(val))
 
-	#plt.xticks([])
+	# Display
+	plt.savefig(plotName)
 
-	liveDisplay = True
 	if (liveDisplay):
 		plt.show()
-
-	plt.savefig(oufputFileName)
 
 
 def main(argv):
@@ -52,8 +54,11 @@ def main(argv):
 	rows = readCSV(sys.argv[1])
 
 	# draw
-	plotHistogram(rows, sys.argv[2], sys.argv[3])
+	plotHistogram(rows, sys.argv[2], float(sys.argv[3]), True)
 
 
 if __name__ == "__main__":
     main(sys.argv)
+
+# Usage
+# python plotHistogram.py ../../build/BigCrunch_y_absolute_error_hist.csv BigCrunch_abs_err_x 0.124985
