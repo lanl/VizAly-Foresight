@@ -31,9 +31,11 @@ def plotHistogram(val, plotName, oufputFileName):
 	plt.title(plotName)
 	plt.xlabel("Absolute Error")
 	plt.ylabel("Frequency")
-	plt.xticks([])
+	plt.xlim(0, len(val))
 
-	liveDisplay = false
+	#plt.xticks([])
+
+	liveDisplay = True
 	if (liveDisplay):
 		plt.show()
 

@@ -16,6 +16,7 @@ Authors:
 #include <string>
 #include <sstream>
 #include <vector>
+#include <math.h>
 #include "metricInterface.hpp"
 
 class absoluteError : public MetricInterface
@@ -75,6 +76,7 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
 	double max_abs_err = *std::max_element(abs_err.begin(), abs_err.end());
 	val = max_abs_err;
 
+
 	double total_max_abs_err = 0;
 	MPI_Allreduce(&max_abs_err, &total_max_abs_err, 1, MPI_DOUBLE, MPI_MAX, comm);// MPI_COMM_WORLD);
 	total_val = total_max_abs_err;
@@ -98,17 +100,13 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
 	MPI_Barrier(comm);
 
 
+	
 
 	// Compute histogram of values
 	if (total_max_abs_err != 0)
 	{
 		std::vector<int> localHistogram(numBins,0);
-		double binSize = total_max_abs_err / (numBins-1);
-
-		// std::cout << "total_max_abs_err: " << total_max_abs_err << std::endl;
-		// std::cout << "binSize: " << binSize << std::endl;
-		// std::cout << "numBins: " << numBins << std::endl;
-
+		double binSize = total_max_abs_err / numBins;
 
 		for (std::size_t i = 0; i < n; ++i)
 		{
@@ -117,14 +115,10 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
 
 			int binPos = err/binSize;
 
-			if (binPos > numBins)
-				std::cout << "Error; binPos " <<  binPos << std::endl;
-			else
-			{
-				localHistogram[binPos]++;
-				//std::cout << "err: " << err << ", binPos: " << binPos << std::endl;
+			if (binPos >= numBins)
+				binPos = binPos-1;
 
-			}
+			localHistogram[binPos]++;
 		}
 
 		histogram.resize(numBins);
