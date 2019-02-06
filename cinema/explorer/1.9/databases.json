@@ -1,0 +1,14 @@
+[
+	{
+		"name" : "Metrics (August 28, 2018)",
+		"directory" : "data/metrics.cdb",
+		"filter" : "(^FILE)|(5$)",
+		"query": {
+			"Float_6" : [20, 70],
+			"Integer_2": [40, 60]
+		},
+		"selection": {
+			"Integer_3": [20, 50]
+		}
+	}
+]
