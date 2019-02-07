@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
 	std::stringstream debuglog, metricsInfo, csvOutput;
 	writeLog(outputLogFile, debuglog.str());
 
-	csvOutput << "Compressor_field" << ", " << "params" << ", ";
+	csvOutput << "Compressor_field" << "__" << "params" << ", ";
 	for (int m = 0; m < metrics.size(); ++m)
 		csvOutput << metrics[m] << ", ";
 
@@ -314,8 +314,7 @@ int main(int argc, char *argv[])
 			debuglog << ioMgr->getDataInfo();
 			debuglog << ioMgr->getLog();
 			appendLog(outputLogFile, debuglog);
-			csvOutput << compressorMgr->getCompressorName() << "_" << params[i] << ", ";
-			csvOutput << compressors[c].getParamsInfo() << ", ";
+			csvOutput << compressorMgr->getCompressorName() << "_" << params[i] << "__" << compressors[c].getParamsInfo() << ", ";
 
 			MPI_Barrier(MPI_COMM_WORLD);
 			
