@@ -60,6 +60,6 @@ if __name__ == "__main__":
 
 
 # Run as:
-# python workflow_b.py workflow_input.json
+# python raw_output_test.py
 
-# Results will be in subdirectory results
+# Results will be in subdirectory raw_results

@@ -47,14 +47,26 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
 	Timer cTime; cTime.start();
 	SZ_Init(NULL); 
 
-	double tol = 1E-3;
+	double relTol = 1E-3;
 	std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("tolerance");
 	if( got != compressorParameters.end() )
 		if (compressorParameters["tolerance"] != "")
-			tol = strConvert::to_double( compressorParameters["tolerance"] );
+			relTol = strConvert::to_double( compressorParameters["tolerance"] );
+
+        double lowAbs = 0.0;
+        got = compressorParameters.find("lower");
+        if( got != compressorParameters.end() )
+                if (compressorParameters["lower"] != "")
+                        lowAbs = strConvert::to_double( compressorParameters["lower"] );
+
+        double upperAbs = 0.0;
+        got = compressorParameters.find("upper");
+        if( got != compressorParameters.end() )
+                if (compressorParameters["upper"] != "")
+                        upperAbs = strConvert::to_double( compressorParameters["upper"] );
 
 	std::uint64_t csize = 0;
-	std::uint8_t *cdata = SZ_compress_args(SZ_FLOAT, static_cast<float *>(input), &csize, PW_REL, 0, 0, tol, n[4], n[3], n[2], n[1], n[0]);
+	std::uint8_t *cdata = SZ_compress_args(SZ_FLOAT, static_cast<float *>(input), &csize, PW_REL, lowAbs, upperAbs, relTol, n[4], n[3], n[2], n[1], n[0]);
 	
 	output = cdata;
 	cTime.stop();
