@@ -54,13 +54,13 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
 			relTol = strConvert::to_double( compressorParameters["tolerance"] );
 
         double lowAbs = 0.0;
-        std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("lower");
+        got = compressorParameters.find("lower");
         if( got != compressorParameters.end() )
                 if (compressorParameters["lower"] != "")
                         lowAbs = strConvert::to_double( compressorParameters["lower"] );
 
         double upperAbs = 0.0;
-        std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("upper");
+        got = compressorParameters.find("upper");
         if( got != compressorParameters.end() )
                 if (compressorParameters["upper"] != "")
                         upperAbs = strConvert::to_double( compressorParameters["upper"] );
