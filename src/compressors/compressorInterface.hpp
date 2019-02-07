@@ -12,6 +12,7 @@ Authors:
 #ifndef _COMPRESSOR_INTERFACE_H_
 #define _COMPRESSOR_INTERFACE_H_
 
+#include <vector>
 #include <string>
 #include <sstream>
 #include <unordered_map>
@@ -19,6 +20,26 @@ Authors:
 #include "memory.hpp"
 #include "strConvert.hpp"
 
+struct compressorParams
+{
+    std::string name;
+    std::unordered_map<std::string, std::string> compressorParameters;
+
+    compressorParams(){};
+    compressorParams(std::string _name){ name = _name; };
+    std::string getParamsInfo()
+    {
+        std::string paramString = "";
+        for (auto it=compressorParameters.begin(); it!=compressorParameters.end(); it++)
+        {
+            if (paramString != "")
+                paramString += "_";
+            paramString += (*it).first + ":" + (*it).second;
+        }
+
+        return paramString;  
+    }
+};
 
 class CompressorInterface
 {
@@ -40,8 +61,9 @@ class CompressorInterface
     std::string getCompressorName(){ return compressorName; }
     std::string getLog() { return log.str(); }
     size_t getCompressedSize(){ return cbytes; }
-	  void clearLog() { log.str(""); }
+	void clearLog() { log.str(""); }
 };
+
 
 inline std::string CompressorInterface::getCompressorInfo()
 {
