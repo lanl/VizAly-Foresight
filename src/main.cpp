@@ -473,7 +473,7 @@ int main(int argc, char *argv[])
 				}
 			}
 
-			ioMgr->writeData("__" + compressorMgr->getCompressorName() + "__" + outputFile);
+			ioMgr->writeData("__" + compressorMgr->getCompressorName() + "__" + compressors[c].getParamsInfo() + "__" + outputFile);
 
 			clockWrite.stop();
 

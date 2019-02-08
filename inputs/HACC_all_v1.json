@@ -11,20 +11,7 @@
 		"filename": "../testing/data/m000.full.mpicosmo.50",
 
 		"scalars-comment" : "which scalars to test",
-		"scalars" : ["x", "y", "z", "vx", "vy", "vz"],
-
-		"parameters": 
-		{
-			"tolerance-comment": "used by BigCrunch SZ zfp Isa",
-			"tolerance": 1e-03,
-
-			"bits-comment": "used by fpzip",
-			"bits" : 27,
-
-			"pcnt-comment": "used by Isa, LW",
-			"pcnt" : 30
-		}
-
+		"scalars" : ["x", "y", "z", "vx", "vy", "vz"]
 	},
 
 	"output": 
