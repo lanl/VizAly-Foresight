@@ -16,6 +16,14 @@ if (CBENCH_ENABLE_LOSSY_WAVE)
 	    #Asks for LossyWave include files and includes it in the project
 	    set (LOSSYWAVE_INCLUDE_PATH ${LOSSYWAVE_INCLUDE_PATH} CACHE PATH "LOSSYWAVE include directory")
 
+		# Find lz4 dependency (only on Win32)
+		if(WIN32)
+			find_library(LOSSYWAVE_LZ4_LIBRARY ${LOSSYWAVE_LZ4_LIBRARY} CACHE STRING "LOSSYWAVE_LZ4_LIBRARY library")
+			set(MY_LIBS ${MY_LIBS} ${LOSSYWAVE_LZ4_LIBRARY})
+			set(LOSSYWAVE_LZ4_INCLUDE_PATH ${LOSSYWAVE_LZ4_INCLUDE_PATH} CACHE PATH "LOSSYWAVE LZ4 include directory")
+			set(LOSSYWAVE_INCLUDE_PATH ${LOSSYWAVE_INCLUDE_PATH} ${LOSSYWAVE_LZ4_INCLUDE_PATH})
+		endif()
+
 	    set_property(GLOBAL APPEND PROPERTY definitions "-DCBENCH_HAS_LOSSY_WAVE")
 	   	set_property(GLOBAL APPEND PROPERTY includeDirectories ${LOSSYWAVE_INCLUDE_PATH})
 	    set_property(GLOBAL APPEND PROPERTY linkLibraries ${MY_LIBS})
