@@ -7,5 +7,15 @@
 	{
 		"name" : "Metrics (Feb 7, 2019)",
 		"directory" : "data/metrics2.cdb"
+	},
+
+	{
+		"name" : "Metrics (Feb 7, 2019) - best of <= 0.003",
+		"directory" : "data/metrics3.cdb"
+	},
+
+	{
+		"name" : "Metrics (Feb 7, 2019) - best <= 0.03",
+		"directory" : "data/metrics4.cdb"
 	}
 ]
