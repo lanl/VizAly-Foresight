@@ -19,7 +19,10 @@
 			"bits" : 27,
 
 			"pcnt-comment": "used by Isa, LW",
-			"pcnt" : 30
+			"pcnt" : 30,
+
+                        "window-size-comment": "used by Isa",
+                        "window-size" : 512
 		}
 
 	},
