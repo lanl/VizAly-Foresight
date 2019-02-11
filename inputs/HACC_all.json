@@ -29,7 +29,7 @@
 	"compressors" : 
 	[
 		{
-			"name" : "BLOSC",
+			"name" : "BLOSC"
 		}
 
 		{
@@ -50,12 +50,6 @@
 		{
 			"name" : "zfp",
 			"tolerance" : 1E-3
-		},
-
-		{
-			"name": "Isabela",
-			"tolerance": 1e-03,
-			"pcnt" : 50
 		}
 	],
 

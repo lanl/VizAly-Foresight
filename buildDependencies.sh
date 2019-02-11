@@ -9,4 +9,3 @@ cd ExternalDependencies
 cp ../tools/externalDependencies/*.sh .
 source buildExternal.sh
 cd ..
- 

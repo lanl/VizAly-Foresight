@@ -101,7 +101,7 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
 
 
 	
-
+	/*
 	// Compute histogram of values
 	if (total_max_abs_err != 0)
 	{
@@ -131,6 +131,7 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
 			histogram[i] = ((float)globalHistogram[i])/global_n;
 		histogramComputed = true;
 	}
+	*/
 	
 
 	return;

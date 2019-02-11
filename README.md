@@ -5,7 +5,7 @@ VizAly is a general framework for **A**na**ly**sis and **Vi**suali**z**ation of 
 
 
 # Building VizAly-CBench
-The default master branch should always point to the latest working version. However, for more stable releases, you should check out the latest tag release. The current latest is **v1.1**
+The default master branch should always point to the latest working version. However, for more stable releases, you should check out the latest tag release. 
 
 ## Prerequisites:
 * CMake 3.6.2 or higher
@@ -64,7 +64,7 @@ CBench takes as input a json file (examples of input json files are in the **_[i
 * [Lossy BigCrunch](https://github.com/lanl/VizAly-BigCrunch) - version 1.1
 * [Lossy LossyWave](https://github.com/lanl/VizAly-LossyWave) - version 0.1
 * [SZ](https://collab.cels.anl.gov/display/ESR/SZ) - version 2.0.2.2
-* [zfp](https://computation.llnl.gov/projects/floating-point-compression) - version 0.5.3
+* [zfp](https://computation.llnl.gov/projects/floating-point-compression) - version 0.5.4
 * [fpzip](https://computation.llnl.gov/projects/floating-point-compression) - version 1.2.0
 * [ISABELA](http://freescience.org/cs/ISABELA/ISABELA.html) - version 0.2.1
 
