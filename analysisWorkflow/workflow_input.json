@@ -1,4 +1,6 @@
 {
+	"Section-A" : "parameters for halo finder",
+
 	"input-files" : 
 	[
 		{
@@ -15,13 +17,6 @@
 			"name" : "/projects/exasky/pascal-projects/VizAly-CBench/build/__SZ__m000.full.mpicosmo",
 			"alias" : "SZ"
 		}
-	],
-
-
-	"input-files-alias" : [
-		"original",
-		"BigCrunch",
-		"SZ"
 	],
 
 
@@ -42,6 +37,16 @@
 	},
 
 
+
+	"Section-B" : "halo query",
+
+
+	"analysis-prams" : {
+		"halo-output-path" : "/projects/exasky/HACC/run/output/analysis/Halos/b0168/",
+		"sqlite-path" : "/projects/exasky/VizAly_genericio/genericio/frontend/GenericIOSQLite.so"
+	},
+
+
 	"analysis" :
 	[
 		{
@@ -59,12 +64,6 @@
 				"select fof_halo_center_x, fof_halo_center_y, fof_halo_center_z, fof_halo_count from __TABLE__ ORDER BY fof_halo_count DESC LIMIT 10"
 			]
 		}
-	],
-
-	"analysis-prams" : {
-		"halo-output-path" : "/projects/exasky/HACC/run/output/analysis/Halos/b0168/",
-		"sqlite-path" : "/projects/exasky/VizAly_genericio/genericio/frontend/GenericIOSQLite.so"
-	}
-
+	]
 }
  

@@ -181,6 +181,8 @@ int main(int argc, char *argv[])
 	}
 
 
+
+
 	//
 	// For humans; all seems valid, let's start ...
 	if (myRank == 0)
@@ -207,7 +209,7 @@ int main(int argc, char *argv[])
 
 
 	//
-	// Open file
+	// Open data file
 	DataLoaderInterface *ioMgr;
 
 	if (inputFileType == "Binary")

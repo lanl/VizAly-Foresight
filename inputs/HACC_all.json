@@ -1,4 +1,7 @@
 {
+	"version-comment" : "1.1: Each compressor has its params",
+	"version" : 1.1,
+
 	"input" :
 	{
 		"filetype-comment" : "type of file to load; HACC or NYX",
@@ -8,23 +11,7 @@
 		"filename": "../testing/data/m000.full.mpicosmo.50",
 
 		"scalars-comment" : "which scalars to test",
-		"scalars" : ["x", "y", "z", "vx", "vy", "vz"],
-
-		"parameters": 
-		{
-			"tolerance-comment": "used by BigCrunch SZ zfp Isa",
-			"tolerance": 1e-03,
-
-			"bits-comment": "used by fpzip",
-			"bits" : 27,
-
-			"pcnt-comment": "used by Isa, LW",
-			"pcnt" : 30,
-
-                        "window-size-comment": "used by Isa",
-                        "window-size" : 512
-		}
-
+		"scalars" : ["x", "y", "z", "vx", "vy", "vz"]
 	},
 
 	"output": 
@@ -38,8 +25,108 @@
 		"metricsfname": "metrics_HACC_all_"
 	},
 
-	"compressor-comment" : "which compressors to test",
-	"compressors" : ["blosc", "BigCrunch", "SZ", "zfp", "fpzip", "Isabela"],
+	"compressor-comment" : "which compressors to test and parameters for that compressor",
+	"compressors" : 
+	[
+		{
+			"name" : "BLOSC",
+		}
+
+		{
+			"name" : "BigCrunch",
+			"tolerance": 1E-3
+		},
+
+		{
+			"name" : "SZ",
+			"tolerance": 1E-3
+		},
+
+		{
+			"name" : "fpzip",
+			"bits" : 27
+		},
+
+		{
+			"name" : "zfp",
+			"tolerance" : 1E-3
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-03,
+			"pcnt" : 50
+		}
+	],
+
+	"metrics-comment" : "which metrics to use",
+	"metrics": [
+		"absolute_error",
+		"relative_error",
+		"mse",
+		"psnr"
+	]
+}
+{
+	"version-comment" : "1.1: Each compressor has its params",
+	"version" : 1.1,
+
+	"input" :
+	{
+		"filetype-comment" : "type of file to load; HACC or NYX",
+		"filetype" : "HACC",
+
+		"filename-comment": "name of input file",
+		"filename": "../testing/data/m000.full.mpicosmo.50",
+
+		"scalars-comment" : "which scalars to test",
+		"scalars" : ["x", "y", "z", "vx", "vy", "vz"]
+	},
+
+	"output": 
+	{
+		"output-decompressed" : false,
+
+		"logfname-comment": "name of output log file",
+		"logfname": "runlog_HACC_all_",
+
+		"metricsfname-comment": "name of file with output",
+		"metricsfname": "metrics_HACC_all_"
+	},
+
+	"compressor-comment" : "which compressors to test and parameters for that compressor",
+	"compressors" : 
+	[
+		{
+			"name" : "BLOSC",
+		}
+
+		{
+			"name" : "BigCrunch",
+			"tolerance": 1E-3
+		},
+
+		{
+			"name" : "SZ",
+			"tolerance": 1E-3
+		},
+
+		{
+			"name" : "fpzip",
+			"bits" : 27
+		},
+
+		{
+			"name" : "zfp",
+			"tolerance" : 1E-3
+		},
+
+		{
+			"name" : "Isabela",
+			"pcnt" : 1E-3,
+			"window_size" : 1024
+		},
+	],
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [
