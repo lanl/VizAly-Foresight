@@ -15,7 +15,7 @@ def output_file(file, directory, result):
 
 def analysis(query_mgr, json_data):
 	output_files = []
-	halo_file_path = json_data["analysis-prams"]["halo-output-path"]
+	halo_file_path = json_data["halo-output-path"]
 
 	count = 0
 	for entry in json_data["analysis"]:

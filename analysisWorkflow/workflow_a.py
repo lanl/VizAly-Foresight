@@ -55,6 +55,12 @@ if __name__ == "__main__":
 		json_data = json.load(read_file)
 
 
+	# Create Path for Halo output if it doesn't exist
+	halo_output_directory = json_data["halo-output-path"]
+	if not os.path.exists(halo_output_directory):
+    	os.makedirs(halo_output_directory)
+
+
 	# Run analysis for each input provided 
 	for dataset_file in json_data["input-files"]:
 
