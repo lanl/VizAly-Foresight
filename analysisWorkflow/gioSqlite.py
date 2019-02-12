@@ -28,12 +28,6 @@ class GioSqlite3:
 		else:
 			self.conn = apsw.Connection(":memory:")
 
-			output=io.StringIO()
-
-			self.shell = apsw.Shell(stdout=output, db=self.conn)
-			self.shell.process_command(".mode csv")
-			self.shell.process_command(".headers on")
-
 	def __del__(self):
 		self.closeConn()
 
@@ -80,6 +74,20 @@ class GioSqlite3:
 			outputString = outputString + str( row ) + " "'\n'
 
 		return outputString
+
+
+	def runQueryOutputCSV(self, queryString): 
+		if dbConnLoaded != "apsw":
+			print ("csv currenly only works with apsw! Running non csv version")
+			return self.runQueryOutputString(queryString)
+		else:
+			output=io.StringIO()
+			self.shell = apsw.Shell(stdout=output, db=self.conn)
+			self.shell.process_command(".mode csv")
+			self.shell.process_command(".headers on")				
+			self.shell.process_sql(queryString) 	
+	
+		return output.getvalue()
 
 
 	def runQueryOutputList(self, queryString):

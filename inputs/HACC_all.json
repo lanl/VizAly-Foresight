@@ -24,7 +24,8 @@
 	},
 
 	"compressor-comment": "which compressors to test and parameters for that compressor",
-	"compressors": [{
+	"compressors": [
+		{
 			"name": "BLOSC"
 		},
 

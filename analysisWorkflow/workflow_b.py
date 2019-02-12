@@ -37,7 +37,7 @@ def analysis(query_mgr, json_data):
 				result_filename = filename + '_' + str(query_count)
 
 				query = sql_query.replace("__TABLE__", table_name)
-				result = query_mgr.runQueryOutputString(query)
+				result = query_mgr.runQueryOutputCSV(query)
 
 				# Saving the output
 				output_file(result_filename, "results", result)
