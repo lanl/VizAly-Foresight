@@ -17,5 +17,10 @@
 	{
 		"name" : "Metrics (Feb 7, 2019) - best <= 0.03",
 		"directory" : "data/metrics4.cdb"
+	},
+
+	{
+		"name" : "Isabela Window Study",
+		"directory" : "data/metrics5.cdb"
 	}
 ]
