@@ -29,8 +29,8 @@
 	"compressors" : 
 	[
 		{
-			"name" : "BLOSC",
-		}
+			"name" : "BLOSC"
+		},
 
 		{
 			"name" : "BigCrunch",
