@@ -20,7 +20,7 @@ class CompressorFactory
   public:
 	static CompressorInterface * createCompressor(std::string compressorName)
 	{
-		if (compressorName == "blosc")
+		if (compressorName == "BLOSC")
 		  return new BLOSCCompressor();
 	  #ifdef CBENCH_HAS_BIG_CRUNCH
 		else if (compressorName == "BigCrunch")
