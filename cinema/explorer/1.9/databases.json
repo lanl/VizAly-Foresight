@@ -22,5 +22,13 @@
 	{
 		"name" : "Isabela Window Study",
 		"directory" : "data/metrics5.cdb"
-	}
+	},
+        {
+                "name" : "Metrics (Feb 15, 2019) - Scaling Absolute Error Input on Positions",
+                "directory" : "data/metrics6.cdb"
+        },
+        {
+                "name" : "Metrics (Feb 15, 2019) - Scaling Relative Error Input on Positions",
+                "directory" : "data/metrics7.cdb"
+        }
 ]
