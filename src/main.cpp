@@ -42,6 +42,7 @@ Authors:
 
 
 
+
 // Function to validate whatever could be wrong with the input
 int validateInput(int argc, char *argv[], int myRank, int numRanks)
 {
@@ -138,11 +139,17 @@ int main(int argc, char *argv[])
 
 	std::string metricsFile = jsonInput["output"]["metricsfname"];
 
-	std::vector< std::string > params;
-	for (int j = 0; j < jsonInput["input"]["scalars"].size(); j++)
-		params.push_back( jsonInput["input"]["scalars"][j] );
+	std::vector< std::string > scalars;
+	for (int i = 0; i < jsonInput["input"]["scalars"].size(); i++)
+		scalars.push_back( jsonInput["input"]["scalars"][i] );
 
-
+	std::vector< std::string > compressors;
+	for (int i = 0; i < jsonInput["compressors"].size(); i++)
+		compressors.push_back( jsonInput["compressors"][i]["name"] );
+		
+	
+	
+	/*
 	std::vector< compressorParams > compressors;
 	if (jsonInput.find("version") != jsonInput.end())
 	{
@@ -152,9 +159,9 @@ int main(int argc, char *argv[])
 			for (auto it = jsonInput["compressors"][j].begin(); it != jsonInput["compressors"][j].end(); ++it)
 			{
 				if (it.key() == "name")
-					temp.name = jsonInput["compressors"][j]["name"];
+					temp.name = jsonInput["compressors"][j]["name"];			 // get compressor name
 				else
-					temp.compressorParameters[it.key()] = strConvert::toStr(it.value());
+					temp.insertParam( it.key(), strConvert::toStr(it.value()) ); // get parameter
 			}
 			compressors.push_back(temp);
 		}
@@ -165,11 +172,11 @@ int main(int argc, char *argv[])
 		for (int j = 0; j < jsonInput["compressors"].size(); j++)
 			compressors.push_back( compressorParams( jsonInput["compressors"][j].get<std::string>() ) );
 	}
-
+	*/
 
 	std::vector< std::string > metrics;
-	for (int j = 0; j < jsonInput["metrics"].size(); j++)
-		metrics.push_back(jsonInput["metrics"][j]);
+	for (int i = 0; i < jsonInput["metrics"].size(); i++)
+		metrics.push_back(jsonInput["metrics"][i]);
 
 	bool writeData = false;
 	std::string outputFile = "";
@@ -205,6 +212,7 @@ int main(int argc, char *argv[])
 	metricsInfo << "Input file: " << inputFile << std::endl;
 
 	overallClock.start();
+
 
 
 
@@ -253,17 +261,23 @@ int main(int argc, char *argv[])
 	CompressorInterface *compressorMgr;
 	MetricInterface *metricsMgr;
 
-	for (int c = 0; c < compressors.size(); ++c)
+
+	for (int c=0; c < compressors.size(); ++c)
 	{	
+		if (myRank == 0)
+			std::cout << compressors[c] << std::endl;
 		// initialize compressor
-		compressorMgr = CompressorFactory::createCompressor(compressors[c].name);
+		//compressorMgr = CompressorFactory::createCompressor(compressors[c].name);
+		compressorMgr = CompressorFactory::createCompressor(compressors[c]);
 		if (compressorMgr == NULL)
 		{
 			if (myRank == 0)
-				std::cout << "Unsupported compressor: " << compressors[c].name << " ... Skipping!" << std::endl;
+				//std::cout << "Unsupported compressor: " << compressors[c].name << " ... Skipping!" << std::endl;
+				std::cout << "Unsupported compressor: " << compressors[c] << " ... Skipping!" << std::endl;
 			continue;
 		}
  
+		/*
 		// Check if the parameters field exist
 		if ( jsonInput.find("version") != jsonInput.end() )
 		{
@@ -284,31 +298,78 @@ int main(int argc, char *argv[])
 				}
 			}
 		}
+		*/
+
+
+
+		// initialize compressor
+		compressorMgr->init();
+
+
 		
 
+		// Apply parameter if same for all scalars, else delay for later
+		bool sameCompressorParams = true;
+		if ( jsonInput["compressors"][c].find("compressor-params") != jsonInput["compressors"][c].end() )
+			sameCompressorParams = false;
+		else
+		{
+			for (auto it = jsonInput["compressors"][c].begin(); it != jsonInput["compressors"][c].end(); ++it)
+				if (it.key() != "name")
+					compressorMgr->compressorParameters[ it.key() ] = strConvert::toStr( it.value() );
+		}
+	
+	
+
+
 		// log
-		compressorMgr->init();
+		
 		metricsInfo << "\n---------------------------------------" << std::endl;
 		metricsInfo << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
-		metricsInfo << compressors[c].getParamsInfo() << std::endl;
+		//metricsInfo << compressors[c].getParamsInfo() << std::endl;
 
 		debuglog << "===============================================" << std::endl;
 		debuglog << "Compressor: " << compressorMgr->getCompressorName() << std::endl;		
 		
 
-		// Cycle through params
-		for (int i=0; i<params.size(); i++)
+		// Cycle through scalars
+		for (int i=0; i<scalars.size(); i++)
 		{
 			Timer compressClock, decompressClock;
 			Memory memLoad;
 
 			memLoad.start();
 
+
 			// Check if parameter is valid before proceding
-			if ( !ioMgr->loadData(params[i]) )
+			if ( !ioMgr->loadData(scalars[i]) )
 			{
 				memLoad.stop();
 				continue;
+			}
+
+
+			// Read in compressor parameter for this field
+			if (!sameCompressorParams)
+			{
+				compressorMgr->compressorParameters.clear(); 	// reset compression param for each field
+				int numdifferentParams = jsonInput["compressors"][c]["compressor-params"].size();
+
+				for (int cp=0; cp<numdifferentParams; cp++)		
+				{
+					for (auto it = jsonInput["compressors"][c]["compressor-params"][cp]["scalar"].begin(); 
+						it != jsonInput["compressors"][c]["compressor-params"][cp]["scalar"].end(); it++)
+					{
+						if (*it != scalars[i])
+							continue;
+
+						for (auto itt = jsonInput["compressors"][c]["compressor-params"][cp].begin(); 
+								itt != jsonInput["compressors"][c]["compressor-params"][cp].end(); ++itt)
+							if (itt.key() != "scalar")
+								compressorMgr->compressorParameters[ itt.key() ] = strConvert::toStr( itt.value() );
+					}
+					
+				}
 			}
 
 			
@@ -316,7 +377,9 @@ int main(int argc, char *argv[])
 			debuglog << ioMgr->getDataInfo();
 			debuglog << ioMgr->getLog();
 			appendLog(outputLogFile, debuglog);
-			csvOutput << compressorMgr->getCompressorName() << "_" << params[i] << "__" << compressors[c].getParamsInfo() << ", ";
+			//csvOutput << compressorMgr->getCompressorName() << "_" << params[i] << "__" << compressors[c].getParamsInfo() << ", ";
+			metricsInfo << compressorMgr->getParamsInfo() << std::endl;
+			csvOutput << compressorMgr->getCompressorName() << "_" << scalars[i] << "__" << compressorMgr->getParamsInfo() << ", ";
 
 			MPI_Barrier(MPI_COMM_WORLD);
 			
@@ -359,8 +422,8 @@ int main(int argc, char *argv[])
 
 			//
 			// metrics
-			debuglog << "\n----- " << params[i] << " error metrics ----- " << std::endl;
-			metricsInfo << "\nField: " << params[i] << std::endl;
+			debuglog << "\n----- " << scalars[i] << " error metrics ----- " << std::endl;
+			metricsInfo << "\nField: " << scalars[i] << std::endl;
 			for (int m = 0; m < metrics.size(); ++m)
 			{
 				metricsMgr = MetricsFactory::createMetric(metrics[m]);
@@ -381,7 +444,8 @@ int main(int argc, char *argv[])
 				if (metrics[m] == "absolute_error")
 				{
 					if (metricsMgr->hasHistogram())
-						writeFile( extractFileName(inputFile) + "_" + compressors[c].name + "_" + params[i] + "_" + metrics[m] + "_" + compressors[c].getParamsInfo() + "_hist.csv", metricsMgr->getHistogramCSV());
+						//writeFile( extractFileName(inputFile) + "_" + compressors[c].name + "_" + params[i] + "_" + metrics[m] + "_" + compressors[c].getParamsInfo() + "_hist.csv", metricsMgr->getHistogramCSV());
+						writeFile( extractFileName(inputFile) + "_" + compressors[c] + "_" + scalars[i] + "_" + metrics[m] + "_" + compressorMgr->getParamsInfo() + "_hist.csv", metricsMgr->getHistogramCSV());
 				}
 				metricsMgr->close();
 			}
@@ -413,7 +477,7 @@ int main(int argc, char *argv[])
 			
 			if (writeData)
 			{
-				ioMgr->saveCompData(params[i], decompdata);
+				ioMgr->saveCompData(scalars[i], decompdata);
 				debuglog << ioMgr->getLog();
 			}
 
@@ -475,7 +539,12 @@ int main(int argc, char *argv[])
 				}
 			}
 
-			ioMgr->writeData("__" + compressorMgr->getCompressorName() + "__" + compressors[c].getParamsInfo() + "__" + outputFile);
+			
+			
+			//ioMgr->writeData("__" + compressorMgr->getCompressorName() + "__" + compressors[c].getParamsInfo() + "__" + outputFile);
+			std::string decompressedOutputName = "__" + compressorMgr->getCompressorName() + "__";
+			decompressedOutputName += compressorMgr->getParamsInfo() + "__" + outputFile;
+			ioMgr->writeData(decompressedOutputName);
 
 			clockWrite.stop();
 

@@ -22,15 +22,20 @@ Authors:
 
 struct compressorParams
 {
-    std::string name;
-    std::unordered_map<std::string, std::string> compressorParameters;
+    std::string compressorName;
+    std::unordered_map<std::string, std::string> paramValue;
 
     compressorParams(){};
-    compressorParams(std::string _name){ name = _name; };
+    compressorParams(std::string _name){ compressorName = _name; };
+    void insertParam(std::string paramName, std::string value)
+    { 
+        paramValue[paramName] = value; 
+    };
+
     std::string getParamsInfo()
     {
         std::string paramString = "";
-        for (auto it=compressorParameters.begin(); it!=compressorParameters.end(); it++)
+        for (auto it=paramValue.begin(); it!=paramValue.end(); it++)
         {
             if (paramString != "")
                 paramString += "_";
@@ -40,6 +45,13 @@ struct compressorParams
         return paramString;  
     }
 };
+
+
+struct scalarCompressor
+{
+	std::string scalar;
+	compressorParams params;
+}; 
 
 class CompressorInterface
 {
@@ -61,6 +73,7 @@ class CompressorInterface
     std::string getCompressorName(){ return compressorName; }
     std::string getLog() { return log.str(); }
     size_t getCompressedSize(){ return cbytes; }
+    std::string getParamsInfo();
 	void clearLog() { log.str(""); }
 };
 
@@ -73,4 +86,17 @@ inline std::string CompressorInterface::getCompressorInfo()
     return dataInfo.str();
 }
 
+
+std::string CompressorInterface::getParamsInfo()
+    {
+        std::string paramString = "";
+        for (auto it=compressorParameters.begin(); it!=compressorParameters.end(); it++)
+        {
+            if (paramString != "")
+                paramString += "_";
+            paramString += (*it).first + "=" + (*it).second;
+        }
+
+        return paramString;  
+    }
 #endif
