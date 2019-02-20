@@ -20,38 +20,6 @@ Authors:
 #include "memory.hpp"
 #include "strConvert.hpp"
 
-struct compressorParams
-{
-    std::string compressorName;
-    std::unordered_map<std::string, std::string> paramValue;
-
-    compressorParams(){};
-    compressorParams(std::string _name){ compressorName = _name; };
-    void insertParam(std::string paramName, std::string value)
-    { 
-        paramValue[paramName] = value; 
-    };
-
-    std::string getParamsInfo()
-    {
-        std::string paramString = "";
-        for (auto it=paramValue.begin(); it!=paramValue.end(); it++)
-        {
-            if (paramString != "")
-                paramString += "_";
-            paramString += (*it).first + ":" + (*it).second;
-        }
-
-        return paramString;  
-    }
-};
-
-
-struct scalarCompressor
-{
-	std::string scalar;
-	compressorParams params;
-}; 
 
 class CompressorInterface
 {
@@ -94,7 +62,7 @@ std::string CompressorInterface::getParamsInfo()
         {
             if (paramString != "")
                 paramString += "_";
-            paramString += (*it).first + "=" + (*it).second;
+            paramString += (*it).first + (*it).second;
         }
 
         return paramString;  

@@ -11,7 +11,7 @@
 	},
 
 	"output": {
-		"output-decompressed": false,
+		"output-decompressed": true,
 
 		"logfname-comment": "name of output log file",
 		"logfname": "runlog_HACC_all_",
@@ -23,15 +23,34 @@
 	"compressor-comment": "which compressors to test and parameters for that compressor",
 	"compressors": [
 		{
-			"name": "BLOSC"
+			"name": "BLOSC", 
+			"output-prefix" : "__BLOSC"
 		},
 
 		{
 			"name": "BigCrunch",
-			"tolerance": 1E-3
+			"tolerance": 1E-3,
+			"output-prefix" : "__BigCrunch_tol-0.001"
 		},
 
 		{
+            "name": "SZ",
+            "compressor-params" :
+            [
+                {
+                    "scalar" : ["x", "y", "z"],
+                    "abs" : 1E-3
+                },
+
+                {
+                    "scalar" : ["vx", "vy", "vz"],
+                    "tolerance" : 1E-2
+                } 
+			],
+			"output-prefix" : "__SZ_posabs-0.001_veltol-0.01"
+        },
+        
+        {
             "name": "SZ",
             "compressor-params" :
             [
@@ -44,7 +63,8 @@
                     "scalar" : ["vx", "vy", "vz"],
                     "tolerance" : 2E-2
                 }
-            ]
+            ],
+			"output-prefix" : "__SZ_posabs-0.002_veltol-0.02"
 		},
 
 		{
@@ -54,7 +74,8 @@
 
 		{
 			"name": "zfp",
-			"tolerance": 1E-3
+			"tolerance": 1E-3,
+			"output-prefix" : "__zfp_tol-0.001"
 		}
 	],
 
