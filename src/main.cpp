@@ -261,7 +261,7 @@ int main(int argc, char *argv[])
 		else
 		{
 			for (auto it = jsonInput["compressors"][c].begin(); it != jsonInput["compressors"][c].end(); ++it)
-				if (it.key() != "name")
+				if ((it.key() != "name") && (it.key() != "output-prefix"))
 					compressorMgr->compressorParameters[ it.key() ] = strConvert::toStr( it.value() );
 		}
 	
