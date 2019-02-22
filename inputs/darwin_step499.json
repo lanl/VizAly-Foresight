@@ -34,28 +34,29 @@
 
 		{
 			"name" : "BigCrunch",
-			"tolerance": 1E-3
+			"tolerance": 1E-5
 		},
 
 		{
 			"name" : "SZ",
-			"tolerance": 1E-3
+			"abs": 3E-3
 		},
 
 		{
 			"name" : "fpzip",
-			"bits" : 27
+			"bits" : 26
 		},
 
 		{
 			"name" : "zfp",
-			"tolerance" : 1E-3
+			"tolerance" : 7E-3
 		},
 
 		{
 			"name": "Isabela",
 			"tolerance": 1e-03,
-			"pcnt" : 50
+			"pcnt" : 50,
+			"window-size" : 2048
 		}
 	],
 

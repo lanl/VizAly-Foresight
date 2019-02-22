@@ -20,7 +20,7 @@ Authors:
 class MetricInterface
 {
   protected:
-    double val; // Local Quantity (MPI)
+    double val;       // Local Quantity (MPI)
     double total_val; // Global Quantity (MPI)
 
     std::vector<float> histogram;
@@ -31,8 +31,9 @@ class MetricInterface
     std::stringstream log;
 
 	MPI_Comm comm;
+
   public:
-    
+    std::unordered_map<std::string, std::string> parameters;
 
 	virtual void init(MPI_Comm _comm) = 0;
     virtual void execute(void *original, void *approx, size_t n) = 0;
@@ -59,6 +60,7 @@ inline std::string MetricInterface::getMetricInfo()
 
     return dataInfo.str();
 }
+
 
 inline std::string MetricInterface::getHistogramCSV()
 {

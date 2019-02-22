@@ -149,10 +149,11 @@ int main(int argc, char *argv[])
 	for (int i = 0; i < jsonInput["compressors"].size(); i++)
 		compressors.push_back( jsonInput["compressors"][i]["name"] );
 	
+	std::cout << "jsonInput[metrics].size(): " << jsonInput["metrics"].size() << std::endl;
 
 	std::vector< std::string > metrics;
 	for (int i = 0; i < jsonInput["metrics"].size(); i++)
-		metrics.push_back(jsonInput["metrics"][i]);
+		metrics.push_back(jsonInput["metrics"][i]["name"]);
 
 	bool writeData = false;
 	std::string outputFile = "";
@@ -173,7 +174,6 @@ int main(int argc, char *argv[])
 		std::cout << "Starting ... \nLook at the log for progress update ... \n" << std::endl;
 
 
-
 	//
 	// Create log and metrics files
 	Timer overallClock;
@@ -189,7 +189,6 @@ int main(int argc, char *argv[])
 	metricsInfo << "Input file: " << inputFile << std::endl;
 
 	overallClock.start();
-
 
 
 
@@ -357,7 +356,7 @@ int main(int argc, char *argv[])
 			debuglog << "unCompressedSize: " << unCompressedSize << ", totalUnCompressedSize: " << totalUnCompressedSize << std::endl;
 			debuglog << "Compression ratio: " << totalUnCompressedSize/(float)totalCompressedSize << std::endl;
 
-			writeLogApp(outputLogFile, compressorMgr->getLog());
+			appendLog(outputLogFile, compressorMgr->getLog());
 			compressorMgr->clearLog();
 
 
@@ -366,7 +365,7 @@ int main(int argc, char *argv[])
 			debuglog << "\n----- " << scalars[i] << " error metrics ----- " << std::endl;
 			metricsInfo << "\nField: " << scalars[i] << std::endl;
 			for (int m = 0; m < metrics.size(); ++m)
-			{
+			{	
 				metricsMgr = MetricsFactory::createMetric(metrics[m]);
 				if (metricsMgr == NULL)
 				{
@@ -376,6 +375,12 @@ int main(int argc, char *argv[])
 				}
 
 
+				// Read in additional params for metrics
+				for (auto it = jsonInput["metrics"][m].begin(); it != jsonInput["metrics"][m].end(); it++)
+					if (it.key() != "name")
+						metricsMgr->parameters[it.key()] = strConvert::toStr( it.value() );
+
+				// Launch 
 				metricsMgr->init(MPI_COMM_WORLD);
 				metricsMgr->execute(ioMgr->data, decompdata, ioMgr->getNumElements());
 				debuglog << metricsMgr->getLog();
