@@ -23,17 +23,15 @@ class MetricInterface
     double val;       // Local Quantity (MPI)
     double total_val; // Global Quantity (MPI)
 
-    std::vector<float> histogram;
-    int numBins;
-    bool histogramComputed;
-
     std::string metricName;
     std::stringstream log;
-
+    
 	MPI_Comm comm;
 
   public:
     std::unordered_map<std::string, std::string> parameters;
+    std::string additionalOutput;   // if ever we need an additional output as for histograms
+                
 
 	virtual void init(MPI_Comm _comm) = 0;
     virtual void execute(void *original, void *approx, size_t n) = 0;
@@ -45,11 +43,7 @@ class MetricInterface
     std::string getMetricName(){ return metricName; }
     std::string getLog() { return log.str(); }
 	void clearLog() { log.str(""); }
-
-    bool hasHistogram(){ return histogramComputed; }
-    std::string getHistogramCSV();
 };
-
 
 
 
@@ -59,17 +53,6 @@ inline std::string MetricInterface::getMetricInfo()
     dataInfo << "\nMetric: " << metricName << std::endl;
 
     return dataInfo.str();
-}
-
-
-inline std::string MetricInterface::getHistogramCSV()
-{
-    std::stringstream hist;
-
-    for (auto it=histogram.begin(); it!=histogram.end(); it++)
-        hist << (*it) << ", ";
-
-    return hist.str();
 }
 
 #endif

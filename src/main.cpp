@@ -148,8 +148,6 @@ int main(int argc, char *argv[])
 	std::vector< std::string > compressors;
 	for (int i = 0; i < jsonInput["compressors"].size(); i++)
 		compressors.push_back( jsonInput["compressors"][i]["name"] );
-	
-	std::cout << "jsonInput[metrics].size(): " << jsonInput["metrics"].size() << std::endl;
 
 	std::vector< std::string > metrics;
 	for (int i = 0; i < jsonInput["metrics"].size(); i++)
@@ -377,8 +375,18 @@ int main(int argc, char *argv[])
 
 				// Read in additional params for metrics
 				for (auto it = jsonInput["metrics"][m].begin(); it != jsonInput["metrics"][m].end(); it++)
+				{
 					if (it.key() != "name")
-						metricsMgr->parameters[it.key()] = strConvert::toStr( it.value() );
+						for (auto it2 = jsonInput["metrics"][m][it.key()].begin();
+								it2 != jsonInput["metrics"][m][it.key()].end(); it2++)
+							if (*it2 != scalars[i])
+								continue;
+							else
+							{
+								metricsMgr->parameters[it.key()] = strConvert::toStr( scalars[i] );
+								break;
+							}	
+				}
 
 				// Launch 
 				metricsMgr->init(MPI_COMM_WORLD);
@@ -387,11 +395,19 @@ int main(int argc, char *argv[])
 				metricsInfo << metricsMgr->getLog();
 				csvOutput << metricsMgr->getGlobalValue() << ", ";
 
-				if (metrics[m] == "absolute_error")
-				{
-					if (metricsMgr->hasHistogram())
-						writeFile( extractFileName(inputFile) + "_" + compressors[c] + "_" + scalars[i] + "_" + metrics[m] + "_" + compressorMgr->getParamsInfo() + "_hist.csv", metricsMgr->getHistogramCSV());
-				}
+				if (myRank == 0)
+					if (metricsMgr->additionalOutput != "")
+					{
+						std::string outputHistogramName = "";
+						outputHistogramName = extractFileName(inputFile) + "_" + compressors[c] + "_" + scalars[i];
+						outputHistogramName += "_" + metrics[m] + "_" + compressorMgr->getParamsInfo() + "_hist.py";
+						writeFile( outputHistogramName, metricsMgr->additionalOutput );
+					}
+				//if (metrics[m] == "absolute_error")
+				//{
+				//	if (metricsMgr->hasHistogram())
+				//		writeFile( extractFileName(inputFile) + "_" + compressors[c] + "_" + scalars[i] + "_" + metrics[m] + "_" + compressorMgr->getParamsInfo() + "_hist.csv", metricsMgr->getHistogramCSV());
+				//}
 				metricsMgr->close();
 			}
 			debuglog << "-----------------------------\n";
@@ -518,5 +534,4 @@ int main(int argc, char *argv[])
 /*
 Run:
 mpirun -np 2 CBench ../inputs/HACC_all.json
-mpirun -np 8 ./CBench ../inputs/HACC_write_bigcrunch.json
 */

@@ -62,7 +62,7 @@
 	"metrics": [
 		{
 			"name" : "absolute_error",
-			"histogram" : ["x", "y", "z"],
+			"histogram" : ["x", "y", "z"]
 		},
 
 		{
