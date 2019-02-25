@@ -1,7 +1,4 @@
 {
-	"version-comment" : "1.1: Each compressor has its params",
-	"version" : 1.1,
-
 	"input" :
 	{
 		"filetype-comment" : "type of file to load; HACC or NYX",

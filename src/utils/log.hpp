@@ -39,7 +39,6 @@ inline void writeLog(std::string filename, std::string log)
 inline void writeLog(std::string filename, std::stringstream log)
 {
   #ifndef NDEBUG
-	std::cout << "In debug modeeeeee" << std::endl;
 	std::ofstream outputFile( (filename + ".log").c_str(), std::ios::out);
 	outputFile << log.str();
 	outputFile.close();
