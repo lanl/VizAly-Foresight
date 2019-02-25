@@ -182,8 +182,8 @@ int main(int argc, char *argv[])
 	for (int m = 0; m < metrics.size(); ++m)
 		csvOutput << metrics[m] << ", ";
 
-	csvOutput << "Max Compression Throughput, Max DeCompression Throughput, ";
-	csvOutput << "Min Compression Throughput, Min DeCompression Throughput, Compression Ratio" << std::endl;
+	csvOutput << "Max Compression Throughput(MB/s), Max DeCompression Throughput(MB/s), Max Compress Time(s), ";
+	csvOutput << "Min Compression Throughput(MB/s), Min DeCompression Throughput(MB/s), Compression Ratio" << std::endl;
 	metricsInfo << "Input file: " << inputFile << std::endl;
 
 	overallClock.start();
@@ -428,9 +428,11 @@ int main(int argc, char *argv[])
 			double max_decompress_throughput = 0;
 			double min_compress_throughput = 0;
 			double min_decompress_throughput = 0;
+			double max_compress_time = 0;
 
 			MPI_Reduce(&compress_throughput, &max_compress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 			MPI_Reduce(&decompress_throughput, &max_decompress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+			MPI_Reduce(&compress_time, &max_compress_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
 			MPI_Reduce(&compress_throughput, &min_compress_throughput, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
 			MPI_Reduce(&decompress_throughput, &min_decompress_throughput, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
@@ -465,10 +467,13 @@ int main(int argc, char *argv[])
 			{
 				metricsInfo << "Max Compression Throughput: " << max_compress_throughput << " Mbytes/s" << std::endl;
 				metricsInfo << "Max DeCompression Throughput: " << max_decompress_throughput << " Mbytes/s" << std::endl;
+				metricsInfo << "Max Compress Time: " << max_compress_time << " s" << std::endl;
+
 				metricsInfo << "Min Compression Throughput: " << min_compress_throughput << " Mbytes/s" << std::endl;
 				metricsInfo << "Min DeCompression Throughput: " << min_decompress_throughput << " Mbytes/s" << std::endl;
+
 				metricsInfo << "Compression ratio: " << totalUnCompressedSize/(float)totalCompressedSize << std::endl;
-				csvOutput << max_compress_throughput << ", " << max_decompress_throughput << ", " 
+				csvOutput << max_compress_throughput << ", " << max_decompress_throughput << ", " << max_compress_time << ", " 
 						  << min_compress_throughput << ", " << min_decompress_throughput << ", " 
 						  << totalUnCompressedSize/(float)totalCompressedSize << "\n";
 
