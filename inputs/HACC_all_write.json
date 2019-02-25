@@ -81,9 +81,21 @@
 
 	"metrics-comment": "which metrics to use",
 	"metrics": [
-		"absolute_error",
-		"relative_error",
-		"mse",
-		"psnr"
+		{
+			"name" : "absolute_error",
+			"histogram" : ["x", "y", "z"]
+		},
+
+		{
+			"name" : "relative_error"
+		},
+
+		{
+			"name" : "mse"
+		},
+
+		{
+			"name" : "psnr"
+		}
 	]
 }

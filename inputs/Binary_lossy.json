@@ -17,14 +17,7 @@
             "target" : "float",
             "dims" : [256, 256, 256],
             "header" : 192
-        },
-        
-		"parameters" :
-		{
-			"tolerance" : 1e-03,
-            "quant" : 3,
-            "pcnt" : 40
-		}
+        }
 	},
 
 	"output" :
@@ -37,13 +30,35 @@
 	},
 
 	"compressor-comment" : "which compressors to test",
-	"compressors" : ["LossyWave", "blosc"],
+	"compressors" : [
+		{
+			"name": "BLOSC"
+		},
+
+		{
+			"name": "LossyWave",
+			"tolerance" : 1e-03,
+            "quant" : 3,
+            "pcnt" : 40
+		}
+	],
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [
-		"absolute_error",
-		"relative_error",
-    	"mse",
-    	"psnr"
+		{
+			"name" : "absolute_error"
+		},
+
+		{
+			"name" : "relative_error"
+		},
+
+		{
+			"name" : "mse"
+		},
+
+		{
+			"name" : "psnr"
+		}
 	]
 }
