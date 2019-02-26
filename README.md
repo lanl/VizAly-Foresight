@@ -5,7 +5,7 @@ VizAly is a general framework for **A**na**ly**sis and **Vi**suali**z**ation of 
 
 
 # Building VizAly-CBench
-The default master branch should always point to the latest working version. However, for more stable releases, you should check out the latest tag release. 
+The default master branch should always point to the latest working version. However, for more stable releases, you should checkout the latest tag release.
 
 ## Prerequisites:
 * CMake 3.6.2 or higher
