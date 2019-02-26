@@ -187,8 +187,6 @@ for metric in cp.geteval(section, "metrics"):
         entry["histogram"] = cp.geteval(section, "scalars")
     cbench_json_data["metrics"].append(entry)
 
-# get CBench settings
-
 # loop over compressor settings
 for c_tag, c_name in cp.items("compressors"):
 
