@@ -11,6 +11,10 @@ To run: python worrkflow_a.py workflow_input.json
 ## Sample input file
 An exmaple for the input file is workflow_input.json. workflow_input.json has two sections, A and B, marked with "Section-A" and "Section-B" respectively.
 
+## workflow_c.py
+This python script will launch batch scripts to run CBench and the halo finder.
+And example configuration file is provided, `workflow_c.ini`.
+
 
 ## Requirements:
 workflow_b.py needs the aspw (Anotger Sqlite Python Wrapper). To run it on Darwin, you will need Python 3 and aspw
