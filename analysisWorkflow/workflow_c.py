@@ -125,29 +125,6 @@ class Config(configparser.ConfigParser):
         """
         return eval(self.get(option, key))
 
-# template for building CBench JSON file
-cbench_json_data = {
-    "input" : {
-        "filetype-comment" : "Type of file to load; HACC or NYX",
-        "filetype" : None,
-        "filename-comment" : "Name of input file",
-        "filename" : None,
-        "scalars-comment" : "Scalars to test",
-        "scalars" : None,
-    },
-    "output" : {
-        "output-decompressed" : None,
-        "logfname-comment" : "Name of output log file",
-        "logfname" : None,
-        "metricsfname-comment" : "Name of file with output",
-        "metricsfname" : None,
-    },
-    "compressor-comment" : "Compressors and parameters to test",
-    "compressors" : [],
-    "metrics-comment": "Metrics to report",
-    "metrics": [],
-}
-
 # parse command line
 parser = argparse.ArgumentParser()
 parser.add_argument("--name", default="workflow_c")
@@ -173,14 +150,29 @@ os.makedirs(cbench_dir)
 # create a workflow
 wflow = Workflow(name=opts.name)
 
-# fill in CBench JSON data except for list of compressors and settings
+# template for building CBench JSON file
 section = "cbench"
-cbench_json_data["input"]["filetype"] = cp.get(section, "file-type")
-cbench_json_data["input"]["filename"] = cp.get(section, "input-file")
-cbench_json_data["input"]["scalars"] = cp.geteval(section, "scalars")
-cbench_json_data["output"]["output-decompressed"] = cp.getboolean(section, "output-decompressed")
-cbench_json_data["output"]["logfname"] = cp.get(section, "log-file")
-cbench_json_data["output"]["metricsfname"] = cp.get(section, "metrics-file")
+cbench_json_data = {
+    "input" : {
+        "filetype-comment" : "Type of file to load; HACC or NYX",
+        "filetype" : cp.get(section, "file-type"),
+        "filename-comment" : "Name of input file",
+        "filename" : cp.get(section, "file-name"),
+        "scalars-comment" : "Scalars to test",
+        "scalars" : cp.geteval(section, "scalars"),
+    },
+    "output" : {
+        "output-decompressed" : cp.getboolean(section, "output-decompressed"),
+        "logfname-comment" : "Name of output log file",
+        "logfname" : cp.get(section, "log-file"),
+        "metricsfname-comment" : "Name of file with output",
+        "metricsfname" : cp.get(section, "metrics-file"),
+    },
+    "compressor-comment" : "Compressors and parameters to test",
+    "compressors" : [],
+    "metrics-comment": "Metrics to report",
+    "metrics": [],
+}
 for metric in cp.geteval(section, "metrics"):
     entry = {"name" : metric}
     if cp.getboolean("cbench", "histogram") and metric == "absolute_error":
