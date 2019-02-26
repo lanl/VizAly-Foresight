@@ -157,7 +157,7 @@ cbench_json_data = {
         "filetype-comment" : "Type of file to load; HACC or NYX",
         "filetype" : cp.get(section, "file-type"),
         "filename-comment" : "Name of input file",
-        "filename" : cp.get(section, "file-name"),
+        "filename" : cp.get(section, "input-file"),
         "scalars-comment" : "Scalars to test",
         "scalars" : cp.geteval(section, "scalars"),
     },
@@ -195,8 +195,11 @@ for c_tag, c_name in cp.items("compressors"):
             val = [val]
         vals.append(val)
     settings = list(itertools.product(*vals))
-    for setting in settings:
-        entry = {"name" : c_name}
+    for i, setting in enumerate(settings):
+        entry = {
+            "name" : c_name,
+            "output-prefix" : "__{}__{}".format(c_tag, i),
+        }
         for i, val in enumerate(setting):
             entry[keys[i]] = val
         cbench_json_data["compressors"].append(entry)
@@ -214,6 +217,20 @@ for c_tag, c_name in cp.items("compressors"):
                      configurations=list(itertools.chain(*cp.items("cbench-configuration"))))
     wflow.add_job(cbench_job)
 
+    # loop over each compressed file
+    for i, setting in enumerate(settings):
+        cbench_file = cbench_json_data["compressors"][i]["output-prefix"] + "__" + os.path.basename(cbench_json_data["input"]["filename"])
+
+        print(i, cbench_file)
+
+#    # get command line for halo finder
+#    section = "halo-finder"
+#    args = [cp.get("executables", "halo-finder"),
+#            "--config", cp.get(section, "config-file"),
+#            "--timesteps", cp.get(section, "timesteps-file"),
+#            "--prefix", cp.get(section, "prefix"),
+#            cp.get("executables", "parameters-file")]
+#    halo_finder_job = Job(name="halo_finder_{}".format(c_tag)
 
 # run halo finder
 
