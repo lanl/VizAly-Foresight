@@ -146,8 +146,10 @@ run_dir = os.getcwd()
 # create output directories
 cbench_dir = os.path.join(run_dir, "cbench")
 halo_dir = os.path.join(run_dir, "halo")
+spectra_dir = os.path.join(run_dir, "spectra")
 os.makedirs(cbench_dir)
 os.makedirs(halo_dir)
+os.makedirs(spectra_dir)
 
 # create a workflow
 wflow = Workflow(name=opts.name)
@@ -166,9 +168,7 @@ cbench_json_data = {
     "output" : {
         "output-decompressed" : cp.getboolean(section, "output-decompressed"),
         "logfname-comment" : "Name of output log file",
-        "logfname" : cp.get(section, "log-file"),
         "metricsfname-comment" : "Name of file with output",
-        "metricsfname" : cp.get(section, "metrics-file"),
     },
     "compressor-comment" : "Compressors and parameters to test",
     "compressors" : [],
@@ -184,10 +184,8 @@ for metric in cp.geteval(section, "metrics"):
 # loop over compressor settings
 for c_tag, c_name in cp.items("compressors"):
 
-    # clear compressors
-    cbench_json_data["compressors"] = []
-
     # get cartesian product of compressors settings
+    cbench_json_data["compressors"] = []
     keys = []
     vals = []
     for key, val in cp.items(c_tag):
@@ -205,6 +203,11 @@ for c_tag, c_name in cp.items("compressors"):
         for i, val in enumerate(setting):
             entry[keys[i]] = val
         cbench_json_data["compressors"].append(entry)
+
+    # set log files
+    section = "cbench"
+    cbench_json_data["output"]["logfname"] = cp.get(section, "log-file") + "_{}".format(c_tag)
+    cbench_json_data["output"]["metricsfname"] = cp.get(section, "metrics-file") + "_{}".format(c_tag)
 
     # write JSON data
     json_file = os.path.join(cbench_dir, "cbench_{}.json".format(c_tag))
@@ -236,17 +239,27 @@ for c_tag, c_name in cp.items("compressors"):
                 "--timesteps", cp.get(section, "timesteps-file"),
                 "--prefix", prefix,
                 cp.get(section, "parameters-file")]
-        halo_finder_job = Job(name="halo_finder_{}".format(c_tag),
+        halo_finder_job = Job(name="halo_finder_{}_{}".format(c_tag, i),
                               execute_dir=halo_dir,
-                              executable=cp.get("executables", section),
+                              executable=cp.get("executables", "mpirun"),
                               arguments=args,
                               configurations=list(itertools.chain(*cp.items("cbench-configuration"))))
         halo_finder_job.add_parents(cbench_job)
         wflow.add_job(halo_finder_job)
 
-# run power spectra
+        # run power spectra
+        section = "power-spectrum"        
+        spectra_job = Job(name="spectra_{}_{}".format(c_tag, i),
+                          execute_dir=spectra_dir,
+                          executable=cp.get("executables", section),
+                          arguments=[cbench_file, os.path.join(spectra_dir, "spectra_{}_{}".format(c_tag, i))],
+                          configurations=list(itertools.chain(*cp.items("cbench-configuration"))))
+        spectra_job.add_parents(cbench_job)
+        wflow.add_job(spectra_job)
 
-# concatenate in Cinema
+        # plotting
+
+        # concatenate in Cinema
 
 # write workflow
 wflow.write()
