@@ -219,8 +219,8 @@ for c_tag, c_name in cp.items("compressors"):
     # add CBench job to workflow
     cbench_job = Job(name="cbench_{}".format(c_tag),
                      execute_dir=cbench_dir,
-                     executable=cp.get("executables", "cbench"),
-                     arguments=[json_file],
+                     executable=cp.get("executables", "mpirun"),
+                     arguments=[cp.get("executables", section), json_file],
                      configurations=list(itertools.chain(*cp.items("cbench-configuration"))))
     wflow.add_job(cbench_job)
 
