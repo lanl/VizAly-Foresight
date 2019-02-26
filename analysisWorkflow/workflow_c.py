@@ -228,21 +228,21 @@ for c_tag, c_name in cp.items("compressors"):
         # cut off timestep from CBench output path
         prefix = halo_dir + "/" + ".".join(cbench_file.split(".")[:-1])
 
-        print(prefix)
-
         # add halo finder job to workflow
         # make dependent on CBench job
         section = "halo-finder"
-        args = [cp.get("executables", "halo-finder"),
+        args = [cp.get("executables", section),
                 "--config", cp.get(section, "config-file"),
                 "--timesteps", cp.get(section, "timesteps-file"),
                 "--prefix", prefix,
-                cp.get("executables", "parameters-file")]
-        halo_finder_job = Job(name="halo_finder_{}".format(c_tag)
+                cp.get(section, "parameters-file")]
+        halo_finder_job = Job(name="halo_finder_{}".format(c_tag),
+                              execute_dir=halo_dir,
+                              executable=cp.get("executables", section),
+                              arguments=args,
+                              configurations=list(itertools.chain(*cp.items("cbench-configuration"))))
         halo_finder_job.add_parents(cbench_job)
-        wflow.add_job(cbench_job)
-
-# run halo finder
+        wflow.add_job(halo_finder_job)
 
 # run power spectra
 
