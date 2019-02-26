@@ -226,7 +226,7 @@ for c_tag, c_name in cp.items("compressors"):
                      executable=cp.get("executables", "mpirun"),
                      arguments=[cp.get("executables", section), json_file],
                      configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
-                     environment=cp.get(section, "environment-file") if cp.get(section, "environment-file") else None)
+                     environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
     wflow.add_job(cbench_job)
 
     # loop over each compressed file from CBench
@@ -251,7 +251,7 @@ for c_tag, c_name in cp.items("compressors"):
                               executable=cp.get("executables", "mpirun"),
                               arguments=args,
                               configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
-                              environment=cp.get(section, "environment-file") if cp.get(section, "environment-file") else None)
+                              environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
         halo_finder_job.add_parents(cbench_job)
         wflow.add_job(halo_finder_job)
 
@@ -264,7 +264,7 @@ for c_tag, c_name in cp.items("compressors"):
                                      "-n", os.path.join(cbench_dir, cbench_file),
                                      os.path.join(spectra_dir, "spectra_{}_{}".format(c_tag, i))],
                               configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
-                              environment=cp.get(section, "environment-file") if cp.get(section, "environment-file") else None)
+                              environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
         spectra_job.add_parents(cbench_job)
         wflow.add_job(spectra_job)
 
