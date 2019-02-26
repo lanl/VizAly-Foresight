@@ -3,7 +3,7 @@ echo "#!/bin/bash"
 numNodes=$1
 ranksPerNode=$2
 projectPath=$3
-inputPath=$3
+inputPath=$4
 
 echo "#!/bin/bash" > temp.sh
 echo "#SBATCH -N $numNodes"         >> temp.sh
