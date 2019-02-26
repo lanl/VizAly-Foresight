@@ -12,7 +12,7 @@ class Workflow(object):
     has meaning in this simple API.
     """
 
-    def __init__(self, name, workflow_dir="."):
+    def __init__(self, name, workflow_dir=""):
 
         # store meta-data about the workflow
         self.name = name
@@ -36,8 +36,9 @@ class Workflow(object):
          """
     
          # create workflow directory
-         if not os.path.exists(self.workflow_dir):
-             os.mkdir(self.workflow_dir)
+         if len(self.workflow_dir):
+             if not os.path.exists(self.workflow_dir):
+                 os.mkdir(self.workflow_dir)
     
          # create submission script
          self.submit_path = self.name + ".sh"
@@ -165,6 +166,14 @@ if not os.path.exists(opts.name):
 else:
     raise OSError("The directory {} already exists! Aborting!".format(opts.name))
 os.chdir(opts.name)
+run_dir = os.getcwd()
+
+# create output directories
+cbench_dir = os.path.join(run_dir, "cbench")
+os.makedirs(cbench_dir)
+
+# create a workflow
+wflow = Workflow(name=opts.name)
 
 # fill in CBench JSON data except for list of compressors and settings
 section = "cbench"
@@ -176,11 +185,15 @@ cbench_json_data["output"]["logfname"] = cp.get(section, "log-file")
 cbench_json_data["output"]["metricsfname"] = cp.get(section, "metrics-file")
 cbench_json_data["metrics"] = cp.geteval(section, "metrics")
 
+# get CBench settings
+
 # loop over compressor settings
 for c_tag, c_name in cp.items("compressors"):
+
+    # clear compressors
     cbench_json_data["compressors"] = []
 
-    # get cartesian product of options
+    # get cartesian product of compressors settings
     keys = []
     vals = []
     for key, val in cp.items(c_tag):
@@ -197,14 +210,24 @@ for c_tag, c_name in cp.items("compressors"):
         cbench_json_data["compressors"].append(entry)
 
     # write JSON data
-    json_file = "cbnech_{}.json".format(c_tag)
+    json_file = os.path.join(cbench_dir, "cbench_{}.json".format(c_tag))
     with open(json_file, "w") as fp:
         json.dump(cbench_json_data, fp, indent=4, sort_keys=True)
 
-    # add CBench
+    # add CBench job to workflow
+    cbench_job = Job(name="cbench_{}".format(c_tag),
+                     execute_dir=cbench_dir,
+                     executable=cp.get("executables", "cbench"),
+                     arguments=[json_file],
+                     configurations=list(itertools.chain(*cp.items("cbench-configuration"))))
+    wflow.add_job(cbench_job)
+
 
 # run halo finder
 
 # run power spectra
 
 # concatenate in Cinema
+
+# write workflow
+wflow.write()
