@@ -260,7 +260,8 @@ for c_tag, c_name in cp.items("compressors"):
         spectra_job = Job(name="spectra_{}_{}".format(c_tag, i),
                           execute_dir=spectra_dir,
                           executable=cp.get("executables", "mpirun"),
-                          arguments=[cp.get(section, "parameters-file"), "-n", os.path.join(cbench_dir, cbench_file),
+                          arguments=[cp.get("executables", section), cp.get(section, "parameters-file"),
+                                     "-n", os.path.join(cbench_dir, cbench_file),
                                      os.path.join(spectra_dir, "spectra_{}_{}".format(c_tag, i))],
                               configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
                               environment=cp.get(section, "environment-file") if cp.get(section, "environment-file") else None)
