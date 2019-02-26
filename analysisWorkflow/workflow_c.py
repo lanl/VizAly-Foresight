@@ -145,7 +145,9 @@ run_dir = os.getcwd()
 
 # create output directories
 cbench_dir = os.path.join(run_dir, "cbench")
+halo_dir = os.path.join(run_dir, "halo")
 os.makedirs(cbench_dir)
+os.makedirs(halo_dir)
 
 # create a workflow
 wflow = Workflow(name=opts.name)
@@ -219,18 +221,26 @@ for c_tag, c_name in cp.items("compressors"):
 
     # loop over each compressed file
     for i, setting in enumerate(settings):
+
+        # get CBench output path
         cbench_file = cbench_json_data["compressors"][i]["output-prefix"] + "__" + os.path.basename(cbench_json_data["input"]["filename"])
 
-        print(i, cbench_file)
+        # cut off timestep from CBench output path
+        prefix = halo_dir + "/" + ".".join(cbench_file.split(".")[:-1])
 
-#    # get command line for halo finder
-#    section = "halo-finder"
-#    args = [cp.get("executables", "halo-finder"),
-#            "--config", cp.get(section, "config-file"),
-#            "--timesteps", cp.get(section, "timesteps-file"),
-#            "--prefix", cp.get(section, "prefix"),
-#            cp.get("executables", "parameters-file")]
-#    halo_finder_job = Job(name="halo_finder_{}".format(c_tag)
+        print(prefix)
+
+        # add halo finder job to workflow
+        # make dependent on CBench job
+        section = "halo-finder"
+        args = [cp.get("executables", "halo-finder"),
+                "--config", cp.get(section, "config-file"),
+                "--timesteps", cp.get(section, "timesteps-file"),
+                "--prefix", prefix,
+                cp.get("executables", "parameters-file")]
+        halo_finder_job = Job(name="halo_finder_{}".format(c_tag)
+        halo_finder_job.add_parents(cbench_job)
+        wflow.add_job(cbench_job)
 
 # run halo finder
 
