@@ -238,14 +238,27 @@ for c_tag, c_name in cp.items("compressors"):
         # cut off timestep from CBench output path for halo finder executable
         prefix = cbench_dir + "/" + ".".join(cbench_file.split(".")[:-1])
 
+        # set paths for configuration and parameters files
+        config_file = os.path.join(halo_dir, "halo_finder_{}_{}_config.txt".format(c_tag, i))
+        parameters_file = os.path.join(halo_dir, "halo_finder_{}_{}_parameters.txt".format(c_tag, i))
+
+        # write parameters file
+        # specify location of parsed configuration file inside
+        section = "halo-finder"
+        os.system("sed \"s/^COSMOTOOLS_CONFIG.*/COSMOTOOLS_CONFIG " + ".\/" + os.path.basename(config_file) + "/\" " + cp.get(section, "parameters-file") + " > " + parameters_file)
+
+        # write configuration file
+        # specify output prefix inside
+        os.system("sed \"s/^BASE_OUTPUT_FILE_NAME.*/BASE_OUTPUT_FILE_NAME " + ".\/" + os.path.basename(cbench_file) + "/\" " + cp.get(section, "config-file") + " > " + "tmp.out")
+        os.system("sed \"s/^ACCUMULATE_CORE_NAME.*/ACCUMULATE_CORE_NAME " + ".\/" + os.path.basename(cbench_file) + "/\" " + "tmp.out" + " > " + config_file)
+
         # add halo finder job to workflow
         # make dependent on CBench job
-        section = "halo-finder"
         args = [cp.get("executables", section),
-                "--config", cp.get(section, "config-file"),
+                "--config", config_file,
                 "--timesteps", cp.get(section, "timesteps-file"),
                 "--prefix", prefix,
-                cp.get(section, "parameters-file")]
+                parameters_file]
         halo_finder_job = Job(name="halo_finder_{}_{}".format(c_tag, i),
                               execute_dir=halo_dir,
                               executable=cp.get("executables", "mpirun"),
