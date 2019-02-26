@@ -22,13 +22,52 @@
 	},
 
 	"compressor-comment" : "which compressors to test",
-	"compressors" : ["blosc", "BigCrunch", "SZ", "zfp", "LossyWave" ],
+	"compressors" : 
+	[
+		{
+			"name": "BLOSC"
+		},
+
+		{
+			"name": "BigCrunch",
+			"tolerance": 1E-3
+		},
+
+		{
+            "name": "SZ",
+            "abs" : 2E-3
+        
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 1E-3
+		},
+
+		{
+			"name": "LossyWave",
+			"tolerance" : 1e-03,
+            "quant" : 3,
+            "pcnt" : 40
+		}
+	],
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [
-		"absolute_error",
-		"relative_error",
-		"mse",
-		"psnr"
+		{
+			"name" : "absolute_error"
+		},
+
+		{
+			"name" : "relative_error"
+		},
+
+		{
+			"name" : "mse"
+		},
+
+		{
+			"name" : "psnr"
+		}
 	]
 }

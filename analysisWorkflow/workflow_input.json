@@ -1,4 +1,6 @@
 {
+	"Section-A" : "parameters for halo finder",
+
 	"input-files" : 
 	[
 		{
@@ -18,19 +20,14 @@
 	],
 
 
-	"input-files-alias" : [
-		"original",
-		"BigCrunch",
-		"SZ"
-	],
-
-
 	"halo-finder-setup" : {
 		"timesteps" : "/projects/exasky/HACC/run/haloInputs/timesteps.dat",
 		"config" : "/projects/exasky/HACC/run/haloInputs/cosmotools-config.dat",
 		"params" : "/projects/exasky/HACC/run/haloInputs/indat.params"
 	},
 
+	"halo-output-path" : "/projects/exasky/HACC/run/output/analysis/Halos/b0168/",
+	
 
 	"job-running-params" : {
 		"path-to-environment-setup" : "/projects/exasky/HACC.darwin_setup",
@@ -42,29 +39,31 @@
 	},
 
 
+
+	"Section-B" : "halo query",
+
+	"analysis-prams" : {
+		"sqlite-path" : "/projects/exasky/VizAly_genericio/genericio/frontend/GenericIOSQLite.so"
+	},
+
+
 	"analysis" :
 	[
 		{
 			"halo-files" : [
-				"m001-499.fofproperties", 
+				"__original__m001-499.fofproperties", 
 				"__BigCrunch__m001-499.fofproperties", 
 				"__SZ__m001-499.fofproperties"
 			],
 
 			"queries" : [
 				"select count(*) from __TABLE__", 
-				"select fof_halo_tag, fof_halo_mass from __TABLE__ ORDER BY fof_halo_mass DESC LIMIT 10",
+				"select fof_halo_mass from __TABLE__ ORDER BY fof_halo_mass DESC LIMIT 10",
 				"select fof_halo_center_x, fof_halo_center_y, fof_halo_center_z, fof_halo_mass from __TABLE__ ORDER BY fof_halo_mass DESC LIMIT 10",
-				"select fof_halo_tag, fof_halo_count from __TABLE__ ORDER BY fof_halo_count DESC LIMIT 10",
+				"select fof_halo_count from __TABLE__ ORDER BY fof_halo_count DESC LIMIT 10",
 				"select fof_halo_center_x, fof_halo_center_y, fof_halo_center_z, fof_halo_count from __TABLE__ ORDER BY fof_halo_count DESC LIMIT 10"
 			]
 		}
-	],
-
-	"analysis-prams" : {
-		"halo-output-path" : "/projects/exasky/HACC/run/output/analysis/Halos/b0168/",
-		"sqlite-path" : "/projects/exasky/VizAly_genericio/genericio/frontend/GenericIOSQLite.so"
-	}
-
+	]
 }
  

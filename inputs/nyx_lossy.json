@@ -29,13 +29,44 @@
 	},
 
 	"compressor-comment" : "which compressors to test",
-	"compressors" : ["BigCrunch", "SZ", "LossyWave" ],
+	"compressors" : 
+	[
+		{
+			"name": "BigCrunch",
+			"tolerance": 1E-3
+		},
+
+		{
+            "name": "SZ",
+            "abs" : 2E-3
+        
+		},
+
+		{
+			"name": "LossyWave",
+			"pcnt": 50.0,
+			"quant": 1.0,
+			"tolerance": 1e-03
+		}
+	],
+
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [
-		"absolute_error",
-		"relative_error",
-		"mse",
-		"psnr"
+		{
+			"name" : "absolute_error"
+		},
+
+		{
+			"name" : "relative_error"
+		},
+
+		{
+			"name" : "mse"
+		},
+
+		{
+			"name" : "psnr"
+		}
 	]
 }

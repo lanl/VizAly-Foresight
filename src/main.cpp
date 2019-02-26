@@ -13,6 +13,8 @@ Authors:
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <time.h>
+#include <stdlib.h>
 
 #include <mpi.h>
 
@@ -38,6 +40,7 @@ Authors:
 #ifdef CBENCH_HAS_NYX
 	#include "NYXDataLoader.hpp"
 #endif
+
 
 
 
@@ -138,38 +141,17 @@ int main(int argc, char *argv[])
 
 	std::string metricsFile = jsonInput["output"]["metricsfname"];
 
-	std::vector< std::string > params;
-	for (int j = 0; j < jsonInput["input"]["scalars"].size(); j++)
-		params.push_back( jsonInput["input"]["scalars"][j] );
+	std::vector< std::string > scalars;
+	for (int i = 0; i < jsonInput["input"]["scalars"].size(); i++)
+		scalars.push_back( jsonInput["input"]["scalars"][i] );
 
-
-	std::vector< compressorParams > compressors;
-	if (jsonInput.find("version") != jsonInput.end())
-	{
-		for (int j = 0; j < jsonInput["compressors"].size(); j++)
-		{
-			compressorParams temp;
-			for (auto it = jsonInput["compressors"][j].begin(); it != jsonInput["compressors"][j].end(); ++it)
-			{
-				if (it.key() == "name")
-					temp.name = jsonInput["compressors"][j]["name"];
-				else
-					temp.compressorParameters[it.key()] = strConvert::toStr(it.value());
-			}
-			compressors.push_back(temp);
-		}
-	}
-	else
-	{
-		compressorParams temp;
-		for (int j = 0; j < jsonInput["compressors"].size(); j++)
-			compressors.push_back( compressorParams( jsonInput["compressors"][j].get<std::string>() ) );
-	}
-
+	std::vector< std::string > compressors;
+	for (int i = 0; i < jsonInput["compressors"].size(); i++)
+		compressors.push_back( jsonInput["compressors"][i]["name"] );
 
 	std::vector< std::string > metrics;
-	for (int j = 0; j < jsonInput["metrics"].size(); j++)
-		metrics.push_back(jsonInput["metrics"][j]);
+	for (int i = 0; i < jsonInput["metrics"].size(); i++)
+		metrics.push_back(jsonInput["metrics"][i]["name"]);
 
 	bool writeData = false;
 	std::string outputFile = "";
@@ -178,6 +160,9 @@ int main(int argc, char *argv[])
 		writeData = jsonInput["output"]["output-decompressed"];
         if(writeData)
             outputFile = extractFileName(inputFile);
+
+		// Initial a random number in case output name is not provided
+		srand( time(NULL) );
 	}
 
 
@@ -185,7 +170,6 @@ int main(int argc, char *argv[])
 	// For humans; all seems valid, let's start ...
 	if (myRank == 0)
 		std::cout << "Starting ... \nLook at the log for progress update ... \n" << std::endl;
-
 
 
 	//
@@ -198,8 +182,8 @@ int main(int argc, char *argv[])
 	for (int m = 0; m < metrics.size(); ++m)
 		csvOutput << metrics[m] << ", ";
 
-	csvOutput << "Max Compression Throughput, Max DeCompression Throughput, ";
-	csvOutput << "Min Compression Throughput, Min DeCompression Throughput, Compression Ratio" << std::endl;
+	csvOutput << "Max Compression Throughput(MB/s), Max DeCompression Throughput(MB/s), Max Compress Time(s), ";
+	csvOutput << "Min Compression Throughput(MB/s), Min DeCompression Throughput(MB/s), Compression Ratio" << std::endl;
 	metricsInfo << "Input file: " << inputFile << std::endl;
 
 	overallClock.start();
@@ -207,7 +191,7 @@ int main(int argc, char *argv[])
 
 
 	//
-	// Open file
+	// Open data file
 	DataLoaderInterface *ioMgr;
 
 	if (inputFileType == "Binary")
@@ -251,62 +235,79 @@ int main(int argc, char *argv[])
 	CompressorInterface *compressorMgr;
 	MetricInterface *metricsMgr;
 
-	for (int c = 0; c < compressors.size(); ++c)
+
+	for (int c=0; c < compressors.size(); ++c)
 	{	
 		// initialize compressor
-		compressorMgr = CompressorFactory::createCompressor(compressors[c].name);
+		compressorMgr = CompressorFactory::createCompressor(compressors[c]);
 		if (compressorMgr == NULL)
 		{
 			if (myRank == 0)
-				std::cout << "Unsupported compressor: " << compressors[c].name << " ... Skipping!" << std::endl;
+				std::cout << "Unsupported compressor: " << compressors[c] << " ... Skipping!" << std::endl;
 			continue;
 		}
- 
-		// Check if the parameters field exist
-		if ( jsonInput.find("version") != jsonInput.end() )
-		{
-			for (auto it=compressors[c].compressorParameters.begin(); it!=compressors[c].compressorParameters.end(); it++)
-				compressorMgr->compressorParameters[(*it).first] = strConvert::toStr( (*it).second);
-		}
+
+		// initialize compressor
+		compressorMgr->init();
+
+
+		// Apply parameter if same for all scalars, else delay for later
+		bool sameCompressorParams = true;
+		if ( jsonInput["compressors"][c].find("compressor-params") != jsonInput["compressors"][c].end() )
+			sameCompressorParams = false;
 		else
 		{
-			if (jsonInput["input"].find("parameters") != jsonInput["input"].end())
-			{
-				// insert parameter into compressor parameter list
-				for (auto it=jsonInput["input"]["parameters"].begin(); it != jsonInput["input"]["parameters"].end(); it++)
-				{
-					if ( (it.key()).find("comment") != std::string::npos)
-						continue;
-					compressorMgr->compressorParameters[it.key()] = strConvert::toStr(it.value());	
-					compressors[c].compressorParameters[it.key()] = strConvert::toStr(it.value());
-				}
-			}
+			for (auto it = jsonInput["compressors"][c].begin(); it != jsonInput["compressors"][c].end(); ++it)
+				if ((it.key() != "name") && (it.key() != "output-prefix"))
+					compressorMgr->compressorParameters[ it.key() ] = strConvert::toStr( it.value() );
 		}
-		
-
+	
+	
 		// log
-		compressorMgr->init();
 		metricsInfo << "\n---------------------------------------" << std::endl;
 		metricsInfo << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
-		metricsInfo << compressors[c].getParamsInfo() << std::endl;
 
 		debuglog << "===============================================" << std::endl;
 		debuglog << "Compressor: " << compressorMgr->getCompressorName() << std::endl;		
 		
 
-		// Cycle through params
-		for (int i=0; i<params.size(); i++)
+		// Cycle through scalars
+		for (int i=0; i<scalars.size(); i++)
 		{
 			Timer compressClock, decompressClock;
 			Memory memLoad;
 
 			memLoad.start();
 
+
 			// Check if parameter is valid before proceding
-			if ( !ioMgr->loadData(params[i]) )
+			if ( !ioMgr->loadData(scalars[i]) )
 			{
 				memLoad.stop();
 				continue;
+			}
+
+
+			// Read in compressor parameter for this field
+			if (!sameCompressorParams)
+			{
+				compressorMgr->compressorParameters.clear(); 	// reset compression param for each field
+				int numdifferentParams = jsonInput["compressors"][c]["compressor-params"].size();
+
+				for (int cp=0; cp<numdifferentParams; cp++)		
+				{
+					for (auto it = jsonInput["compressors"][c]["compressor-params"][cp]["scalar"].begin(); 
+						it != jsonInput["compressors"][c]["compressor-params"][cp]["scalar"].end(); it++)
+					{
+						if (*it != scalars[i])
+							continue;
+
+						for (auto itt = jsonInput["compressors"][c]["compressor-params"][cp].begin(); 
+								itt != jsonInput["compressors"][c]["compressor-params"][cp].end(); ++itt)
+							if (itt.key() != "scalar")
+								compressorMgr->compressorParameters[ itt.key() ] = strConvert::toStr( itt.value() );
+					}
+				}
 			}
 
 			
@@ -314,7 +315,9 @@ int main(int argc, char *argv[])
 			debuglog << ioMgr->getDataInfo();
 			debuglog << ioMgr->getLog();
 			appendLog(outputLogFile, debuglog);
-			csvOutput << compressorMgr->getCompressorName() << "_" << params[i] << "__" << compressors[c].getParamsInfo() << ", ";
+			
+			metricsInfo << compressorMgr->getParamsInfo() << std::endl;
+			csvOutput << compressorMgr->getCompressorName() << "_" << scalars[i] << "__" << compressorMgr->getParamsInfo() << ", ";
 
 			MPI_Barrier(MPI_COMM_WORLD);
 			
@@ -351,16 +354,16 @@ int main(int argc, char *argv[])
 			debuglog << "unCompressedSize: " << unCompressedSize << ", totalUnCompressedSize: " << totalUnCompressedSize << std::endl;
 			debuglog << "Compression ratio: " << totalUnCompressedSize/(float)totalCompressedSize << std::endl;
 
-			writeLogApp(outputLogFile, compressorMgr->getLog());
+			appendLog(outputLogFile, compressorMgr->getLog());
 			compressorMgr->clearLog();
 
 
 			//
 			// metrics
-			debuglog << "\n----- " << params[i] << " error metrics ----- " << std::endl;
-			metricsInfo << "\nField: " << params[i] << std::endl;
+			debuglog << "\n----- " << scalars[i] << " error metrics ----- " << std::endl;
+			metricsInfo << "\nField: " << scalars[i] << std::endl;
 			for (int m = 0; m < metrics.size(); ++m)
-			{
+			{	
 				metricsMgr = MetricsFactory::createMetric(metrics[m]);
 				if (metricsMgr == NULL)
 				{
@@ -370,17 +373,41 @@ int main(int argc, char *argv[])
 				}
 
 
+				// Read in additional params for metrics
+				for (auto it = jsonInput["metrics"][m].begin(); it != jsonInput["metrics"][m].end(); it++)
+				{
+					if (it.key() != "name")
+						for (auto it2 = jsonInput["metrics"][m][it.key()].begin();
+								it2 != jsonInput["metrics"][m][it.key()].end(); it2++)
+							if (*it2 != scalars[i])
+								continue;
+							else
+							{
+								metricsMgr->parameters[it.key()] = strConvert::toStr( scalars[i] );
+								break;
+							}	
+				}
+
+				// Launch 
 				metricsMgr->init(MPI_COMM_WORLD);
 				metricsMgr->execute(ioMgr->data, decompdata, ioMgr->getNumElements());
 				debuglog << metricsMgr->getLog();
 				metricsInfo << metricsMgr->getLog();
 				csvOutput << metricsMgr->getGlobalValue() << ", ";
 
-				if (metrics[m] == "absolute_error")
-				{
-					if (metricsMgr->hasHistogram())
-						writeFile( extractFileName(inputFile) + "_" + compressors[c].name + "_" + params[i] + "_" + metrics[m] + "_" + compressors[c].getParamsInfo() + "_hist.csv", metricsMgr->getHistogramCSV());
-				}
+				if (myRank == 0)
+					if (metricsMgr->additionalOutput != "")
+					{
+						std::string outputHistogramName = "";
+						outputHistogramName = extractFileName(inputFile) + "_" + compressors[c] + "_" + scalars[i];
+						outputHistogramName += "_" + metrics[m] + "_" + compressorMgr->getParamsInfo() + "_hist.py";
+						writeFile( outputHistogramName, metricsMgr->additionalOutput );
+					}
+				//if (metrics[m] == "absolute_error")
+				//{
+				//	if (metricsMgr->hasHistogram())
+				//		writeFile( extractFileName(inputFile) + "_" + compressors[c] + "_" + scalars[i] + "_" + metrics[m] + "_" + compressorMgr->getParamsInfo() + "_hist.csv", metricsMgr->getHistogramCSV());
+				//}
 				metricsMgr->close();
 			}
 			debuglog << "-----------------------------\n";
@@ -401,9 +428,11 @@ int main(int argc, char *argv[])
 			double max_decompress_throughput = 0;
 			double min_compress_throughput = 0;
 			double min_decompress_throughput = 0;
+			double max_compress_time = 0;
 
 			MPI_Reduce(&compress_throughput, &max_compress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 			MPI_Reduce(&decompress_throughput, &max_decompress_throughput, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+			MPI_Reduce(&compress_time, &max_compress_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
 			MPI_Reduce(&compress_throughput, &min_compress_throughput, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
 			MPI_Reduce(&decompress_throughput, &min_decompress_throughput, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
@@ -411,12 +440,11 @@ int main(int argc, char *argv[])
 			
 			if (writeData)
 			{
-				ioMgr->saveCompData(params[i], decompdata);
+				ioMgr->saveCompData(scalars[i], decompdata);
 				debuglog << ioMgr->getLog();
 			}
 
 			
-
 			//
 			// deallocate
 			std::free(decompdata);
@@ -439,19 +467,20 @@ int main(int argc, char *argv[])
 			{
 				metricsInfo << "Max Compression Throughput: " << max_compress_throughput << " Mbytes/s" << std::endl;
 				metricsInfo << "Max DeCompression Throughput: " << max_decompress_throughput << " Mbytes/s" << std::endl;
+				metricsInfo << "Max Compress Time: " << max_compress_time << " s" << std::endl;
+
 				metricsInfo << "Min Compression Throughput: " << min_compress_throughput << " Mbytes/s" << std::endl;
 				metricsInfo << "Min DeCompression Throughput: " << min_decompress_throughput << " Mbytes/s" << std::endl;
+
 				metricsInfo << "Compression ratio: " << totalUnCompressedSize/(float)totalCompressedSize << std::endl;
-				csvOutput << max_compress_throughput << ", " << max_decompress_throughput << ", " 
+				csvOutput << max_compress_throughput << ", " << max_decompress_throughput << ", " << max_compress_time << ", " 
 						  << min_compress_throughput << ", " << min_decompress_throughput << ", " 
 						  << totalUnCompressedSize/(float)totalCompressedSize << "\n";
 
 				writeFile(metricsFile, metricsInfo.str());
 				writeFile(metricsFile + ".csv", csvOutput.str());
-
 			}
-			
-			
+				
 			MPI_Barrier(MPI_COMM_WORLD);
 		}
 		
@@ -473,7 +502,15 @@ int main(int argc, char *argv[])
 				}
 			}
 
-			ioMgr->writeData("__" + compressorMgr->getCompressorName() + "__" + compressors[c].getParamsInfo() + "__" + outputFile);
+
+			std::string decompressedOutputName;
+			if (jsonInput["compressors"][c].find("output-prefix") != jsonInput["compressors"][c].end())
+				decompressedOutputName = jsonInput["compressors"][c]["output-prefix"];
+			else
+				decompressedOutputName = "__" + compressorMgr->getCompressorName() + "_" + std::to_string( rand() );
+			decompressedOutputName = decompressedOutputName + "__" + outputFile;
+
+			ioMgr->writeData(decompressedOutputName);
 
 			clockWrite.stop();
 
@@ -502,5 +539,4 @@ int main(int argc, char *argv[])
 /*
 Run:
 mpirun -np 2 CBench ../inputs/HACC_all.json
-mpirun -np 8 ./CBench ../inputs/HACC_write_bigcrunch.json
 */

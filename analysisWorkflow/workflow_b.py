@@ -15,7 +15,7 @@ def output_file(file, directory, result):
 
 def analysis(query_mgr, json_data):
 	output_files = []
-	halo_file_path = json_data["analysis-prams"]["halo-output-path"]
+	halo_file_path = json_data["halo-output-path"]
 
 	count = 0
 	for entry in json_data["analysis"]:
@@ -37,7 +37,7 @@ def analysis(query_mgr, json_data):
 				result_filename = filename + '_' + str(query_count)
 
 				query = sql_query.replace("__TABLE__", table_name)
-				result = query_mgr.runQueryOutputString(query)
+				result = query_mgr.runQueryOutputCSV(query)
 
 				# Saving the output
 				output_file(result_filename, "results", result)

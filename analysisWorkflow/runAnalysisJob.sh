@@ -1,7 +1,11 @@
 #!/bin/bash
 #SBATCH -N 1
 
-projectPath=/projects/exasky/pascal-projects/VizAly-CBench
+# Go up one level before
+pushd ..
+projectPath=$(pwd)
+popd
+
 
 # load modules
 source $projectPath/analysisWorkflow/HACC.darwin_setup

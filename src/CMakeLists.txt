@@ -3,15 +3,13 @@ cmake_minimum_required(VERSION 3.6.2)
 project(CBench)
 
 set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel.")
+
 
 # add libs
 set (EXTRA_LIBS "")
 
-option(CBENCH_ENABLE_NYX_LOADER
-	"Enables the reading of NyX HDF5 data"
-	OFF
-)
-
+# inclue dirs
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/metrics)
 include_directories(${CMAKE_SOURCE_DIR}/utils)
@@ -19,6 +17,7 @@ include_directories(${CMAKE_SOURCE_DIR}/utils)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader/Binary)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader/HACC)
+
 if(CBENCH_ENABLE_NYX_LOADER)
 	include_directories(${CMAKE_SOURCE_DIR}/dataLoader/NYX)
 endif()
@@ -27,6 +26,7 @@ if(WIN32)
 	add_definitions(-DNOMINMAX)
 endif()
 
+
 # HACC Loader
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty/genericio)
 add_definitions(-DGENERICIO_NO_COMPRESSION)
@@ -34,7 +34,8 @@ add_library(GenericIO STATIC "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO
 set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # NYX Loader
-if(CBENCH_ENABLE_NYX_LOADER)
+option(CBENCH_ENABLE_NYX_LOADER "Enables the reading of NyX HDF5 data" OFF )
+if (CBENCH_ENABLE_NYX_LOADER)
     set(HDF5_USE_STATIC_LIBRARIES ON)
 	find_package(HDF5 COMPONENTS CXX REQUIRED)
 	if(HDF5_FOUND)

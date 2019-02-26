@@ -15,8 +15,10 @@ Authors:
 #include <cmath>
 #include <string>
 #include <sstream>
+#include <iostream>
 #include <vector>
 #include <math.h>
+
 #include "metricInterface.hpp"
 
 class absoluteError : public MetricInterface
@@ -40,13 +42,11 @@ inline absoluteError::absoluteError()
 	myRank = 0;
 	numRanks = 0;
 	metricName = "absolute_error";
-	numBins = 512;
-	histogramComputed = false;
 }
 
 inline absoluteError::~absoluteError()
 {
-	histogramComputed = false;
+
 }
 
 inline void absoluteError::init(MPI_Comm _comm)
@@ -100,36 +100,67 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
 	MPI_Barrier(comm);
 
 
-	
-
-	// Compute histogram of values
-	if (total_max_abs_err != 0)
+	auto found  = parameters.find("histogram");
+	if ( found != parameters.end() )
 	{
-		std::vector<int> localHistogram(numBins,0);
-		double binSize = total_max_abs_err / numBins;
-
-		for (std::size_t i = 0; i < n; ++i)
+		// Compute histogram of values
+		if (total_max_abs_err != 0)
 		{
-			// Max set tolerence to 1
-			double err = absError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i]);
+			std::vector<float>histogram;
+			int numBins = 512;
+			std::vector<int> localHistogram(numBins,0);
+			double binSize = total_max_abs_err / numBins;
 
-			int binPos = err/binSize;
+			for (std::size_t i = 0; i < n; ++i)
+			{
+				// Max set tolerence to 1
+				double err = absError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i]);
 
-			if (binPos >= numBins)
-				binPos = binPos-1;
+				int binPos = err/binSize;
 
-			localHistogram[binPos]++;
+				if (binPos >= numBins)
+					binPos = binPos-1;
+
+				localHistogram[binPos]++;
+			}
+
+			histogram.resize(numBins);
+
+			std::vector<int> globalHistogram(numBins,0);
+			MPI_Allreduce(&localHistogram[0], &globalHistogram[0], numBins, MPI_INT, MPI_SUM, comm);
+
+			for (std::size_t i=0; i<numBins; ++i)
+				histogram[i] = ((float)globalHistogram[i])/global_n;
+
+
+			// Output histogram as a python script file
+			if (myRank == 0)
+			{
+				std::stringstream outputFileSS;
+				outputFileSS << "import sys" << std::endl;
+				outputFileSS << "import numpy as np" << std::endl;
+				outputFileSS << "import matplotlib.pyplot as plt" << std::endl;
+
+				outputFileSS << "y=[";
+				std::size_t i;
+				for (i=0; i<numBins-1; ++i) 
+					outputFileSS << std::to_string(histogram[i]) << ", ";
+				outputFileSS << std::to_string(histogram[i]) << "]" << std::endl;
+
+				outputFileSS << "maxVal=" << std::to_string(total_max_abs_err) << std::endl;
+				outputFileSS << "plotName=sys.argv[0]" << std::endl;
+				outputFileSS << "plotName = plotName.replace('.py','.png')" << std::endl;
+
+				outputFileSS << "numVals = len(y)" << std::endl;
+				outputFileSS << "x = np.linspace(0, maxVal, numVals+1)[1:]" << std::endl;
+				outputFileSS << "plt.plot(x,y)" << std::endl;
+				outputFileSS << "plt.title(plotName)" << std::endl;
+				outputFileSS << "plt.ylabel(\"Frequency\")" << std::endl;
+				outputFileSS << "plt.savefig(plotName)" << std::endl;
+
+				additionalOutput = outputFileSS.str();
+			}
 		}
-
-		histogram.resize(numBins);
-
-		std::vector<int> globalHistogram(numBins,0);
-		MPI_Allreduce(&localHistogram[0], &globalHistogram[0], numBins, MPI_INT, MPI_SUM, comm);
-
-
-		for (std::size_t i=0; i<numBins; ++i)
-			histogram[i] = ((float)globalHistogram[i])/global_n;
-		histogramComputed = true;
 	}
 	
 
