@@ -129,6 +129,7 @@ class Config(configparser.ConfigParser):
 parser = argparse.ArgumentParser()
 parser.add_argument("--name", default="workflow_c")
 parser.add_argument("--config-file", default="workflow_c.ini")
+parser.add_argument("--submit", action="store_true")
 opts = parser.parse_args()
 
 # read configuration file
@@ -185,6 +186,7 @@ for metric in cp.geteval(section, "metrics"):
 for c_tag, c_name in cp.items("compressors"):
 
     # get cartesian product of compressors settings
+    # specify output prefix
     cbench_json_data["compressors"] = []
     keys = []
     vals = []
@@ -204,7 +206,7 @@ for c_tag, c_name in cp.items("compressors"):
             entry[keys[i]] = val
         cbench_json_data["compressors"].append(entry)
 
-    # set log files
+    # set log files for CBench
     section = "cbench"
     cbench_json_data["output"]["logfname"] = cp.get(section, "log-file") + "_{}".format(c_tag)
     cbench_json_data["output"]["metricsfname"] = cp.get(section, "metrics-file") + "_{}".format(c_tag)
@@ -222,13 +224,13 @@ for c_tag, c_name in cp.items("compressors"):
                      configurations=list(itertools.chain(*cp.items("cbench-configuration"))))
     wflow.add_job(cbench_job)
 
-    # loop over each compressed file
+    # loop over each compressed file from CBench
     for i, setting in enumerate(settings):
 
         # get CBench output path
         cbench_file = cbench_json_data["compressors"][i]["output-prefix"] + "__" + os.path.basename(cbench_json_data["input"]["filename"])
 
-        # cut off timestep from CBench output path
+        # cut off timestep from CBench output path for halo finder executable
         prefix = halo_dir + "/" + ".".join(cbench_file.split(".")[:-1])
 
         # add halo finder job to workflow
@@ -247,7 +249,7 @@ for c_tag, c_name in cp.items("compressors"):
         halo_finder_job.add_parents(cbench_job)
         wflow.add_job(halo_finder_job)
 
-        # run power spectra
+        # add power spectra job to workflow
         section = "power-spectrum"        
         spectra_job = Job(name="spectra_{}_{}".format(c_tag, i),
                           execute_dir=spectra_dir,
@@ -257,9 +259,9 @@ for c_tag, c_name in cp.items("compressors"):
         spectra_job.add_parents(cbench_job)
         wflow.add_job(spectra_job)
 
-        # plotting
-
-        # concatenate in Cinema
-
 # write workflow
 wflow.write()
+
+# submit
+if opts.submit:
+    wflow.submit()
