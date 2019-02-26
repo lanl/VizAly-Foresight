@@ -95,6 +95,9 @@ ExternalDependencies/
 *-sublime-project
 *-sublime-project.sublime-workspace
 
+# workflow files
+analysisWorkflow/*/*
+
 CMakeCache\.txt
 
 CMakeFiles/cmake\.check_cache

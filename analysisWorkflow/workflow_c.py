@@ -68,7 +68,7 @@ class Workflow(object):
              with open(path, "w") as fp:
                  fp.write("#! /bin/bash\n")
                  for key, val in zip(job.configurations[::2], job.configurations[1::2]):
-                     fp.write("#SBATCH {} {}\n".format(key, val))
+                     fp.write("#SBATCH --{}={}\n".format(key, val))
                  fp.write("mkdir -p {}/{}\n".format(self.workflow_dir, job.execute_dir))
                  fp.write("cd {}/{}\n".format(self.workflow_dir, job.execute_dir))
                  fp.write(job.executable + " " + " ".join(map(str, job.arguments)) + "\n")
@@ -127,8 +127,6 @@ class Config(configparser.ConfigParser):
 
 # template for building CBench JSON file
 cbench_json_data = {
-    "version-comment" : "1.1: Each compressor has its parameters",
-    "version" : 1.1,
     "input" : {
         "filetype-comment" : "Type of file to load; HACC or NYX",
         "filetype" : None,
@@ -145,9 +143,9 @@ cbench_json_data = {
         "metricsfname" : None,
     },
     "compressor-comment" : "Compressors and parameters to test",
-    "compressors" : None,
+    "compressors" : [],
     "metrics-comment": "Metrics to report",
-    "metrics": None,
+    "metrics": [],
 }
 
 # parse command line
@@ -183,7 +181,11 @@ cbench_json_data["input"]["scalars"] = cp.geteval(section, "scalars")
 cbench_json_data["output"]["output-decompressed"] = cp.getboolean(section, "output-decompressed")
 cbench_json_data["output"]["logfname"] = cp.get(section, "log-file")
 cbench_json_data["output"]["metricsfname"] = cp.get(section, "metrics-file")
-cbench_json_data["metrics"] = cp.geteval(section, "metrics")
+for metric in cp.geteval(section, "metrics"):
+    entry = {"name" : metric}
+    if cp.getboolean("cbench", "histogram") and metric == "absolute_error":
+        entry["histogram"] = cp.geteval(section, "scalars")
+    cbench_json_data["metrics"].append(entry)
 
 # get CBench settings
 
