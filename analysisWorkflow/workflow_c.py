@@ -253,8 +253,9 @@ for c_tag, c_name in cp.items("compressors"):
         section = "power-spectrum"        
         spectra_job = Job(name="spectra_{}_{}".format(c_tag, i),
                           execute_dir=spectra_dir,
-                          executable=cp.get("executables", section),
-                          arguments=[cbench_file, os.path.join(spectra_dir, "spectra_{}_{}".format(c_tag, i))],
+                          executable=cp.get("executables", "mpirun"),
+                          arguments=[cp.get(section, "parameters-file"), "-n", cbench_file,
+                                     os.path.join(spectra_dir, "spectra_{}_{}".format(c_tag, i))],
                           configurations=list(itertools.chain(*cp.items("cbench-configuration"))))
         spectra_job.add_parents(cbench_job)
         wflow.add_job(spectra_job)
