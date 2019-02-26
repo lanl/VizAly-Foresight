@@ -9,7 +9,7 @@ echo "#!/bin/bash" > temp.sh
 echo "#SBATCH -N $numNodes"         >> temp.sh
 echo "#SBATCH --ntasks-per-node $ranksPerNode"  >> temp.sh
 echo "#SBATCH -p scaling"           >> temp.sh
-echo "#SBATCH -qos=scaling"         >> temp.sh
+echo "#SBATCH --qos=scaling"        >> temp.sh
 
 echo "source $projectPath/scripts/VizAly-CBench.bash.darwin"    >> temp.sh
 echo "cd $projectPath/build"                                    >> temp.sh
