@@ -75,8 +75,7 @@ if opts.descending:
     query += " DESC"
 if opts.limit:
     query += " LIMIT {}".format(opts.limit)
-
-print(query)
+print("Will execute the following query: {}".format(query))
 
 # count scalar fields to query and match
 n_parameters = len(opts.parameters)
