@@ -130,7 +130,7 @@ for i, d_1 in enumerate(data_1_snap):
     # ensure unqiue matches
     # record number of particles without match
     if idx.size > 1:
-        raise KeyError("More than one particle matched! No in good regime!")
+        raise KeyError("More than one particle matched! Not in good regime!")
     elif idx.size == 0:
         n_lost += 1
         lost_idxs.append(i)
