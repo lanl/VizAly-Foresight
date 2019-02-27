@@ -130,8 +130,7 @@ for i, d_1 in enumerate(data_1_snap):
     # ensure unqiue matches
     # record number of particles without match
     if idx.size > 1:
-        n_lost += 1
-        continue
+        raise KeyError("More than one particle matched! No in good regime!")
     elif idx.size == 0:
         n_lost += 1
         lost_idxs.append(i)
@@ -139,16 +138,12 @@ for i, d_1 in enumerate(data_1_snap):
     else:
         idx = idx[0]
 
-    # get hashed values
-    d_2 = data_2_snap[idx]
-
     # get data values
     r_1 = data_1[:, i]
     r_2 = data_2[:, idx]
 
     # compute metric
     metric = operate(r_2, r_1, opts.operation)
-    metric_hash = operate(d_2, d_1, opts.operation)
 
     # append result
     metrics.append(metric)
