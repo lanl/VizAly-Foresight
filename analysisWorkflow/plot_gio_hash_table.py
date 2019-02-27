@@ -1,52 +1,12 @@
 #! /usr/bin/env python
+""" Plots distributions of hashed GenericIO files.
+"""
 
 import argparse
 import gioSqlite as gio_sqlite
 import matplotlib.pyplot as plt
 import numpy
 import os
-
-def make_fake_data():
-
-    # particles
-    n_particles = 1e5
-
-    # random sampling coordinates
-    x_min, x_max = 0.0, 256.0
-    mass_min, mass_max = 1e13, 1e14
-    vx_min, vx_max = 2e2, 1e3
-    coords_mins = [x_min, x_min, x_min, mass_min, vx_min, vx_min, vx_min]
-    coords_maxs = [x_max, x_max, x_max, mass_max, vx_max, vx_max, vx_max]
-    coords_raw = []
-    for coord_min, coord_max in zip(coords_mins, coords_maxs):
-        coords_raw.append(numpy.random.uniform(coord_min, coord_max, n_particles))
-    coords_raw = numpy.vstack(coords_raw)
-    
-    # add noise
-    x_mean = 0.0
-    x_var = 0.003
-    mass_mean = 1e6
-    mass_var = 1e3
-    vx_mean = None
-    vx_var = None
-    jit_means = [x_mean, x_mean, x_mean, mass_mean, vx_mean, vx_mean, vx_mean]
-    jit_vars = [x_var, x_var, x_var, mass_var, vx_var, vx_var, vx_var]
-    coords_jit = []
-    for i, (jit_mean, jit_var) in enumerate(zip(jit_means, jit_vars)):
-        if jit_mean == jit_var == None:
-            vals = coords_raw[i, :]
-        else:
-            vals = coords_raw[i, :] + numpy.random.normal(jit_mean, jit_var, n_particles)
-        coords_jit.append(vals)
-    coords_jit = numpy.vstack(coords_jit)
-    
-    # example data 1
-    data_1 = coords_raw
-    
-    # example data 2
-    data_2 = coords_jit
-
-    return data_1, data_2
 
 def load_sqlite_data(path, query, sqlite_file):
 
@@ -118,10 +78,8 @@ if opts.input_file and opts.reference_file:
     data_2 = load_sqlite_data(opts.input_file, query, opts.sqlite_file)
     data_1 = numpy.transpose(data_1)
     data_2 = numpy.transpose(data_2)
-elif opts.input_file or opts.reference_file:
-    raise KeyError("Must use both --input-file and --reference-file!")
 else:
-    data_1, data_2 = make_fake_data()
+    raise KeyError("Must use both --input-file and --reference-file!")
 
 # print statment
 print("Read {} particles from {}...".format(data_1.shape[1], opts.input_file))
