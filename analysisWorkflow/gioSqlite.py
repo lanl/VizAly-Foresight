@@ -97,7 +97,7 @@ class GioSqlite3:
 
 		resultsList = []
 		while row is not None:
-			resultsList.append(row[0])
+			resultsList.append(row)
 			row = cursor.fetchone()
 
 		return resultsList
