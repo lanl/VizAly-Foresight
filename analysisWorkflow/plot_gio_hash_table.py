@@ -9,6 +9,8 @@ import numpy
 import os
 
 def load_sqlite_data(path, query, sqlite_file):
+    """ Loads data using SQLite query.
+    """
 
     # load file
     print("Reading {}...".format(path))
@@ -30,6 +32,8 @@ def load_sqlite_data(path, query, sqlite_file):
     return result
 
 def snap(x, d=0.25):
+    """ Snaps data to a grid.
+    """
 #    d = 1.0 / d
 #    return numpy.ceil(d * x) / d
     return numpy.ceil(x / d) * d
