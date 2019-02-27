@@ -191,51 +191,63 @@ for metric in cp.geteval(section, "metrics"):
     cbench_json_data["metrics"].append(entry)
 
 # loop over compressors
-for c_tag, c_name in cp.items("compressors"):
+compressors = cp.items("compressors")
+compressors += [("original", None,)]
+for c_tag, c_name in compressors:
 
-    # get cartesian product of compressor settings to sweep
-    keys = []
-    vals = []
-    for key, val in cp.items(c_tag):
-        keys.append(key)
-        val = eval(val)
-        if isinstance(val, int) or isinstance(val, float):
-            val = [val]
-        vals.append(val)
-    settings = list(itertools.product(*vals))
+    # create a CBench job if doing compression
+    if c_tag != "original":
 
-    # add compressors settings to JSON data
-    cbench_json_data["compressors"] = []
-    for i, setting in enumerate(settings):
-        entry = {
-            "name" : c_name,
-            "output-prefix" : "__{}__{}".format(c_tag, i),
-        }
-        for i, val in enumerate(setting):
-            entry[keys[i]] = val
-        cbench_json_data["compressors"].append(entry)
+        # get cartesian product of compressor settings to sweep
+        keys = []
+        vals = []
+        for key, val in cp.items(c_tag):
+            keys.append(key)
+            val = eval(val)
+            if isinstance(val, int) or isinstance(val, float):
+                val = [val]
+            vals.append(val)
+        settings = list(itertools.product(*vals))
+    
+        # add compressors settings to JSON data
+        cbench_json_data["compressors"] = []
+        for i, setting in enumerate(settings):
+            entry = {
+                "name" : c_name,
+                "output-prefix" : "__{}__{}".format(c_tag, i),
+            }
+            for i, val in enumerate(setting):
+                entry[keys[i]] = val
+            cbench_json_data["compressors"].append(entry)
+    
+        # set log file prefixes for CBench in JSON data
+        section = "cbench"
+        cbench_json_data["output"]["logfname"] = cp.get(section, "log-file") + "_{}".format(c_tag)
+        cbench_json_data["output"]["metricsfname"] = cp.get(section, "metrics-file") + "_{}".format(c_tag)
+    
+        # write CBENCH JSON data
+        json_file = os.path.join(cbench_dir, "cbench_{}.json".format(c_tag))
+        with open(json_file, "w") as fp:
+            json.dump(cbench_json_data, fp, indent=4, sort_keys=True)
+    
+        # add a single CBench job to workflow for entire sweep
+        cbench_job = Job(name="cbench_{}".format(c_tag),
+                         execute_dir=cbench_dir,
+                         executable=cp.get("executables", "mpirun"),
+                         arguments=[cp.get("executables", section), json_file],
+                         configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
+                         environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
+        wflow.add_job(cbench_job)
 
-    # set log file prefixes for CBench in JSON data
-    section = "cbench"
-    cbench_json_data["output"]["logfname"] = cp.get(section, "log-file") + "_{}".format(c_tag)
-    cbench_json_data["output"]["metricsfname"] = cp.get(section, "metrics-file") + "_{}".format(c_tag)
-
-    # write CBENCH JSON data
-    json_file = os.path.join(cbench_dir, "cbench_{}.json".format(c_tag))
-    with open(json_file, "w") as fp:
-        json.dump(cbench_json_data, fp, indent=4, sort_keys=True)
-
-    # add a single CBench job to workflow for entire sweep
-    cbench_job = Job(name="cbench_{}".format(c_tag),
-                     execute_dir=cbench_dir,
-                     executable=cp.get("executables", "mpirun"),
-                     arguments=[cp.get("executables", section), json_file],
-                     configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
-                     environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
-    wflow.add_job(cbench_job)
+    # symlink if input data file without doing compression
+    else:
+        cbench_json_data["compressors"] = [{"name" : "original", "output-prefix" : "__original__0"}]
+        os.system("ln -s {} {}/{}__{}".format(cp.get("cbench", "input-file"), cbench_dir, 
+                                              cbench_json_data["compressors"][0]["output-prefix"],
+                                              os.path.basename(cbench_json_data["input"]["filename"])))
 
     # loop over each compressed file from CBench
-    for i, setting in enumerate(settings):
+    for i, _ in enumerate(cbench_json_data["compressors"]):
 
         # get CBench output path for this compressed file
         cbench_file = cbench_json_data["compressors"][i]["output-prefix"] + "__" + os.path.basename(cbench_json_data["input"]["filename"])
