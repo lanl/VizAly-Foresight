@@ -55,7 +55,6 @@ for input_file in opts.input_files:
     data = numpy.loadtxt(input_file, usecols=[0, 1])
     k = data[:, 0]
     pk = data[:, 1]
-    assert(numpy.all(k == k_ref))
 
     # only keep values in plot canvas
     idxs = []
@@ -76,6 +75,7 @@ for input_file in opts.input_files:
         pk = pk[idxs]
 
     if opts.reference_file:
+        assert(numpy.all(k == k_ref))
         pk_tmp = pk_ref[idxs] if len(idxs) else pk_ref
         pk = operate(pk, pk_tmp, opts.operation)
 
