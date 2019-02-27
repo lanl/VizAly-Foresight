@@ -1,4 +1,6 @@
 #! /usr/bin/env python
+""" Creates a workflow for Slurm clusters to compress and analyze cosmological data.
+"""
 
 import argparse
 import configparser
@@ -130,10 +132,10 @@ class Config(configparser.ConfigParser):
         return eval(self.get(option, key))
 
 # parse command line
-parser = argparse.ArgumentParser()
-parser.add_argument("--name", default="workflow_c")
-parser.add_argument("--config-file", default="workflow_c.ini")
-parser.add_argument("--submit", action="store_true")
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--name", default="workflow_c", help="Name of the workflow.")
+parser.add_argument("--config-file", default="workflow_c.ini", help="Path to configuration file.")
+parser.add_argument("--submit", action="store_true", help="Submit workflow to Slurm.")
 opts = parser.parse_args()
 
 # read configuration file
@@ -159,7 +161,7 @@ os.makedirs(spectra_dir)
 # create a workflow
 wflow = Workflow(name=opts.name)
 
-# template for building CBench JSON file
+# template for building CBench JSON data
 section = "cbench"
 cbench_json_data = {
     "input" : {
@@ -180,105 +182,126 @@ cbench_json_data = {
     "metrics-comment": "Metrics to report",
     "metrics": [],
 }
+
+# add list of metrics to compute with CBench JSON data
 for metric in cp.geteval(section, "metrics"):
     entry = {"name" : metric}
     if cp.getboolean("cbench", "histogram") and metric == "absolute_error":
         entry["histogram"] = cp.geteval(section, "scalars")
     cbench_json_data["metrics"].append(entry)
 
-# loop over compressor settings
-for c_tag, c_name in cp.items("compressors"):
+# loop over compressors
+compressors = cp.items("compressors")
+compressors += [("original", None,)]
+for c_tag, c_name in compressors:
 
-    # get cartesian product of compressors settings
-    # specify output prefix
-    cbench_json_data["compressors"] = []
-    keys = []
-    vals = []
-    for key, val in cp.items(c_tag):
-        keys.append(key)
-        val = eval(val)
-        if isinstance(val, int) or isinstance(val, float):
-            val = [val]
-        vals.append(val)
-    settings = list(itertools.product(*vals))
-    for i, setting in enumerate(settings):
-        entry = {
-            "name" : c_name,
-            "output-prefix" : "__{}__{}".format(c_tag, i),
-        }
-        for i, val in enumerate(setting):
-            entry[keys[i]] = val
-        cbench_json_data["compressors"].append(entry)
+    # create a CBench job if doing compression
+    if c_tag != "original":
 
-    # set log files for CBench
-    section = "cbench"
-    cbench_json_data["output"]["logfname"] = cp.get(section, "log-file") + "_{}".format(c_tag)
-    cbench_json_data["output"]["metricsfname"] = cp.get(section, "metrics-file") + "_{}".format(c_tag)
+        # get cartesian product of compressor settings to sweep
+        keys = []
+        vals = []
+        for key, val in cp.items(c_tag):
+            keys.append(key)
+            val = eval(val)
+            if isinstance(val, int) or isinstance(val, float):
+                val = [val]
+            vals.append(val)
+        settings = list(itertools.product(*vals))
+    
+        # add compressors settings to JSON data
+        cbench_json_data["compressors"] = []
+        for i, setting in enumerate(settings):
+            entry = {
+                "name" : c_name,
+                "output-prefix" : "__{}__{}".format(c_tag, i),
+            }
+            for i, val in enumerate(setting):
+                entry[keys[i]] = val
+            cbench_json_data["compressors"].append(entry)
+    
+        # set log file prefixes for CBench in JSON data
+        section = "cbench"
+        cbench_json_data["output"]["logfname"] = cp.get(section, "log-file") + "_{}".format(c_tag)
+        cbench_json_data["output"]["metricsfname"] = cp.get(section, "metrics-file") + "_{}".format(c_tag)
+    
+        # write CBENCH JSON data
+        json_file = os.path.join(cbench_dir, "cbench_{}.json".format(c_tag))
+        with open(json_file, "w") as fp:
+            json.dump(cbench_json_data, fp, indent=4, sort_keys=True)
+    
+        # add a single CBench job to workflow for entire sweep
+        cbench_job = Job(name="cbench_{}".format(c_tag),
+                         execute_dir=cbench_dir,
+                         executable=cp.get("executables", "mpirun"),
+                         arguments=[cp.get("executables", section), json_file],
+                         configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
+                         environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
+        wflow.add_job(cbench_job)
 
-    # write JSON data
-    json_file = os.path.join(cbench_dir, "cbench_{}.json".format(c_tag))
-    with open(json_file, "w") as fp:
-        json.dump(cbench_json_data, fp, indent=4, sort_keys=True)
-
-    # add CBench job to workflow
-    cbench_job = Job(name="cbench_{}".format(c_tag),
-                     execute_dir=cbench_dir,
-                     executable=cp.get("executables", "mpirun"),
-                     arguments=[cp.get("executables", section), json_file],
-                     configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
-                     environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
-    wflow.add_job(cbench_job)
+    # symlink if input data file without doing compression
+    else:
+        cbench_json_data["compressors"] = [{"name" : "original", "output-prefix" : "__original__0"}]
 
     # loop over each compressed file from CBench
-    for i, setting in enumerate(settings):
+    for i, _ in enumerate(cbench_json_data["compressors"]):
 
-        # get CBench output path
-        cbench_file = cbench_json_data["compressors"][i]["output-prefix"] + "__" + os.path.basename(cbench_json_data["input"]["filename"])
+        # get uncompressed or compressed file
+        # cut off timestep from path for halo finder executable
+        if c_tag == "original":
+            cbench_file = cp.get("cbench", "input-file")
+            prefix = ".".join(cbench_file.split(".")[:-1])
+        else:
+            cbench_file = cbench_json_data["compressors"][i]["output-prefix"] + "__" + os.path.basename(cbench_json_data["input"]["filename"])
+            prefix = cbench_dir + "/" + ".".join(cbench_file.split(".")[:-1])
 
-        # cut off timestep from CBench output path for halo finder executable
-        prefix = cbench_dir + "/" + ".".join(cbench_file.split(".")[:-1])
-
-        # set paths for configuration and parameters files
+        # set paths for halo finder configuration and parameters files
         config_file = os.path.join(halo_dir, "halo_finder_{}_{}_config.txt".format(c_tag, i))
         parameters_file = os.path.join(halo_dir, "halo_finder_{}_{}_parameters.txt".format(c_tag, i))
 
-        # write parameters file
+        # write halo finder parameters file
         # specify location of parsed configuration file inside
         section = "halo-finder"
-        os.system("sed \"s/^COSMOTOOLS_CONFIG.*/COSMOTOOLS_CONFIG " + ".\/" + os.path.basename(config_file) + "/\" " + cp.get(section, "parameters-file") + " > " + parameters_file)
+        os.system("sed \"s/^COSMOTOOLS_CONFIG.*/COSMOTOOLS_CONFIG .\/{}/\" {} > {}".format(os.path.basename(config_file),
+                                                                                           cp.get(section, "parameters-file"),
+                                                                                           parameters_file))
 
-        # write configuration file
+        # write halo finder configuration file
         # specify output prefix inside
-        os.system("sed \"s/^BASE_OUTPUT_FILE_NAME.*/BASE_OUTPUT_FILE_NAME " + ".\/" + os.path.basename(cbench_file) + "/\" " + cp.get(section, "config-file") + " > " + "tmp.out")
-        os.system("sed \"s/^ACCUMULATE_CORE_NAME.*/ACCUMULATE_CORE_NAME " + ".\/" + os.path.basename(cbench_file) + "/\" " + "tmp.out" + " > " + config_file)
+        os.system("sed \"s/^BASE_OUTPUT_FILE_NAME.*/BASE_OUTPUT_FILE_NAME .\/{}/\" {} > {}".format(cbench_json_data["compressors"][i]["output-prefix"],
+                                                                                                   cp.get(section, "config-file"),
+                                                                                                   "tmp.out"))
+        os.system("sed \"s/^ACCUMULATE_CORE_NAME.*/ACCUMULATE_CORE_NAME .\/{}/\" {} > {}".format(cbench_json_data["compressors"][i]["output-prefix"],
+                                                                                                "tmp.out", config_file))
 
-        # add halo finder job to workflow
+        # add halo finder job to workflow for compressed file
         # make dependent on CBench job
-        args = [cp.get("executables", section),
-                "--config", config_file,
-                "--timesteps", cp.get(section, "timesteps-file"),
-                "--prefix", prefix,
-                parameters_file]
         halo_finder_job = Job(name="halo_finder_{}_{}".format(c_tag, i),
                               execute_dir=halo_dir,
                               executable=cp.get("executables", "mpirun"),
-                              arguments=args,
+                              arguments=[cp.get("executables", section),
+                                         "--config", config_file,
+                                         "--timesteps", cp.get(section, "timesteps-file"),
+                                         "--prefix", prefix,
+                                         parameters_file],
                               configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
                               environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
-        halo_finder_job.add_parents(cbench_job)
+        if c_tag != "original":
+            halo_finder_job.add_parents(cbench_job)
         wflow.add_job(halo_finder_job)
 
-        # add power spectra job to workflow
-        section = "power-spectrum"        
+        # add power spectra job to workflow for compressed file
+        section = "power-spectrum"
         spectra_job = Job(name="spectra_{}_{}".format(c_tag, i),
                           execute_dir=spectra_dir,
                           executable=cp.get("executables", "mpirun"),
                           arguments=[cp.get("executables", section), cp.get(section, "parameters-file"),
                                      "-n", os.path.join(cbench_dir, cbench_file),
                                      os.path.join(spectra_dir, "spectra_{}_{}".format(c_tag, i))],
-                              configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
-                              environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
-        spectra_job.add_parents(cbench_job)
+                          configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
+                          environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
+        if c_tag != "original":
+            spectra_job.add_parents(cbench_job)
         wflow.add_job(spectra_job)
 
 # write workflow
