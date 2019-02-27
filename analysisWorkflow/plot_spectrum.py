@@ -76,6 +76,7 @@ for input_file in opts.input_files:
         k = k[idxs]
         pk = pk[idxs]
 
+    # operate on data with reference file
     if opts.reference_file:
         pk_tmp = pk_ref[idxs] if len(idxs) else pk_ref
         pk = operate(pk, pk_tmp, opts.operation)
@@ -95,6 +96,7 @@ plt.ylabel(opts.ylabel)
 plt.grid()
 plt.legend()
 
+# display
 if not opts.output_file:
     plt.show()
 else:
