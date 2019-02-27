@@ -1,4 +1,7 @@
 #! /usr/bin/env python
+""" Plots a space-delimited file of the power spectra where the first column is `k` and
+the second column is `P(k)`.
+"""
 
 import argparse
 import matplotlib.pyplot as plt
@@ -16,7 +19,7 @@ def operate(y, ref, operation):
         raise NotImplementedError("Do not understand operation {}!".format(operation))
 
 # parse command line
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--input-files", nargs="+", required=True)
 parser.add_argument("--reference-file")
 parser.add_argument("--output-file")
@@ -68,11 +71,12 @@ for input_file in opts.input_files:
             idxs += numpy.where((pk > opts.ylim[0]) & (pk < opts.ylim[1]))
     idxs = sum([list(arr) for arr in idxs], [])
     idxs = numpy.unique(idxs)
-    k = k[idxs]
-    pk = pk[idxs]
+    if len(idxs):
+        k = k[idxs]
+        pk = pk[idxs]
 
     if opts.reference_file:
-        pk_tmp = pk_ref[idxs]
+        pk_tmp = pk_ref[idxs] if len(idxs) else pk_ref
         pk = operate(pk, pk_tmp, opts.operation)
 
     # plot
