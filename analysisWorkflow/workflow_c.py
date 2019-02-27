@@ -1,4 +1,6 @@
 #! /usr/bin/env python
+""" Creates a workflow for Slurm clusters to compress and analyze cosmological data.
+"""
 
 import argparse
 import configparser
@@ -130,10 +132,10 @@ class Config(configparser.ConfigParser):
         return eval(self.get(option, key))
 
 # parse command line
-parser = argparse.ArgumentParser()
-parser.add_argument("--name", default="workflow_c")
-parser.add_argument("--config-file", default="workflow_c.ini")
-parser.add_argument("--submit", action="store_true")
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--name", default="workflow_c", help="Name of the workflow.")
+parser.add_argument("--config-file", default="workflow_c.ini", help="Path to configuration file.")
+parser.add_argument("--submit", action="store_true", help="Submit workflow to Slurm.")
 opts = parser.parse_args()
 
 # read configuration file
