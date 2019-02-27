@@ -250,12 +250,17 @@ for c_tag, c_name in cp.items("compressors"):
         # write parameters file
         # specify location of parsed configuration file inside
         section = "halo-finder"
-        os.system("sed \"s/^COSMOTOOLS_CONFIG.*/COSMOTOOLS_CONFIG " + ".\/" + os.path.basename(config_file) + "/\" " + cp.get(section, "parameters-file") + " > " + parameters_file)
+        os.system("sed \"s/^COSMOTOOLS_CONFIG.*/COSMOTOOLS_CONFIG .\/{}/\" {} > {}".format(os.path.basename(config_file),
+                                                                                           cp.get(section, "parameters-file"),
+                                                                                           parameters_file))
 
         # write configuration file
         # specify output prefix inside
-        os.system("sed \"s/^BASE_OUTPUT_FILE_NAME.*/BASE_OUTPUT_FILE_NAME " + ".\/" + os.path.basename(cbench_file) + "/\" " + cp.get(section, "config-file") + " > " + "tmp.out")
-        os.system("sed \"s/^ACCUMULATE_CORE_NAME.*/ACCUMULATE_CORE_NAME " + ".\/" + os.path.basename(cbench_file) + "/\" " + "tmp.out" + " > " + config_file)
+        os.system("sed \"s/^BASE_OUTPUT_FILE_NAME.*/BASE_OUTPUT_FILE_NAME .\/{}/\" {} > {}".format(os.path.basename(cbench_file),
+                                                                                                   cp.get(section, "config-file"),
+                                                                                                   "tmp.out"))
+        os.system("sed \"s/^ACCUMULATE_CORE_NAME.*/ACCUMULATE_CORE_NAME .\/{}/\" {} > {}".format(os.path.basename(cbench_file),
+                                                                                                "tmp.out", config_file))
 
         # add halo finder job to workflow for compressed file
         # make dependent on CBench job
