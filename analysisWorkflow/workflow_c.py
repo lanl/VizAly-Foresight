@@ -247,14 +247,14 @@ for c_tag, c_name in cp.items("compressors"):
         config_file = os.path.join(halo_dir, "halo_finder_{}_{}_config.txt".format(c_tag, i))
         parameters_file = os.path.join(halo_dir, "halo_finder_{}_{}_parameters.txt".format(c_tag, i))
 
-        # write parameters file
+        # write halo finder parameters file
         # specify location of parsed configuration file inside
         section = "halo-finder"
         os.system("sed \"s/^COSMOTOOLS_CONFIG.*/COSMOTOOLS_CONFIG .\/{}/\" {} > {}".format(os.path.basename(config_file),
                                                                                            cp.get(section, "parameters-file"),
                                                                                            parameters_file))
 
-        # write configuration file
+        # write halo finder configuration file
         # specify output prefix inside
         os.system("sed \"s/^BASE_OUTPUT_FILE_NAME.*/BASE_OUTPUT_FILE_NAME .\/{}/\" {} > {}".format(os.path.basename(cbench_file),
                                                                                                    cp.get(section, "config-file"),
