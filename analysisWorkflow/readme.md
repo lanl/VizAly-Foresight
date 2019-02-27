@@ -12,8 +12,8 @@ To run: python worrkflow_a.py workflow_input.json
 An exmaple for the input file is workflow_input.json. workflow_input.json has two sections, A and B, marked with "Section-A" and "Section-B" respectively.
 
 ## workflow_c.py
-This python script will launch batch scripts to run CBench and the halo finder.
-And example configuration file is provided, `workflow_c.ini`.
+This python script will launch batch scripts to run CBench, the halo finder, and power spectra calculation.
+An example configuration file is provided, `workflow_c.ini`.
 
 
 ## Requirements:
