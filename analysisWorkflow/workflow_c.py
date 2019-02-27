@@ -242,18 +242,18 @@ for c_tag, c_name in compressors:
     # symlink if input data file without doing compression
     else:
         cbench_json_data["compressors"] = [{"name" : "original", "output-prefix" : "__original__0"}]
-        os.system("ln -s {} {}/{}__{}".format(cp.get("cbench", "input-file"), cbench_dir, 
-                                              cbench_json_data["compressors"][0]["output-prefix"],
-                                              os.path.basename(cbench_json_data["input"]["filename"])))
 
     # loop over each compressed file from CBench
     for i, _ in enumerate(cbench_json_data["compressors"]):
 
-        # get CBench output path for this compressed file
-        cbench_file = cbench_json_data["compressors"][i]["output-prefix"] + "__" + os.path.basename(cbench_json_data["input"]["filename"])
-
-        # cut off timestep from CBench output path for halo finder executable
-        prefix = cbench_dir + "/" + ".".join(cbench_file.split(".")[:-1])
+        # get uncompressed or compressed file
+        # cut off timestep from path for halo finder executable
+        if c_tag == "original":
+            cbench_file = cp.get("cbench", "input-file")
+            prefix = ".".join(cbench_file.split(".")[:-1])
+        else:
+            cbench_file = cbench_json_data["compressors"][i]["output-prefix"] + "__" + os.path.basename(cbench_json_data["input"]["filename"])
+            prefix = cbench_dir + "/" + ".".join(cbench_file.split(".")[:-1])
 
         # set paths for halo finder configuration and parameters files
         config_file = os.path.join(halo_dir, "halo_finder_{}_{}_config.txt".format(c_tag, i))
@@ -268,10 +268,10 @@ for c_tag, c_name in compressors:
 
         # write halo finder configuration file
         # specify output prefix inside
-        os.system("sed \"s/^BASE_OUTPUT_FILE_NAME.*/BASE_OUTPUT_FILE_NAME .\/{}/\" {} > {}".format(os.path.basename(cbench_file),
+        os.system("sed \"s/^BASE_OUTPUT_FILE_NAME.*/BASE_OUTPUT_FILE_NAME .\/{}/\" {} > {}".format(cbench_json_data["compressors"][i]["output-prefix"],
                                                                                                    cp.get(section, "config-file"),
                                                                                                    "tmp.out"))
-        os.system("sed \"s/^ACCUMULATE_CORE_NAME.*/ACCUMULATE_CORE_NAME .\/{}/\" {} > {}".format(os.path.basename(cbench_file),
+        os.system("sed \"s/^ACCUMULATE_CORE_NAME.*/ACCUMULATE_CORE_NAME .\/{}/\" {} > {}".format(cbench_json_data["compressors"][i]["output-prefix"],
                                                                                                 "tmp.out", config_file))
 
         # add halo finder job to workflow for compressed file
@@ -286,7 +286,8 @@ for c_tag, c_name in compressors:
                                          parameters_file],
                               configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
                               environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
-        halo_finder_job.add_parents(cbench_job)
+        if c_tag != "original":
+            halo_finder_job.add_parents(cbench_job)
         wflow.add_job(halo_finder_job)
 
         # add power spectra job to workflow for compressed file
@@ -299,7 +300,8 @@ for c_tag, c_name in compressors:
                                      os.path.join(spectra_dir, "spectra_{}_{}".format(c_tag, i))],
                           configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
                           environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
-        spectra_job.add_parents(cbench_job)
+        if c_tag != "original":
+            spectra_job.add_parents(cbench_job)
         wflow.add_job(spectra_job)
 
 # write workflow
