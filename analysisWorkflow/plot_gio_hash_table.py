@@ -34,8 +34,6 @@ def load_sqlite_data(path, query, sqlite_file):
 def snap(x, d=0.25):
     """ Snaps data to a grid.
     """
-#    d = 1.0 / d
-#    return numpy.ceil(d * x) / d
     return numpy.ceil(x / d) * d
 
 # parse command line
