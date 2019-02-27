@@ -239,14 +239,14 @@ for c_tag, c_name in compressors:
                          environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
         wflow.add_job(cbench_job)
 
-    # symlink if input data file without doing compression
+    # fill in JSON data if input file
     else:
         cbench_json_data["compressors"] = [{"name" : "original", "output-prefix" : "__original__0"}]
 
     # loop over each compressed file from CBench
     for i, _ in enumerate(cbench_json_data["compressors"]):
 
-        # get uncompressed or compressed file
+        # set uncompressed or compressed file
         # cut off timestep from path for halo finder executable
         if c_tag == "original":
             cbench_file = cp.get("cbench", "input-file")
@@ -274,6 +274,10 @@ for c_tag, c_name in compressors:
         os.system("sed \"s/^ACCUMULATE_CORE_NAME.*/ACCUMULATE_CORE_NAME .\/{}/\" {} > {}".format(cbench_json_data["compressors"][i]["output-prefix"],
                                                                                                 "tmp.out", config_file))
 
+        # set halo finder file
+        timestep = cbench_file.split(".")[:-1]
+        halo_finder_file = os.path.join(cbench_json_data["compressors"][i]["output-prefix"], "{}.fofproperties".format(timestep))
+
         # add halo finder job to workflow for compressed file
         # make dependent on CBench job
         halo_finder_job = Job(name="halo_finder_{}_{}".format(c_tag, i),
@@ -292,12 +296,12 @@ for c_tag, c_name in compressors:
 
         # add power spectra job to workflow for compressed file
         section = "power-spectrum"
+        spectra_file = os.path.join(spectra_dir, "spectra_{}_{}.pk".format(c_tag, i))
         spectra_job = Job(name="spectra_{}_{}".format(c_tag, i),
                           execute_dir=spectra_dir,
                           executable=cp.get("executables", "mpirun"),
                           arguments=[cp.get("executables", section), cp.get(section, "parameters-file"),
-                                     "-n", os.path.join(cbench_dir, cbench_file),
-                                     os.path.join(spectra_dir, "spectra_{}_{}".format(c_tag, i))],
+                                     "-n", os.path.join(cbench_dir, cbench_file), spectra_file.rstrip(".pk")],
                           configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
                           environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
         if c_tag != "original":
