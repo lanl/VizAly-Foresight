@@ -373,7 +373,7 @@ for i, (c_tag, c_name) in enumerate(compressors):
                                             "--output-file", plot_halo_dist_files[-1]] + cp.arguments_from_section(section),
                                  configurations=cp.configuration_from_section(section),
                                  environment=cp.environment_from_section(section))
-        spectra_job.add_parents(halo_finder_job)
+        plot_halo_dist_job.add_parents(halo_finder_job)
         wflow.add_job(plot_halo_dist_job)
 
         # add plot power spectra job to workflow for compressed file
@@ -387,13 +387,11 @@ for i, (c_tag, c_name) in enumerate(compressors):
                                           "--output-file", plot_spectra_files[-1]] + cp.arguments_from_section(section),
                                configurations=cp.configuration_from_section(section),
                                environment=cp.environment_from_section(section))
-        spectra_job.add_parents(spectra_job)
+        plot_spectra_job.add_parents(spectra_job)
         wflow.add_job(plot_spectra_job)
 
 # write workflow
 wflow.write()
-
-print(compressor_inputs)
 
 # write output manifest
 with open(run_dir + "/{}.csv".format(opts.name), "w") as fp:
