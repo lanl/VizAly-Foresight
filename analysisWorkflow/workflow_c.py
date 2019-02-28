@@ -192,8 +192,8 @@ for metric in cp.geteval(section, "metrics"):
 
 # loop over compressors
 compressors = cp.items("compressors")
-compressors += [("original", None,)]
-for c_tag, c_name in compressors:
+compressors = [("original", None,)] + compressors
+for i, (c_tag, c_name) in enumerate(compressors):
 
     # create a CBench job if doing compression
     if c_tag != "original":
@@ -246,7 +246,7 @@ for c_tag, c_name in compressors:
     # loop over each compressed file from CBench
     for i, _ in enumerate(cbench_json_data["compressors"]):
 
-        # set uncompressed or compressed file
+        # compressed file not explicitly set so construct it here
         # cut off timestep from path for halo finder executable
         if c_tag == "original":
             cbench_file = cp.get("cbench", "input-file")
@@ -274,7 +274,7 @@ for c_tag, c_name in compressors:
         os.system("sed \"s/^ACCUMULATE_CORE_NAME.*/ACCUMULATE_CORE_NAME .\/{}/\" {} > {}".format(cbench_json_data["compressors"][i]["output-prefix"],
                                                                                                 "tmp.out", config_file))
 
-        # set halo finder file
+        # halo finder file not explicitly set so construct it here
         timestep = cbench_file.split(".")[:-1]
         halo_finder_file = os.path.join(cbench_json_data["compressors"][i]["output-prefix"], "{}.fofproperties".format(timestep))
 
@@ -294,9 +294,11 @@ for c_tag, c_name in compressors:
             halo_finder_job.add_parents(cbench_job)
         wflow.add_job(halo_finder_job)
 
+        # spectra file not explicitly set so construct it here
+        spectra_file = os.path.join(spectra_dir, "spectra_{}_{}.pk".format(c_tag, i))
+
         # add power spectra job to workflow for compressed file
         section = "power-spectrum"
-        spectra_file = os.path.join(spectra_dir, "spectra_{}_{}.pk".format(c_tag, i))
         spectra_job = Job(name="spectra_{}_{}".format(c_tag, i),
                           execute_dir=spectra_dir,
                           executable=cp.get("executables", "mpirun"),
