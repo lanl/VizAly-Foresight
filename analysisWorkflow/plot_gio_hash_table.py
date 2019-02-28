@@ -11,7 +11,9 @@ import os
 def operate(y, ref, operation):
     """ Suite of math operations for plot.
     """
-    if operation == "diff":
+    if operation == "none":
+        return y
+    elif operation == "diff":
         return y - ref
     elif operation == "ratio":
         return y / ref
@@ -58,7 +60,8 @@ parser.add_argument("--match-parameters-snaps", nargs="+", type=float, default=[
 parser.add_argument("--order-by")
 parser.add_argument("--descending", action="store_true")
 parser.add_argument("--limit", type=float, default=None)
-parser.add_argument("--operation", choices=["diff", "ratio"], default="diff")
+parser.add_argument("--operation", choices=["none", "diff", "ratio"], default="none")
+parser.add_argument("--plot-type", choices=["histogram", "scatter"], default="histogram")
 parser.add_argument("--bins", type=int, default=50)
 opts = parser.parse_args()
 
@@ -88,8 +91,8 @@ for p in opts.match_parameters:
 
 # set data to compare
 if opts.input_file and opts.reference_file:
-    data_1 = load_sqlite_data(opts.reference_file, query, opts.sqlite_file)
-    data_2 = load_sqlite_data(opts.input_file, query, opts.sqlite_file)
+    data_1 = load_sqlite_data(opts.input_file, query, opts.sqlite_file)
+    data_2 = load_sqlite_data(opts.reference_file, query, opts.sqlite_file)
     data_1 = numpy.transpose(data_1)
     data_2 = numpy.transpose(data_2)
 else:
@@ -121,19 +124,22 @@ data_2_snap[data_2_snap == -0.0] = 0.0
 # hash
 n_lost = 0
 metrics = []
-lost_idxs = []
+found_1 = []
+found_2 = []
+lost_1 = []
+found_2_idxs = []
 for i, d_1 in enumerate(data_1_snap):
 
     # find matches
     idx = numpy.flatnonzero((d_1 == data_2_snap).all(1))
 
     # ensure unqiue matches
-    # record number of particles without match
+    # record particles with and without match
     if idx.size > 1:
         raise KeyError("More than one particle matched! Not in good regime!")
     elif idx.size == 0:
         n_lost += 1
-        lost_idxs.append(i)
+        lost_1.append(data_1[:, i])
         continue
     else:
         idx = idx[0]
@@ -142,27 +148,67 @@ for i, d_1 in enumerate(data_1_snap):
     r_1 = data_1[:, i]
     r_2 = data_2[:, idx]
 
-    # compute metric
-    metric = operate(r_2, r_1, opts.operation)
+    # compute operation
+    metric = operate(r_1, r_2, opts.operation)
 
     # append result
     metrics.append(metric)
+    found_1.append(r_1)
+    found_2.append(r_2)
+    found_2_idxs.append(idx)
+
+# get missed values
+mask = numpy.ones(data_2.shape[1], numpy.bool)
+mask[found_2_idxs] = 0
+lost_2 = numpy.transpose(data_2[:, mask])
+if len(lost_1):
+    lost_1 = numpy.vstack(lost_1)
 
 # typecast and count
 metrics = numpy.vstack(metrics)
+found_1 = numpy.vstack(found_1)
+found_2 = numpy.vstack(found_2)
 n_found = metrics.shape[0]
 n_particles = data_1.shape[1]
 
 # print statement
 print("Number of matched particles: {}".format(n_found))
 print("Number of missed particles: {}".format(n_lost))
-print("Indices missed were: {}".format(lost_idxs))
 assert(n_found + n_lost == n_particles)
+print("Missed values:", lost_1)
+print("Missed values:", lost_2)
 
 # plot
 for i in range(n_parameters):
-    plt.hist(metrics[:, i], bins=opts.bins)
-    plt.xlabel("Difference {}".format(opts.parameters[i]))
+    p = opts.parameters[i]
+    l1 = os.path.basename(opts.input_file)
+    l2 = os.path.basename(opts.reference_file)
+    l3 = opts.operation + " of " if opts.operation != "none" else ""
+
+    # plot histogram
+    if opts.plot_type == "histogram":
+        if opts.operation == "none":
+            plt.hist(found_1[:, i], bins=opts.bins, histtype="step", label=l1)
+            plt.hist(found_2[:, i], bins=opts.bins, histtype="step", label=l2)
+            plt.xlabel(p)
+        else:
+            plt.hist(metrics[:, i], bins=opts.bins)
+            plt.xlabel("{}{}".format(l3, p))
+        plt.ylabel("Counts")
+
+    # plot scatter
+    elif opts.plot_type == "scatter":
+        if opts.operation == "none":
+            plt.scatter(found_1[:, i], found_2[:, i])
+            plt.ylabel("{} of {}".format(p, l1))
+            plt.xlabel("{} of {}".format(p, l2))
+        else:
+            raise NotImplementedError("Cannot use {} with --plot-type scatter!".format(opts.operation))
+
+    # format plot
+    plt.grid(zorder=1)
+
+    # display
     if opts.output_file and i == 0:
         if n_parameters > 1:
             print("Will only write out {} into {}!".format(opts.parameters[i], opts.output_file))
