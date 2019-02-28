@@ -254,7 +254,7 @@ for i, (c_tag, c_name) in enumerate(compressors):
             compressor_data.append({"name" : c_name})
             v_tag = ""
             for key, val in zip(keys, setting):
-                v_tag += "{}:{}__".format(key, val)
+                v_tag += "{}{}__".format(key, val)
                 compressor_data[-1][key] = val
                 if key not in compressor_inputs:
                     compressor_inputs.append(key)
@@ -270,12 +270,6 @@ for i, (c_tag, c_name) in enumerate(compressors):
         section = "cbench"
         cbench_json_data["output"]["logfname"] = cp.get(section, "log-file") + "_{}".format(c_tag)
         cbench_json_data["output"]["metricsfname"] = cp.get(section, "metrics-file") + "_{}".format(c_tag)
-        for _, _ in enumerate(settings):
-            metrics_files.append(os.path.join(cbench_dir, cbench_json_data["output"]["metricsfname"] + ".csv"))
-            if cp.getboolean("cbench", "histogram"):
-                histogram_files.append(os.path.join(cbench_dir, "histogram_" + cbench_json_data["output"]["metricsfname"] + ".py"))
-            else:
-                histogram_files.append("")
 
         # write CBENCH JSON data
         json_file = os.path.join(cbench_dir, "cbench_{}.json".format(c_tag))
@@ -295,11 +289,25 @@ for i, (c_tag, c_name) in enumerate(compressors):
     else:
         cbench_json_data["compressors"] = [{"name" : "original", "output-prefix" : "out__original__"}]
         compressor_data.append({"name" : c_name})
-        metrics_files.append("")
-        histogram_files.append("")
 
     # loop over each compressed file from CBench
     for i, _ in enumerate(cbench_json_data["compressors"]):
+
+        # metrics file not explicitly set so construct it here
+        section = "cbench"
+        if c_tag != "original":
+            metrics_files.append(os.path.join(cbench_dir, cbench_json_data["output"]["metricsfname"] + ".csv"))
+        else:
+            metrics_files.append("")
+
+        # histogram file not explicitly set so construct it here
+        if c_tag != "original" and cp.getboolean(section, "histogram"):
+            histogram_files.append(",".join([os.path.join(cbench_dir, os.path.basename(cp.get(section, "input-file") + "_" + c_name + "_" + p + "_absolute_error_" + cbench_json_data["compressors"][i]["output-prefix"][len("out__{}__".format(c_tag)):-2] + "_histogram.py"))
+                                   for p in cp.geteval(section, "scalars")]))
+        elif cp.getboolean(section, "histogram"):
+            histogram_files.append((len(cp.geteval(section, "scalars")) - 1) * ",")
+        else:
+            histogram_files.append("")
 
         # compressed file not explicitly set so construct it here
         # cut off timestep from path for halo finder executable
@@ -373,8 +381,12 @@ wflow.write()
 
 # write output manifest
 with open(run_dir + "/{}.csv".format(opts.name), "w") as fp:
+    if cp.getboolean("cbench", "histogram"):
+        histogram_header = ",".join(["histogram_{}".format(p) for p in cp.geteval("cbench", "scalars")])
+    else:
+        histogram_header = ""
     fp.write(",".join(["compressor_name"] + compressor_inputs + ["cbench_file", "halo_finder_file", "spectra_file",
-                                                                 "metric_file", "histogram_file"]) + "\n")
+                                                                 "metric_file"]) + "," + histogram_header + "\n")
     lines = zip(cbench_files, halo_finder_files, spectra_files, metrics_files, histogram_files)
     for i, line in enumerate(lines):
         inputs = compressor_data[i]["name"] + ","
