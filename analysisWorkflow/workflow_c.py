@@ -232,7 +232,7 @@ compressor_inputs = []
 # loop over compressors
 # first "compressor" is the input file
 compressors = cp.items("compressors")
-compressors = [("original", None,)] + compressors
+compressors = [("original", "Original",)] + compressors
 for i, (c_tag, c_name) in enumerate(compressors):
 
     # create a CBench job if doing compression
@@ -251,8 +251,8 @@ for i, (c_tag, c_name) in enumerate(compressors):
     
         # add compressors settings to JSON data
         cbench_json_data["compressors"] = []
-        compressor_data.append({"name" : c_name})
         for i, setting in enumerate(settings):
+            compressor_data.append({"name" : c_name})
             v_tag = ""
             for key, val in zip(keys, setting):
                 v_tag += "{}:{}__".format(key, val)
@@ -271,7 +271,8 @@ for i, (c_tag, c_name) in enumerate(compressors):
         section = "cbench"
         cbench_json_data["output"]["logfname"] = cp.get(section, "log-file") + "_{}".format(c_tag)
         cbench_json_data["output"]["metricsfname"] = cp.get(section, "metrics-file") + "_{}".format(c_tag)
-        metrics_files.append(os.path.join(cbench_dir, cbench_json_data["output"]["metricsfname"] + ".csv"))
+        for _, _ in enumerate(settings):
+            metrics_files.append(os.path.join(cbench_dir, cbench_json_data["output"]["metricsfname"] + ".csv"))
 
         # write CBENCH JSON data
         json_file = os.path.join(cbench_dir, "cbench_{}.json".format(c_tag))
@@ -290,6 +291,8 @@ for i, (c_tag, c_name) in enumerate(compressors):
     # fill in JSON data if input file
     else:
         cbench_json_data["compressors"] = [{"name" : "original", "output-prefix" : "out__original__"}]
+        compressor_data.append({"name" : c_name})
+        metrics_files.append("")
 
     # loop over each compressed file from CBench
     for i, _ in enumerate(cbench_json_data["compressors"]):
@@ -297,12 +300,11 @@ for i, (c_tag, c_name) in enumerate(compressors):
         # compressed file not explicitly set so construct it here
         # cut off timestep from path for halo finder executable
         if c_tag == "original":
-            cbench_file = cp.get("cbench", "input-file")
-            prefix = ".".join(cbench_file.split(".")[:-1])
+            cbench_file = os.path.join(cbench_dir, cp.get("cbench", "input-file"))
         else:
-            cbench_file = cbench_json_data["compressors"][i]["output-prefix"] + "__" + os.path.basename(cbench_json_data["input"]["filename"])
-            prefix = cbench_dir + "/" + ".".join(cbench_file.split(".")[:-1])
-        timestep = cbench_file.split(".")[:-1]
+            cbench_file = os.path.join(cbench_dir, cbench_json_data["compressors"][i]["output-prefix"] + "__" + os.path.basename(cbench_json_data["input"]["filename"]))
+        prefix = ".".join(cbench_file.split(".")[:-1])
+        timestep = cbench_file.split(".")[-1]
         cbench_files.append(cbench_file)
 
         # set paths for halo finder configuration and parameters files
@@ -325,7 +327,7 @@ for i, (c_tag, c_name) in enumerate(compressors):
                                                                                                 "tmp.out", config_file))
 
         # halo finder file not explicitly set so construct it here
-        halo_finder_file = os.path.join(cbench_json_data["compressors"][i]["output-prefix"], "{}.fofproperties".format(timestep))
+        halo_finder_file = os.path.join(halo_dir, cbench_json_data["compressors"][i]["output-prefix"] + "{}.fofproperties".format(timestep))
         halo_finder_files.append(halo_finder_file)
 
         # add halo finder job to workflow for compressed file
@@ -406,6 +408,7 @@ with open(run_dir + "/{}.csv".format(opts.name), "w") as fp:
             else:
                 inputs += ","
         line = inputs + ",".join(line) + "\n"
+        line = line.replace(run_dir + "/", "")
         fp.write(line)
 
 # submit
