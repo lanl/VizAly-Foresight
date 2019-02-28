@@ -179,11 +179,9 @@ run_dir = os.getcwd()
 cbench_dir = os.path.join(run_dir, "cbench")
 halo_dir = os.path.join(run_dir, "halo")
 spectra_dir = os.path.join(run_dir, "spectra")
-output_dir = os.path.join(run_dir, "output")
 os.makedirs(cbench_dir)
 os.makedirs(halo_dir)
 os.makedirs(spectra_dir)
-os.makedirs(output_dir)
 
 # create a workflow
 wflow = Workflow(name=opts.name)
