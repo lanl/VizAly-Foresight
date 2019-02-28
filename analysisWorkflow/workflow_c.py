@@ -302,7 +302,7 @@ for i, (c_tag, c_name) in enumerate(compressors):
 
         # histogram file not explicitly set so construct it here
         if c_tag != "original" and cp.getboolean(section, "histogram"):
-            histogram_files.append(",".join([os.path.join(cbench_dir, os.path.basename(cp.get(section, "input-file") + "_" + c_name + "_" + p + "_absolute_error_" + cbench_json_data["compressors"][i]["output-prefix"][len("out__{}__".format(c_tag)):-2] + "_histogram.py"))
+            histogram_files.append(",".join([os.path.join(cbench_dir, os.path.basename(cp.get(section, "input-file") + "_" + c_name + "_" + p + "_absolute_error_" + cbench_json_data["compressors"][i]["output-prefix"][len("out__{}__".format(c_tag)):-2] + "_hist.py"))
                                    for p in cp.geteval(section, "scalars")]))
         elif cp.getboolean(section, "histogram"):
             histogram_files.append((len(cp.geteval(section, "scalars")) - 1) * ",")
