@@ -374,6 +374,9 @@ for i, (c_tag, c_name) in enumerate(compressors):
             spectra_job.add_parents(cbench_job)
         wflow.add_job(spectra_job)
 
+# remove the temporary file
+os.remove("tmp.out")
+
 # write workflow
 wflow.write()
 
