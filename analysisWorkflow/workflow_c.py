@@ -127,9 +127,34 @@ class Config(configparser.ConfigParser):
         super().__init__()
 
     def geteval(self, option, key):
-        """ Does eval on getter.
+        """ Does `eval` on getter.
         """
         return eval(self.get(option, key))
+
+    def arguments_from_section(self, section):
+        """ Returns list of arguments for section.
+        """
+        if cp.has_section(section):
+            its = cp.items(section)
+            its = [("--" + k, v) for k, v in its]
+            return list(itertools.chain(its))
+        return None
+
+    def configuration_from_section(self, section):
+        """ Returns list of configuration settings for section.
+        """
+        section += "-configuration"
+        if cp.has_section(section):
+            return list(itertools.chain(*cp.items(section)))
+        return None
+
+    def environment_from_section(self, section):
+        """ Returns enviroment file for section.
+        """
+        if cp.has_section("environments"):
+            if cp.has_option("enviroments", section):
+                return cp.get("environments", section)
+        return None
 
 # parse command line
 parser = argparse.ArgumentParser(description=__doc__)
@@ -154,9 +179,11 @@ run_dir = os.getcwd()
 cbench_dir = os.path.join(run_dir, "cbench")
 halo_dir = os.path.join(run_dir, "halo")
 spectra_dir = os.path.join(run_dir, "spectra")
+output_dir = os.path.join(run_dir, "output")
 os.makedirs(cbench_dir)
 os.makedirs(halo_dir)
 os.makedirs(spectra_dir)
+os.makedirs(output_dir)
 
 # create a workflow
 wflow = Workflow(name=opts.name)
@@ -190,6 +217,18 @@ for metric in cp.geteval(section, "metrics"):
         entry["histogram"] = cp.geteval(section, "scalars")
     cbench_json_data["metrics"].append(entry)
 
+# store files
+cbench_files = []
+halo_finder_files = []
+spectra_files = []
+metrics_files = []
+plot_halo_dist_files = []
+plot_spectra_files = []
+
+# store compressor data
+compressor_data = []
+compressor_inputs = []
+
 # loop over compressors
 # first "compressor" is the input file
 compressors = cp.items("compressors")
@@ -212,10 +251,14 @@ for i, (c_tag, c_name) in enumerate(compressors):
     
         # add compressors settings to JSON data
         cbench_json_data["compressors"] = []
+        compressor_data.append({"name" : c_name})
         for i, setting in enumerate(settings):
             v_tag = ""
             for key, val in zip(keys, setting):
                 v_tag += "{}:{}__".format(key, val)
+                compressor_data[-1][key] = val
+                if key not in compressor_inputs:
+                    compressor_inputs.append(key)
             entry = {
                 "name" : c_name,
                 "output-prefix" : "out__{}__{}".format(c_tag, v_tag),
@@ -228,7 +271,8 @@ for i, (c_tag, c_name) in enumerate(compressors):
         section = "cbench"
         cbench_json_data["output"]["logfname"] = cp.get(section, "log-file") + "_{}".format(c_tag)
         cbench_json_data["output"]["metricsfname"] = cp.get(section, "metrics-file") + "_{}".format(c_tag)
-    
+        metrics_files.append(os.path.join(cbench_dir, cbench_json_data["output"]["metricsfname"] + ".csv"))
+
         # write CBENCH JSON data
         json_file = os.path.join(cbench_dir, "cbench_{}.json".format(c_tag))
         with open(json_file, "w") as fp:
@@ -239,8 +283,8 @@ for i, (c_tag, c_name) in enumerate(compressors):
                          execute_dir=cbench_dir,
                          executable=cp.get("executables", "mpirun"),
                          arguments=[cp.get("executables", section), json_file],
-                         configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
-                         environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
+                         configurations=cp.configuration_from_section(section),
+                         environment=cp.environment_from_section(section))
         wflow.add_job(cbench_job)
 
     # fill in JSON data if input file
@@ -259,6 +303,7 @@ for i, (c_tag, c_name) in enumerate(compressors):
             cbench_file = cbench_json_data["compressors"][i]["output-prefix"] + "__" + os.path.basename(cbench_json_data["input"]["filename"])
             prefix = cbench_dir + "/" + ".".join(cbench_file.split(".")[:-1])
         timestep = cbench_file.split(".")[:-1]
+        cbench_files.append(cbench_file)
 
         # set paths for halo finder configuration and parameters files
         config_file = os.path.join(halo_dir, "halo_finder_{}_{}_config.txt".format(c_tag, i))
@@ -281,6 +326,7 @@ for i, (c_tag, c_name) in enumerate(compressors):
 
         # halo finder file not explicitly set so construct it here
         halo_finder_file = os.path.join(cbench_json_data["compressors"][i]["output-prefix"], "{}.fofproperties".format(timestep))
+        halo_finder_files.append(halo_finder_file)
 
         # add halo finder job to workflow for compressed file
         # make dependent on CBench job
@@ -292,14 +338,15 @@ for i, (c_tag, c_name) in enumerate(compressors):
                                          "--timesteps", cp.get(section, "timesteps-file"),
                                          "--prefix", prefix,
                                          parameters_file],
-                              configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
-                              environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
+                              configurations=cp.configuration_from_section(section),
+                              environment=cp.environment_from_section(section))
         if c_tag != "original":
             halo_finder_job.add_parents(cbench_job)
         wflow.add_job(halo_finder_job)
 
         # spectra file not explicitly set so construct it here
         spectra_file = os.path.join(spectra_dir, "spectra_{}_{}.pk".format(c_tag, i))
+        spectra_files.append(spectra_file)
 
         # add power spectra job to workflow for compressed file
         # make dependent on CBench job
@@ -309,14 +356,58 @@ for i, (c_tag, c_name) in enumerate(compressors):
                           executable=cp.get("executables", "mpirun"),
                           arguments=[cp.get("executables", section), cp.get(section, "parameters-file"),
                                      "-n", os.path.join(cbench_dir, cbench_file), spectra_file.rstrip(".pk")],
-                          configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
-                          environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
+                                     configurations=cp.configuration_from_section(section),
+                          environment=cp.environment_from_section(section))
         if c_tag != "original":
             spectra_job.add_parents(cbench_job)
         wflow.add_job(spectra_job)
 
+        # add plot power spectra job to workflow for compressed file
+        # make dependent on power spectra job
+        section = "plot-halo-distribution"
+        plot_halo_dist_files.append(output_dir + "/plot_halo_dist_{}_{}.png".format(c_tag, i))
+        plot_halo_dist_job = Job(name="plot_halo_dist_{}_{}".format(c_tag, i),
+                                 execute_dir=output_dir,
+                                 executable=cp.get("executables", section),
+                                 arguments=["--input-files", halo_finder_files[-1], "--reference-file", halo_finder_files[0],
+                                            "--output-file", plot_halo_dist_files[-1]] + cp.arguments_from_section(section),
+                                 configurations=cp.configuration_from_section(section),
+                                 environment=cp.environment_from_section(section))
+        spectra_job.add_parents(halo_finder_job)
+        wflow.add_job(plot_halo_dist_job)
+
+        # add plot power spectra job to workflow for compressed file
+        # make dependent on power spectra job
+        section = "plot-power-spectrum"
+        plot_spectra_files.append(output_dir + "/plot_spectra_{}_{}.png".format(c_tag, i))
+        plot_spectra_job = Job(name="plot_spectra_{}_{}".format(c_tag, i),
+                               execute_dir=output_dir,
+                               executable=cp.get("executables", section),
+                               arguments=["--input-files", spectra_files[-1], "--reference-file", spectra_files[0],
+                                          "--output-file", plot_spectra_files[-1]] + cp.arguments_from_section(section),
+                               configurations=cp.configuration_from_section(section),
+                               environment=cp.environment_from_section(section))
+        spectra_job.add_parents(spectra_job)
+        wflow.add_job(plot_spectra_job)
+
 # write workflow
 wflow.write()
+
+print(compressor_inputs)
+
+# write output manifest
+with open(run_dir + "/{}.csv".format(opts.name), "w") as fp:
+    fp.write(",".join(["compressor_name"] + compressor_inputs + ["metric_file", "halo_dist_file", "spectra_file"]) + "\n")
+    lines = zip(metrics_files, plot_halo_dist_files, plot_spectra_files)
+    for i, line in enumerate(lines):
+        inputs = compressor_data[i]["name"] + ","
+        for key in compressor_inputs:
+            if key in compressor_data[i].keys():
+                inputs += str(compressor_data[i][key]) + ","
+            else:
+                inputs += ","
+        line = inputs + ",".join(line) + "\n"
+        fp.write(line)
 
 # submit
 if opts.submit:
