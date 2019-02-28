@@ -181,8 +181,8 @@ print("Missed values:", lost_2)
 # plot
 for i in range(n_parameters):
     p = opts.parameters[i]
-    l1 = os.path.basename(opts.input_file)
-    l2 = os.path.basename(opts.reference_file)
+    l1 = os.path.basename(opts.input_file).strip("__")
+    l2 = os.path.basename(opts.reference_file).strip("__")
     l3 = opts.operation + " of " if opts.operation != "none" else ""
 
     # plot histogram
@@ -191,6 +191,7 @@ for i in range(n_parameters):
             plt.hist(found_1[:, i], bins=opts.bins, histtype="step", label=l1)
             plt.hist(found_2[:, i], bins=opts.bins, histtype="step", label=l2)
             plt.xlabel(p)
+            plt.legend()
         else:
             plt.hist(metrics[:, i], bins=opts.bins)
             plt.xlabel("{}{}".format(l3, p))
