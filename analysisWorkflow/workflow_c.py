@@ -395,8 +395,9 @@ wflow.write()
 
 # write output manifest
 with open(run_dir + "/{}.csv".format(opts.name), "w") as fp:
-    fp.write(",".join(["compressor_name"] + compressor_inputs + ["metric_file", "halo_dist_file", "spectra_file"]) + "\n")
-    lines = zip(metrics_files, plot_halo_dist_files, plot_spectra_files)
+    fp.write(",".join(["compressor_name"] + compressor_inputs + ["cbench_file", "halo_finder_file", "spectra_file",
+                                                                 "metric_file", "halo_dist_file", "spectra_file"]) + "\n")
+    lines = zip(cbench_files, halo_finder_files, spectra_files, metrics_files, plot_halo_dist_files, plot_spectra_files)
     for i, line in enumerate(lines):
         inputs = compressor_data[i]["name"] + ","
         for key in compressor_inputs:
