@@ -191,6 +191,7 @@ for metric in cp.geteval(section, "metrics"):
     cbench_json_data["metrics"].append(entry)
 
 # loop over compressors
+# first "compressor" is the input file
 compressors = cp.items("compressors")
 compressors = [("original", None,)] + compressors
 for i, (c_tag, c_name) in enumerate(compressors):
@@ -254,6 +255,7 @@ for i, (c_tag, c_name) in enumerate(compressors):
         else:
             cbench_file = cbench_json_data["compressors"][i]["output-prefix"] + "__" + os.path.basename(cbench_json_data["input"]["filename"])
             prefix = cbench_dir + "/" + ".".join(cbench_file.split(".")[:-1])
+        timestep = cbench_file.split(".")[:-1]
 
         # set paths for halo finder configuration and parameters files
         config_file = os.path.join(halo_dir, "halo_finder_{}_{}_config.txt".format(c_tag, i))
@@ -275,7 +277,6 @@ for i, (c_tag, c_name) in enumerate(compressors):
                                                                                                 "tmp.out", config_file))
 
         # halo finder file not explicitly set so construct it here
-        timestep = cbench_file.split(".")[:-1]
         halo_finder_file = os.path.join(cbench_json_data["compressors"][i]["output-prefix"], "{}.fofproperties".format(timestep))
 
         # add halo finder job to workflow for compressed file
@@ -298,6 +299,7 @@ for i, (c_tag, c_name) in enumerate(compressors):
         spectra_file = os.path.join(spectra_dir, "spectra_{}_{}.pk".format(c_tag, i))
 
         # add power spectra job to workflow for compressed file
+        # make dependent on CBench job
         section = "power-spectrum"
         spectra_job = Job(name="spectra_{}_{}".format(c_tag, i),
                           execute_dir=spectra_dir,
