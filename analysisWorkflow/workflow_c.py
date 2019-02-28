@@ -213,12 +213,15 @@ for i, (c_tag, c_name) in enumerate(compressors):
         # add compressors settings to JSON data
         cbench_json_data["compressors"] = []
         for i, setting in enumerate(settings):
+            v_tag = ""
+            for key, val in zip(keys, setting):
+                v_tag += "{}:{}__".format(key, val)
             entry = {
                 "name" : c_name,
-                "output-prefix" : "__{}__{}".format(c_tag, i),
+                "output-prefix" : "out__{}__{}".format(c_tag, v_tag),
             }
-            for i, val in enumerate(setting):
-                entry[keys[i]] = val
+            for j, val in enumerate(setting):
+                entry[keys[j]] = val
             cbench_json_data["compressors"].append(entry)
     
         # set log file prefixes for CBench in JSON data
@@ -242,7 +245,7 @@ for i, (c_tag, c_name) in enumerate(compressors):
 
     # fill in JSON data if input file
     else:
-        cbench_json_data["compressors"] = [{"name" : "original", "output-prefix" : "__original__0"}]
+        cbench_json_data["compressors"] = [{"name" : "original", "output-prefix" : "out__original__"}]
 
     # loop over each compressed file from CBench
     for i, _ in enumerate(cbench_json_data["compressors"]):
