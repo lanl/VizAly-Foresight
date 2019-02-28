@@ -222,8 +222,7 @@ cbench_files = []
 halo_finder_files = []
 spectra_files = []
 metrics_files = []
-plot_halo_dist_files = []
-plot_spectra_files = []
+histogram_files = []
 
 # store compressor data
 compressor_data = []
@@ -273,6 +272,10 @@ for i, (c_tag, c_name) in enumerate(compressors):
         cbench_json_data["output"]["metricsfname"] = cp.get(section, "metrics-file") + "_{}".format(c_tag)
         for _, _ in enumerate(settings):
             metrics_files.append(os.path.join(cbench_dir, cbench_json_data["output"]["metricsfname"] + ".csv"))
+            if cp.getboolean("cbench", "histogram"):
+                histogram_files.append(os.path.join(cbench_dir, "histogram_" + cbench_json_data["output"]["metricsfname"] + ".py"))
+            else:
+                histogram_files.append("")
 
         # write CBENCH JSON data
         json_file = os.path.join(cbench_dir, "cbench_{}.json".format(c_tag))
@@ -293,6 +296,7 @@ for i, (c_tag, c_name) in enumerate(compressors):
         cbench_json_data["compressors"] = [{"name" : "original", "output-prefix" : "out__original__"}]
         compressor_data.append({"name" : c_name})
         metrics_files.append("")
+        histogram_files.append("")
 
     # loop over each compressed file from CBench
     for i, _ in enumerate(cbench_json_data["compressors"]):
@@ -364,42 +368,14 @@ for i, (c_tag, c_name) in enumerate(compressors):
             spectra_job.add_parents(cbench_job)
         wflow.add_job(spectra_job)
 
-        # add plot power spectra job to workflow for compressed file
-        # make dependent on power spectra job
-        section = "plot-halo-distribution"
-        plot_halo_dist_files.append(output_dir + "/plot_halo_dist_{}_{}.png".format(c_tag, i))
-        plot_halo_dist_job = Job(name="plot_halo_dist_{}_{}".format(c_tag, i),
-                                 execute_dir=output_dir,
-                                 executable=cp.get("executables", section),
-                                 arguments=["--input-files", halo_finder_files[-1], "--reference-file", halo_finder_files[0],
-                                            "--output-file", plot_halo_dist_files[-1]] + cp.arguments_from_section(section),
-                                 configurations=cp.configuration_from_section(section),
-                                 environment=cp.environment_from_section(section))
-        plot_halo_dist_job.add_parents(halo_finder_job)
-        wflow.add_job(plot_halo_dist_job)
-
-        # add plot power spectra job to workflow for compressed file
-        # make dependent on power spectra job
-        section = "plot-power-spectrum"
-        plot_spectra_files.append(output_dir + "/plot_spectra_{}_{}.png".format(c_tag, i))
-        plot_spectra_job = Job(name="plot_spectra_{}_{}".format(c_tag, i),
-                               execute_dir=output_dir,
-                               executable=cp.get("executables", section),
-                               arguments=["--input-files", spectra_files[-1], "--reference-file", spectra_files[0],
-                                          "--output-file", plot_spectra_files[-1]] + cp.arguments_from_section(section),
-                               configurations=cp.configuration_from_section(section),
-                               environment=cp.environment_from_section(section))
-        plot_spectra_job.add_parents(spectra_job)
-        wflow.add_job(plot_spectra_job)
-
 # write workflow
 wflow.write()
 
 # write output manifest
 with open(run_dir + "/{}.csv".format(opts.name), "w") as fp:
     fp.write(",".join(["compressor_name"] + compressor_inputs + ["cbench_file", "halo_finder_file", "spectra_file",
-                                                                 "metric_file", "halo_dist_file", "spectra_file"]) + "\n")
-    lines = zip(cbench_files, halo_finder_files, spectra_files, metrics_files, plot_halo_dist_files, plot_spectra_files)
+                                                                 "metric_file", "histogram_file"]) + "\n")
+    lines = zip(cbench_files, halo_finder_files, spectra_files, metrics_files, histogram_files)
     for i, line in enumerate(lines):
         inputs = compressor_data[i]["name"] + ","
         for key in compressor_inputs:
