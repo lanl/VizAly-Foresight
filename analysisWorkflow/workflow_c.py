@@ -337,7 +337,7 @@ for i, (c_tag, c_name) in enumerate(compressors):
                                                                                                 "tmp.out", config_file))
 
         # halo finder file not explicitly set so construct it here
-        halo_finder_file = os.path.join(halo_dir, cbench_json_data["compressors"][i]["output-prefix"] + "{}.fofproperties".format(timestep))
+        halo_finder_file = os.path.join(halo_dir, cbench_json_data["compressors"][i]["output-prefix"] + "-{}.fofproperties".format(timestep))
         halo_finder_files.append(halo_finder_file)
 
         # add halo finder job to workflow for compressed file
