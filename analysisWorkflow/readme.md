@@ -15,6 +15,13 @@ An exmaple for the input file is workflow_input.json. workflow_input.json has tw
 This python script will launch batch scripts to run CBench, the halo finder, and power spectra calculation.
 An example configuration file is provided, `workflow_c.ini`.
 
+To create a Cinema database, do:
+```
+cd workflow_c
+cp ../*.py
+python create_cinema.py --input-file workflow_c.csv --debug
+```
+
 
 ## Requirements:
 workflow_b.py needs the aspw (Anotger Sqlite Python Wrapper). To run it on Darwin, you will need Python 3 and aspw
