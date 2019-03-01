@@ -161,11 +161,21 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--name", default="workflow_c", help="Name of the workflow.")
 parser.add_argument("--config-file", default="workflow_c.ini", help="Path to configuration file.")
 parser.add_argument("--submit", action="store_true", help="Submit workflow to Slurm.")
+parser.add_argument("--config-overrides", nargs="+", default=None)
 opts = parser.parse_args()
 
 # read configuration file
 cp = Config()
 cp.readfp(open(opts.config_file))
+
+# do command line overrides for configuration file
+for arg in opts.config_overrides:
+    arg = arg.split(":")
+    arg = arg if len(arg) == 3 else arg + [""]
+    section = arg[0]
+    key = arg[1]
+    val = arg[2]
+    cp.set(section, key, val)
 
 # change directory
 if not os.path.exists(opts.name):
@@ -174,6 +184,9 @@ else:
     raise OSError("The directory {} already exists! Aborting!".format(opts.name))
 os.chdir(opts.name)
 run_dir = os.getcwd()
+
+# save parsed configuration file
+cp.write(open(opts.name + ".ini", "w"))
 
 # create output directories
 cbench_dir = os.path.join(run_dir, "cbench")
