@@ -169,11 +169,12 @@ cp = Config()
 cp.readfp(open(opts.config_file))
 
 # do command line overrides for configuration file
-for arg in opts.config_overrides:
-    arg = arg.split(":")
-    arg = arg if len(arg) == 3 else arg + [""]
-    assert(len(arg) == 3)
-    cp.set(*arg)
+if opts.config_overrides:
+    for arg in opts.config_overrides:
+        arg = arg.split(":")
+        arg = arg if len(arg) == 3 else arg + [""]
+        assert(len(arg) == 3)
+        cp.set(*arg)
 
 # change directory
 if not os.path.exists(opts.name):
