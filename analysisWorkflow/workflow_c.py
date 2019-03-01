@@ -252,13 +252,13 @@ for i, (c_tag, c_name) in enumerate(compressors):
             compressor_data.append({"name" : c_name})
             v_tag = ""
             for key, val in zip(keys, setting):
-                v_tag += "{}{}__".format(key, val)
+                v_tag += "{}{}_".format(key, val)
                 compressor_data[-1][key] = val
                 if key not in compressor_inputs:
                     compressor_inputs.append(key)
             entry = {
                 "name" : c_name,
-                "output-prefix" : "out__{}__{}".format(c_tag, v_tag),
+                "output-prefix" : "out_{}_{}".format(c_tag, v_tag),
             }
             for j, val in enumerate(setting):
                 entry[keys[j]] = val
@@ -300,7 +300,7 @@ for i, (c_tag, c_name) in enumerate(compressors):
 
         # histogram file not explicitly set so construct it here
         if c_tag != "original" and cp.getboolean(section, "histogram"):
-            histogram_files.append(",".join([os.path.join(cbench_dir, os.path.basename(cp.get(section, "input-file") + "_" + c_name + "_" + p + "_absolute_error_" + cbench_json_data["compressors"][i]["output-prefix"][len("out__{}__".format(c_tag)):-2] + "_hist.py"))
+            histogram_files.append(",".join([os.path.join(cbench_dir, os.path.basename(cp.get(section, "input-file") + "_" + c_name + "_" + p + "_absolute_error_" + cbench_json_data["compressors"][i]["output-prefix"][len("out_{}_".format(c_tag)):].replace("__", "_") + "hist.py"))
                                    for p in cp.geteval(section, "scalars")]))
         elif cp.getboolean(section, "histogram"):
             histogram_files.append((len(cp.geteval(section, "scalars")) - 1) * ",")
