@@ -127,9 +127,34 @@ class Config(configparser.ConfigParser):
         super().__init__()
 
     def geteval(self, option, key):
-        """ Does eval on getter.
+        """ Does `eval` on getter.
         """
         return eval(self.get(option, key))
+
+    def arguments_from_section(self, section):
+        """ Returns list of arguments for section.
+        """
+        if cp.has_section(section):
+            its = cp.items(section)
+            its = [("--" + k, v) for k, v in its]
+            return list(itertools.chain(its))
+        return None
+
+    def configuration_from_section(self, section):
+        """ Returns list of configuration settings for section.
+        """
+        section += "-configuration"
+        if cp.has_section(section):
+            return list(itertools.chain(*cp.items(section)))
+        return None
+
+    def environment_from_section(self, section):
+        """ Returns enviroment file for section.
+        """
+        if cp.has_section("environments"):
+            if cp.has_option("enviroments", section):
+                return cp.get("environments", section)
+        return None
 
 # parse command line
 parser = argparse.ArgumentParser(description=__doc__)
@@ -190,10 +215,22 @@ for metric in cp.geteval(section, "metrics"):
         entry["histogram"] = cp.geteval(section, "scalars")
     cbench_json_data["metrics"].append(entry)
 
+# store files
+cbench_files = []
+halo_finder_files = []
+spectra_files = []
+metrics_files = []
+histogram_files = []
+
+# store compressor data
+compressor_data = []
+compressor_inputs = []
+
 # loop over compressors
+# first "compressor" is the input file
 compressors = cp.items("compressors")
-compressors += [("original", None,)]
-for c_tag, c_name in compressors:
+compressors = [("original", "Original",)] + compressors
+for i, (c_tag, c_name) in enumerate(compressors):
 
     # create a CBench job if doing compression
     if c_tag != "original":
@@ -212,19 +249,26 @@ for c_tag, c_name in compressors:
         # add compressors settings to JSON data
         cbench_json_data["compressors"] = []
         for i, setting in enumerate(settings):
+            compressor_data.append({"name" : c_name})
+            v_tag = ""
+            for key, val in zip(keys, setting):
+                v_tag += "{}{}_".format(key, val)
+                compressor_data[-1][key] = val
+                if key not in compressor_inputs:
+                    compressor_inputs.append(key)
             entry = {
                 "name" : c_name,
-                "output-prefix" : "__{}__{}".format(c_tag, i),
+                "output-prefix" : "out_{}_{}".format(c_tag, v_tag),
             }
-            for i, val in enumerate(setting):
-                entry[keys[i]] = val
+            for j, val in enumerate(setting):
+                entry[keys[j]] = val
             cbench_json_data["compressors"].append(entry)
     
         # set log file prefixes for CBench in JSON data
         section = "cbench"
         cbench_json_data["output"]["logfname"] = cp.get(section, "log-file") + "_{}".format(c_tag)
         cbench_json_data["output"]["metricsfname"] = cp.get(section, "metrics-file") + "_{}".format(c_tag)
-    
+
         # write CBENCH JSON data
         json_file = os.path.join(cbench_dir, "cbench_{}.json".format(c_tag))
         with open(json_file, "w") as fp:
@@ -235,25 +279,43 @@ for c_tag, c_name in compressors:
                          execute_dir=cbench_dir,
                          executable=cp.get("executables", "mpirun"),
                          arguments=[cp.get("executables", section), json_file],
-                         configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
-                         environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
+                         configurations=cp.configuration_from_section(section),
+                         environment=cp.environment_from_section(section))
         wflow.add_job(cbench_job)
 
     # fill in JSON data if input file
     else:
-        cbench_json_data["compressors"] = [{"name" : "original", "output-prefix" : "__original__0"}]
+        cbench_json_data["compressors"] = [{"name" : "original", "output-prefix" : "out__original__"}]
+        compressor_data.append({"name" : c_name})
 
     # loop over each compressed file from CBench
     for i, _ in enumerate(cbench_json_data["compressors"]):
 
-        # set uncompressed or compressed file
+        # metrics file not explicitly set so construct it here
+        section = "cbench"
+        if c_tag != "original":
+            metrics_files.append(os.path.join(cbench_dir, cbench_json_data["output"]["metricsfname"] + ".csv"))
+        else:
+            metrics_files.append("")
+
+        # histogram file not explicitly set so construct it here
+        if c_tag != "original" and cp.getboolean(section, "histogram"):
+            histogram_files.append(",".join([os.path.join(cbench_dir, os.path.basename(cp.get(section, "input-file") + "_" + c_name + "_" + p + "_absolute_error_" + cbench_json_data["compressors"][i]["output-prefix"][len("out_{}_".format(c_tag)):].replace("__", "_") + "hist.py"))
+                                   for p in cp.geteval(section, "scalars")]))
+        elif cp.getboolean(section, "histogram"):
+            histogram_files.append((len(cp.geteval(section, "scalars")) - 1) * ",")
+        else:
+            histogram_files.append("")
+
+        # compressed file not explicitly set so construct it here
         # cut off timestep from path for halo finder executable
         if c_tag == "original":
-            cbench_file = cp.get("cbench", "input-file")
-            prefix = ".".join(cbench_file.split(".")[:-1])
+            cbench_file = os.path.join(cbench_dir, cp.get("cbench", "input-file"))
         else:
-            cbench_file = cbench_json_data["compressors"][i]["output-prefix"] + "__" + os.path.basename(cbench_json_data["input"]["filename"])
-            prefix = cbench_dir + "/" + ".".join(cbench_file.split(".")[:-1])
+            cbench_file = os.path.join(cbench_dir, cbench_json_data["compressors"][i]["output-prefix"] + "__" + os.path.basename(cbench_json_data["input"]["filename"]))
+        prefix = ".".join(cbench_file.split(".")[:-1])
+        timestep = cbench_file.split(".")[-1]
+        cbench_files.append(cbench_file)
 
         # set paths for halo finder configuration and parameters files
         config_file = os.path.join(halo_dir, "halo_finder_{}_{}_config.txt".format(c_tag, i))
@@ -274,9 +336,9 @@ for c_tag, c_name in compressors:
         os.system("sed \"s/^ACCUMULATE_CORE_NAME.*/ACCUMULATE_CORE_NAME .\/{}/\" {} > {}".format(cbench_json_data["compressors"][i]["output-prefix"],
                                                                                                 "tmp.out", config_file))
 
-        # set halo finder file
-        timestep = cbench_file.split(".")[:-1]
-        halo_finder_file = os.path.join(cbench_json_data["compressors"][i]["output-prefix"], "{}.fofproperties".format(timestep))
+        # halo finder file not explicitly set so construct it here
+        halo_finder_file = os.path.join(halo_dir, cbench_json_data["compressors"][i]["output-prefix"] + "-{}.fofproperties".format(timestep))
+        halo_finder_files.append(halo_finder_file)
 
         # add halo finder job to workflow for compressed file
         # make dependent on CBench job
@@ -288,28 +350,55 @@ for c_tag, c_name in compressors:
                                          "--timesteps", cp.get(section, "timesteps-file"),
                                          "--prefix", prefix,
                                          parameters_file],
-                              configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
-                              environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
+                              configurations=cp.configuration_from_section(section),
+                              environment=cp.environment_from_section(section))
         if c_tag != "original":
             halo_finder_job.add_parents(cbench_job)
         wflow.add_job(halo_finder_job)
 
-        # add power spectra job to workflow for compressed file
-        section = "power-spectrum"
+        # spectra file not explicitly set so construct it here
         spectra_file = os.path.join(spectra_dir, "spectra_{}_{}.pk".format(c_tag, i))
+        spectra_files.append(spectra_file)
+
+        # add power spectra job to workflow for compressed file
+        # make dependent on CBench job
+        section = "power-spectrum"
         spectra_job = Job(name="spectra_{}_{}".format(c_tag, i),
                           execute_dir=spectra_dir,
                           executable=cp.get("executables", "mpirun"),
                           arguments=[cp.get("executables", section), cp.get(section, "parameters-file"),
                                      "-n", os.path.join(cbench_dir, cbench_file), spectra_file.rstrip(".pk")],
-                          configurations=list(itertools.chain(*cp.items("{}-configuration".format(section)))),
-                          environment=cp.get(section, "environment-file") if cp.has_option(section, "environment-file") else None)
+                                     configurations=cp.configuration_from_section(section),
+                          environment=cp.environment_from_section(section))
         if c_tag != "original":
             spectra_job.add_parents(cbench_job)
         wflow.add_job(spectra_job)
 
+# remove the temporary file
+os.remove("tmp.out")
+
 # write workflow
 wflow.write()
+
+# write output manifest
+with open(run_dir + "/{}.csv".format(opts.name), "w") as fp:
+    if cp.getboolean("cbench", "histogram"):
+        histogram_header = ",".join(["histogram_{}".format(p) for p in cp.geteval("cbench", "scalars")])
+    else:
+        histogram_header = ""
+    fp.write(",".join(["compressor_name"] + compressor_inputs + ["cbench_file", "halo_finder_file", "spectra_file",
+                                                                 "metric_file"]) + "," + histogram_header + "\n")
+    lines = zip(cbench_files, halo_finder_files, spectra_files, metrics_files, histogram_files)
+    for i, line in enumerate(lines):
+        inputs = compressor_data[i]["name"] + ","
+        for key in compressor_inputs:
+            if key in compressor_data[i].keys():
+                inputs += str(compressor_data[i][key]) + ","
+            else:
+                inputs += ","
+        line = inputs + ",".join(line) + "\n"
+        line = line.replace(run_dir + "/", "")
+        fp.write(line)
 
 # submit
 if opts.submit:
