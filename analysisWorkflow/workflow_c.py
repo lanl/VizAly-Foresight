@@ -172,10 +172,7 @@ cp.readfp(open(opts.config_file))
 for arg in opts.config_overrides:
     arg = arg.split(":")
     arg = arg if len(arg) == 3 else arg + [""]
-    section = arg[0]
-    key = arg[1]
-    val = arg[2]
-    cp.set(section, key, val)
+    cp.set(*arg)
 
 # change directory
 if not os.path.exists(opts.name):
