@@ -161,7 +161,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--name", default="workflow_c", help="Name of the workflow.")
 parser.add_argument("--config-file", default="workflow_c.ini", help="Path to configuration file.")
 parser.add_argument("--submit", action="store_true", help="Submit workflow to Slurm.")
-parser.add_argument("--config-overrides", nargs="+", default=None)
+parser.add_argument("--config-overrides", nargs="+", default=None, help="Override configuration file options.")
 opts = parser.parse_args()
 
 # read configuration file
