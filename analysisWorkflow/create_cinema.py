@@ -68,8 +68,7 @@ for i in range(data.shape[0]):
     output_files.append("halo_{}.png".format(i))
     if not os.path.exists(output_files[-1]):
         cmd = ["python", "plot_gio_distribution.py",
-               "--input-file", data["halo_finder_file"][i],
-               "--reference-file", data["halo_finder_file"][0],
+               "--input-file", data["halo_finder_file"][i], data["halo_finder_file"][0],
                "--output-file", opts.output_file + "/" + output_files[-1],
                "--xlim", 1e10, 1e15,
                "--ylim", 1e-1, 1e6,
