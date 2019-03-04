@@ -65,7 +65,7 @@ for i in range(data.shape[0]):
         _external_call(cmd, debug=opts.debug)
 
     # plot halo mass distribution
-    output_files.append("halo__{}.png".format(i))
+    output_files.append("halo_{}.png".format(i))
     if not os.path.exists(output_files[-1]):
         cmd = ["python", "plot_gio_distribution.py",
                "--input-file", data["halo_finder_file"][i],
