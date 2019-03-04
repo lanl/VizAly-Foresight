@@ -88,7 +88,6 @@ for i in range(data.shape[0]):
                "--xlim", 1e10, 1e14,
                "--ylim", 0.5, 2.0,
                "--xlog",
-               "--ylog",
                "--log-bins",
                "--operation", "ratio"]
         _external_call(cmd, debug=opts.debug)
@@ -103,7 +102,6 @@ for i in range(data.shape[0]):
                "--xlim", 1e10, 1e14,
                "--ylim", 0.9, 1.1,
                "--xlog",
-               "--ylog",
                "--log-bins",
                "--operation", "ratio"]
         _external_call(cmd, debug=opts.debug)
