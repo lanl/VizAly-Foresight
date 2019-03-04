@@ -17,7 +17,7 @@ def operate(y, ref, operation):
         return y / ref
     elif operation == "abs":
         return numpy.abs(y - ref)
-    elif operaiton == "diff":
+    elif operation == "diff":
         return y - ref
     else:
         raise NotImplementedError("Do not understand operation {}!".format(operation))
