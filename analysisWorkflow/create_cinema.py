@@ -43,6 +43,11 @@ for i in range(data.shape[0]):
         assert(data["compressor_name"][i] == opts.reference_row)
         continue
 
+    # skip if not input files
+    if not os.path.exists(data["spectra_file"][i]) or not os.path.exists(data["halo_finder_file"][i]):
+        print("Input files do not exist! Skipping!")
+        continue
+
     # get CSV data from manifest
     row = list(data.values[i][header_idxs])
     output_files = []
@@ -59,8 +64,37 @@ for i in range(data.shape[0]):
                "--operation", "ratio"]
         _external_call(cmd, debug=opts.debug)
 
+    # plot halo mass distribution
+    output_files.append("halo__{}.png".format(i))
+    if not os.path.exists(output_files[-1]):
+        cmd = ["python", "plot_gio_distribution.py",
+               "--input-file", data["halo_finder_file"][i],
+               "--reference-file", data["halo_finder_file"][0],
+               "--output-file", opts.output_file + "/" + output_files[-1],
+               "--xlim", 1e10, 1e15,
+               "--ylim", 1e-1, 1e6,
+               "--xlog",
+               "--ylog",
+               "--log-bins"]
+        _external_call(cmd, debug=opts.debug)
+
     # plot halo mass distribution ratio
     output_files.append("halo_ratio_{}.png".format(i))
+    if not os.path.exists(output_files[-1]):
+        cmd = ["python", "plot_gio_distribution.py",
+               "--input-file", data["halo_finder_file"][i],
+               "--reference-file", data["halo_finder_file"][0],
+               "--output-file", opts.output_file + "/" + output_files[-1],
+               "--xlim", 1e10, 1e14,
+               "--ylim", 0.5, 2.0,
+               "--xlog",
+               "--ylog",
+               "--log-bins",
+               "--operation", "ratio"]
+        _external_call(cmd, debug=opts.debug)
+
+    # plot halo mass distribution ratio
+    output_files.append("halo_ratio_zoom_{}.png".format(i))
     if not os.path.exists(output_files[-1]):
         cmd = ["python", "plot_gio_distribution.py",
                "--input-file", data["halo_finder_file"][i],
@@ -72,6 +106,35 @@ for i in range(data.shape[0]):
                "--ylog",
                "--log-bins",
                "--operation", "ratio"]
+        _external_call(cmd, debug=opts.debug)
+
+    # plot halo mass distribution absolute value
+    output_files.append("halo_abs_{}.png".format(i))
+    if not os.path.exists(output_files[-1]):
+        cmd = ["python", "plot_gio_distribution.py",
+               "--input-file", data["halo_finder_file"][i],
+               "--reference-file", data["halo_finder_file"][0],
+               "--output-file", opts.output_file + "/" + output_files[-1],
+               "--xlim", 1e10, 1e14,
+               "--ylim", 1e-1, 1e3,
+               "--xlog",
+               "--ylog",
+               "--log-bins",
+               "--operation", "abs"]
+        _external_call(cmd, debug=opts.debug)
+
+    # plot halo mass distribution difference
+    output_files.append("halo_diff_{}.png".format(i))
+    if not os.path.exists(output_files[-1]):
+        cmd = ["python", "plot_gio_distribution.py",
+               "--input-file", data["halo_finder_file"][i],
+               "--reference-file", data["halo_finder_file"][0],
+               "--output-file", opts.output_file + "/" + output_files[-1],
+               "--xlim", 1e10, 1e14,
+               "--ylim", -1e3, 1e3,
+               "--xlog",
+               "--log-bins",
+               "--operation", "diff"]
         _external_call(cmd, debug=opts.debug)
 
     # read metrics file

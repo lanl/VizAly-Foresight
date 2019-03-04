@@ -15,6 +15,10 @@ def operate(y, ref, operation):
         return y
     elif operation == "ratio":
         return y / ref
+    elif operation == "abs":
+        return numpy.abs(y - ref)
+    elif operaiton == "diff":
+        return y - ref
     else:
         raise NotImplementedError("Do not understand operation {}!".format(operation))
 
@@ -37,7 +41,7 @@ def load_sqlite_data(path, query, sqlite_file):
     result = query_mgr.runQueryOutputList(query)
 
     # typecast
-    result = numpy.array(result)
+    result = numpy.array(result).flatten()
     assert(len(result.shape) == 1)
 
     return result
@@ -49,7 +53,7 @@ parser.add_argument("--reference-file")
 parser.add_argument("--output-file")
 parser.add_argument("--sqlite-file", default="/home/cmbiwer/src/VizAly-Vis_IO/genericio/frontend/GenericIOSQLite.so")
 parser.add_argument("--query", default="select fof_halo_mass from __TABLE__ ORDER BY fof_halo_mass DESC LIMIT 50")
-parser.add_argument("--operation", choices=["none", "ratio"], default="none")
+parser.add_argument("--operation", choices=["none", "ratio", "abs", "diff"], default="none")
 parser.add_argument("--ylim", nargs="+", type=float, default=[])
 parser.add_argument("--xlim", nargs="+", type=float, default=[])
 parser.add_argument("--ylabel", default="Counts")
