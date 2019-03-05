@@ -56,6 +56,18 @@ for i in range(data.shape[0]):
     output_files.append("spectrum_{}.png".format(i))
     if not os.path.exists(output_files[-1]):
         cmd = ["python", "plot_spectrum.py",
+               "--input-file", data["spectra_file"][i], data["spectra_file"][0],
+               "--output-file", opts.output_file + "/" + output_files[-1],
+               "--xlog",
+               "--ylog",
+               "--xlim", 0, 10,
+               "--ylim", 1e1, 1e5]
+        _external_call(cmd, debug=opts.debug)
+
+    # plot spectrum ratio
+    output_files.append("spectrum_ratio_{}.png".format(i))
+    if not os.path.exists(opts.output_file + "/" + output_files[-1]):
+        cmd = ["python", "plot_spectrum.py",
                "--input-file", data["spectra_file"][i],
                "--reference-file", data["spectra_file"][0],
                "--output-file", opts.output_file + "/" + output_files[-1],
@@ -66,7 +78,7 @@ for i in range(data.shape[0]):
 
     # plot halo mass distribution
     output_files.append("halo_{}.png".format(i))
-    if not os.path.exists(output_files[-1]):
+    if not os.path.exists(opts.output_file + "/" + output_files[-1]):
         cmd = ["python", "plot_gio_distribution.py",
                "--input-file", data["halo_finder_file"][i], data["halo_finder_file"][0],
                "--output-file", opts.output_file + "/" + output_files[-1],
@@ -79,7 +91,7 @@ for i in range(data.shape[0]):
 
     # plot halo mass distribution ratio
     output_files.append("halo_ratio_{}.png".format(i))
-    if not os.path.exists(output_files[-1]):
+    if not os.path.exists(opts.output_file + "/" + output_files[-1]):
         cmd = ["python", "plot_gio_distribution.py",
                "--input-file", data["halo_finder_file"][i],
                "--reference-file", data["halo_finder_file"][0],
@@ -93,7 +105,7 @@ for i in range(data.shape[0]):
 
     # plot halo mass distribution ratio
     output_files.append("halo_ratio_zoom_{}.png".format(i))
-    if not os.path.exists(output_files[-1]):
+    if not os.path.exists(opts.output_file + "/" + output_files[-1]):
         cmd = ["python", "plot_gio_distribution.py",
                "--input-file", data["halo_finder_file"][i],
                "--reference-file", data["halo_finder_file"][0],
@@ -107,13 +119,13 @@ for i in range(data.shape[0]):
 
     # plot halo mass distribution absolute value
     output_files.append("halo_abs_{}.png".format(i))
-    if not os.path.exists(output_files[-1]):
+    if not os.path.exists(opts.output_file + "/" + output_files[-1]):
         cmd = ["python", "plot_gio_distribution.py",
                "--input-file", data["halo_finder_file"][i],
                "--reference-file", data["halo_finder_file"][0],
                "--output-file", opts.output_file + "/" + output_files[-1],
                "--xlim", 1e10, 1e14,
-               "--ylim", 1e-1, 1e3,
+               "--ylim", 1e-1, 1e5,
                "--xlog",
                "--ylog",
                "--log-bins",
@@ -122,7 +134,7 @@ for i in range(data.shape[0]):
 
     # plot halo mass distribution difference
     output_files.append("halo_diff_{}.png".format(i))
-    if not os.path.exists(output_files[-1]):
+    if not os.path.exists(opts.output_file + "/" + output_files[-1]):
         cmd = ["python", "plot_gio_distribution.py",
                "--input-file", data["halo_finder_file"][i],
                "--reference-file", data["halo_finder_file"][0],
@@ -134,10 +146,27 @@ for i in range(data.shape[0]):
                "--operation", "diff"]
         _external_call(cmd, debug=opts.debug)
 
+    # plot histograms from CBench
+    for c in data.columns:
+        if c.startswith("histogram_"):
+            var = c[len("histogram_"):]
+        else:
+            continue
+        output_files.append(os.path.basename(data[c][i]).replace(".py", ".png"))
+        if not os.path.exists(opts.output_file + "/" + output_files[-1]):
+            cmd = ["python", data[c][i]]
+            _external_call(cmd, debug=opts.debug)
+            cmd = ["mv", data[c][i].replace(".py", ".png"), opts.output_file]
+            _external_call(cmd, debug=opts.debug)
+
     # read metrics file
     metrics = pandas.read_csv(data["metric_file"][i])
 
-    # add to header
+    # tag used in metrics file to idenify lines that correspond to this compressed data
+    #! FIXME: very specific
+    metric_tag = data["histogram_x"][i][len("cbench/m000.full.mpicosmo.499_"):-len("_hist.py")].replace("absolute_error", "")
+
+    # add output files to header
     if i == 1:
         init_metrics_header = list(metrics.columns)
         header += init_metrics_header
@@ -145,10 +174,15 @@ for i in range(data.shape[0]):
     else:
         assert(all(init_metrics_header == metrics.columns))
 
-    # append rows
+    # append rows from metrics file
+    tmp_rows = []
     for j in range(metrics.shape[0]):
-        rows.append(row + list(metrics.values[j]) + output_files)
-        assert(len(rows[-1]) == len(header))
+        if metrics["Compressor_field__params"][j] == metric_tag:
+            tmp_rows.append(row + list(metrics.values[j]) + output_files)
+
+    # append rows to full CSV file
+    rows += tmp_rows
+    assert(len(rows[-1]) == len(header))
 
 # write CSV file
 with open(opts.output_file + "/data.csv", "w") as fp:
