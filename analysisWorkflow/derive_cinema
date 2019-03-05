@@ -12,12 +12,15 @@ parser.add_argument("--output-file")
 parser.add_argument("--columns", nargs=2, default=["abs", "FILE_1"])
 opts = parser.parse_args()
 
+# read input file
 data = pandas.read_csv(opts.input_file, usecols=opts.columns)
 data = data.rename(columns={opts.columns[0] : opts.columns[0], opts.columns[-1] : "FILE"})
 
+# create output CSV file
 if not os.path.exists(opts.output_file):
     os.mkdir(opts.output_file)
 data.to_csv(opts.output_file + "/data.csv", index=False)
 
+# copy images
 for path in data["FILE"].values:
     shutil.copyfile(os.path.dirname(opts.input_file) + "/" + path, opts.output_file + "/" + path)
