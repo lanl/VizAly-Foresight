@@ -1,0 +1,17 @@
+#!/bin/sh
+
+BROWSER="Firefox"
+
+echo "Creating test_single.html and test_double.html in the current directory"
+cp index.html test_single.html
+sed 's/data\/sphere.cdb/data\/sphere.cdb\", \"data\/sphere.cdb/' index.html > test_double.html
+
+echo "Opening $BROWSER on files ..."
+open -a $BROWSER test_single.html &
+open -a $BROWSER test_double.html &
+
+sleep 2
+
+echo "Cleaning up ..."
+rm -f test_single.html
+rm -f test_double.html
