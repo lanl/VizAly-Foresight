@@ -30,5 +30,13 @@
         {
                 "name" : "Metrics (Feb 15, 2019) - Scaling Relative Error Input on Positions",
                 "directory" : "data/metrics7.cdb"
+        },
+        {
+                "name" : "Metrics (Mar 7, 2019) - Position",
+                "directory" : "data/20150307_position.cdb"
+        },
+        {
+                "name" : "Metrics (Mar 7, 2019) - Velocity",
+                "directory" : "data/20150307_velocity.cdb"
         }
 ]
