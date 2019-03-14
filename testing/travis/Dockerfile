@@ -4,8 +4,8 @@ FROM centos:7
 # install packages
 RUN yum install -y epel-release && \
     yum install -y doxygen git gsl-devel hdf5-devel help2man make \
-                   perl-CPAN perl-Thread-Queue perl-devel openssl-devel \
-                   selinux-policy sudo wget
+                   perl-CPAN perl-Thread-Queue perl-devel opencl-headers \
+                   openssl-devel selinux-policy sudo wget
 
 ## install gcc
 RUN yum install -y centos-release-scl && \
