@@ -61,4 +61,5 @@ RUN source /opt/rh/devtoolset-6/enable && \
 
 # create env script
 RUN echo "source /opt/rh/devtoolset-6/enable" > env.sh && \
-    echo "ldconfig" >> env.sh
+    echo "ldconfig" >> env.sh && \
+    echo "export OpenCL_LIBRARY=/usr/include/CL" >> env.sh

@@ -7,8 +7,6 @@ source /src/env.sh
 cd /src/VizAly-CBench
 projectPath=$(pwd)
 
-export OpenCL_LIBRARY=/usr/include/CL
-
 source buildDependencies.sh	# build dependencies
 source build.sh				# build the code
 
