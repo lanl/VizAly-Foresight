@@ -107,7 +107,7 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
 		if (total_max_abs_err != 0)
 		{
 			std::vector<float>histogram;
-			int numBins = 512;
+			int numBins = 1024;
 			std::vector<int> localHistogram(numBins,0);
 			double binSize = total_max_abs_err / numBins;
 
@@ -135,31 +135,7 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
 
 			// Output histogram as a python script file
 			if (myRank == 0)
-			{
-				std::stringstream outputFileSS;
-				outputFileSS << "import sys" << std::endl;
-				outputFileSS << "import numpy as np" << std::endl;
-				outputFileSS << "import matplotlib.pyplot as plt" << std::endl;
-
-				outputFileSS << "y=[";
-				std::size_t i;
-				for (i=0; i<numBins-1; ++i) 
-					outputFileSS << std::to_string(histogram[i]) << ", ";
-				outputFileSS << std::to_string(histogram[i]) << "]" << std::endl;
-
-				outputFileSS << "maxVal=" << std::to_string(total_max_abs_err) << std::endl;
-				outputFileSS << "plotName=sys.argv[0]" << std::endl;
-				outputFileSS << "plotName = plotName.replace('.py','.png')" << std::endl;
-
-				outputFileSS << "numVals = len(y)" << std::endl;
-				outputFileSS << "x = np.linspace(0, maxVal, numVals+1)[1:]" << std::endl;
-				outputFileSS << "plt.plot(x,y)" << std::endl;
-				outputFileSS << "plt.title(plotName)" << std::endl;
-				outputFileSS << "plt.ylabel(\"Frequency\")" << std::endl;
-				outputFileSS << "plt.savefig(plotName)" << std::endl;
-
-				additionalOutput = outputFileSS.str();
-			}
+				additionalOutput = python_histogram(numBins, total_max_abs_err, histogram);
 		}
 	}
 	
