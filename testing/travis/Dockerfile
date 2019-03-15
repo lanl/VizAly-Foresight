@@ -13,8 +13,7 @@ RUN yum install -y centos-release-scl && \
                    devtoolset-6-libquadmath-devel devtoolset-6-gcc-gfortran
 
 # install OpenCL
-RUN yum install -y nvidia-libopencl1-340 opencl-headers \
-                   ocl-icd ocl-icd-devel
+RUN yum install -y ocl-icd-devel
 
 # install CMake
 WORKDIR /src
