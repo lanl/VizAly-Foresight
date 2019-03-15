@@ -4,13 +4,17 @@ FROM centos:7
 # install packages
 RUN yum install -y epel-release && \
     yum install -y doxygen git gsl-devel hdf5-devel help2man make \
-                   perl-CPAN perl-Thread-Queue perl-devel opencl-headers \
+                   perl-CPAN perl-Thread-Queue perl-devel \
                    openssl-devel selinux-policy sudo wget
 
 ## install gcc
 RUN yum install -y centos-release-scl && \
     yum install -y devtoolset-6-gcc devtoolset-6-gcc-c++ \
                    devtoolset-6-libquadmath-devel devtoolset-6-gcc-gfortran
+
+# install OpenCL
+RUN yum install -y nvidia-libopencl1-340 opencl-headers \
+                   ocl-icd ocl-icd-opencl-dev
 
 # install CMake
 WORKDIR /src
@@ -62,4 +66,4 @@ RUN source /opt/rh/devtoolset-6/enable && \
 # create env script
 RUN echo "source /opt/rh/devtoolset-6/enable" > env.sh && \
     echo "ldconfig" >> env.sh && \
-    echo "export OpenCL_LIBRARY=/usr/include/CL" >> env.sh
+    echo "export OpenCL_LIBRARY=/usr/lib64/libOpenCL.so" >> env.sh
