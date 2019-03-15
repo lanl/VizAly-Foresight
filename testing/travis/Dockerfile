@@ -4,13 +4,16 @@ FROM centos:7
 # install packages
 RUN yum install -y epel-release && \
     yum install -y doxygen git gsl-devel hdf5-devel help2man make \
-                   perl-CPAN perl-Thread-Queue perl-devel openssl-devel \
-                   selinux-policy sudo wget
+                   perl-CPAN perl-Thread-Queue perl-devel \
+                   openssl-devel selinux-policy sudo wget
 
 ## install gcc
 RUN yum install -y centos-release-scl && \
     yum install -y devtoolset-6-gcc devtoolset-6-gcc-c++ \
                    devtoolset-6-libquadmath-devel devtoolset-6-gcc-gfortran
+
+# install OpenCL
+RUN yum install -y ocl-icd-devel
 
 # install CMake
 WORKDIR /src
