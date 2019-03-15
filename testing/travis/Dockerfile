@@ -14,7 +14,7 @@ RUN yum install -y centos-release-scl && \
 
 # install OpenCL
 RUN yum install -y nvidia-libopencl1-340 opencl-headers \
-                   ocl-icd ocl-icd-opencl-dev
+                   ocl-icd ocl-icd-devel
 
 # install CMake
 WORKDIR /src

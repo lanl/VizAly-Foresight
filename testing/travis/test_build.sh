@@ -1,5 +1,7 @@
 #! /bin/bash
 
+set -e
+
 # get GCC compiler
 source /src/env.sh
 
