@@ -1,12 +1,13 @@
 #! /bin/bash
 
+set -e
+
 # get GCC compiler
 source /src/env.sh
 
 # build
 cd /src/VizAly-CBench
 projectPath=$(pwd)
-
 
 source buildDependencies.sh	# build dependencies
 source build.sh				# build the code
