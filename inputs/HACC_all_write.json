@@ -74,8 +74,8 @@
 
 		{
 			"name": "zfp",
-			"tolerance": 1E-3,
-			"output-prefix" : "__zfp_tol-0.001"
+			"abs": 1E-3,
+			"output-prefix" : "__zfp_abs-0.001"
 		}
 	],
 
