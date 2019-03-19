@@ -385,7 +385,7 @@ for i, (c_tag, c_name) in enumerate(compressors):
                           execute_dir=spectra_dir,
                           executable=cp.get("executables", "mpirun"),
                           arguments=[cp.get("executables", section), cp.get(section, "parameters-file"),
-                                     "-n", os.path.join(cbench_dir, cbench_file), spectra_file.rstrip(".pk")],
+                                     "-n", os.path.join(cbench_dir, cbench_file), spectra_file.rstrip(".pk"), timestep],
                                      configurations=cp.configuration_from_section(section),
                           environment=cp.environment_from_section(section))
         if c_tag != "original":
