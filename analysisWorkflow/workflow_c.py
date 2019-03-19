@@ -238,6 +238,9 @@ histogram_files = []
 compressor_data = []
 compressor_inputs = []
 
+# store prefixes for each entry in the CBench metrics file
+prefixes = []
+
 # loop over compressors
 # first "compressor" is the input file
 compressors = cp.items("compressors")
@@ -302,6 +305,9 @@ for i, (c_tag, c_name) in enumerate(compressors):
 
     # loop over each compressed file from CBench
     for i, _ in enumerate(cbench_json_data["compressors"]):
+
+        # get prefix that is created internally inside CBench
+        prefixes.append(cbench_json_data["compressors"][i]["output-prefix"][len("out_{}_".format(c_tag)):])
 
         # metrics file not explicitly set so construct it here
         section = "cbench"
@@ -398,19 +404,21 @@ with open(run_dir + "/{}.csv".format(opts.name), "w") as fp:
         histogram_header = ",".join(["histogram_{}".format(p) for p in cp.geteval("cbench", "scalars")])
     else:
         histogram_header = ""
-    fp.write(",".join(["compressor_name"] + compressor_inputs + ["cbench_file", "halo_finder_file", "spectra_file",
+    fp.write(",".join(["compressor_name", "prefix"] + compressor_inputs + ["cbench_file", "halo_finder_file", "spectra_file",
                                                                  "metric_file"]) + "," + histogram_header + "\n")
     lines = zip(cbench_files, halo_finder_files, spectra_files, metrics_files, histogram_files)
     for i, line in enumerate(lines):
-        inputs = compressor_data[i]["name"] + ","
-        for key in compressor_inputs:
-            if key in compressor_data[i].keys():
-                inputs += str(compressor_data[i][key]) + ","
-            else:
-                inputs += ","
-        line = inputs + ",".join(line) + "\n"
-        line = line.replace(run_dir + "/", "")
-        fp.write(line)
+        for p in cp.geteval("cbench", "scalars"):
+            inputs = compressor_data[i]["name"] + "," + compressor_data[i]["name"] + "__" + p + "__" + prefixes[i] + ","
+            for key in compressor_inputs:
+                if key in compressor_data[i].keys():
+                    inputs += str(compressor_data[i][key]) + ","
+                else:
+                    inputs += ","
+            
+            eline = inputs + ",".join(line) + "\n"
+            eline = eline.replace(run_dir + "/", "")
+            fp.write(eline)
 
 # submit
 if opts.submit:
