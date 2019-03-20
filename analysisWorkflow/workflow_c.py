@@ -409,7 +409,7 @@ with open(run_dir + "/{}.csv".format(opts.name), "w") as fp:
     lines = zip(cbench_files, halo_finder_files, spectra_files, metrics_files, histogram_files)
     for i, line in enumerate(lines):
         for p in cp.geteval("cbench", "scalars"):
-            inputs = compressor_data[i]["name"] + "," + compressor_data[i]["name"] + "__" + p + "__" + prefixes[i] + ","
+            inputs = compressor_data[i]["name"] + "," + compressor_data[i]["name"] + "_" + p + "__" + prefixes[i][:-1] + ","
             for key in compressor_inputs:
                 if key in compressor_data[i].keys():
                     inputs += str(compressor_data[i][key]) + ","
