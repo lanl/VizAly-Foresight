@@ -72,11 +72,11 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
 			numel *= n[i];
 
     // Read in json compression parameters
-    double tolerance = 1E-3;
-    std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("tolerance");
+    double abs = 1E-3;
+    std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("abs");
     if( got != compressorParameters.end() )
-        if (compressorParameters["tolerance"] != "")
-            tolerance = strConvert::to_double( compressorParameters["tolerance"] );
+        if (compressorParameters["abs"] != "")
+            abs = strConvert::to_double( compressorParameters["abs"] );
 
     Timer cTime; 
     cTime.start();
@@ -90,8 +90,8 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
     // allocate meta data for a compressed stream
     zfp_stream* zfp = zfp_stream_open(NULL);
 
-    // set tolerance
-    zfp_stream_set_accuracy(zfp, tolerance);
+    // set absolute error tolerance
+    zfp_stream_set_accuracy(zfp, abs);
 
    	//allocate buffer for compressed data
     size_t bufsize = zfp_stream_maximum_size(zfp, field);
@@ -135,11 +135,11 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
 			numel *= n[i];
 
     // Read in json compression parameters
-	double tolerance = 1E-3;
-    std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("tolerance");
+	double abs = 1E-3;
+    std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("abs");
     if( got != compressorParameters.end() )
-        if (compressorParameters["tolerance"] != "")
-            tolerance = strConvert::to_double( compressorParameters["tolerance"] );
+        if (compressorParameters["abs"] != "")
+            abs = strConvert::to_double( compressorParameters["abs"] );
 
     Timer dTime; 
     dTime.start();
@@ -153,7 +153,7 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
 
     // allocate meta data for a compressed stream
     zfp_stream* zfp = zfp_stream_open(NULL);
-    zfp_stream_set_accuracy(zfp, tolerance);
+    zfp_stream_set_accuracy(zfp, abs);
 
     // allocate buffer for compressed data and transfer data
     size_t bufsize = zfp_stream_maximum_size(zfp, field);

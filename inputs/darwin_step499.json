@@ -46,7 +46,7 @@
 
 		{
 			"name" : "zfp",
-			"tolerance" : 7E-3
+			"abs" : 7E-3
 		},
 
 		{
