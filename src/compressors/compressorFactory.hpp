@@ -20,37 +20,39 @@ class CompressorFactory
   public:
 	static CompressorInterface * createCompressor(std::string compressorName)
 	{
+	  #ifdef CBENCH_HAS_BLOSC
 		if (compressorName == "BLOSC")
 		  return new BLOSCCompressor();
+	  #endif
 	  #ifdef CBENCH_HAS_BIG_CRUNCH
-		else if (compressorName == "BigCrunch")
+		if (compressorName == "BigCrunch")
 		  return new BigCrunchCompressor();
 	  #endif
 	  #ifdef CBENCH_HAS_ZFP
-		else if (compressorName == "zfp")
+		if (compressorName == "zfp")
 		 return new ZFPCompressor();
 	  #endif
 	  #ifdef CBENCH_HAS_SZ
-		else if (compressorName == "SZ")
+		if (compressorName == "SZ")
 		  return new SZCompressor();
 	  #endif
 	  #ifdef CBENCH_HAS_LOSSY_WAVE
-		else if (compressorName == "LossyWave")
+		if (compressorName == "LossyWave")
 		  return new LossyWaveCompressor();
 	  #endif
 	  #ifdef CBENCH_HAS_MGARD
-		else if (compressorName == "MGARD")
+		if (compressorName == "MGARD")
 		  return new MGARDCompressor();
 	  #endif
 	  #ifdef CBENCH_HAS_ISABELA
-		else if (compressorName == "Isabela")
+		if (compressorName == "Isabela")
 		  return new IsabelaCompressor();
 	  #endif
 	  #ifdef CBENCH_HAS_FPZIP
-		else if (compressorName == "fpzip")
+		if (compressorName == "fpzip")
 			return new FPZIPCompressor();
 	  #endif
-		else
+
 		  return NULL;
 	}
 };

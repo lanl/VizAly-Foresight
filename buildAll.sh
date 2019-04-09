@@ -28,6 +28,7 @@ cmake ../src \
 	-DCBENCH_ENABLE_LOSSY_WAVE=ON \
 	-DLOSSYWAVE_INCLUDE_PATH=$projectPath/ExternalDependencies/VizAly-LossyWave/install/include \
 	-DLOSSYWAVE_LIBRARY=$projectPath/ExternalDependencies/VizAly-LossyWave/install/lib/liblossywave.so \
+	-DLOSSYWAVE_LZ4_LIBRARY=$projectPath/ExternalDependencies/VizAly-LossyWave/build/3rdparty/lz4/lz4-external/src/lz4-external/lib/liblz4.a \
 	-DCBENCH_ENABLE_MGARD=ON \
 	-DMGARD_INCLUDE_PATH=$projectPath/ExternalDependencies/MGARD/install/include \
 	-DMGARD_LIBRARY=$projectPath/ExternalDependencies/MGARD/install/lib/libmgard.so \

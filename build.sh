@@ -15,6 +15,7 @@ cd $buildDir
  
 # build 
 cmake ../src \
+    -DCBENCH_ENABLE_BLOSC=ON \
     -DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
 	-DBLOSC_LIBRARY=$projectPath/ExternalDependencies/c-blosc/install/lib/libblosc.so \
 	-DCBENCH_ENABLE_SZ=ON \
@@ -25,7 +26,7 @@ cmake ../src \
 	-DCBENCH_ENABLE_BIG_CRUNCH=ON \
 	-DBIGCRUNCH_INCLUDE_PATH=$projectPath/ExternalDependencies/VizAly-BigCrunch/install/include \
 	-DBIGCRUNCH_LIBRARY=$projectPath/ExternalDependencies/VizAly-BigCrunch/install/lib/libbigcrunch.so \
-	-DCBENCH_ENABLE_LOSSY_WAVE=ON \
+	-DCBENCH_ENABLE_LOSSY_WAVE=OFF \
 	-DLOSSYWAVE_INCLUDE_PATH=$projectPath/ExternalDependencies/VizAly-LossyWave/install/include \
 	-DLOSSYWAVE_LIBRARY=$projectPath/ExternalDependencies/VizAly-LossyWave/install/lib/liblossywave.so \
 	-DCBENCH_ENABLE_ZFP=ON \

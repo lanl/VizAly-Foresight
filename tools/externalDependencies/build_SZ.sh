@@ -5,7 +5,7 @@ echo "Building SZ ... "
 
 git clone https://github.com/disheng222/SZ.git
 cd SZ
-git checkout v2.1.1
+git checkout v2.1.4.2
 mkdir install
 mkdir build
 cd build

@@ -1,4 +1,4 @@
-option(CBENCH_ENABLE_BLOSC "Enable BLOSC." ON)
+option(CBENCH_ENABLE_BLOSC "Enable BLOSC." OFF)
 
 if(CBENCH_ENABLE_BLOSC)
 	set(MY_LIBS "")

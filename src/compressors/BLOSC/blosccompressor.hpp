@@ -1,3 +1,5 @@
+#ifdef CBENCH_HAS_BLOSC
+
 #ifndef _BLOSC_COMPRESSOR_H_
 #define _BLOSC_COMPRESSOR_H_
 
@@ -99,3 +101,4 @@ inline void BLOSCCompressor::close()
 }
 
 #endif //_BLOSC_COMPRESSOR_H_
+#endif // CBENCH_HAS_BLOSC

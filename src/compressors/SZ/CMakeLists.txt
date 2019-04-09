@@ -1,4 +1,4 @@
-option(CBENCH_ENABLE_SZ "Enable SZ." ON)
+option(CBENCH_ENABLE_SZ "Enable SZ." OFF)
 
 if (CBENCH_ENABLE_SZ)
 	set(MY_LIBS "")
