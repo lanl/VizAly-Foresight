@@ -9,7 +9,7 @@ git checkout v1.10.2
 mkdir install
 mkdir build
 cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=../install
+cmake .. -DCMAKE_C_FLAGS=-dynamic -DCMAKE_CXX_FLAGS=-dynamic -DCMAKE_INSTALL_PREFIX=../install
 make -j
 make install
 cd ..
