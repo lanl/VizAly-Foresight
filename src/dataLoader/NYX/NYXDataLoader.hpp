@@ -17,6 +17,155 @@ Authors:
 #include "timer.hpp"
 #include "H5Cpp.h"
 
+#include <list>
+#include <iterator>
+#include <algorithm>
+
+
+struct partition
+{ 
+	int min_x; 
+	int min_y; 
+	int min_z;
+
+	int max_x; 
+	int max_y; 
+	int max_z;
+
+	partition(){};
+	partition(int _min_x, int _min_y, int _min_z, int _max_x, int _max_y, int _max_z){ setPatition(_min_x,_min_y,_min_z, _max_x,_max_y,_max_z); }
+	void setPatition(int _min_x, int _min_y, int _min_z, int _max_x, int _max_y, int _max_z)
+	{ 
+		min_x = _min_x; 	max_x = _max_x; 
+		min_y = _min_y; 	max_y = _max_y; 
+		min_z = _min_z; 	max_z = _max_z; 
+	}
+
+	void print()
+	{
+		std::cout << min_x << ", " << min_y << ", " << min_z << " - "
+				  << max_x << ", " << max_y << ", " << max_z << std::endl;
+	}
+};
+
+
+partition getPartition(int myRank, int numRanks, int extentsX, int extentsY, int extentsZ)
+{
+	float extents[3];
+	extents[0] = extentsX;
+	extents[1] = extentsY;
+	extents[2] = extentsZ;
+
+	std::list<partition> partitions;
+	partition temp(0, 0, 0, extentsX, extentsY, extentsZ);
+	partitions.push_back(temp);
+
+	partition firstHalf, secondHalf;
+
+	int axis = 0;
+	while (partitions.size() < numRanks)
+	{
+		int numCurrentPartitions = partitions.size();
+		for (int i=0; i<numCurrentPartitions; i++)
+		{
+			partition parent = partitions.front();
+			partitions.pop_front();
+
+			// if (myRank == 0)
+			// {
+			// 	std::cout << "axis: " << axis << std::endl; 
+			// 	std::cout << "Parent: "; 
+			// 	parent.print();
+			// }
+
+
+			if (axis == 0)
+			{
+				firstHalf.min_x = parent.min_x;
+				firstHalf.max_x = (parent.min_x + parent.max_x)/2;
+
+				secondHalf.min_x = firstHalf.max_x;
+				secondHalf.max_x = parent.max_x;
+
+				firstHalf.min_y = secondHalf.min_y = parent.min_y;
+				firstHalf.max_y = secondHalf.max_y = parent.max_y;
+
+				firstHalf.min_z = secondHalf.min_z = parent.min_z;
+				firstHalf.max_z = secondHalf.max_z = parent.max_z;
+			}
+
+			if (axis == 1)
+			{
+				firstHalf.min_y = parent.min_y;
+				firstHalf.max_y = (parent.min_y + parent.max_y)/2;
+
+				secondHalf.min_y = firstHalf.max_y;
+				secondHalf.max_y = parent.max_y;
+
+				firstHalf.min_x = secondHalf.min_x = parent.min_x;
+				firstHalf.max_x = secondHalf.max_x = parent.max_x;
+
+				firstHalf.min_z = secondHalf.min_z = parent.min_z;
+				firstHalf.max_z = secondHalf.max_z = parent.max_z;
+			}
+
+			if (axis == 2)
+			{
+				firstHalf.min_z = parent.min_z;
+				firstHalf.max_z = (parent.min_z + parent.max_z)/2;
+
+				secondHalf.min_z = firstHalf.max_z;
+				secondHalf.max_z = parent.max_z;
+
+				firstHalf.min_x = secondHalf.min_x = parent.min_x;
+				firstHalf.max_x = secondHalf.max_x = parent.max_x;
+
+				firstHalf.min_y = secondHalf.min_y = parent.min_y;
+				firstHalf.max_y = secondHalf.max_y = parent.max_y;
+			}
+
+			partitions.push_back(firstHalf);
+			partitions.push_back(secondHalf);
+
+
+			// if (myRank == 0)
+			// {
+			// 	std::cout << "child 1: ";	firstHalf.print();
+			// 	std::cout << "child 2: ";	secondHalf.print();
+			// 	std::cout << "\n";
+			// }
+
+			if (partitions.size() >= numRanks)
+				break;
+		}
+
+
+		axis++;
+			if (axis == 3)
+				axis = 0;
+
+
+
+		// if (myRank == 0)
+		// {
+		// 	for (auto it=partitions.begin(); it!=partitions.end() ; it++)
+		// 	{
+		// 		(*it).print();
+		// 	}
+
+		// 	std::cout << "\n\n";
+		// }
+	}
+
+
+	auto it = partitions.begin();
+	std::advance(it, myRank);
+
+	return *it;
+
+}  	
+
+
 class NYXDataLoader: public DataLoaderInterface
 {
 	int numRanks;
@@ -167,25 +316,7 @@ inline int NYXDataLoader::loadData(std::string paramName)
 	try {
 		H5::H5File file(filename, H5F_ACC_RDONLY);
 		H5::Group group(file.openGroup("native_fields"));
-		/*for (int grps = 0; grps < group.getNumObjs(); grps++)
-		{
-			std::cout << "Field: " << group.getObjnameByIdx(grps) << "\n";
-			std::string name = group.getObjnameByIdx(grps);
-		}
-		std::cout << "Detected " << group.getNumObjs() << " variables in file.\n";*/
-
 		H5::Group group_meta(file.openGroup("universe"));
-		/*for (int grps = 0; grps < group_meta.getNumAttrs(); grps++)
-		{
-			H5::Attribute attr = group_meta.openAttribute(grps);
-			std::cout << "Universe: " << attr.getName() << " : ";
-			std::string name = attr.getName();
-			double val = 0.0;
-			H5::DataType type = attr.getDataType();
-			attr.read(type, &val);
-			std::cout << val << std::endl;
-		}
-		std::cout << "Detected " << group_meta.getNumAttrs() << " universe attributes.\n";*/
 
 		int fields = group.getNumObjs();
 
@@ -194,21 +325,60 @@ inline int NYXDataLoader::loadData(std::string paramName)
 		H5::DataSpace memspace(dataset.getSpace()); //This would define rank and local rank extent
 		hsize_t tdims[3];
 		dataspace.getSimpleExtentDims(tdims);
-		//std::cout << "Data dimensions: " << dims[0] << " " << dims[1] << " " << dims[2] << "\n";
-		numElements = tdims[0] * tdims[1] * tdims[2];
-        sizePerDim[0] = tdims[0];
-        sizePerDim[1] = tdims[1];
-        sizePerDim[2] = tdims[2];
-			
-		totalNumberOfElements = numElements; // Temporary 
+		totalNumberOfElements = tdims[0] * tdims[1] * tdims[2];
 
+		log << "Param: " << paramName << std::endl;
+		log << "Data dimensions: " << tdims[0] << " " << tdims[1] << " " << tdims[2] <<  " | totalNumberOfElements " << totalNumberOfElements << "\n";
+		
+
+		// Read only a subset of the file
+		hsize_t count[3];              
+    	hsize_t offset[3];            
+
+
+    	partition current = getPartition(myRank, numRanks, tdims[0], tdims[1], tdims[2]);
+    	count[0] = current.max_x - current.min_x;
+    	count[1] = current.max_y - current.min_y;
+    	count[2] = current.max_z - current.min_z;
+
+    	offset[0] = current.min_x;
+    	offset[1] = current.min_y;
+    	offset[2] = current.min_z;
+
+		numElements = count[0] * count[1] * count[2];
+
+
+        log << myRank << " ~ Count : " << count[0] << " " << count[1] << " " << count[2]  << " | " << numElements << "\n";
+		log << myRank << " ~ Offset: " << offset[0] << " " << offset[1] << " " << offset[2] << "\n";
+
+        dataspace.selectHyperslab( H5S_SELECT_SET, count, offset );
+        H5::DataSpace memspaceRead( 3, count, NULL );
+        hsize_t zero[3] = {0,0,0};
+        memspaceRead.selectHyperslab( H5S_SELECT_SET, count, zero );
+       
+
+        // Set-up data stream
 		dataType = "float";
-		// Set-up data stream
 		allocateMem(dataType, numElements, 0);
 
-		// Data buffer stream, data_type, memory_space, file_space
-		// H%::PredType::NATIVE_DOUBLE
-		dataset.read(data, H5::PredType::NATIVE_FLOAT, memspace, dataspace);
+
+		dataset.read(data, H5::PredType::NATIVE_FLOAT, memspaceRead, dataspace);
+
+
+		for (int z=0; z<count[2]; z++)
+		{
+			for (int y=0; y<count[1]; y++)
+			{
+				for (int x=0; x<count[0]; x++)
+				{
+					log << ((float *)data)[z*count[0]*count[1] + y*count[0]+ x] << " ";
+				}
+				log << std::endl;
+			}
+
+			log << std::endl << std::endl;
+		}
+     
 
 		dataset.close();
 		file.close();

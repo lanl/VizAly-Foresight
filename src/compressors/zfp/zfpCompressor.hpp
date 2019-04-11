@@ -120,7 +120,7 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
     cTime.stop();
 
 
-    log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << cbytes << ", cRatio: " << (dataTypeSize*numel / (float)cbytes) << std::endl;
+    log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << cbytes << ", cRatio: " << (dataTypeSize*numel / (float)cbytes) << ", #elements: " << numel << std::endl;
     log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
 
     return 1;

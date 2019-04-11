@@ -67,7 +67,7 @@ inline int BLOSCCompressor::compress(void *input, void *&output, std::string dat
 
 	cbytes = osize;
 
-	log << "\n" << compressorName << " ~ InputBytes: " << isize << ", OutputBytes: " << osize << ", cRatio: " << (isize/(float)osize) << std::endl;
+	log << "\n" << compressorName << " ~ InputBytes: " << isize << ", OutputBytes: " << osize << ", cRatio: " << (isize/(float)osize) << ", #elements: " << numel << std::endl;
 	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
 
     return 1;

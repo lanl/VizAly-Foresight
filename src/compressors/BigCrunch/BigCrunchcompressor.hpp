@@ -83,7 +83,7 @@ inline int BigCrunchCompressor::compress(void *input, void *&output, std::string
 
 	cbytes = csize;
 
-	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*numel / (float)csize) << std::endl;
+	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*numel / (float)csize) << ", #elements: " << numel << std::endl;
 	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
 
     return 1;

@@ -91,7 +91,7 @@ inline int FPZIPCompressor::compress(void* input, void *&output, std::string dat
 	//fprintf(stderr, "in=%zu out=%zu ratio=%.2f seconds=%.3f MB/s=%.3f\n", inbytes, outbytes, (double)inbytes / outbytes, t, (double)inbytes / (1024 * 1024 * t));
 	cTime.stop();
 
-	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << cbytes << ", cRatio: " << (dataTypeSize*numel / (float)cbytes) << std::endl;
+	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << cbytes << ", cRatio: " << (dataTypeSize*numel / (float)cbytes) << ", #elements: " << numel << std::endl;
 	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
 
 	return 1;

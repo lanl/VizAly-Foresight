@@ -73,7 +73,7 @@ inline int LossyWaveCompressor::compress(void *input, void *&output, std::string
 
 	cbytes = csize+4; //add 4 byte header for lz4
 
-	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*numel / (float)csize) << std::endl;
+	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*numel / (float)csize) << ", #elements: " << numel << std::endl;
 	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
 
     return 1;
