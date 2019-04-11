@@ -348,7 +348,7 @@ inline int NYXDataLoader::loadData(std::string paramName)
 		numElements = count[0] * count[1] * count[2];
 
 
-        log << myRank << " ~ Count : " << count[0] << " " << count[1] << " " << count[2]  << " | " << numElements << "\n";
+        log << myRank << " ~ Count : " << count[0]  << " " << count[1]  << " " << count[2]  << " | " << numElements << "\n";
 		log << myRank << " ~ Offset: " << offset[0] << " " << offset[1] << " " << offset[2] << "\n";
 
         dataspace.selectHyperslab( H5S_SELECT_SET, count, offset );
