@@ -25,8 +25,13 @@ class DataLoaderInterface
 	std::string loader;
 	std::string filename;
 	bool saveData;
+
+	int origNumDims;
 	
+	size_t origDims[5]{ 0,0,0,0,0 };
 	size_t sizePerDim[5]{ 0,0,0,0,0 };	// For compression
+
+	size_t rankOffset[3];
 
 	std::string dataType;
 	std::string param;

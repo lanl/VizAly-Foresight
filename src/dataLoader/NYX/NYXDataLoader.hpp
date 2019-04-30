@@ -15,11 +15,96 @@ Authors:
 #include <string>
 #include "dataLoaderInterface.hpp"
 #include "timer.hpp"
-#include "H5Cpp.h"
+//#include "H5Cpp.h"
+#include "hdf5.h"
 
 #include <list>
 #include <iterator>
 #include <algorithm>
+
+
+struct uncompressedData
+{
+	std::string paramName;
+	std::string dataType;
+	size_t numElements;
+	size_t dims[3];
+	void *data;
+
+	uncompressedData(){};
+
+	uncompressedData(std::string _paramName, std::string _dataType, size_t _numElements, size_t _dims[3])
+	{
+		paramName = _paramName;
+		dataType = _dataType;
+		numElements = _numElements;
+
+		for (int i=0; i<3; i++)
+			dims[i] = _dims[i];
+	}
+
+	inline int allocateMem()
+	{
+	    if (dataType == "float")
+	        data = new float[numElements];
+	    else if (dataType == "double")
+	        data = new double[numElements];
+	    else if (dataType == "int8_t")
+	        data = new int8_t[numElements];
+	    else if (dataType == "int16_t")
+	        data = new int16_t[numElements];
+	    else if (dataType == "int32_t")
+	        data = new int32_t[numElements];
+	    else if (dataType == "int64_t")
+	        data = new int64_t[numElements];
+	    else if (dataType == "uint8_t")
+	        data = new uint8_t[numElements];
+	    else if (dataType == "uint16_t")
+	        data = new uint16_t[numElements];
+	    else if (dataType == "uint32_t")
+	        data = new uint32_t[numElements];
+	    else if (dataType == "uint64_t")
+	        data = new uint64_t[numElements];
+	    else
+	        return 0;
+
+	    return 1;
+	}
+
+
+	inline int deAllocateMem()
+	{
+	    if (data == NULL) // already deallocated!
+	        return 1;
+
+	    if (dataType == "float")
+	        delete[](float*) data;
+	    else if (dataType == "double")
+	        delete[](double*) data;
+	    else if (dataType == "int8_t")
+	        delete[](int8_t*) data;
+	    else if (dataType == "int16_t")
+	        delete[](int16_t*) data;
+	    else if (dataType == "int32_t")
+	        delete[](int32_t*) data;
+	    else if (dataType == "int64_t")
+	        delete[](int64_t*) data;
+	    else if (dataType == "uint8_t")
+	        delete[](uint8_t*) data;
+	    else if (dataType == "uint16_t")
+	        delete[](uint16_t*) data;
+	    else if (dataType == "uint32_t")
+	        delete[](uint32_t*) data;
+	    else if (dataType == "uint64_t")
+	        delete[](uint64_t*) data;
+	    else
+	        return 0;
+
+	    data = NULL;
+
+	    return 1;
+	}
+};
 
 
 struct partition
@@ -171,6 +256,8 @@ class NYXDataLoader: public DataLoaderInterface
 	int numRanks;
 	int myRank;
 
+	std::vector<uncompressedData> toWriteData;
+
   public:
 	NYXDataLoader();
 	~NYXDataLoader();
@@ -192,6 +279,8 @@ inline NYXDataLoader::NYXDataLoader()
 	numRanks = 0;
 	loader = "NYX";
 	saveData = false;
+
+	inOutData.clear();
 }
 
 inline NYXDataLoader::~NYXDataLoader()
@@ -210,12 +299,13 @@ inline void NYXDataLoader::init(std::string _filename, MPI_Comm _comm)
 	MPI_Comm_rank(comm, &myRank);
 }
 
+
 inline int NYXDataLoader::saveInputFileParameters()
 {
-    // 
-
     return 1;
 }
+
+
 
 inline int NYXDataLoader::allocateMem(std::string dataType, size_t numElements, int offset)
 {
@@ -305,6 +395,7 @@ inline int NYXDataLoader::deAllocateMem()
 }
 
 
+
 inline int NYXDataLoader::loadData(std::string paramName)
 {
 	Timer clock;
@@ -313,18 +404,31 @@ inline int NYXDataLoader::loadData(std::string paramName)
 	clock.start();
 	
 	// Note: hdf5-cxx not compatible with parallel
-	try {
-		H5::H5File file(filename, H5F_ACC_RDONLY);
-		H5::Group group(file.openGroup("native_fields"));
-		H5::Group group_meta(file.openGroup("universe"));
+	//try {
+	{
+		log << "filename: " << filename << " param name: " << paramName << std::endl;
 
-		int fields = group.getNumObjs();
+		hid_t file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+		hid_t group = H5Gopen(file, "native_fields", H5P_DEFAULT);
+		hid_t group_meta = H5Gopen(file, "universe", H5P_DEFAULT);
 
-		H5::DataSet dataset(group.openDataSet(paramName));
-		H5::DataSpace dataspace(dataset.getSpace());
-		H5::DataSpace memspace(dataset.getSpace()); //This would define rank and local rank extent
+		hsize_t fields;
+		herr_t err = H5Gget_num_objs(group, &fields);
+
+
+		paramName = "/native_fields/" + paramName;
+		log << "paramName: " <<  paramName << std::endl;
+		hid_t dataset = H5Dopen(file, paramName.c_str(), H5P_DEFAULT);
+		hid_t dataspace = H5Dget_space(dataset);
+		hid_t memspace = H5Dget_space(dataset);
+
+
 		hsize_t tdims[3];
-		dataspace.getSimpleExtentDims(tdims);
+		int ndims = H5Sget_simple_extent_dims(dataspace, tdims, NULL);
+		origDims[0] = tdims[0];
+		origDims[1] = tdims[1];
+		origDims[2] = tdims[2];
+
 		totalNumberOfElements = tdims[0] * tdims[1] * tdims[2];
 
 		log << "Param: " << paramName << std::endl;
@@ -341,28 +445,38 @@ inline int NYXDataLoader::loadData(std::string paramName)
     	count[1] = current.max_y - current.min_y;
     	count[2] = current.max_z - current.min_z;
 
+    	sizePerDim[0] = count[0];
+		sizePerDim[1] = count[1];
+		sizePerDim[2] = count[2];
+
     	offset[0] = current.min_x;
     	offset[1] = current.min_y;
     	offset[2] = current.min_z;
 
 		numElements = count[0] * count[1] * count[2];
 
+		rankOffset[0] = offset[0];
+		rankOffset[1] = offset[1];
+		rankOffset[2] = offset[2];
+
 
         log << myRank << " ~ Count : " << count[0]  << " " << count[1]  << " " << count[2]  << " | " << numElements << "\n";
 		log << myRank << " ~ Offset: " << offset[0] << " " << offset[1] << " " << offset[2] << "\n";
 
-        dataspace.selectHyperslab( H5S_SELECT_SET, count, offset );
-        H5::DataSpace memspaceRead( 3, count, NULL );
+
+		herr_t status = H5Sselect_hyperslab(dataspace, H5S_SELECT_SET, offset, NULL, count, NULL);
+        hid_t memspaceRead = H5Screate_simple(3, count, NULL);
+
         hsize_t zero[3] = {0,0,0};
-        memspaceRead.selectHyperslab( H5S_SELECT_SET, count, zero );
+        status = H5Sselect_hyperslab(memspaceRead, H5S_SELECT_SET, zero, NULL, count, NULL);
        
 
         // Set-up data stream
 		dataType = "float";
 		allocateMem(dataType, numElements, 0);
+		log << myRank << " ~ numElements: " <<numElements << "\n";
 
-
-		dataset.read(data, H5::PredType::NATIVE_FLOAT, memspaceRead, dataspace);
+		status = H5Dread(dataset, H5T_NATIVE_FLOAT, memspaceRead, dataspace, H5P_DEFAULT, data);
 
 
 		for (int z=0; z<count[2]; z++)
@@ -378,51 +492,129 @@ inline int NYXDataLoader::loadData(std::string paramName)
 
 			log << std::endl << std::endl;
 		}
+
+
+		log << myRank << " ~ done!!! " << "\n";
      
 
-		dataset.close();
-		file.close();
+		H5Dclose(dataset);
+		H5Fclose(file);
 	}
-	catch (H5::FileIException error)
-	{
-		//error.printError();
-		return -1;
-	}
-	// catch failure caused by the DataSet operations
-	catch (H5::DataSetIException error)
-	{
-		//error.printError();
-		return -1;
-	}
-	// catch failure caused by the DataSpace operations
-	catch (H5::DataSpaceIException error)
-	{
-		//error.printError();
-		return -1;
-	}
-	// catch failure caused by the DataSpace operations
-	catch (H5::DataTypeIException error)
-	{
-		//error.printError();
-		return -1;
-	}
-
-
+	
 	clock.stop();
 	log << "Loading data took " << clock.getDuration() << " s" << std::endl;
 
 	return 1; // All good
 }
 
+
+
 inline int NYXDataLoader::saveCompData(std::string paramName, void * cData)
 {
-	compFullData.insert({ paramName, cData });
+	size_t _dims[3];
+	_dims[0] = sizePerDim[0];
+	_dims[1] = sizePerDim[1];
+	_dims[2] = sizePerDim[2];
+
+	uncompressedData temp(paramName, "float", numElements, _dims);
+	temp.allocateMem();
+	std::memcpy(temp.data, cData, numElements*sizeof(float));
+
+	compFullData.insert({ paramName, temp.data });
+	toWriteData.push_back(temp);
+
 	return 1;
 }
 
 inline int NYXDataLoader::writeData(std::string _filename)
 {
-	return 1;
+	hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
+    H5Pset_fapl_mpio(plist_id, comm, MPI_INFO_NULL);
+
+    //std::cout << "_filename: " << _filename << std::endl;
+
+
+	hid_t file_id = H5Fcreate(_filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
+	H5Pclose(plist_id);
+
+	hsize_t fileDims[3];
+	fileDims[0] = origDims[0];
+	fileDims[1] = origDims[1];
+	fileDims[2] = origDims[2];
+	hid_t filespace = H5Screate_simple(3, fileDims, NULL);
+
+	hid_t group = H5Gcreate2(file_id, "/native_fields", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+	int numDatasets = compFullData.size();
+	hid_t *dset_id = new hid_t[numDatasets];
+
+	int datasetCount = 0;
+	for (auto& scalar: compFullData)
+	{
+		std::string fieldname = "/native_fields/" + scalar.first;
+		//std::cout << myRank << " ~ inOutData[i].name: " << scalar.first << std::endl;
+
+		dset_id[datasetCount] = H5Dcreate(file_id, fieldname.c_str(), H5T_NATIVE_FLOAT, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	    datasetCount++;
+	}
+
+    hsize_t	 count[3];	          
+    count[0] = sizePerDim[0];
+    count[1] = sizePerDim[1];
+    count[2] = sizePerDim[2];
+
+    hsize_t	offset[3];
+    offset[0] = rankOffset[0];
+    offset[1] = rankOffset[1];
+    offset[2] = rankOffset[2];
+    hid_t memspace = H5Screate_simple(3, count, NULL);
+
+
+    filespace = H5Dget_space(dset_id[0]);
+    H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, count, NULL);
+
+    plist_id = H5Pcreate(H5P_DATASET_XFER);
+    H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+
+    datasetCount = 0;
+    for (auto& scalar: compFullData)
+	{
+		log << "outputting " << scalar.first << std::endl;
+		for (int z=0; z<count[2]; z++)
+		{
+			for (int y=0; y<count[1]; y++)
+			{
+				for (int x=0; x<count[0]; x++)
+				{
+					log << ((float *)scalar.second)[z*count[0]*count[1] + y*count[0]+ x] << " ";
+				}
+				log << std::endl;
+			}
+
+			log << std::endl << std::endl;
+		}
+
+
+	    herr_t status = H5Dwrite(dset_id[datasetCount], H5T_NATIVE_FLOAT, memspace, filespace, plist_id, (float*)scalar.second);
+	    datasetCount++;
+	}
+
+	for (int i=0; i<numDatasets; i++)
+    	H5Dclose(dset_id[i]);
+
+	//H5Dclose(filespace);
+	//H5Sclose(memspace);
+
+
+	herr_t status = H5Gclose(group);
+
+
+    H5Pclose(plist_id);
+    H5Fclose(file_id);
+
+
+    for (int i=0; i<toWriteData.size(); i++)
+    	toWriteData[i].deAllocateMem();
 }
 
 #endif
