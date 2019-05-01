@@ -47,7 +47,6 @@ class DataLoaderInterface
 	void *data;
 	
 	std::unordered_map<std::string, std::string> loaderParams;
-	std::unordered_map<std::string, void *> compFullData;
 	std::vector<GioData> inOutData;
 
   public:

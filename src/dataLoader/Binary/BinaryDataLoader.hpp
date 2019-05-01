@@ -27,6 +27,8 @@ class BinaryDataLoader: public DataLoaderInterface
 	size_t headerSize;
 	std::string dataTarget;
 
+	std::unordered_map<std::string, void *> compFullData;
+
   public:
 	BinaryDataLoader();
 	~BinaryDataLoader();

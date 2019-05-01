@@ -15,6 +15,7 @@ cd $buildDir
  
 # build 
 cmake ../src \
+    -DCMAKE_BUILD_TYPE=Debug \
     -DCBENCH_ENABLE_BLOSC=ON \
     -DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
 	-DBLOSC_LIBRARY=$projectPath/ExternalDependencies/c-blosc/install/lib/libblosc.so \
