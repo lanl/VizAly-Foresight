@@ -9,12 +9,18 @@ else
   buildDir=$1
 fi
 
+
+mv scripts/Cori.CMakeLists.txt src/CMakeLists.txt
+
 # Create build directory 
 mkdir $buildDir
 cd $buildDir
 
+export CPATH=/usr/common/software/hdf5-parallel/1.10.1/gnu/include:$CPATH
+export LD_LIBRARY_PATH=/usr/common/software/hdf5-parallel/1.10.1/gnu/lib:$LD_LIBRARY_PATH
+
 # build 
-cmake ../src -DCMAKE_C_FLAGS=-dynamic -DCMAKE_CXX_FLAGS=-dynamic \
+cmake ../src -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS=-dynamic -DCMAKE_CXX_FLAGS=-dynamic \
     -DCBENCH_ENABLE_BLOSC=OFF \
     -DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
     -DBLOSC_LIBRARY=$projectPath/ExternalDependencies/c-blosc/install/lib/libblosc.so \
@@ -36,5 +42,6 @@ cmake ../src -DCMAKE_C_FLAGS=-dynamic -DCMAKE_CXX_FLAGS=-dynamic \
     -DCBENCH_ENABLE_ISABELA=ON \
     -DISABELA_INCLUDE_PATH=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/include \
     -DISABELA_LIBRARY=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
-    -DCBENCH_ENABLE_BIG_CRUNCH=OFF
+    -DCBENCH_ENABLE_BIG_CRUNCH=OFF \
+    -DCBENCH_ENABLE_NYX_LOADER=ON
 make -j

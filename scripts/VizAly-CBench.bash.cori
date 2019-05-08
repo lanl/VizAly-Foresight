@@ -8,11 +8,15 @@ module load fftw
 module load vim
 module load openmpi
 module load zlib/1.2.11
+module unload darshan
+module load hdf5-parallel/1.10.1
 
 export CC="cc -dynamic -fPIC"
 export CXX="CC -dynamic -fPIC"
 
 export FFTW_MAJOR_VERSION=3
+
+export HDF5_USE_FILE_LOCKING=FALSE
 
 export CPLUS_INCLUDE_PATH=$CPLUS_INLUDE_PATH:/usr/common/software/gsl/2.1/gnu/include
 export C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/common/software/gsl/2.1/gnu/include
