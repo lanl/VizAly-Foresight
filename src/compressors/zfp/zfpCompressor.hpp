@@ -73,10 +73,20 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
 
     // Read in json compression parameters
     double abs = 1E-3;
+    double rel = 1E-3;
+    bool compressionTypeAbs = true;
     std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("abs");
-    if( got != compressorParameters.end() )
+    if ( got != compressorParameters.end() )
         if (compressorParameters["abs"] != "")
+        {
             abs = strConvert::to_double( compressorParameters["abs"] );
+            compressionTypeAbs = true;
+        }
+        else if (compressorParameters["rel"] != "")
+        {
+            rel = strConvert::to_double( compressorParameters["rel"] );
+            compressionTypeAbs = false;
+        }
 
     Timer cTime; 
     cTime.start();
@@ -90,8 +100,11 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
     // allocate meta data for a compressed stream
     zfp_stream* zfp = zfp_stream_open(NULL);
 
-    // set absolute error tolerance
-    zfp_stream_set_accuracy(zfp, abs);
+    // set absolute/relative error tolerance
+    if (compressionTypeAbs)
+        zfp_stream_set_accuracy(zfp, abs);
+    else
+        zfp_stream_set_precision(zfp, rel);
 
    	//allocate buffer for compressed data
     size_t bufsize = zfp_stream_maximum_size(zfp, field);
@@ -135,9 +148,23 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
 			numel *= n[i];
 
     // Read in json compression parameters
-	double abs = 1E-3;
+    double abs = 1E-3;
+    double rel = 1E-3;
+    bool compressionTypeAbs = true;
     std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("abs");
-    if( got != compressorParameters.end() )
+    if ( got != compressorParameters.end() )
+        if (compressorParameters["abs"] != "")
+        {
+            abs = strConvert::to_double( compressorParameters["abs"] );
+            compressionTypeAbs = true;
+        }
+        else if (compressorParameters["rel"] != "")
+        {
+            rel = strConvert::to_double( compressorParameters["rel"] );
+            compressionTypeAbs = false;
+        }
+
+
         if (compressorParameters["abs"] != "")
             abs = strConvert::to_double( compressorParameters["abs"] );
 
@@ -153,7 +180,12 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
 
     // allocate meta data for a compressed stream
     zfp_stream* zfp = zfp_stream_open(NULL);
-    zfp_stream_set_accuracy(zfp, abs);
+   
+    // set absolute/relative error tolerance
+    if (compressionTypeAbs)
+        zfp_stream_set_accuracy(zfp, abs);
+    else
+        zfp_stream_set_precision(zfp, rel);
 
     // allocate buffer for compressed data and transfer data
     size_t bufsize = zfp_stream_maximum_size(zfp, field);

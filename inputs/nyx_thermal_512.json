@@ -1,0 +1,76 @@
+{
+  "input": {
+    "filetype-comment": "type of file to load; HACC or NYX",
+    "filetype": "NYX",
+
+    "filename-comment": "name of input file",
+    "filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z54.hdf5",
+
+ 
+    "scalars-comment": "which scalars to test",
+    "scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ]
+  },
+
+	"output" :
+	{
+		"output-decompressed": false,
+		
+		"logfname-comment": "name of output log file",
+		"logfname" : "runlog_NYX_thermal_S12345T692_z42_",
+
+		"metricsfname-comment": "name of file with output",
+		"metricsfname" : "metrics_NYX_thermal_S12345T692_z42_"
+	},
+
+	"compressor-comment" : "which compressors to test",
+	"compressors" : 
+	[
+		{
+			"name": "BLOSC"
+		},
+
+		{
+            "name": "SZ",
+            "relative_error" : 1
+		},
+
+		{
+			"name": "zfp",
+			"rel": 2
+		},
+
+		{
+			"name": "fpzip",
+			"bits": 20
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-01,
+			"pcnt" : 50,
+			"window-size" : 2048
+		},
+	
+		{
+			"name": "BigCrunch",
+			"tolerance": 1E-1
+		}
+
+		{
+			"name": "MGARD",
+			"tolerance" : 1e-01
+		},
+		
+	],
+
+	"metrics-comment" : "which metrics to use",
+	"metrics": [
+		{
+			"name" : "relative_error"
+		},
+
+		{
+			"name" : "psnr"
+		}
+	]
+}
