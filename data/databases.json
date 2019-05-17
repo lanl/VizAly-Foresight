@@ -3,6 +3,12 @@
 		"name" : "Metrics (Feb 4, 2019)",
 		"directory" : "data/metrics.cdb"
 	},
+	
+	
+	{
+		"name" : "Thermal 512",
+		"directory" : "data/metricsThermal512.cdb"
+	},
 
 	{
 		"name" : "Metrics (Feb 7, 2019)",
@@ -47,10 +53,5 @@
 	{
 		"name" : "Metrics (Mar 7, 2019) - Velocity",
 		"directory" : "data/20150307_velocity.cdb"
-	},
-
-	{
-		"name" : "Thermal 512",
-		"directory" : "data/metricsThermal512.cdb"
 	}
 ]
