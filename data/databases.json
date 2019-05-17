@@ -52,5 +52,5 @@
 	{
 		"name" : "Thermal 512",
 		"directory" : "data/metricsThermal512.cdb"
-	},
+	}
 ]
