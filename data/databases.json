@@ -57,6 +57,6 @@
 	{
 		"name" : "Thermal 2048",
 		"directory" : "data/metricsThermal2048.cdb"
-	},
+	}
 
 ]
