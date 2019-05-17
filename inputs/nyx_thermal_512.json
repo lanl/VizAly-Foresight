@@ -16,51 +16,74 @@
 		"output-decompressed": false,
 		
 		"logfname-comment": "name of output log file",
-		"logfname" : "runlog_NYX_thermal_S12345T692_z42_",
+		"logfname" : "runlog_NYX_SZrel_thermal_S12345T692_z42_",
 
 		"metricsfname-comment": "name of file with output",
-		"metricsfname" : "metrics_NYX_thermal_S12345T692_z42_"
+		"metricsfname" : "metrics_NYX_SZrel_thermal_S12345T692_z42_"
 	},
 
 	"compressor-comment" : "which compressors to test",
 	"compressors" : 
 	[
 		{
-			"name": "BLOSC"
+            "name": "SZ",
+            "rel" : 1
 		},
 
 		{
             "name": "SZ",
-            "relative_error" : 1
+            "rel" : 2
 		},
 
 		{
-			"name": "zfp",
-			"rel": 2
+            "name": "SZ",
+            "rel" : 0.1
 		},
 
 		{
-			"name": "fpzip",
-			"bits": 20
+            "name": "SZ",
+            "rel" : 0.2
 		},
 
 		{
-			"name": "Isabela",
-			"tolerance": 1e-01,
-			"pcnt" : 50,
-			"window-size" : 2048
+            "name": "SZ",
+            "rel" : 0.01
 		},
-	
+
 		{
-			"name": "BigCrunch",
-			"tolerance": 1E-1
+            "name": "SZ",
+            "rel" : 0.02
+		},
+
+		{
+            "name": "SZ",
+            "pw_rel" : 1
+		},
+
+		{
+            "name": "SZ",
+            "pw_rel" : 2
+		},
+
+		{
+            "name": "SZ",
+            "pw_rel" : 0.1
+		},
+
+		{
+            "name": "SZ",
+            "pw_rel" : 0.2
+		},
+
+		{
+            "name": "SZ",
+            "pw_rel" : 0.01
+		},
+
+		{
+            "name": "SZ",
+            "pw_rel" : 0.02
 		}
-
-		{
-			"name": "MGARD",
-			"tolerance" : 1e-01
-		},
-		
 	],
 
 	"metrics-comment" : "which metrics to use",

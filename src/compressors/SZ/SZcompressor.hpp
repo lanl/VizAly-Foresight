@@ -48,14 +48,16 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
 	SZ_Init(NULL); 
 
 	int mode = PW_REL; // Default by Sheng, PW_REL = 10
+	std::string _mode = "PW_REL";
 
-	double relTol = 1E-3;
-	std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("tolerance");
+	double relTol = 0.0;
+	std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("rel");
 	if( got != compressorParameters.end() )
-		if (compressorParameters["tolerance"] != "")
+		if (compressorParameters["rel"] != "")
 		{
-			relTol = strConvert::to_double(compressorParameters["tolerance"]);
-			mode = PW_REL;
+			relTol = strConvert::to_double(compressorParameters["rel"]);
+			mode = REL;
+			_mode = "REL";
 		}
 
 	double absTol = 0.0;
@@ -65,19 +67,22 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
 		{
 			absTol = strConvert::to_double(compressorParameters["abs"]);
 			mode = ABS;
+			_mode = "ABS";
 		}
 
 	double powerTol = 0.0;
-	got = compressorParameters.find("power");
+	got = compressorParameters.find("pw_rel");
 	if( got != compressorParameters.end() )
-		if (compressorParameters["power"] != "")
+		if (compressorParameters["pw_rel"] != "")
 		{
-			powerTol = strConvert::to_double(compressorParameters["power"]);
+			powerTol = strConvert::to_double(compressorParameters["pw_rel"]);
+			mode = PW_REL;
+			_mode = "PW_REL";
 			// Unknown mode, just fill in input to SZ
 		}
 
 	std::uint64_t csize = 0;
-	std::uint8_t *cdata = SZ_compress_args(SZ_FLOAT, static_cast<float *>(input), &csize, mode, absTol, powerTol, relTol, n[4], n[3], n[2], n[1], n[0]);
+	std::uint8_t *cdata = SZ_compress_args(SZ_FLOAT, static_cast<float *>(input), &csize, mode, absTol, relTol, powerTol, n[4], n[3], n[2], n[1], n[0]);
 	
 	output = cdata;
 	cTime.stop();
@@ -85,10 +90,12 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
 	cbytes = csize;
 
 	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*numel / (float)csize) << ", #elements: " << numel << std::endl;
+	log << " ~ Mode used: " << _mode << " abs: " << absTol << ", rel: " << relTol << ", pw_tol: " << powerTol << " val: " << n[4] << ", " << n[3] << ", " << n[2] << ", " <<n[1] << ", " << n[0] << std::endl;
 	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
 
 	return 1;
 }
+
 
 inline int SZCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
