@@ -200,7 +200,14 @@ int main(int argc, char *argv[])
 		ioMgr = new HACCDataLoader();
   #ifdef CBENCH_HAS_NYX
 	else if (inputFileType == "NYX")
+	{
 		ioMgr = new NYXDataLoader();
+		if (inputFileType == "NYX")
+			if (jsonInput["input"].find("group") != jsonInput["input"].end())
+			{
+				ioMgr->setParam("group","string",jsonInput["input"]["group"]);
+			}
+	}
   #endif
 	else
 	{
@@ -539,4 +546,5 @@ int main(int argc, char *argv[])
 /*
 Run:
 mpirun -np 2 CBench ../inputs/HACC_all.json
+mpirun -np 2 CBench ../inputs/nyx_all.json
 */

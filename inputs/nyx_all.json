@@ -7,6 +7,7 @@
     "filename": "../testing/data/z255_32.h5",
 
     "scalars-comment": "which scalars to test",
+    "group" : "native_fields",
     "scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ]
   },
 

@@ -43,6 +43,7 @@ class HACCDataLoader: public DataLoaderInterface
 	int writeData(std::string _filename);
 	int saveInputFileParameters();
 	int close() { return deAllocateMem(dataType, data); }
+	void setParam(std::string paramName, std::string type, std::string value){};
 };
 
 

@@ -228,6 +228,7 @@ class NYXDataLoader: public DataLoaderInterface
 {
 	int numRanks;
 	int myRank;
+	std::string groupName;
 
 	std::vector<uncompressedData> toWriteData;
 
@@ -243,6 +244,7 @@ class NYXDataLoader: public DataLoaderInterface
 	int writeData(std::string _filename);
 	int saveInputFileParameters();
 	int close() { return deAllocateMem(); }
+	void setParam(std::string paramName, std::string type, std::string value);
 };
 
 
@@ -276,6 +278,12 @@ inline int NYXDataLoader::saveInputFileParameters()
     return 1;
 }
 
+
+inline void NYXDataLoader::setParam(std::string paramName, std::string type, std::string value)
+{
+	if (paramName == "group")
+		groupName = value;
+}
 
 
 inline int NYXDataLoader::allocateMem(std::string dataType, size_t numElements, int offset)
@@ -378,14 +386,14 @@ inline int NYXDataLoader::loadData(std::string paramName)
 	log << "filename: " << filename << " param name: " << paramName << std::endl;
 
 	hid_t file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-	hid_t group = H5Gopen(file, "native_fields", H5P_DEFAULT);
+	hid_t group = H5Gopen(file, groupName.c_str(), H5P_DEFAULT);
 	hid_t group_meta = H5Gopen(file, "universe", H5P_DEFAULT);
 
 	hsize_t fields;
 	herr_t err = H5Gget_num_objs(group, &fields);
 
 
-	paramName = "/native_fields/" + paramName;
+	paramName = "/" + groupName + "/" + paramName;
 	log << "paramName: " <<  paramName << std::endl;
 	hid_t dataset = H5Dopen(file, paramName.c_str(), H5P_DEFAULT);
 	hid_t dataspace = H5Dget_space(dataset);
@@ -492,7 +500,7 @@ inline int NYXDataLoader::writeData(std::string _filename)
 	fileDims[2] = origDims[2];
 	hid_t filespace = H5Screate_simple(3, fileDims, NULL);
 
-	hid_t group = H5Gcreate2(file_id, "/native_fields", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+	hid_t group = H5Gcreate2(file_id, ("/" + groupName).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
 	int numDatasets = toWriteData.size();
 	hid_t *dset_id = new hid_t[numDatasets];
@@ -500,7 +508,7 @@ inline int NYXDataLoader::writeData(std::string _filename)
 	int datasetCount = 0;
 	for (auto item=toWriteData.begin(); item!=toWriteData.end(); item++)
 	{
-		std::string fieldname = "/native_fields/" + (*item).paramName;
+		std::string fieldname = "/" + groupName + "/" + (*item).paramName;
 
 		dset_id[datasetCount] = H5Dcreate(file_id, fieldname.c_str(), H5T_NATIVE_FLOAT, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 	    datasetCount++;

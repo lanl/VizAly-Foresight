@@ -42,6 +42,7 @@ class BinaryDataLoader: public DataLoaderInterface
 	int writeData(std::string _filename);
     int saveInputFileParameters() { return 1; };
 	int close() { return deAllocateMem(); }
+	void setParam(std::string paramName, std::string type, std::string value){};
 };
 
 

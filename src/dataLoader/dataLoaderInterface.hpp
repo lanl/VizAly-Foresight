@@ -56,6 +56,7 @@ class DataLoaderInterface
 	virtual int writeData(std::string _filename) = 0;
 	virtual int saveInputFileParameters() = 0;
 	virtual int close() = 0;
+	virtual void setParam(std::string paramName, std::string type, std::string value) = 0;
 
 	size_t getNumElements() { return numElements; }
 	size_t * getSizePerDim() { return sizePerDim; }
