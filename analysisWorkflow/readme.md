@@ -24,7 +24,7 @@ python create_cinema.py --input-file workflow_c.csv --debug
 
 
 ## Requirements:
-workflow_b.py needs the aspw (Anotger Sqlite Python Wrapper). To run it on Darwin, you will need Python 3 and aspw
+workflow_b.py needs the aspw (Another Sqlite Python Wrapper). To run it on Darwin, you will need Python 3 and aspw
 
 ``` Shell Script
 # load Python 3
