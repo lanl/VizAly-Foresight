@@ -387,7 +387,6 @@ inline int NYXDataLoader::loadData(std::string paramName)
 
 	hid_t file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 	hid_t group = H5Gopen(file, groupName.c_str(), H5P_DEFAULT);
-	hid_t group_meta = H5Gopen(file, "universe", H5P_DEFAULT);
 
 	hsize_t fields;
 	herr_t err = H5Gget_num_objs(group, &fields);
