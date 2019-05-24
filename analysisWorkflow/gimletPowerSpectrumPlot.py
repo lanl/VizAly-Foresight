@@ -1,11 +1,5 @@
-#!/usr/bin/python
-
-import sys, json, os, csv
+mport sys, json, os, csv
 import matplotlib.pyplot as plt
-
-filename_orig = "/home/pascal/Desktop/gimletPlotting/orig_rhob_ps3d.txt"
-filename_sz = "/home/pascal/Desktop/gimletPlotting/sz_rhob_ps3d.txt"
-title_name = "ratio_rhob_ps3d"
 
 
 def extractValue(filename, colpos):
@@ -30,22 +24,35 @@ def plotGraph(x, x_label, y_label, title, list_of_tuples):
 	for item in list_of_tuples:
 		ax.plot(x, item[0], label=item[1], marker=item[2])
 		ax.legend()
-	
+
 	fig = plt.plot(figsize=(50,50))
 	plt.show()
 
 
 
 if __name__ == "__main__":
-	k_list  = extractValue(filename_orig, 2)
-	orig_pk = extractValue(filename_orig, 3)
-	sz_pk   = extractValue(filename_sz, 3)
+	if len(sys.argv) < 3:
+		print ("Json file and title needed; e.g. python gimletPowerSpectrumPlot.py rhob.json rhob")
+		exit()
 
-	sz_pk_ratio = [i / j for i, j in zip(sz_pk, orig_pk)] 
+	# Read input json file
+	with open(sys.argv[1], "r") as read_file:
+		json_data = json.load(read_file)
 
-	toplot = []
+	to_plot = []  # all the items to plot
 
-	sz = (sz_pk_ratio, "SZ", ".") #array, name, marker
-	toplot.append(sz)
+	k_list = []
+	orig_pk = []
+	for file in json_data["files"]:
+		if (file["name"]=="orig"):
+			k_list  = extractValue(file["path"], 2)
+			orig_pk = extractValue(file["path"], 3)
+		else:
+			temp_pk = extractValue(file["path"], 3)
+			pk_ratio = [i / j for i, j in zip(temp_pk, orig_pk)]
+			this_tuple = (pk_ratio, file["name"], ".") #array, name, marker
+			to_plot.append(this_tuple)
 
-	plotGraph(k_list, 'k', 'pk', 'rhob', toplot)
+	plotGraph(k_list, 'k', 'pk', sys.argv[2], to_plot)
+
+#python gimletPowerSpectrumPlot.py rhob.json rhob
