@@ -13,6 +13,26 @@
       "velocity_x",
       "velocity_y",
       "velocity_z"
+    ],
+    "uncompressed": [
+      {
+        "group": "derived_fields",
+        "scalars": [
+          "HI_number_density",
+          "HeIII_number_density",
+          "tau_local",
+          "tau_real",
+          "tau_red",
+          "tau_red_heii",
+          "taubeta_red"
+        ]
+      },
+      {
+        "value": "domain"
+      },
+      {
+        "value": "universe"
+      }
     ]
   },
   "output":{
