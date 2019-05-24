@@ -4,7 +4,7 @@
     "filetype": "NYX",
 
     "filename-comment": "name of input file",
-    "filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z54.hdf5",
+    "filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",
 
  
     "scalars-comment": "which scalars to test",
@@ -14,66 +14,21 @@
 
 	"output" :
 	{
-		"output-decompressed": false,
+		"output-decompressed": true,
 		
 		"logfname-comment": "name of output log file",
-		"logfname" : "runlog_NYX_SZrel_thermal_S12345T692_z42_",
+		"logfname" : "runlog_NYX_",
 
 		"metricsfname-comment": "name of file with output",
-		"metricsfname" : "metrics_NYX_SZrel_thermal_S12345T692_z42_"
+		"metricsfname" : "metrics_NYX_"
 	},
 
 	"compressor-comment" : "which compressors to test",
 	"compressors" : 
 	[
 		{
-            "name": "SZ",
-            "rel" : 1
-		},
-
-		{
-            "name": "SZ",
-            "rel" : 2
-		},
-
-		{
-            "name": "SZ",
-            "rel" : 0.1
-		},
-
-		{
-            "name": "SZ",
-            "rel" : 0.2
-		},
-
-		{
-            "name": "SZ",
-            "rel" : 0.01
-		},
-
-		{
-            "name": "SZ",
-            "rel" : 0.02
-		},
-
-		{
-            "name": "SZ",
-            "pw_rel" : 1
-		},
-
-		{
-            "name": "SZ",
-            "pw_rel" : 2
-		},
-
-		{
-            "name": "SZ",
-            "pw_rel" : 0.1
-		},
-
-		{
-            "name": "SZ",
-            "pw_rel" : 0.2
+            "name": "BLOSC",
+            "output-prefix" : "__BLOSC"
 		},
 
 		{
@@ -82,10 +37,11 @@
 		},
 
 		{
-            "name": "SZ",
-            "pw_rel" : 0.02
+            "name": "zfp",
+            "rel" : 30
 		}
 	],
+
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [

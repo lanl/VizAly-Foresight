@@ -15,7 +15,6 @@ Authors:
 #include <string>
 #include "dataLoaderInterface.hpp"
 #include "timer.hpp"
-//#include "H5Cpp.h"
 #include "hdf5.h"
 
 #include <list>
@@ -485,10 +484,10 @@ inline int NYXDataLoader::saveCompData(std::string paramName, void * cData)
 
 inline int NYXDataLoader::writeData(std::string _filename)
 {
+	log << "writing to " << _filename  << std::endl;
+
 	hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
     H5Pset_fapl_mpio(plist_id, comm, MPI_INFO_NULL);
-
-
 
 	hid_t file_id = H5Fcreate(_filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
 	H5Pclose(plist_id);
@@ -511,7 +510,24 @@ inline int NYXDataLoader::writeData(std::string _filename)
 
 		dset_id[datasetCount] = H5Dcreate(file_id, fieldname.c_str(), H5T_NATIVE_FLOAT, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 	    datasetCount++;
+
+	    log << "creating fieldname " << fieldname << ", status: " << (dset_id[datasetCount-1] == -1) << std::endl;
 	}
+
+
+	{
+		char strformat[] = "nyx-lyaf";
+		hid_t type  = H5Tcopy(H5T_C_S1);
+	    int32_t len = strlen(strformat);
+	    H5Tset_size(type, len);
+	    hid_t ds = H5Screate(H5S_SCALAR);
+
+		hid_t attribute_id = H5Acreate(file_id, "format", type, ds, H5P_DEFAULT, H5P_DEFAULT);
+		H5Awrite(attribute_id, type, &strformat);
+
+		H5Aclose(attribute_id);
+	}
+
 
     hsize_t	 count[3];	          
     count[0] = sizePerDim[0];
@@ -523,6 +539,9 @@ inline int NYXDataLoader::writeData(std::string _filename)
     offset[1] = rankOffset[1];
     offset[2] = rankOffset[2];
     hid_t memspace = H5Screate_simple(3, count, NULL);
+
+    log << "count " << count[0] << ", " << count[1] << ", " << count[2]<< std::endl;
+    log << "offset " << offset[0] << ", " << offset[1] << ", " << offset[2]<< std::endl;
 
 
     filespace = H5Dget_space(dset_id[0]);
@@ -536,16 +555,26 @@ inline int NYXDataLoader::writeData(std::string _filename)
 	{
 	    herr_t status = H5Dwrite(dset_id[datasetCount], H5T_NATIVE_FLOAT, memspace, filespace, plist_id, (float*)(*item).data);
 	    datasetCount++;
+
+	    log << "writing fieldname " << (*item).paramName << ", status: " << (status == -1) << std::endl;
+	    log << ((float*)(*item).data)[0] << ", " << ((float*)(*item).data)[1] << ", " << 
+	    	  ((float*)(*item).data)[count[0]*count[1]*count[2] -2] << ", " << ((float*)(*item).data)[count[0]*count[1]*count[2] -1] << std::endl;
 	}
 
 	for (int i=0; i<numDatasets; i++)
-    	H5Dclose(dset_id[i]);
+	{
+    	herr_t status = H5Dclose(dset_id[i]);
+	    log << "dataset " << i << " of " << numDatasets << " closing status: " << (status == -1) << std::endl;
+	}
 
 	herr_t status = H5Gclose(group);
 
+	log << "group close status: " << (status == -1) << std::endl;
+
+	H5Sclose(filespace);
+    H5Sclose(memspace);
     H5Pclose(plist_id);
     H5Fclose(file_id);
-
 
     for (int i=0; i<toWriteData.size(); i++)
     	toWriteData[i].deAllocateMem();

@@ -447,6 +447,8 @@ int main(int argc, char *argv[])
 			
 			if (writeData)
 			{
+				debuglog << "writing: " << scalars[i] << std::endl;
+				
 				ioMgr->saveCompData(scalars[i], decompdata);
 				debuglog << ioMgr->getLog();
 			}
@@ -492,9 +494,12 @@ int main(int argc, char *argv[])
 		}
 		
 		
-		
+
 		if (writeData)
 		{
+			debuglog << "Write data .... \n";
+
+
 			Timer clockWrite;
 			clockWrite.start();
 
@@ -545,6 +550,6 @@ int main(int argc, char *argv[])
 
 /*
 Run:
-mpirun -np 2 CBench ../inputs/HACC_all.json
-mpirun -np 2 CBench ../inputs/nyx_all.json
+mpirun -np 4 CBench ../inputs/HACC_all.json
+mpirun -np 4 CBench ../inputs/nyx_all.json
 */

@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH -N 16
-#SBATCH --ntasks-per-node 8
+#SBATCH -N 1
+#SBATCH --ntasks-per-node 16
 #SBATCH -p scaling
 
 pushd ..
@@ -14,5 +14,5 @@ source $projectPath/scripts/VizAly-CBench.bash.darwin
 cd $projectPath/build
 
 # Run:
-mpirun $projectPath/build/CBench $projectPath/inputs/nyx_thermal_512.json
+mpirun $projectPath/build/CBench $projectPath/inputs/nyx_all.json
 
