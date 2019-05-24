@@ -11,6 +11,7 @@ src/compressors/compressorIncludes.h
 *_build*
 build-*
 ExternalDependencies/
+cmake-build-*
 
 # garbage files
 *.swp
@@ -88,8 +89,9 @@ ExternalDependencies/
 *.dSYM/
 *.su
 
-# visual studio code files
+# IDE files
 .vscode/
+.idea/
 
 # sublime text
 *-sublime-project
