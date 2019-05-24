@@ -1,34 +1,57 @@
 #! /usr/bin/env python
-import os, sys
 
-input_file = sys.argv[1]
-output_file = sys.argv[2]
-prefix = sys.argv[3]
+import sys, json, os
+
 
 def createCommand(hdfpath, input_file, output_file, field):
 	command = hdf5_path + "h5copy" + " -v -i \"" + input_file + "\" -o \"" + output_file + "\" -s \"" + field + "\" -d \"" + field + "\""
 	return command
 
+
+
 if __name__ == "__main__":
-	hdf5_path = "/projects/exasky/VizAly-CBench/ExternalDependencies/hdf5/install/bin/"
+	if len(sys.argv) < 2:
+		print ("Json file and title needed; e.g. python gimletAnalysis.py gimletInput.json")
+		exit()
 
-	# Copy missing attributes
-	command = createCommand(hdf5_path, input_file, output_file, "/domain")
-	os.system(command)
+	# Open json file
+	with open(sys.argv[1], "r") as read_file:
+		json_data = json.load(read_file)
 
-	command = createCommand(hdf5_path, input_file, output_file, "/universe")
-	os.system(command)
+	
+	# Find original file
+	index_orig = 0
+	for file in json_data["input-files"]:
+		if (file["name"] != "orig"):
+			break
+
+		index_orig = index_orig + 1
 
 
-	# setup environment
-	os.system("source /projects/exasky/HACC.darwin_setup")
-	os.system("cd /projects/exasky/gimlet2")
+	# Set some environment variables
+	hdf5_path = json_data["hdf5_path"]
+	os.system("source " + json_data["evn_path"])
+	os.system("cd " + json_data["gimlet-home"])
 
-	gimlet_path = "/projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex"
-	cmd = gimlet_path + " " + output_file + " " + prefix
-	os.system(cmd)
+
+	# Copy uncompressed attributes from original to compressed; needed for gimlet
+	for file in json_data["input-files"]:
+		if (file["name"] != "orig"):
+			# Copy missing attributes
+			command = createCommand(hdf5_path, json_data["input-files"][index_orig]["path"], file["path"], "/domain")
+			print command
+			os.system(command)
+
+			command = createCommand(hdf5_path, json_data["input-files"][index_orig]["path"], file["path"], "/universe")
+			print command
+			os.system(command)
+
+		# Run gimlet analysis
+		cmd = json_data["gimlet-path"] + " " + file["path"] + " " + file["output-prefix"]
+			print cmd
+			os.system(cmd)
+
 
 """
-python runAnalysis.py /projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5 /projects/exasky/VizAly-CBench/build/__SZ_1853541582__NVB_C009_l10n512_S12345T692_z42.hdf5 _test_SZ_
-fields: /domain /universe
+python runAnalysis.py gimletInput.json
 """
