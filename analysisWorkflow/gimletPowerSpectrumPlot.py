@@ -17,7 +17,7 @@ def extractValue(filename, colpos):
 
 def plotGraph(x, x_label, y_label, title, list_of_tuples):
 	fig = plt.figure()
-	ax = plt.subplot(111)
+	ax = plt.subplot(1,1,1)
 
 	plt.title(title)
 	plt.xlabel(x_label)
@@ -28,8 +28,9 @@ def plotGraph(x, x_label, y_label, title, list_of_tuples):
 		ax.plot(x, item[0], label=item[1], marker=item[2])
 		ax.legend()
 
-	fig = plt.plot(figsize=(50,50))
+	fig = plt.gcf()
 	plt.show()
+	fig.savefig(title + '.png', dpi=100)
 
 
 
@@ -37,6 +38,8 @@ if __name__ == "__main__":
 	if len(sys.argv) < 2:
 		print ("Json file and title needed; e.g. python gimletPowerSpectrumPlot.py gimletInput.json")
 		exit()
+
+	print sys.argv[1]
 
 	# Read input json file
 	with open(sys.argv[1], "r") as read_file:
