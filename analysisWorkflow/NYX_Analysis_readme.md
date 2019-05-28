@@ -28,8 +28,6 @@ _velmag_ps3d.txt - sqrt(vx*vx+vy*vy+vz*vz)
 
 
 ### What is _rhom_ps3d.txt"
-
-
 Apps in gimlet:
 1. lya_all_axes (yes)
 2. lya_all_axes_rhoT
@@ -40,4 +38,4 @@ Apps in gimlet:
 
 ### Which app to use?
 
-Range of k: 0-20
+Range of k: 0-10
