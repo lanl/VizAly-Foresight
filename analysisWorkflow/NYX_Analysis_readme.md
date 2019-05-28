@@ -23,7 +23,7 @@ gimlet (sim_stats.ex) metrics:
 *  _temp_ps3d.txt - temperature 
 *  _rhob_ps3d.txt - baryon_density 
 *  _rhom_ps3d.txt - total matter density 
-*_velmag_ps3d.txt - sqrt(vx*vx+vy*vy+vz*vz) 
+* _velmag_ps3d.txt - sqrt(vx*vx+vy*vy+vz*vz) 
 *    _vz_ps3d.txt - vz 
 
 
