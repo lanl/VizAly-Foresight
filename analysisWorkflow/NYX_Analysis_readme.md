@@ -1,5 +1,3 @@
-NYX_reamde.md
-
 ## gimletAnalysis.py
 Add missing attributes to the compressed hdf5 files and run the gimlet analysis sim_stats.ex
 
