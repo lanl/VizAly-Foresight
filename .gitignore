@@ -101,5 +101,6 @@ cmake-build-*
 analysisWorkflow/*/*
 
 CMakeCache\.txt
-
 CMakeFiles/cmake\.check_cache
+src/CMakeLists.txt.cori
+src/*/*.old
