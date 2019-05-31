@@ -501,7 +501,8 @@ inline void NYXDataLoader::writeGroupData(
 
   assert(not group_data.empty()); 
   int const num_fields = group_data.size();
-  hid_t* dset_id = new hid_t[num_fields]; 
+  //hid_t* dset_id = new hid_t[num_fields]; 
+  std::vector<hid_t> dset_id(num_fields);
 
   // create a HDF5 group
   hid_t group = H5Gcreate2(
@@ -588,16 +589,17 @@ inline void NYXDataLoader::writeGroupData(
   
   // finalization
   herr_t status = H5Gclose(group); 
-  H5Sclose(filespace);
-  H5Pclose(plist_id);
   log << "group close status: " << (status == -1) << std::endl;
 
-  //delete[] dset_id;
-  //for (auto&& dataset : dset_id) {
+  H5Sclose(filespace);
+  H5Pclose(plist_id);
+
   // IMPORTANT
-  for (int i=0; i < num_fields; ++i) {
-    H5Dclose(dset_id[i]);
+  //for (int i=0; i < num_fields; ++i) {
+  for (auto&& dataset : dset_id) {
+    H5Dclose(dataset);
   }
+  dset_id.clear();
 
   for (auto&& item : group_data) {
     item.deAllocateMem();
@@ -740,6 +742,8 @@ inline int NYXDataLoader::writeDataOld(std::string _filename) {
   H5Sclose(memspace);
   H5Pclose(plist_id);
   H5Fclose(file_id);
+
+  delete[] dset_id;
 
   for (int i = 0; i < toWriteData.size(); i++)
     toWriteData[i].deAllocateMem();
