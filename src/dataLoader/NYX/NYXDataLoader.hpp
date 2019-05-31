@@ -45,63 +45,12 @@ public:
       dims { in_dims[0], in_dims[1], in_dims[2] }
   {}
 
-  inline int allocateMem() {
-    if (dataType == "float")
-      data = new float[numElements];
-    else if (dataType == "double")
-      data = new double[numElements];
-    else if (dataType == "int8_t")
-      data = new int8_t[numElements];
-    else if (dataType == "int16_t")
-      data = new int16_t[numElements];
-    else if (dataType == "int32_t")
-      data = new int32_t[numElements];
-    else if (dataType == "int64_t")
-      data = new int64_t[numElements];
-    else if (dataType == "uint8_t")
-      data = new uint8_t[numElements];
-    else if (dataType == "uint16_t")
-      data = new uint16_t[numElements];
-    else if (dataType == "uint32_t")
-      data = new uint32_t[numElements];
-    else if (dataType == "uint64_t")
-      data = new uint64_t[numElements];
-    else
-      return 0;
-
-    return 1;
+  inline bool allocateMem() { 
+    return Memory::allocate(data, dataType, numElements);
   }
 
-
-  inline int deAllocateMem() {
-    if (data == nullptr) // already deallocated!
-      return 1;
-
-    if (dataType == "float")
-      delete[](float *) data;
-    else if (dataType == "double")
-      delete[](double *) data;
-    else if (dataType == "int8_t")
-      delete[](int8_t *) data;
-    else if (dataType == "int16_t")
-      delete[](int16_t *) data;
-    else if (dataType == "int32_t")
-      delete[](int32_t *) data;
-    else if (dataType == "int64_t")
-      delete[](int64_t *) data;
-    else if (dataType == "uint8_t")
-      delete[](uint8_t *) data;
-    else if (dataType == "uint16_t")
-      delete[](uint16_t *) data;
-    else if (dataType == "uint32_t")
-      delete[](uint32_t *) data;
-    else if (dataType == "uint64_t")
-      delete[](uint64_t *) data;
-    else
-      return 0;
-
-    data = nullptr;
-    return 1;
+  inline bool deAllocateMem() {
+    return Memory::release(data, dataType);
   }
 };
 
@@ -216,15 +165,11 @@ class NYXDataLoader : public DataLoaderInterface {
   std::unordered_map<std::string, std::vector<UncompressedData>> groupsData;
 
 public:
-  NYXDataLoader() {
-    loader = "NYX";
-    saveData = false;
-  }
-
+   NYXDataLoader() { loader = "NYX"; saveData = false; }
   ~NYXDataLoader() { deAllocateMem(); }
 
-  int allocateMem(std::string dataType, size_t numElements, int offset);
-  int deAllocateMem();
+  bool allocateMem(std::string dataType, size_t numElements, int offset);
+  bool deAllocateMem();
 
   void init(std::string _filename, MPI_Comm _comm);
   int loadData(std::string paramName);
@@ -267,89 +212,14 @@ inline void NYXDataLoader::setParam(std::string paramName, std::string type, std
 }
 
 // TODO: refactor it in a util class
-inline int NYXDataLoader::allocateMem(std::string dataType, size_t numElements, int offset) {
-  // Allocate mem
-  if (dataType == "float")
-    data = new float[numElements + offset];
-  else if (dataType == "double")
-    data = new double[numElements + offset];
-  else if (dataType == "int8_t")
-    data = new int8_t[numElements + offset];
-  else if (dataType == "int16_t")
-    data = new int16_t[numElements + offset];
-  else if (dataType == "int32_t")
-    data = new int32_t[numElements + offset];
-  else if (dataType == "int64_t")
-    data = new int64_t[numElements + offset];
-  else if (dataType == "uint8_t")
-    data = new uint8_t[numElements + offset];
-  else if (dataType == "uint16_t")
-    data = new uint16_t[numElements + offset];
-  else if (dataType == "uint32_t")
-    data = new uint32_t[numElements + offset];
-  else if (dataType == "uint64_t")
-    data = new uint64_t[numElements + offset];
-  else
-    return 0;
-
-  // Get size
-  if (dataType == "float")
-    elemSize = sizeof(float);
-  else if (dataType == "double")
-    elemSize = sizeof(double);
-  else if (dataType == "int8_t")
-    elemSize = sizeof(int8_t);
-  else if (dataType == "int16_t")
-    elemSize = sizeof(int16_t);
-  else if (dataType == "int32_t")
-    elemSize = sizeof(int32_t);
-  else if (dataType == "int64_t")
-    elemSize = sizeof(int64_t);
-  else if (dataType == "uint8_t")
-    elemSize = sizeof(uint8_t);
-  else if (dataType == "uint16_t")
-    elemSize = sizeof(uint16_t);
-  else if (dataType == "uint32_t")
-    elemSize = sizeof(uint32_t);
-  else if (dataType == "uint64_t")
-    elemSize = sizeof(uint64_t);
-  else
-    return 0;
-
-  return 1;
+inline bool NYXDataLoader::allocateMem(std::string dataType, size_t numElements, int offset) {
+  elemSize = Memory::sizeOf[dataType];
+  return Memory::allocate(data, dataType, numElements, offset);
 }
 
 
-inline int NYXDataLoader::deAllocateMem() {
-  if (data == NULL) // already deallocated!
-    return 1;
-
-  if (dataType == "float")
-    delete[](float *) data;
-  else if (dataType == "double")
-    delete[](double *) data;
-  else if (dataType == "int8_t")
-    delete[](int8_t *) data;
-  else if (dataType == "int16_t")
-    delete[](int16_t *) data;
-  else if (dataType == "int32_t")
-    delete[](int32_t *) data;
-  else if (dataType == "int64_t")
-    delete[](int64_t *) data;
-  else if (dataType == "uint8_t")
-    delete[](uint8_t *) data;
-  else if (dataType == "uint16_t")
-    delete[](uint16_t *) data;
-  else if (dataType == "uint32_t")
-    delete[](uint32_t *) data;
-  else if (dataType == "uint64_t")
-    delete[](uint64_t *) data;
-  else
-    return 0;
-
-  data = NULL;
-
-  return 1;
+inline bool NYXDataLoader::deAllocateMem() {
+  return Memory::release(data, dataType);
 }
 
 inline int NYXDataLoader::loadData(std::string paramName) {
