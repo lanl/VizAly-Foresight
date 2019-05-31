@@ -2,9 +2,8 @@ cmake_minimum_required(VERSION 3.6.2)
 
 project(CBench)
 
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel.")
-
 
 # add libs
 set (EXTRA_LIBS "")
@@ -18,9 +17,6 @@ include_directories(${CMAKE_SOURCE_DIR}/dataLoader)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader/Binary)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader/HACC)
 
-if(CBENCH_ENABLE_NYX_LOADER)
-	include_directories(${CMAKE_SOURCE_DIR}/dataLoader/NYX)
-endif()
 
 if(WIN32)
 	add_definitions(-DNOMINMAX)
@@ -34,15 +30,27 @@ add_library(GenericIO STATIC "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO
 set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # NYX Loader
-option(CBENCH_ENABLE_NYX_LOADER "Enables the reading of NyX HDF5 data" OFF )
+set(HDF5_INCLUDE_DIRS )
+
+option(CBENCH_ENABLE_NYX_LOADER "Enables the reading of NyX HDF5 data" ON )
 if (CBENCH_ENABLE_NYX_LOADER)
-    set(HDF5_USE_STATIC_LIBRARIES ON)
-	find_package(HDF5 REQUIRED)
+  set(HDF5_USE_STATIC_LIBRARIES ON)
+  
+  # FIXME
+  set(HDF5_FOUND TRUE)
+
+  # It still link to the wrong library, and no cmake config file is found
+  #find_package(HDF5 PATHS ${HDF5_DIR} NO_DEFAULT_PATH REQUIRED)
 	if(HDF5_FOUND)
+    message( "HDF5_INCLUDE_DIRS: " ${HDF5_INCLUDE_DIRS} )
 		include_directories(${HDF5_INCLUDE_DIRS})
 		set (EXTRA_LIBS ${EXTRA_LIBS} ${HDF5_LIBRARIES} )
 		add_definitions (-DCBENCH_HAS_NYX)
-	endif()
+	  # include right NYX data loader header file
+    include_directories(${CMAKE_SOURCE_DIR}/dataLoader/NYX)
+	else()
+    message(FATAL_ERROR "HDF5 library not found")
+  endif()
 endif()
     
 
