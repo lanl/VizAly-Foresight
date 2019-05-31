@@ -209,7 +209,7 @@ Partition getPartition(int myRank, int numRanks, int extentsX, int extentsY, int
 class NYXDataLoader : public DataLoaderInterface {
   int myRank = 0;
   int numRanks = 0;
-  std::string groupName = "native_fields";
+  std::string defaultGroup = "native_fields";
 
   std::vector<UncompressedData> toWriteData;
   // group data: key=group, value:array of field data
@@ -228,6 +228,7 @@ public:
 
   void init(std::string _filename, MPI_Comm _comm);
   int loadData(std::string paramName);
+  int loadDataOld(std::string paramName);
   int saveCompData(std::string paramName, void *cData);
   int writeData(std::string _filename);
   int writeDataOld(std::string _filename);
@@ -237,12 +238,18 @@ public:
 
 private:
   hid_t getNativeDataType(std::string const& dataType) const;
+
   void writeGroupData(
     hid_t& in_file_id, hid_t& in_filespace, hid_t& in_memspace,
     std::string const& in_group_name, 
     hsize_t const count[3], hsize_t const offset[3]
   );
 
+  herr_t loadGroupDataSet(
+    hid_t const& in_file,
+    std::string const& in_group_name,
+    std::string const& in_field_name
+  );
 };
 
 inline void NYXDataLoader::init(std::string _filename, MPI_Comm _comm) {
@@ -256,7 +263,7 @@ inline void NYXDataLoader::init(std::string _filename, MPI_Comm _comm) {
 
 inline void NYXDataLoader::setParam(std::string paramName, std::string type, std::string value) {
   if (paramName == "group")
-    groupName = value;
+    defaultGroup = value;
 }
 
 // TODO: refactor it in a util class
@@ -345,32 +352,48 @@ inline int NYXDataLoader::deAllocateMem() {
   return 1;
 }
 
-
 inline int NYXDataLoader::loadData(std::string paramName) {
 
   Timer clock;
-  log.str("");
-
   clock.start();
 
-
+  log.str("");
   log << "filename: " << filename << " param name: " << paramName << std::endl;
-
   hid_t file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-  hid_t group = H5Gopen(file, groupName.c_str(), H5P_DEFAULT);
 
+  herr_t status = loadGroupDataSet(file, defaultGroup, paramName);
+  
+  H5Fclose(file);
+  clock.stop();
+  log << "Loading data took " << clock.getDuration() << " s" << std::endl;
+
+  int const exit_code = (status < 0 ? 0: 1);
+  return exit_code;
+}
+
+
+// generic group data field loader
+// assume that all datasets have the same dimension
+inline herr_t NYXDataLoader::loadGroupDataSet(
+  hid_t const& in_file,
+  std::string const& in_group_name,
+  std::string const& in_field_name
+) {
+  
   hsize_t fields;
-  herr_t err = H5Gget_num_objs(group, &fields);
-
-
-  paramName = "/" + groupName + "/" + paramName;
-  log << "paramName: " << paramName << std::endl;
-  hid_t dataset = H5Dopen(file, paramName.c_str(), H5P_DEFAULT);
-  hid_t dataspace = H5Dget_space(dataset);
-  hid_t memspace = H5Dget_space(dataset);
-
-
   hsize_t tdims[3];
+  hsize_t count[3];
+  hsize_t offset[3];
+  hsize_t zero[3] = {0, 0, 0};
+
+  std::string param_name = "/" + in_group_name + "/" + in_field_name;
+  log << "paramName: " << param_name << std::endl;
+
+  hid_t group     = H5Gopen(in_file, in_group_name.c_str(), H5P_DEFAULT);
+  herr_t err      = H5Gget_num_objs(group, &fields);
+  hid_t dataset   = H5Dopen(in_file, param_name.c_str(), H5P_DEFAULT);
+  hid_t dataspace = H5Dget_space(dataset);
+
   int ndims = H5Sget_simple_extent_dims(dataspace, tdims, NULL);
   origDims[0] = tdims[0];
   origDims[1] = tdims[1];
@@ -378,16 +401,11 @@ inline int NYXDataLoader::loadData(std::string paramName) {
 
   totalNumberOfElements = tdims[0] * tdims[1] * tdims[2];
 
-  log << "Param: " << paramName << std::endl;
-  log << "Data dimensions: " << tdims[0] << " " << tdims[1] << " " << tdims[2] << " | totalNumberOfElements "
-      << totalNumberOfElements << "\n";
-
+  log << "Param: " << param_name << std::endl;
+  log << "Data dimensions: " << tdims[0] << " " << tdims[1] << " " << tdims[2] 
+      << " | totalNumberOfElements " << totalNumberOfElements << std::endl;
 
   // Read only a subset of the file
-  hsize_t count[3];
-  hsize_t offset[3];
-
-
   Partition current = getPartition(myRank, numRanks, tdims[0], tdims[1], tdims[2]);
   count[0] = current.max_x - current.min_x;
   count[1] = current.max_y - current.min_y;
@@ -396,46 +414,47 @@ inline int NYXDataLoader::loadData(std::string paramName) {
   sizePerDim[0] = count[0];
   sizePerDim[1] = count[1];
   sizePerDim[2] = count[2];
+  
+  numElements = count[0] * count[1] * count[2];
 
   offset[0] = current.min_x;
   offset[1] = current.min_y;
   offset[2] = current.min_z;
 
-  numElements = count[0] * count[1] * count[2];
-
   rankOffset[0] = offset[0];
   rankOffset[1] = offset[1];
   rankOffset[2] = offset[2];
 
-
   log << myRank << " ~ Count : " << count[0] << " " << count[1] << " " << count[2] << " | " << numElements << "\n";
   log << myRank << " ~ Offset: " << offset[0] << " " << offset[1] << " " << offset[2] << "\n";
-
-
-  herr_t status = H5Sselect_hyperslab(dataspace, H5S_SELECT_SET, offset, NULL, count, NULL);
-  hid_t memspaceRead = H5Screate_simple(3, count, NULL);
-
-  hsize_t zero[3] = {0, 0, 0};
-  status = H5Sselect_hyperslab(memspaceRead, H5S_SELECT_SET, zero, NULL, count, NULL);
-
-
-  // Set-up data stream
-  dataType = "float";
-  allocateMem(dataType, numElements, 0);
   log << myRank << " ~ numElements: " << numElements << "\n";
 
-  status = H5Dread(dataset, H5T_NATIVE_FLOAT, memspaceRead, dataspace, H5P_DEFAULT, data);
+  // select data section
+  hid_t memspace = H5Screate_simple(3, count, NULL);
+  H5Sselect_hyperslab(dataspace, H5S_SELECT_SET, offset, NULL, count, NULL);
+  H5Sselect_hyperslab(memspace, H5S_SELECT_SET, zero, NULL, count, NULL);
+
+  // Set-up data stream and select only float values
+  bool const is_default = (in_group_name == defaultGroup);
+  // two cases: default group and custom group
+  if (is_default) {
+    dataType = "float";
+    allocateMem(dataType, numElements, 0);
+  } else {
+    auto& group_data = groupsData[in_group_name];
+    group_data.emplace_back(in_field_name, "float", numElements, sizePerDim);
+    auto& field_dataset = group_data.back();
+    field_dataset.allocateMem();
+  }
+  
+  // set data storage pointer and copy dataset
+  auto storage = (is_default ? data : groupsData[in_group_name].back().data); 
+  hid_t const native_datatype = getNativeDataType(dataType); 
+  herr_t status = H5Dread(dataset, native_datatype, memspace, dataspace, H5P_DEFAULT, storage);
 
   H5Dclose(dataset);
-  H5Fclose(file);
-
-
-  clock.stop();
-  log << "Loading data took " << clock.getDuration() << " s" << std::endl;
-
-  return 1; // All good
+  return status;
 }
-
 
 inline int NYXDataLoader::saveCompData(std::string paramName, void *cData) {
   size_t _dims[3];
@@ -479,7 +498,6 @@ inline hid_t NYXDataLoader::getNativeDataType(std::string const& dataType) const
   }
 }
 
-// TODO: generic data field writer
 // no need to pass data_type, as well as group uncompressed data vector
 inline void NYXDataLoader::writeGroupData(
   hid_t& in_file_id,
@@ -496,12 +514,11 @@ inline void NYXDataLoader::writeGroupData(
   // step 1: initialization
   // retrieve group fields data
   auto& group_data = (
-    in_group_name == groupName ? toWriteData : groupsData[in_group_name]
+    in_group_name == defaultGroup ? toWriteData : groupsData[in_group_name]
   );
 
   assert(not group_data.empty()); 
   int const num_fields = group_data.size();
-  //hid_t* dset_id = new hid_t[num_fields]; 
   std::vector<hid_t> dset_id(num_fields);
 
   // create a HDF5 group
@@ -595,7 +612,6 @@ inline void NYXDataLoader::writeGroupData(
   H5Pclose(plist_id);
 
   // IMPORTANT
-  //for (int i=0; i < num_fields; ++i) {
   for (auto&& dataset : dset_id) {
     H5Dclose(dataset);
   }
@@ -610,23 +626,20 @@ inline void NYXDataLoader::writeGroupData(
 // a new version of 'writeData' that use 'writeGroupData'
 inline int NYXDataLoader::writeData(std::string in_filename) {
 
+  hsize_t fileDims[3];
+  hsize_t count[3];
+  hsize_t offset[3];
+
   log << "writing to " << in_filename << std::endl;
 
   hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
   H5Pset_fapl_mpio(plist_id, comm, MPI_INFO_NULL);
 
   hid_t file_id = H5Fcreate(in_filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
-  H5Pclose(plist_id);
-
-  hsize_t fileDims[3];
-  hsize_t count[3];
-  hsize_t offset[3];
 
   fileDims[0] = origDims[0];
   fileDims[1] = origDims[1];
   fileDims[2] = origDims[2];
-  hid_t filespace = H5Screate_simple(3, fileDims, NULL);
-
   
   count[0] = sizePerDim[0];
   count[1] = sizePerDim[1];
@@ -635,119 +648,20 @@ inline int NYXDataLoader::writeData(std::string in_filename) {
   offset[0] = rankOffset[0];
   offset[1] = rankOffset[1];
   offset[2] = rankOffset[2];
-  hid_t memspace = H5Screate_simple(3, count, NULL);
+  
+  hid_t filespace = H5Screate_simple(3, fileDims, NULL);
+  hid_t memspace  = H5Screate_simple(3, count, NULL);
 
   log << "count " << count[0] << ", " << count[1] << ", " << count[2] << std::endl;
-  log << "offset " << offset[0] << ", " << offset[1] << ", " << offset[2] << std::endl;
+  log << "offset "<< offset[0] << ", " << offset[1] << ", " << offset[2] << std::endl;
 
   // call writeGroupHere with the right args
-  writeGroupData(file_id, filespace, memspace, groupName, count, offset);
-
-  H5Sclose(filespace);
-  H5Sclose(memspace);
-  //H5Pclose(plist_id);
-  H5Fclose(file_id);
-}
-
-
-inline int NYXDataLoader::writeDataOld(std::string _filename) {
-  log << "writing to " << _filename << std::endl;
-
-  hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
-  H5Pset_fapl_mpio(plist_id, comm, MPI_INFO_NULL);
-
-  hid_t file_id = H5Fcreate(_filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
-  H5Pclose(plist_id);
-
-  hsize_t fileDims[3];
-  fileDims[0] = origDims[0];
-  fileDims[1] = origDims[1];
-  fileDims[2] = origDims[2];
-  hid_t filespace = H5Screate_simple(3, fileDims, NULL);
-
-  hid_t group = H5Gcreate2(file_id, ("/" + groupName).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-  int numDatasets = toWriteData.size();
-  hid_t *dset_id = new hid_t[numDatasets];
-
-  int datasetCount = 0;
-  for (auto item = toWriteData.begin(); item != toWriteData.end(); item++) {
-    std::string fieldname = "/" + groupName + "/" + (*item).paramName;
-
-    dset_id[datasetCount] = H5Dcreate(file_id, fieldname.c_str(), H5T_NATIVE_FLOAT, filespace, H5P_DEFAULT, H5P_DEFAULT,
-                                      H5P_DEFAULT);
-    datasetCount++;
-
-    log << "creating fieldname " << fieldname << ", status: " << (dset_id[datasetCount - 1] == -1) << std::endl;
-  }
-
-
-  {
-    char strformat[] = "nyx-lyaf";
-    hid_t type = H5Tcopy(H5T_C_S1);
-    int32_t len = strlen(strformat);
-    H5Tset_size(type, len);
-    hid_t ds = H5Screate(H5S_SCALAR);
-
-    hid_t attribute_id = H5Acreate(file_id, "format", type, ds, H5P_DEFAULT, H5P_DEFAULT);
-    H5Awrite(attribute_id, type, &strformat);
-
-    H5Aclose(attribute_id);
-  }
-
-
-  hsize_t count[3];
-  count[0] = sizePerDim[0];
-  count[1] = sizePerDim[1];
-  count[2] = sizePerDim[2];
-
-  hsize_t offset[3];
-  offset[0] = rankOffset[0];
-  offset[1] = rankOffset[1];
-  offset[2] = rankOffset[2];
-  hid_t memspace = H5Screate_simple(3, count, NULL);
-
-  log << "count " << count[0] << ", " << count[1] << ", " << count[2] << std::endl;
-  log << "offset " << offset[0] << ", " << offset[1] << ", " << offset[2] << std::endl;
-
-
-  filespace = H5Dget_space(dset_id[0]);
-  H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, count, NULL);
-
-  plist_id = H5Pcreate(H5P_DATASET_XFER);
-  H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
-
-  datasetCount = 0;
-  for (auto item = toWriteData.begin(); item != toWriteData.end(); item++) {
-    herr_t status = H5Dwrite(dset_id[datasetCount], H5T_NATIVE_FLOAT, memspace, filespace, plist_id,
-                             (float *) (*item).data);
-    datasetCount++;
-
-    log << "writing fieldname " << (*item).paramName << ", status: " << (status == -1) << std::endl;
-    log << ((float *) (*item).data)[0] << ", " << ((float *) (*item).data)[1] << ", " <<
-        ((float *) (*item).data)[count[0] * count[1] * count[2] - 2] << ", "
-        << ((float *) (*item).data)[count[0] * count[1] * count[2] - 1] << std::endl;
-  }
-
-  for (int i = 0; i < numDatasets; i++) {
-    herr_t status = H5Dclose(dset_id[i]);
-    log << "dataset " << i << " of " << numDatasets << " closing status: " << (status == -1) << std::endl;
-  }
-
-  herr_t status = H5Gclose(group);
-
-  log << "group close status: " << (status == -1) << std::endl;
+  writeGroupData(file_id, filespace, memspace, defaultGroup, count, offset);
 
   H5Sclose(filespace);
   H5Sclose(memspace);
   H5Pclose(plist_id);
   H5Fclose(file_id);
-
-  delete[] dset_id;
-
-  for (int i = 0; i < toWriteData.size(); i++)
-    toWriteData[i].deAllocateMem();
-  toWriteData.clear();
 }
 
 #endif
