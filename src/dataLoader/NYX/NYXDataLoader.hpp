@@ -212,6 +212,8 @@ class NYXDataLoader : public DataLoaderInterface {
   std::string groupName = "native_fields";
 
   std::vector<UncompressedData> toWriteData;
+  // group data: key=group, value:array of field data
+  std::unordered_map<std::string, std::vector<UncompressedData>> groupsData;
 
 public:
   NYXDataLoader() {
@@ -232,6 +234,15 @@ public:
   int saveInputFileParameters() { return 1; } 
   int close() { return deAllocateMem(); }
   void setParam(std::string paramName, std::string type, std::string value);
+
+private:
+  hid_t getNativeDataType(std::string const& dataType) const;
+  void writeGroupData(
+    hid_t& in_file_id, hid_t& in_filespace, hid_t& in_memspace,
+    std::string const& in_group_name, 
+    hsize_t const count[3], hsize_t const offset[3]
+  );
+
 };
 
 inline void NYXDataLoader::init(std::string _filename, MPI_Comm _comm) {
@@ -441,8 +452,203 @@ inline int NYXDataLoader::saveCompData(std::string paramName, void *cData) {
   return 1;
 }
 
+inline hid_t NYXDataLoader::getNativeDataType(std::string const& dataType) const {
 
-inline int NYXDataLoader::writeData(std::string _filename) {
+  if (dataType == "float") {
+    return H5T_NATIVE_FLOAT;
+  } else if (dataType == "double") {
+    return H5T_NATIVE_DOUBLE;
+  } else if (dataType == "int8_t") {
+    return H5T_NATIVE_INT8;
+  } else if (dataType == "int16_t") {
+    return H5T_NATIVE_INT16;
+  } else if (dataType == "int32_t") {
+    return H5T_NATIVE_INT32;
+  } else if (dataType == "int64_t") {
+    return H5T_NATIVE_INT64;
+  } else if (dataType == "uint8_t") {
+    return H5T_NATIVE_UINT8;
+  } else if (dataType == "uint16_t") {
+    return H5T_NATIVE_UINT16;
+  } else if (dataType == "uint32_t") {
+    return H5T_NATIVE_UINT32;
+  } else if (dataType == "uint64_t") {
+    return H5T_NATIVE_UINT64;
+  } else {
+    throw std::runtime_error("Bad data type");
+  }
+}
+
+// TODO: generic data field writer
+// no need to pass data_type, as well as group uncompressed data vector
+inline void NYXDataLoader::writeGroupData(
+  hid_t& in_file_id,
+  hid_t& in_filespace,
+  hid_t& in_memspace,
+  std::string const& in_group_name,
+  hsize_t const count[3], hsize_t const offset[3]
+) {
+
+  // should normally be initialized by 'sizePerDim' and 'rankOffset'
+  assert(count != nullptr);
+  assert(offset != nullptr);
+
+  // step 1: initialization
+  // retrieve group fields data
+  auto& group_data = (
+    in_group_name == groupName ? toWriteData : groupsData[in_group_name]
+  );
+
+  assert(not group_data.empty()); 
+  int const num_fields = group_data.size();
+  hid_t* dset_id = new hid_t[num_fields]; 
+
+  // create a HDF5 group
+  hid_t group = H5Gcreate2(
+    in_file_id, ("/" + in_group_name).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT
+  );
+
+  // step 2: create metadata
+  int field_index = 0;
+  for (auto&& item : group_data) {
+    std::string fieldname = "/"+ in_group_name + "/" + item.paramName;
+    hid_t data_type = getNativeDataType(item.dataType);
+
+    dset_id[field_index] = H5Dcreate(
+      in_file_id, fieldname.c_str(), data_type, in_filespace, 
+      H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT 
+    );
+    auto const status = (dset_id[field_index] == -1);
+    log << "creating fieldname" << fieldname << ", status: " << status << std::endl; 
+    field_index++;
+  }
+
+  // create attribute 'format'
+  {
+    char strformat[] = "nyx-lyaf";
+    hid_t type = H5Tcopy(H5T_C_S1);
+    int32_t len = strlen(strformat);
+    H5Tset_size(type, len);
+    hid_t ds = H5Screate(H5S_SCALAR);
+
+    hid_t attribute_id = H5Acreate(in_file_id, "format", type, ds, H5P_DEFAULT, H5P_DEFAULT);
+    H5Awrite(attribute_id, type, &strformat);
+    H5Aclose(attribute_id);
+  }
+
+  // step 3: write fields related data
+  hid_t filespace = H5Dget_space(dset_id[0]);
+  H5Sselect_hyperslab(filespace, H5S_SELECT_SET, offset, NULL, count, NULL);
+  hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
+  H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
+
+  field_index = 0;
+  for (auto&& item : group_data) {
+    hid_t data_type = getNativeDataType(item.dataType);
+    int const shift = count[0] * count[1] * count[2];
+
+    auto write = [&](auto* data) {
+      herr_t const status = H5Dwrite(
+        dset_id[field_index], data_type, in_memspace, filespace, plist_id, data   
+      );
+
+      log << "writing field: " << item.paramName 
+          << ", status: " << (status == -1) << std::endl
+          << data[0] << ", " << data[1] << ", " 
+          << data[shift - 2] << ", " << data[shift - 1] << std::endl; 
+    };
+  
+    // FIXME: to be refactored, change the way data is stored  
+    if (item.dataType == "float") {
+      write((float*) item.data);
+    } else if (item.dataType == "double") {
+      write((double*) item.data);
+    } else if (item.dataType == "int8_t") {
+      write((int8_t*) item.data);
+    } else if (item.dataType == "int16_t") {
+      write((int16_t*) item.data);
+    } else if (item.dataType == "int32_t") {
+      write((int32_t*) item.data);
+    } else if (item.dataType == "int64_t") {
+      write((int64_t*) item.data);
+    } else if (item.dataType == "uint8_t") {
+      write((uint8_t*) item.data);
+    } else if (item.dataType == "uint16_t") {
+      write((uint16_t*) item.data);
+    } else if (item.dataType == "uint32_t") {
+      write((uint32_t*) item.data);
+    } else if (item.dataType == "uint64_t") {
+      write((uint64_t*) item.data);
+    } else { 
+      log << "Error: Bad data type" << std::endl;
+      throw std::runtime_error("Bad data type");
+    } 
+    field_index++;
+  }
+  
+  // finalization
+  herr_t status = H5Gclose(group); 
+  H5Sclose(filespace);
+  H5Pclose(plist_id);
+  log << "group close status: " << (status == -1) << std::endl;
+
+  //delete[] dset_id;
+  //for (auto&& dataset : dset_id) {
+  // IMPORTANT
+  for (int i=0; i < num_fields; ++i) {
+    H5Dclose(dset_id[i]);
+  }
+
+  for (auto&& item : group_data) {
+    item.deAllocateMem();
+  }
+  group_data.clear();
+}
+
+// a new version of 'writeData' that use 'writeGroupData'
+inline int NYXDataLoader::writeData(std::string in_filename) {
+
+  log << "writing to " << in_filename << std::endl;
+
+  hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
+  H5Pset_fapl_mpio(plist_id, comm, MPI_INFO_NULL);
+
+  hid_t file_id = H5Fcreate(in_filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
+  H5Pclose(plist_id);
+
+  hsize_t fileDims[3];
+  hsize_t count[3];
+  hsize_t offset[3];
+
+  fileDims[0] = origDims[0];
+  fileDims[1] = origDims[1];
+  fileDims[2] = origDims[2];
+  hid_t filespace = H5Screate_simple(3, fileDims, NULL);
+
+  
+  count[0] = sizePerDim[0];
+  count[1] = sizePerDim[1];
+  count[2] = sizePerDim[2];
+
+  offset[0] = rankOffset[0];
+  offset[1] = rankOffset[1];
+  offset[2] = rankOffset[2];
+  hid_t memspace = H5Screate_simple(3, count, NULL);
+
+  log << "count " << count[0] << ", " << count[1] << ", " << count[2] << std::endl;
+  log << "offset " << offset[0] << ", " << offset[1] << ", " << offset[2] << std::endl;
+
+  // call writeGroupHere with the right args
+  writeGroupData(file_id, filespace, memspace, groupName, count, offset);
+
+  H5Sclose(filespace);
+  H5Sclose(memspace);
+  //H5Pclose(plist_id);
+  H5Fclose(file_id);
+}
+
+
+inline int NYXDataLoader::writeDataOld(std::string _filename) {
   log << "writing to " << _filename << std::endl;
 
   hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
