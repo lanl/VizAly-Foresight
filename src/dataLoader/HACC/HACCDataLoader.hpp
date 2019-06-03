@@ -44,6 +44,7 @@ class HACCDataLoader: public DataLoaderInterface
 	int saveInputFileParameters();
 	int close() { return deAllocateMem(dataType, data); }
 	void setParam(std::string paramName, std::string type, std::string value){};
+  bool loadUncompressedFields(nlohmann::json const&) { return false; }
 };
 
 

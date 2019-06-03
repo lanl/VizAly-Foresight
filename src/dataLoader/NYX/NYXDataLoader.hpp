@@ -180,6 +180,7 @@ public:
   int saveInputFileParameters() { return 1; } 
   int close() { return deAllocateMem(); }
   void setParam(std::string paramName, std::string type, std::string value);
+  bool loadUncompressedFields(nlohmann::json const& jsonInput);
 
 private:
   hid_t getNativeDataType(std::string const& dataType) const;
@@ -264,7 +265,10 @@ inline herr_t NYXDataLoader::loadGroupDataSet(
   hid_t dataset   = H5Dopen(in_file, param_name.c_str(), H5P_DEFAULT);
   hid_t dataspace = H5Dget_space(dataset);
 
-  int ndims = H5Sget_simple_extent_dims(dataspace, tdims, NULL);
+    int ndims = H5Sget_simple_extent_dims(dataspace, tdims, NULL);
+//  log << "origDims:("<< origDims[0] <<", "<< origDims[1] <<", "<< origDims[2] <<")"<< std::endl;
+//  log << "tdims:("<< (unsigned) tdims[0] <<", "<< (unsigned) tdims[1] <<", "<< (unsigned) tdims[2] <<")"<< std::endl;
+
   origDims[0] = tdims[0];
   origDims[1] = tdims[1];
   origDims[2] = tdims[2];
@@ -276,6 +280,7 @@ inline herr_t NYXDataLoader::loadGroupDataSet(
       << " | totalNumberOfElements " << totalNumberOfElements << std::endl;
 
   // Read only a subset of the file
+  // FIXME: Bug here for "derived_fields"
   Partition current = getPartition(myRank, numRanks, tdims[0], tdims[1], tdims[2]);
   count[0] = current.max_x - current.min_x;
   count[1] = current.max_y - current.min_y;
@@ -411,18 +416,6 @@ inline void NYXDataLoader::writeGroupData(
     field_index++;
   }
 
-  // create attribute 'format'
-  {
-    char strformat[] = "nyx-lyaf";
-    hid_t type = H5Tcopy(H5T_C_S1);
-    int32_t len = strlen(strformat);
-    H5Tset_size(type, len);
-    hid_t ds = H5Screate(H5S_SCALAR);
-
-    hid_t attribute_id = H5Acreate(in_file_id, "format", type, ds, H5P_DEFAULT, H5P_DEFAULT);
-    H5Awrite(attribute_id, type, &strformat);
-    H5Aclose(attribute_id);
-  }
 
   // step 3: write fields related data
   hid_t filespace = H5Dget_space(dset_id[0]);
@@ -507,6 +500,9 @@ inline int NYXDataLoader::writeData(std::string in_filename) {
 
   hid_t file_id = H5Fcreate(in_filename.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, plist_id);
 
+  // write native field data
+  // important: we assume here that dimensions and offset per rank
+  // are (and should normally be) identical for all datasets (native or derived)
   fileDims[0] = origDims[0];
   fileDims[1] = origDims[1];
   fileDims[2] = origDims[2];
@@ -524,14 +520,88 @@ inline int NYXDataLoader::writeData(std::string in_filename) {
 
   log << "count " << count[0] << ", " << count[1] << ", " << count[2] << std::endl;
   log << "offset "<< offset[0] << ", " << offset[1] << ", " << offset[2] << std::endl;
+  
+  // create attribute 'format'
+  {
+    char strformat[] = "nyx-lyaf";
+    hid_t type = H5Tcopy(H5T_C_S1);
+    int32_t len = strlen(strformat);
+    H5Tset_size(type, len);
+    hid_t ds = H5Screate(H5S_SCALAR);
 
-  // call writeGroupHere with the right args
+    hid_t attribute_id = H5Acreate(file_id, "format", type, ds, H5P_DEFAULT, H5P_DEFAULT);
+    H5Awrite(attribute_id, type, &strformat);
+    H5Aclose(attribute_id);
+  }
+
+  // write native fields datasets with the right args
   writeGroupData(file_id, filespace, memspace, defaultGroup, count, offset);
+
+  // write uncompressed derived fields datasets
+  for (auto&& dataset : groupsData) {
+
+    // filespace and memspace should be the same as for native fields 
+    writeGroupData(file_id, filespace, memspace, dataset.first, count, offset);
+  }
 
   H5Sclose(filespace);
   H5Sclose(memspace);
   H5Pclose(plist_id);
   H5Fclose(file_id);
+}
+
+// pass other fields to output HDF5 file
+// - process datasets in the first place
+// - process single attributes values then
+bool NYXDataLoader::loadUncompressedFields(nlohmann::json const& jsonInput) {
+
+  std::string filename = jsonInput["input"]["filename"];
+  std::ifstream checkfile(filename);
+  if (not checkfile.good()) {
+    log << "Error: unable to load file: " << filename << std::endl;
+    checkfile.close();
+    return false;
+  }
+  checkfile.close(); 
+
+  hid_t file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+
+  // 1. register scalars to be forwarded
+  std::map<std::string, std::vector<std::string>> scalars;
+  std::vector<std::string> values;
+
+  // parse fields to be stored
+  auto const& uncompressed_fields = jsonInput["input"]["uncompressed"];
+  for (auto&& entry : uncompressed_fields) { 
+    // check if group of data fields
+    if (entry.find("group") not_eq entry.end()) {
+      std::string const& name = entry["group"];
+      for (auto&& field : entry["scalars"]) {
+        scalars[name].push_back(field);
+      }
+    } else if (entry.find("value") not_eq entry.end()) {
+      std::string const& name = entry["value"];
+      values.push_back(name);
+    }
+  } 
+
+  // 2. load them
+  log << "Loading group datasets:" << std::endl;
+  if (not scalars.empty()) {
+    for (auto&& entry : scalars) {
+      auto const& group = entry.first;
+      for (auto&& field : entry.second) {
+        log << "- current field: /" << group << "/" << field << std::endl;
+        loadGroupDataSet(file, group, field);
+      }
+    }
+  }
+  H5Fclose(file);
+  scalars.clear();
+  values.clear();
+
+  // 3. write them
+  return true;
 }
 
 #endif

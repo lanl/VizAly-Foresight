@@ -19,31 +19,28 @@ Authors:
 #include "gioData.hpp"
 
 
-class DataLoaderInterface
-{
-  protected:
+class DataLoaderInterface {
+
+protected:
 	std::string loader;
 	std::string filename;
-	bool saveData;
-
-	int origNumDims;
-	
-	size_t origDims[5]{ 0,0,0,0,0 };
-	size_t sizePerDim[5]{ 0,0,0,0,0 };	// For compression
-
-	size_t rankOffset[3];
-
 	std::string dataType;
 	std::string param;
-	size_t elemSize;				// size in bytes of that parameter
-
-	size_t totalNumberOfElements;	// total number of particles for input file
-	size_t numElements;				// number of particles for that mpi rank
-
-	MPI_Comm comm;
 	std::stringstream log;
 
-  public:   // TO_CHANGE
+	bool saveData;
+	int origNumDims;
+
+	size_t origDims[5]{ 0,0,0,0,0 };
+	size_t sizePerDim[5]{ 0,0,0,0,0 };	// For compression
+	size_t rankOffset[3];
+	size_t elemSize;				            // size in bytes of that parameter
+	size_t totalNumberOfElements;	      // total number of particles for input file
+	size_t numElements;				          // number of particles for that mpi rank
+
+	MPI_Comm comm;
+
+public:   // TO_CHANGE
 	void *data;
 	
 	std::unordered_map<std::string, std::string> loaderParams;
@@ -57,6 +54,7 @@ class DataLoaderInterface
 	virtual int saveInputFileParameters() = 0;
 	virtual int close() = 0;
 	virtual void setParam(std::string paramName, std::string type, std::string value) = 0;
+  virtual bool loadUncompressedFields(nlohmann::json const& jsonInput) = 0;
 
 	size_t getNumElements() { return numElements; }
 	size_t * getSizePerDim() { return sizePerDim; }
@@ -79,7 +77,9 @@ inline std::string DataLoaderInterface::getDataInfo()
 	dataInfo << "Param: " << param << std::endl;
 	dataInfo << "dataType: " << dataType << std::endl;
 	dataInfo << "numElements: " << numElements << std::endl;
-	dataInfo << "sizePerDim: " << sizePerDim[0] << " " << sizePerDim[1] << " " << sizePerDim[2] << " " << sizePerDim[3] << " " << sizePerDim[4] << std::endl;
+	dataInfo << "sizePerDim: " << sizePerDim[0] << " " << sizePerDim[1] 
+           << " " << sizePerDim[2] << " " << sizePerDim[3] << " " 
+           << sizePerDim[4] << std::endl;
 
 	return dataInfo.str();
 }

@@ -187,14 +187,13 @@ int main(int argc, char *argv[]) {
   else if (inputFileType == "HACC")
     ioMgr = new HACCDataLoader();
 #ifdef CBENCH_HAS_NYX
-    else if (inputFileType == "NYX")
-    {
+    else if (inputFileType == "NYX") {
       ioMgr = new NYXDataLoader();
-      if (inputFileType == "NYX")
-        if (jsonInput["input"].find("group") != jsonInput["input"].end())
-        {
+      if (inputFileType == "NYX") {
+        if (jsonInput["input"].find("group") != jsonInput["input"].end()) {
           ioMgr->setParam("group","string",jsonInput["input"]["group"]);
         }
+      }
     }
 #endif
   else {
@@ -471,11 +470,20 @@ int main(int argc, char *argv[]) {
 
 
     if (writeData) {
-      debuglog << "Write data .... \n";
 
 
       Timer clockWrite;
       clockWrite.start();
+
+      // EDIT: load and write uncompressed fields here
+      #if CBENCH_HAS_NYX
+        debuglog << "\nLoading uncompressed fields" << std::endl;
+        ioMgr->loadUncompressedFields(jsonInput);
+        //debuglog << ioMgr->getLog();
+        MPI_Barrier(MPI_COMM_WORLD);
+      #endif
+
+      debuglog << "Write data .... \n";
 
       // Pass data that was not compressed
       for (int i = 0; i < ioMgr->inOutData.size(); i++) {
@@ -485,6 +493,7 @@ int main(int argc, char *argv[]) {
           ioMgr->close();
         }
       }
+
 
 
       std::string decompressedOutputName;
