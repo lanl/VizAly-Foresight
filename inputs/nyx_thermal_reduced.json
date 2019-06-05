@@ -7,24 +7,14 @@
     "scalars-comment":"which scalars to test",
     "group" : "native_fields",
     "scalars":[
-      "baryon_density",
-      "dark_matter_density",
-      "temperature",
-      "velocity_x",
-      "velocity_y",
-      "velocity_z"
+      "baryon_density"
     ],
     "uncompressed": [
       {
         "group": "derived_fields",
         "scalars": [
           "HI_number_density",
-          "HeIII_number_density",
-          "tau_local",
-          "tau_real",
-          "tau_red",
-          "tau_red_heii",
-          "taubeta_red"
+          "HeIII_number_density"
         ]
       },
       {
@@ -52,22 +42,22 @@
           },
           {
             "name": "omega_b",
-            "type": "double",
+            "type": "double"
             "size": 1
           },
           {
             "name": "omega_l",
-            "type": "double",
+            "type": "double"
             "size": 1
           },
           {
             "name": "omega_m",
-            "type": "double",
+            "type": "double"
             "size": 1
           },
           {
             "name": "redshift",
-            "type": "double",
+            "type": "double"
             "size": 1
           }
         ]
@@ -84,37 +74,6 @@
   },
   "compressor-comment":"which compressors to test",
   "compressors":[
-    {
-      "name":"BigCrunch",
-      "compressor-params":[
-        {
-          "scalar":[
-            "baryon_density",
-            "dark_matter_density",
-            "temperature"
-          ],
-          "tolerance": 1E-3
-        },
-        {
-          "scalar":[
-            "velocity_x",
-            "velocity_y",
-            "velocity_z"
-          ],
-          "tolerance": 1E-3
-        }
-      ]
-    },
-    {
-      "name":"fpzip",
-      "bits":16
-    },
-    {
-      "name":"Isabela",
-      "tolerance":1,
-      "pcnt":50,
-      "window-size":1024
-    },
     {
       "name":"SZ",
       "compressor-params":[
@@ -136,34 +95,6 @@
             "velocity_z"
           ],
           "tolerance":0.01
-        }
-      ]
-    },
-    {
-      "name":"zfp",
-      "compressor-params":[
-        {
-          "scalar":[
-            "baryon_density",
-            "dark_matter_density"
-          ],
-          "abs":0.028
-        },
-        {
-          "scalar":"temperature",
-          "abs":70
-        },
-        {
-          "scalar":"velocity_x",
-          "abs":0.063
-        },
-        {
-          "scalar":"velocity_y",
-          "abs":0.04
-        },
-        {
-          "scalar":"velocity_z",
-          "abs":0.039
         }
       ]
     }
