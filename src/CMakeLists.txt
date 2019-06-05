@@ -32,7 +32,7 @@ set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
 # NYX Loader
 set(HDF5_INCLUDE_DIRS )
 
-option(CBENCH_ENABLE_NYX_LOADER "Enables the reading of NyX HDF5 data" ON )
+option(CBENCH_ENABLE_NYX_LOADER "Enables the reading of NyX HDF5 data" OFF )
 if (CBENCH_ENABLE_NYX_LOADER)
   set(HDF5_USE_STATIC_LIBRARIES ON)
   
