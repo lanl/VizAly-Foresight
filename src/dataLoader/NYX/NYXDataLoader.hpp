@@ -346,33 +346,32 @@ inline herr_t NYXDataLoader::loadAttribute(
   std::string param_name = "/" + in_group_name + "/" + in_attrib_name;
   log << "attrib_name: " << param_name << std::endl; 
 
-  hid_t dataset   = H5Dopen(in_file, in_group_name.c_str(), H5P_DEFAULT);
-  hid_t attrib_id = H5Aopen(dataset, param_name.c_str(), H5P_DEFAULT);
+  hid_t group_id  = H5Gopen(in_file, in_group_name.c_str(), H5P_DEFAULT); 
+  hid_t attrib_id = H5Aopen(group_id, in_attrib_name.c_str(), H5P_DEFAULT);
   hid_t datatype  = H5Aget_type(attrib_id); 
-  hid_t dataspace = H5Aget_space(attrib_id);
-  //int ndims       = H5Sget_simple_extent_dims(dataspace, adims, NULL); 
-  //H5S_class_t dataclass = H5Sget_simple_extent_type(dataspace);
 
   std::string type = "";
+  size_t size_per_dim[] = {1, 1, 1};  // arbitrary
+
   switch (H5Tget_class(datatype)) {
     case H5T_INTEGER: type = "int"; break;
     case H5T_FLOAT:   type = "double"; break;
+    case H5T_STRING:  type = "string"; break;
     default: throw std::runtime_error("Bad group attribute type"); 
   } 
 
-  size_t size_per_dim[] = { 0,0,0 };  // arbitrary
-  // read and store the group attribute
+  // set up and uncompressed data object
   auto& group_data = groupsAttribs[in_group_name];
   group_data.emplace_back(in_attrib_name, type, num_elems, size_per_dim); 
   auto& current_attrib = group_data.back();
-  current_attrib.allocateMem();
+  assert(current_attrib.allocateMem());
+  assert(current_attrib.data != nullptr);
+  // read and store the group attribute
   herr_t status = H5Aread(attrib_id, datatype, current_attrib.data);
 
-  H5Aclose(dataspace);
-  H5Aclose(datatype);
+  H5Tclose(datatype);
   H5Aclose(attrib_id);
-  H5Dclose(dataset);
-
+  H5Gclose(group_id);
   return status;
 }
 
@@ -632,8 +631,6 @@ inline bool NYXDataLoader::loadUncompressedFields(nlohmann::json const& jsonInpu
     if (entry.find("scalars") != entry.end()) {
       // first handle group datasets
       for (std::string field : entry["scalars"]) {
-        //scalars[name].push_back(field);
-        //std::string const field_name = field;
         std::string const full_name = "/"+ group +"/"+ field; 
         log << "\tField: "<< full_name << std::endl;
         if (loadGroupDataSet(file, group, field) < 0) {
@@ -653,12 +650,11 @@ inline bool NYXDataLoader::loadUncompressedFields(nlohmann::json const& jsonInpu
         
         std::string const full_name = "/"+ group +"/"+ name; 
         log << "\tAttribute: "<< full_name << std::endl;
-        /*
+        
         if (loadAttribute(file, group, name, size) < 0) {
           log << "\tError while loading attribute: " << full_name << std::endl;
           return false;
         }
-        */
       }
     }
   } 
