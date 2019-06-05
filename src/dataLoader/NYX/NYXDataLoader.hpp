@@ -163,6 +163,7 @@ class NYXDataLoader : public DataLoaderInterface {
   std::vector<UncompressedData> toWriteData;
   // group data: key=group, value:array of field data
   std::unordered_map<std::string, std::vector<UncompressedData>> groupsData;
+  std::unordered_map<std::string, std::vector<UncompressedData>> groupsAttribs;
 
 public:
    NYXDataLoader() { loader = "NYX"; saveData = false; }
@@ -195,6 +196,11 @@ private:
     hid_t const& in_file,
     std::string const& in_group_name,
     std::string const& in_field_name
+  );
+
+  herr_t loadAttribute(
+    hid_t const& in_file, std::string const& in_group_name, 
+    std::string const& in_attrib_name, int num_elems = 1 
   );
 };
 
@@ -265,7 +271,7 @@ inline herr_t NYXDataLoader::loadGroupDataSet(
   hid_t dataset   = H5Dopen(in_file, param_name.c_str(), H5P_DEFAULT);
   hid_t dataspace = H5Dget_space(dataset);
 
-    int ndims = H5Sget_simple_extent_dims(dataspace, tdims, NULL);
+  int ndims = H5Sget_simple_extent_dims(dataspace, tdims, NULL);
 //  log << "origDims:("<< origDims[0] <<", "<< origDims[1] <<", "<< origDims[2] <<")"<< std::endl;
 //  log << "tdims:("<< (unsigned) tdims[0] <<", "<< (unsigned) tdims[1] <<", "<< (unsigned) tdims[2] <<")"<< std::endl;
 
@@ -280,7 +286,6 @@ inline herr_t NYXDataLoader::loadGroupDataSet(
       << " | totalNumberOfElements " << totalNumberOfElements << std::endl;
 
   // Read only a subset of the file
-  // FIXME: Bug here for "derived_fields"
   Partition current = getPartition(myRank, numRanks, tdims[0], tdims[1], tdims[2]);
   count[0] = current.max_x - current.min_x;
   count[1] = current.max_y - current.min_y;
@@ -328,6 +333,46 @@ inline herr_t NYXDataLoader::loadGroupDataSet(
   herr_t status = H5Dread(dataset, native_datatype, memspace, dataspace, H5P_DEFAULT, storage);
 
   H5Dclose(dataset);
+  return status;
+}
+
+// (!) attributes may be scalars or arrays of any datatype
+inline herr_t NYXDataLoader::loadAttribute(
+  hid_t const& in_file, std::string const& in_group_name, 
+  std::string const& in_attrib_name, int num_elems 
+) {
+
+  assert(num_elems > 0);
+  std::string param_name = "/" + in_group_name + "/" + in_attrib_name;
+  log << "attrib_name: " << param_name << std::endl; 
+
+  hid_t dataset   = H5Dopen(in_file, in_group_name.c_str(), H5P_DEFAULT);
+  hid_t attrib_id = H5Aopen(dataset, param_name.c_str(), H5P_DEFAULT);
+  hid_t datatype  = H5Aget_type(attrib_id); 
+  hid_t dataspace = H5Aget_space(attrib_id);
+  //int ndims       = H5Sget_simple_extent_dims(dataspace, adims, NULL); 
+  //H5S_class_t dataclass = H5Sget_simple_extent_type(dataspace);
+
+  std::string type = "";
+  switch (H5Tget_class(datatype)) {
+    case H5T_INTEGER: type = "int"; break;
+    case H5T_FLOAT:   type = "double"; break;
+    default: throw std::runtime_error("Bad group attribute type"); 
+  } 
+
+  size_t size_per_dim[] = { 0,0,0 };  // arbitrary
+  // read and store the group attribute
+  auto& group_data = groupsAttribs[in_group_name];
+  group_data.emplace_back(in_attrib_name, type, num_elems, size_per_dim); 
+  auto& current_attrib = group_data.back();
+  current_attrib.allocateMem();
+  herr_t status = H5Aread(attrib_id, datatype, current_attrib.data);
+
+  H5Aclose(dataspace);
+  H5Aclose(datatype);
+  H5Aclose(attrib_id);
+  H5Dclose(dataset);
+
   return status;
 }
 
@@ -553,12 +598,12 @@ inline int NYXDataLoader::writeData(std::string in_filename) {
 // pass other fields to output HDF5 file
 // - process datasets in the first place
 // - process single attributes values then
-bool NYXDataLoader::loadUncompressedFields(nlohmann::json const& jsonInput) {
+inline bool NYXDataLoader::loadUncompressedFields(nlohmann::json const& jsonInput) {
 
   std::string filename = jsonInput["input"]["filename"];
   std::ifstream checkfile(filename);
   if (not checkfile.good()) {
-    log << "Error: unable to load file: " << filename << std::endl;
+    log << "\tError: unable to load file: " << filename << std::endl;
     checkfile.close();
     return false;
   }
@@ -566,39 +611,82 @@ bool NYXDataLoader::loadUncompressedFields(nlohmann::json const& jsonInput) {
 
   hid_t file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 
+  /*struct Metadata {
+    std::string name;
+    std::string type;
+    int size;
+  };
+
   // 1. register scalars to be forwarded
-  std::map<std::string, std::vector<std::string>> scalars;
-  std::vector<std::string> values;
+  std::unordered_map<std::string, std::vector<std::string>> scalars;
+  std::unordered_map<std::string, std::vector<Metadata>> attribs;
+*/
 
   // parse fields to be stored
   auto const& uncompressed_fields = jsonInput["input"]["uncompressed"];
   for (auto&& entry : uncompressed_fields) { 
-    // check if group of data fields
-    if (entry.find("group") not_eq entry.end()) {
-      std::string const& name = entry["group"];
-      for (auto&& field : entry["scalars"]) {
-        scalars[name].push_back(field);
+    log << "Loading uncompressed group data:" << std::endl;
+    assert(entry.find("group") != entry.end());
+    std::string const& group = entry["group"];
+
+    if (entry.find("scalars") != entry.end()) {
+      // first handle group datasets
+      for (std::string field : entry["scalars"]) {
+        //scalars[name].push_back(field);
+        //std::string const field_name = field;
+        std::string const full_name = "/"+ group +"/"+ field; 
+        log << "\tField: "<< full_name << std::endl;
+        if (loadGroupDataSet(file, group, field) < 0) {
+          log << "\tError while loading dataset: " << full_name << std::endl;
+          return false;
+        }
       }
-    } else if (entry.find("value") not_eq entry.end()) {
-      std::string const& name = entry["value"];
-      values.push_back(name);
+    } else if (entry.find("attributes") != entry.end()) {
+      // then handle group attributes
+      for (auto&& attribute : entry["attributes"]) {
+/*        attribs[name].emplace_back(
+          attribute["name"], attribute["type"], attribute["size"]
+        );*/
+        std::string const& name = attribute["name"];
+        std::string const& type = attribute["type"];
+        int const size = attribute["size"];
+        
+        std::string const full_name = "/"+ group +"/"+ name; 
+        log << "\tAttribute: "<< full_name << std::endl;
+        /*
+        if (loadAttribute(file, group, name, size) < 0) {
+          log << "\tError while loading attribute: " << full_name << std::endl;
+          return false;
+        }
+        */
+      }
     }
   } 
 
+/*
   // 2. load them
   log << "Loading group datasets:" << std::endl;
-  if (not scalars.empty()) {
-    for (auto&& entry : scalars) {
-      auto const& group = entry.first;
-      for (auto&& field : entry.second) {
-        log << "- current field: /" << group << "/" << field << std::endl;
-        loadGroupDataSet(file, group, field);
-      }
+  for (auto&& entry : scalars) {
+    auto const& group = entry.first;
+    for (auto&& field : entry.second) {
+      log << "- current field: /" << group << "/" << field << std::endl;
+      loadGroupDataSet(file, group, field);
     }
   }
+
+  // 3. load attributes
+  log << "Loading group attributes" << std::endl;
+  for (auto&& entry : attribs) {
+    auto const& group = entry.first;
+    for (auto&& attrib : entry.second) {
+      log << "- current attribute: /" << group << "/" << attrib << std::endl;
+    }
+  }
+*/
+
   H5Fclose(file);
-  scalars.clear();
-  values.clear();
+  //scalars.clear();
+  //values.clear();
 
   // 3. write them
   return true;
