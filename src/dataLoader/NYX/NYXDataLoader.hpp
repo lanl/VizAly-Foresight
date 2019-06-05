@@ -186,6 +186,11 @@ public:
 private:
   hid_t getNativeDataType(std::string const& dataType) const;
 
+  void writeGroupAttrib(
+    hid_t& in_file_id,
+    std::string const& in_group_name
+  );
+
   void writeGroupData(
     hid_t& in_file_id, hid_t& in_filespace, hid_t& in_memspace,
     std::string const& in_group_name, 
@@ -390,9 +395,12 @@ inline int NYXDataLoader::saveCompData(std::string paramName, void *cData) {
   return 1;
 }
 
+// TODO: replace it by a lookup table
 inline hid_t NYXDataLoader::getNativeDataType(std::string const& dataType) const {
 
-  if (dataType == "float") {
+  if (dataType == "int") {
+    return H5T_NATIVE_INT;
+  } else if (dataType == "float") {
     return H5T_NATIVE_FLOAT;
   } else if (dataType == "double") {
     return H5T_NATIVE_DOUBLE;
@@ -416,6 +424,62 @@ inline hid_t NYXDataLoader::getNativeDataType(std::string const& dataType) const
     throw std::runtime_error("Bad data type");
   }
 }
+
+// write group attribute
+inline void NYXDataLoader::writeGroupAttrib(
+  hid_t& in_file_id, std::string const& in_group_name
+) {
+
+  // either default group or not
+  auto& group_attrib = groupsAttribs[in_group_name];
+  assert(not group_attrib.empty());
+
+  // create a HDF5 group
+  hid_t group = H5Gcreate2(
+    in_file_id, ("/" + in_group_name).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT
+  );
+
+  auto write = [](hid_t const& attrib, hid_t const& datatype, auto& item) {
+    // export the given attribute data of arbitrary type
+    return (datatype == H5T_NATIVE_INT ? H5Awrite(attrib, datatype, (int*) item.data) :
+           (datatype == H5T_NATIVE_DOUBLE ? H5Awrite(attrib, datatype, (double*) item.data) :
+                                            H5Awrite(attrib, datatype, (char*) item.data)));
+  };
+
+  // write each attribute of the group
+  for (auto&& item : group_attrib) {
+    hid_t dataspace;
+    hid_t attrib;
+
+    // retrieve attribute meta-data 
+    std::string const& dataname = item.paramName;  
+    hid_t const datatype = getNativeDataType(item.dataType);
+    hsize_t const dims[] = { item.numElements };
+    bool const is_array  = (dims[0] > 1);
+
+    // set right dataspace 
+    if (is_array) {
+      dataspace = H5Screate(H5S_SIMPLE);
+      H5Sset_extent_simple(dataspace, 1, dims, NULL);
+      attrib = H5Acreate(group, dataname.c_str(), datatype, dataspace, H5P_DEFAULT, H5P_DEFAULT); 
+    } else {
+      assert(datatype == H5T_NATIVE_INT or datatype == H5T_NATIVE_DOUBLE);
+      dataspace = H5Screate(H5S_SCALAR);
+      attrib = H5Acreate(group, dataname.c_str(), datatype, dataspace, H5P_DEFAULT, H5P_DEFAULT);
+    }
+    // write it
+    herr_t const status = write(attrib, datatype, item);
+    log << "\twriting attrib: /" << in_group_name << "/" << item.paramName
+        << ", status: " << (status == -1) << std::endl;
+     
+    H5Aclose(attrib);
+    H5Sclose(dataspace);
+  }
+  
+  H5Gclose(group);
+  log << "Attributes writing finished for: " << in_group_name << std::endl; 
+}
+
 
 // no need to pass data_type, as well as group uncompressed data vector
 inline void NYXDataLoader::writeGroupData(
@@ -583,9 +647,12 @@ inline int NYXDataLoader::writeData(std::string in_filename) {
 
   // write uncompressed derived fields datasets
   for (auto&& dataset : groupsData) {
-
     // filespace and memspace should be the same as for native fields 
     writeGroupData(file_id, filespace, memspace, dataset.first, count, offset);
+  }
+
+  for (auto&& group_attrib : groupsAttribs) {
+    writeGroupAttrib(file_id, group_attrib.first);
   }
 
   H5Sclose(filespace);
