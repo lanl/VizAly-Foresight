@@ -30,28 +30,22 @@ add_library(GenericIO STATIC "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO
 set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # NYX Loader
-set(HDF5_INCLUDE_DIRS )
-
-option(CBENCH_ENABLE_NYX_LOADER "Enables the reading of NyX HDF5 data" OFF )
+option(CBENCH_ENABLE_NYX_LOADER "Enables the reading of NyX HDF5 data" OFF)
 if (CBENCH_ENABLE_NYX_LOADER)
-  set(HDF5_USE_STATIC_LIBRARIES ON)
-  
-  # FIXME
-  set(HDF5_FOUND TRUE)
+    set(HDF5_USE_STATIC_LIBRARIES ON)
+    find_package(HDF5 REQUIRED)
 
-  # It still link to the wrong library, and no cmake config file is found
-  #find_package(HDF5 PATHS ${HDF5_DIR} NO_DEFAULT_PATH REQUIRED)
-	if(HDF5_FOUND)
-    message( "HDF5_INCLUDE_DIRS: " ${HDF5_INCLUDE_DIRS} )
-		include_directories(${HDF5_INCLUDE_DIRS})
-		set (EXTRA_LIBS ${EXTRA_LIBS} ${HDF5_LIBRARIES} )
-		add_definitions (-DCBENCH_HAS_NYX)
-	  # include right NYX data loader header file
-    include_directories(${CMAKE_SOURCE_DIR}/dataLoader/NYX)
-	else()
-    message(FATAL_ERROR "HDF5 library not found")
-  endif()
-endif()
+    if (HDF5_FOUND)
+        message(STATUS "HDF5_INCLUDE_DIRS: " ${HDF5_INCLUDE_DIRS})
+        include_directories(${HDF5_INCLUDE_DIRS})
+        set(EXTRA_LIBS ${EXTRA_LIBS} ${HDF5_LIBRARIES})
+        add_definitions(-DCBENCH_HAS_NYX)
+        # include NYX data loader file here
+        include_directories(${CMAKE_SOURCE_DIR}/dataLoader/NYX)
+    else ()
+        message(FATAL_ERROR "HDF5 library not found")
+    endif ()
+endif ()
     
 
 # Creates header file, compressorIncludes.h, with all available compressors

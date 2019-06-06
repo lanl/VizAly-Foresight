@@ -1,7 +1,7 @@
 #! /bin/bash
 
 num_ranks=4
-project="$EXASKY_HOME/cbench"  # update if needed 
+project="$(pwd)/.."
 build_dir=$project/build
 input_dir=$project/inputs
 script_dir=$project/scripts
@@ -14,7 +14,7 @@ clean() {
 }
 
 build() {
-  cd "$project" && source build.sh
+  cd "$project" && source buildAll.sh
 }
 
 run() {
