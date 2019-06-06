@@ -1,0 +1,506 @@
+{
+	"version-comment": "1.1: Each compressor has its params",
+	"version": 1.1,
+
+	"input": {
+		"filetype-comment": "type of file to load; HACC or NYX",
+		"filetype": "HACC",
+
+		"filename-comment": "name of input file",
+		"filename": "/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP499/m000.full.mpicosmo.499",
+
+		"scalars-comment": "which scalars to test",
+		"scalars": ["x", "y", "z"]
+	},
+
+	"output": {
+		"output-decompressed": false,
+
+		"logfname-comment": "name of output log file",
+		"logfname": "runlog_HACC_HACC_499__m_fpzip_isabela_zfp_SZ_BC_",
+
+		"metricsfname-comment": "name of file with output",
+		"metricsfname": "metrics_HACC_499__m_fpzip_isabela_zfp_SZ_BC_"
+	},
+
+	"compressor-comment": "which compressors to test and parameters for that compressor",
+	"compressors": [
+		{
+			"name": "SZ",
+			"abs": 1E-2
+		},
+
+		{
+			"name": "SZ",
+			"abs": 1E-3
+		},
+
+		{
+			"name": "SZ",
+			"abs": 1E-4
+		},
+
+		{
+			"name": "SZ",
+			"abs": 1E-5
+		},
+
+		{
+			"name": "SZ",
+			"abs": 1E-6
+		},
+
+
+
+		{
+			"name": "SZ",
+			"abs": 2E-2
+		},
+
+		{
+			"name": "SZ",
+			"abs": 2E-3
+		},
+
+		{
+			"name": "SZ",
+			"abs": 2E-4
+		},
+
+		{
+			"name": "SZ",
+			"abs": 2E-5
+		},
+
+		{
+			"name": "SZ",
+			"abs": 2E-6
+		},
+
+
+		{
+			"name": "SZ",
+			"abs": 3E-2
+		},
+
+		{
+			"name": "SZ",
+			"abs": 3E-3
+		},
+
+		{
+			"name": "SZ",
+			"abs": 3E-4
+		},
+
+		{
+			"name": "SZ",
+			"abs": 3E-5
+		},
+
+		{
+			"name": "SZ",
+			"abs": 3E-6
+		},
+
+
+
+		{
+			"name": "SZ",
+			"abs": 4E-2
+		},
+
+		{
+			"name": "SZ",
+			"abs": 4E-3
+		},
+
+		{
+			"name": "SZ",
+			"abs": 4E-4
+		},
+
+		{
+			"name": "SZ",
+			"abs": 4E-5
+		},
+
+		{
+			"name": "SZ",
+			"abs": 4E-6
+		},
+
+
+		{
+			"name": "zfp",
+			"tolerance": 1E-2
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 1E-6
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 1E-4
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 1E-5
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 1E-6
+		},
+
+
+		{
+			"name": "zfp",
+			"tolerance": 2E-2
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 2E-6
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 2E-4
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 2E-5
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 2E-6
+		},
+
+
+		{
+			"name": "zfp",
+			"tolerance": 3E-2
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 3E-6
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 3E-4
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 3E-5
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 3E-6
+		},
+
+
+
+
+		{
+			"name": "zfp",
+			"tolerance": 4E-2
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 4E-6
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 4E-4
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 4E-5
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 4E-6
+		},
+
+
+
+		{
+			"name": "zfp",
+			"tolerance": 5E-2
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 5E-6
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 5E-4
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 5E-5
+		},
+
+		{
+			"name": "zfp",
+			"tolerance": 5E-6
+		},
+
+
+
+		
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-02,
+			"pcnt" : 20
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-02,
+			"pcnt" : 30
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-02,
+			"pcnt" : 40
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-02,
+			"pcnt" : 50
+		},
+
+
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-03,
+			"pcnt" : 20
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-03,
+			"pcnt" : 30
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-03,
+			"pcnt" : 40
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-03,
+			"pcnt" : 50
+		},
+
+
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-04,
+			"pcnt" : 20
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-04,
+			"pcnt" : 30
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-04,
+			"pcnt" : 40
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-04,
+			"pcnt" : 50
+		},
+
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-05,
+			"pcnt" : 20
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-05,
+			"pcnt" : 30
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-05,
+			"pcnt" : 40
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-05,
+			"pcnt" : 50
+		},
+
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-06,
+			"pcnt" : 20
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-06,
+			"pcnt" : 30
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-06,
+			"pcnt" : 40
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-06,
+			"pcnt" : 50
+		},
+
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-07,
+			"pcnt" : 20
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-07,
+			"pcnt" : 30
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-07,
+			"pcnt" : 40
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-07,
+			"pcnt" : 50
+		},
+
+
+		{
+			"name": "BigCrunch",
+			"tolerance": 1E-2
+		},
+
+		{
+			"name": "BigCrunch",
+			"tolerance": 1E-3
+		},
+
+		{
+			"name": "BigCrunch",
+			"tolerance": 1E-4
+		},
+
+		{
+			"name": "BigCrunch",
+			"tolerance": 1E-5
+		},
+
+		{
+			"name": "BigCrunch",
+			"tolerance": 1E-6
+		},
+
+
+
+		{
+			"name" : "fpzip",
+			"bits" : 18
+		},
+	
+		{
+			"name" : "fpzip",
+			"bits" : 19
+		},
+	
+		{
+			"name" : "fpzip",
+			"bits" : 20
+		},
+	
+		{
+			"name" : "fpzip",
+			"bits" : 21
+		},
+	
+		{
+			"name" : "fpzip",
+			"bits" : 22
+		},
+
+		{
+			"name" : "fpzip",
+			"bits" : 23
+		},
+	
+		{
+			"name" : "fpzip",
+			"bits" : 24
+		},
+	
+		{
+			"name" : "fpzip",
+			"bits" : 25
+		},
+	
+		{
+			"name" : "fpzip",
+			"bits" : 26
+		},
+	
+		{
+			"name" : "fpzip",
+			"bits" : 27
+		}
+	],
+
+	"metrics-comment": "which metrics to use",
+	"metrics": [
+		"absolute_error",
+		"mse",
+		"psnr"
+	]
+}

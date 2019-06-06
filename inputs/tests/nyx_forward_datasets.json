@@ -1,0 +1,55 @@
+{
+  "input":{
+    "filetype-comment":"type of file to load; HACC or NYX",
+    "filetype":"NYX",
+    "filename-comment":"name of input file",
+    "filename":"/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z54.hdf5",
+    "scalars-comment":"which scalars to test",
+    "group" : "native_fields",
+    "scalars":[
+      "baryon_density"
+    ],
+    "uncompressed": [
+      {
+        "group": "derived_fields",
+        "scalars": [
+          "HI_number_density",
+          "HeIII_number_density",
+          "tau_local",
+          "tau_red",
+          "tau_red_heii",
+          "taubeta_red"
+        ]
+      }
+    ]
+  },
+  "output":{
+    "output-decompressed":true,
+    "output-prefix":"_nyx_forward_datasets",
+    "logfname-comment":"name of output log file",
+    "logfname":"runlog_nyx_forward_datasets",
+    "metricsfname-comment":"name of file with output",
+    "metricsfname":"metrics_nyx_forward_datasets"
+  },
+  "compressor-comment":"which compressors to test",
+  "compressors":[
+    {
+      "name":"SZ",
+      "compressor-params":[
+        {
+          "scalar": "baryon_density",
+          "abs":0.01
+        }
+      ]
+    }
+  ],
+  "metrics-comment":"which metrics to use",
+  "metrics":[
+    {
+      "name":"relative_error"
+    },
+    {
+      "name":"psnr"
+    }
+  ]
+}

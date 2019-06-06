@@ -38,6 +38,9 @@ cmake ../src \
 	-DFPZIP_LIBRARY=$projectPath/ExternalDependencies/fpzip-1.2.0/lib/libfpzip.a \
 	-DCBENCH_ENABLE_ISABELA=ON \
 	-DISABELA_INCLUDE_PATH=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/include \
-	-DISABELA_LIBRARY=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a
+	-DISABELA_LIBRARY=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
+    -DHDF5_INCLUDE_DIRS=$projectPath/ExternalDependencies/hdf5/install/include \
+    -DHDF5_LIBRARIES=$projectPath/ExternalDependencies/hdf5/install/lib/libhdf5.so
+
 make -j
 

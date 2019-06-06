@@ -1,0 +1,79 @@
+{
+	"input" :
+	{
+		"filetype-comment" : "type of file to load; HACC or NYX",
+		"filetype" : "HACC",
+
+		"filename-comment": "name of input file",
+		"filename": "/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP499/m000.full.mpicosmo.499",
+
+		"scalars-comment" : "which scalars to test",
+		"scalars" : ["x", "y", "z"]
+	},
+
+	"output" :
+	{
+		"output-decompressed" : false,
+
+		"logfname-comment": "name of output log file",
+		"logfname" : "runlog_HACC_mpicosmo.499_all_",
+
+		"metricsfname-comment": "name of file with output",
+		"metricsfname" : "metrics_HACC_mpicosmo.499_all_"
+	},
+
+	"compressor-comment" : "which compressors to test",
+	"compressors" : 
+	[
+		{
+			"name" : "BLOSC"
+		},
+
+		{
+			"name" : "BigCrunch",
+			"tolerance": 1E-5
+		},
+
+		{
+			"name" : "SZ",
+			"abs": 3E-3
+		},
+
+		{
+			"name" : "fpzip",
+			"bits" : 26
+		},
+
+		{
+			"name" : "zfp",
+			"tolerance" : 7E-3
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance": 1e-03,
+			"pcnt" : 50,
+			"window-size" : 2048
+		}
+	],
+
+	"metrics-comment" : "which metrics to use",
+	"metrics": [
+		{
+			"name" : "absolute_error",
+			"histogram" : ["x", "y", "z"]
+		},
+
+		{
+			"name" : "relative_error"
+		},
+
+		{
+			"name" : "mse"
+		},
+
+		{
+			"name" : "psnr"
+		}
+	]
+}

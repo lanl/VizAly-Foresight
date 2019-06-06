@@ -32,12 +32,14 @@ class Memory
 
 	void GetMemorySize(unsigned long &size, unsigned long &rss);
 
-  public:
+public:
 	Memory();
 	~Memory() {};
 
 	void start();
 	void stop();
+
+
 
 	unsigned long getMemorySizeInB() { return usage_size; }
 	double getMemorySizeInKB() { return usage_size / 1024.0; }
@@ -51,8 +53,26 @@ class Memory
 	unsigned long getMemoryRSSInB() { return usage_rss; }
 	double getMemoryRSSInKB() { return usage_rss / 1024.0; }
 	double getMemoryRSSInMB() { return usage_rss / (1024.0 * 1024.0); }
+
+  // static data and methods
+  static std::map<std::string, size_t> sizeOf;
+
+  static bool allocate(void*& data, std::string datatype, size_t num_elems=1, int offset=0);
+  static bool release(void*& data, std::string datatype);
 };
 
+/* static*/ std::map<std::string, size_t> Memory::sizeOf = {
+  {   "float", sizeof(float)},
+  {  "double", sizeof(double)},
+  {  "int8_t", sizeof(int8_t)},
+  { "int16_t", sizeof(int16_t)},
+  { "int32_t", sizeof(int32_t)},
+  { "int64_t", sizeof(int64_t)},
+  { "uint8_t", sizeof(uint8_t)},
+  {"uint16_t", sizeof(uint16_t)},
+  {"uint32_t", sizeof(uint32_t)},
+  {"uint64_t", sizeof(uint64_t)}
+};
 
 inline Memory::Memory()
 {
@@ -76,6 +96,66 @@ inline void Memory::stop()
 	usage_rss = after_rss - before_rss;
 }
 
+inline bool Memory::allocate(
+  void*& data, std::string datatype, size_t num_elems, int offset
+) {
+  if (datatype == "float")
+    data = new float[num_elems + offset];
+  else if (datatype == "double")
+    data = new double[num_elems + offset];
+  else if (datatype == "int8_t")
+    data = new int8_t[num_elems + offset];
+  else if (datatype == "int16_t")
+    data = new int16_t[num_elems + offset];
+  else if (datatype == "int32_t")
+    data = new int32_t[num_elems + offset];
+  else if (datatype == "int64_t")
+    data = new int64_t[num_elems + offset];
+  else if (datatype == "uint8_t")
+    data = new uint8_t[num_elems + offset];
+  else if (datatype == "uint16_t")
+    data = new uint16_t[num_elems + offset];
+  else if (datatype == "uint32_t")
+    data = new uint32_t[num_elems + offset];
+  else if (datatype == "uint64_t")
+    data = new uint64_t[num_elems + offset];
+  else
+    return false;
+
+  return true;
+}
+
+inline bool Memory::release(void*& data, std::string datatype) {
+
+  if (data == nullptr) // already deallocated!
+    return true;
+
+  if (datatype == "float")
+    delete[](float *) data;
+  else if (datatype == "double")
+    delete[](double *) data;
+  else if (datatype == "int8_t")
+    delete[](int8_t *) data;
+  else if (datatype == "int16_t")
+    delete[](int16_t *) data;
+  else if (datatype == "int32_t")
+    delete[](int32_t *) data;
+  else if (datatype == "int64_t")
+    delete[](int64_t *) data;
+  else if (datatype == "uint8_t")
+    delete[](uint8_t *) data;
+  else if (datatype == "uint16_t")
+    delete[](uint16_t *) data;
+  else if (datatype == "uint32_t")
+    delete[](uint32_t *) data;
+  else if (datatype == "uint64_t")
+    delete[](uint64_t *) data;
+  else
+    return false;
+
+  data = nullptr;
+  return true;
+}
 
 inline double Memory::getMemoryInUseInB()
 {
