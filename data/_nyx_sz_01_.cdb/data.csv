@@ -1,4 +1,4 @@
-Compressor_field__params, relative_error, Max Compress Time(s), Min Compression Throughput(MB/s), Min DeCompression Throughput(MB/s), Compression Ratio,FILE_SimStats_Pk,FILE_lya_all_axes_x_Pk,FILE_lya_all_axes_y_Pk,FILE_lya_all_axes_z_Pk
+Compressor_field__params, relative_error, Max Compression Throughput(MB/s), Max DeCompression Throughput(MB/s), Max Compress Time(s), Min Compression Throughput(MB/s), Min DeCompression Throughput(MB/s), Compression Ratio,FILE_SimStats_Pk,FILE_lya_all_axes_x_Pk,FILE_lya_all_axes_y_Pk,FILE_lya_all_axes_z_Pk
 BLOSC_baryon_density__, 0, 113.59, 1137.42, 0.362524, 88.2699, 1004.97, 1.21874,sim_stats_rhob.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
 BLOSC_dark_matter_density__, 0, 115.949, 1089.63, 0.424845, 75.3216, 929.542, 1.08031,sim_stats_rhodm.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
 BLOSC_temperature__, 0, 110.497, 1494.8, 0.31598, 101.272, 1171.99, 1.26586,sim_stats_temp.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
