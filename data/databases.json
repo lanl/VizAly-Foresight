@@ -3,7 +3,7 @@
 		"name" : "Metrics (Feb 4, 2019)",
 		"directory" : "data/metrics.cdb"
 	},
-	
+
 	{
 		"name" : "Metrics (Feb 7, 2019)",
 		"directory" : "data/metrics2.cdb"
@@ -59,4 +59,13 @@
 		"directory" : "data/metricsThermal2048.cdb"
 	},
 
+    {
+		"name" : "NYX_SZ",
+		"directory" : "data/_nyx_sz_01_.cdb"
+	},
+
+    {
+		"name" : "NYX_fpzip",
+		"directory" : "data/_NYX_fpzip_.cdb"
+	}
 ]
