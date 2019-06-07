@@ -10,7 +10,7 @@
 
 class SZCompressor: public CompressorInterface
 {
-    
+
   public:
     SZCompressor();
     ~SZCompressor();
@@ -28,7 +28,7 @@ inline SZCompressor::SZCompressor()
 
 inline SZCompressor::~SZCompressor()
 {
-    
+
 }
 
 
@@ -45,7 +45,7 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
 			numel *= n[i];
 
 	Timer cTime; cTime.start();
-	SZ_Init(NULL); 
+	SZ_Init(NULL);
 
 	int mode = PW_REL; // Default by Sheng, PW_REL = 10
 	std::string _mode = "PW_REL";
@@ -81,9 +81,9 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
 			// Unknown mode, just fill in input to SZ
 		}
 
-	std::uint64_t csize = 0;
+	std::size_t csize = 0;
 	std::uint8_t *cdata = SZ_compress_args(SZ_FLOAT, static_cast<float *>(input), &csize, mode, absTol, relTol, powerTol, n[4], n[3], n[2], n[1], n[0]);
-	
+
 	output = cdata;
 	cTime.stop();
 
@@ -106,7 +106,7 @@ inline int SZCompressor::decompress(void *&input, void *&output, std::string dat
 
 	Timer dTime; dTime.start();
 	output = SZ_decompress(SZ_FLOAT, static_cast<std::uint8_t *>(input), cbytes, n[4], n[3], n[2], n[1], n[0]);
-	dTime.stop(); 
+	dTime.stop();
 
 	std::free(input);	input=NULL;
 
