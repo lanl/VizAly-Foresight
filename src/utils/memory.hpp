@@ -17,6 +17,10 @@ Authors:
 #include <unistd.h>
 #endif // Linux
 
+#if defined(__APPLE__) && defined(__MACH__)
+#include <mach/mach.h>
+#endif
+
 #if defined(WIN32)
 #include <windows.h>
 #include "psapi.h" //MSVC Performance query
@@ -184,7 +188,6 @@ inline double Memory::getMemoryInUseInMB()
 
 
 #if defined(__unix__) || defined(__unix) || defined(unix)
-
 // From VisIt avt/Pipeline/Pipeline/avtMemory.cpp
 inline void Memory::GetMemorySize(unsigned long &size, unsigned long &rss)
 {
@@ -205,9 +208,7 @@ inline void Memory::GetMemorySize(unsigned long &size, unsigned long &rss)
 	rss  *= (unsigned long)getpagesize();
 	fclose(file);
 }
-#endif	// Linux
-
-#if defined(WIN32)
+#elif defined(WIN32)
 inline void Memory::GetMemorySize(unsigned long &size, unsigned long &rss)
 {
 	//Virtual Memory by current process
@@ -221,6 +222,18 @@ inline void Memory::GetMemorySize(unsigned long &size, unsigned long &rss)
 	size = virtualMemUsedByMe;
 	rss = physMemUsedByMe;
 }
-#endif // Windows
+#elif defined(__APPLE__) && defined(__MACH__)
+inline void Memory::GetMemorySize(unsigned long &size, unsigned long &rss)
+{
+  struct mach_task_basic_info info;
+  mach_msg_type_number_t infoCount = MACH_TASK_BASIC_INFO_COUNT;
+  if ( task_info( mach_task_self( ), MACH_TASK_BASIC_INFO,
+                  (task_info_t)&info, &infoCount ) != KERN_SUCCESS )
+    rss = (size_t)0L;		/* Can't access? */
+
+  rss = (size_t) info.resident_size;
+  size = (size_t) info.virtual_size;
+}
+#endif
 
 #endif	// _MEM_H_2

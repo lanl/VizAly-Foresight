@@ -46,7 +46,7 @@ if (CBENCH_ENABLE_NYX_LOADER)
         message(FATAL_ERROR "HDF5 library not found")
     endif ()
 endif ()
-    
+
 
 # Creates header file, compressorIncludes.h, with all available compressors
 file(GLOB_RECURSE header_files "${CMAKE_SOURCE_DIR}/compressors/*/*.hpp")
@@ -70,7 +70,7 @@ foreach (dir ${subdir})
     if ("${dir}" MATCHES "\\.hpp$")
         continue()
     endif()
-    
+
     # Skip files ending in .md
     if ("${dir}" MATCHES "\\.md$")
         continue()
@@ -86,7 +86,7 @@ foreach (dir ${subdir})
         set_property(GLOBAL PROPERTY includeDirectories "")
         set_property(GLOBAL PROPERTY linkLibraries "")
         set_property(GLOBAL PROPERTY definitions "")
-        
+
         add_subdirectory(${dir})
 
         #include directories to add
@@ -108,12 +108,12 @@ endforeach()
 find_package(MPI)
 if (MPI_FOUND)
     include_directories(${MPI_INCLUDE_PATH})
-    set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
-    set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
+    set(CMAKE_CXX_COMPILE_FLAGS "${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS}")
+    set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS}")
     SET(CMAKE_C_COMPILER mpicc)
     SET(CMAKE_CXX_COMPILER mpicxx)
 else()
-    message(FATAL_ERROR "Could not find any MPI installation!!!") 
+    message(FATAL_ERROR "Could not find any MPI installation!!!")
 endif()
 
 
@@ -134,9 +134,9 @@ target_link_libraries(CBench ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO)
 
 # Prevent in source builds since they are evil
 if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
-    message(FATAL_ERROR "In source build is not supported, please restore modified files, 
+    message(FATAL_ERROR "In source build is not supported, please restore modified files,
                         delete CMake generated things (CMakeFiles folder and CMakeCache.txt)
-                        , and build out of source") 
+                        , and build out of source")
 endif()
 
 
