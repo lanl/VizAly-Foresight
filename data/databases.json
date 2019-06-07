@@ -61,11 +61,11 @@
 
     {
 		"name" : "NYX_SZ",
-		"directory" : "data/_nyx_sz_01_.cdb"
+		"directory" : "data/nyx_sz_01_.cdb"
 	},
 
     {
 		"name" : "NYX_fpzip",
-		"directory" : "data/_NYX_fpzip_.cdb"
+		"directory" : "data/NYX_fpzip_.cdb"
 	}
 ]
