@@ -2,9 +2,8 @@ cmake_minimum_required(VERSION 3.6.2)
 
 project(CBench)
 
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel.")
-
 
 # add libs
 set (EXTRA_LIBS "")
@@ -18,9 +17,6 @@ include_directories(${CMAKE_SOURCE_DIR}/dataLoader)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader/Binary)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader/HACC)
 
-if(CBENCH_ENABLE_NYX_LOADER)
-	include_directories(${CMAKE_SOURCE_DIR}/dataLoader/NYX)
-endif()
 
 if(WIN32)
 	add_definitions(-DNOMINMAX)
@@ -34,21 +30,23 @@ add_library(GenericIO STATIC "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO
 set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # NYX Loader
-option(CBENCH_ENABLE_NYX_LOADER "Enables the reading of NyX HDF5 data" OFF )
+option(CBENCH_ENABLE_NYX_LOADER "Enables the reading of NyX HDF5 data" OFF)
 if (CBENCH_ENABLE_NYX_LOADER)
     set(HDF5_USE_STATIC_LIBRARIES ON)
+    find_package(HDF5 REQUIRED)
 
-    find_package(HDF5 REQUIRED COMPONENTS C)
-	if(HDF5_FOUND)
-		include_directories(${HDF5_INCLUDE_DIRS})
-		set (EXTRA_LIBS ${EXTRA_LIBS} ${HDF5_LIBRARIES} )
-		add_definitions (-DCBENCH_HAS_NYX)
+    if (HDF5_FOUND)
+        message(STATUS "HDF5_INCLUDE_DIRS: " ${HDF5_INCLUDE_DIRS})
+        include_directories(${HDF5_INCLUDE_DIRS})
+        set(EXTRA_LIBS ${EXTRA_LIBS} ${HDF5_LIBRARIES})
+        add_definitions(-DCBENCH_HAS_NYX)
+        # include NYX data loader file here
+        include_directories(${CMAKE_SOURCE_DIR}/dataLoader/NYX)
+    else ()
+        message(FATAL_ERROR "HDF5 library not found")
+    endif ()
+endif ()
 
-        include_directories("/usr/common/software/hdf5-parallel/1.10.1/gnu/include")
-        set (EXTRA_LIBS hdf5)
-	endif()
-endif()
-    
 
 # Creates header file, compressorIncludes.h, with all available compressors
 file(GLOB_RECURSE header_files "${CMAKE_SOURCE_DIR}/compressors/*/*.hpp")
@@ -72,7 +70,7 @@ foreach (dir ${subdir})
     if ("${dir}" MATCHES "\\.hpp$")
         continue()
     endif()
-    
+
     # Skip files ending in .md
     if ("${dir}" MATCHES "\\.md$")
         continue()
@@ -88,7 +86,7 @@ foreach (dir ${subdir})
         set_property(GLOBAL PROPERTY includeDirectories "")
         set_property(GLOBAL PROPERTY linkLibraries "")
         set_property(GLOBAL PROPERTY definitions "")
-        
+
         add_subdirectory(${dir})
 
         #include directories to add
@@ -110,12 +108,12 @@ endforeach()
 find_package(MPI)
 if (MPI_FOUND)
     include_directories(${MPI_INCLUDE_PATH})
-    set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
-    set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
+    set(CMAKE_CXX_COMPILE_FLAGS "${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS}")
+    set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS}")
     SET(CMAKE_C_COMPILER mpicc)
     SET(CMAKE_CXX_COMPILER mpicxx)
 else()
-    message(FATAL_ERROR "Could not find any MPI installation!!!") 
+    message(FATAL_ERROR "Could not find any MPI installation!!!")
 endif()
 
 
@@ -136,13 +134,12 @@ target_link_libraries(CBench ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO)
 
 # Prevent in source builds since they are evil
 if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
-    message(FATAL_ERROR "In source build is not supported, please restore modified files, 
+    message(FATAL_ERROR "In source build is not supported, please restore modified files,
                         delete CMake generated things (CMakeFiles folder and CMakeCache.txt)
-                        , and build out of source") 
+                        , and build out of source")
 endif()
 
 
-# Remove output files
-add_custom_target(clean-output
-    COMMAND rm -f *.log
-)
+# Build log folder
+add_custom_target(build-time-make-directory ALL COMMAND ${CMAKE_COMMAND} -E make_directory logs)
+

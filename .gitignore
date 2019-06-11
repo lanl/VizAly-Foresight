@@ -12,6 +12,7 @@ src/compressors/compressorIncludes.h
 build-*
 ExternalDependencies/
 cmake-build-*
+temp/
 
 # garbage files
 *.swp
@@ -100,7 +101,6 @@ cmake-build-*
 # workflow files
 analysisWorkflow/*/*
 
-CMakeLists.txt
 CMakeCache\.txt
 CMakeFiles/cmake\.check_cache
 src/CMakeLists.txt.cori

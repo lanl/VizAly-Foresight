@@ -1,0 +1,165 @@
+{
+	"project-home" : "/projects/exasky/VizAly-CBench/",
+
+  	"input": 
+  	{
+	    "filetype-comment": "type of file to load; HACC or NYX",
+	    "filetype": "NYX",
+
+	    
+	    "filename-comment": "name of input file",
+	    "filename": "../testing/data/z255_32.h5",
+
+	    "scalars-comment": "which scalars to test",
+	    "group" : "native_fields",
+	    "scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ],
+
+	    "uncompressed": 
+		[
+	  		{
+				"group": "domain",
+				"attributes": [
+			  		{
+						"name": "shape",
+						"type": "int",
+						"size": 3
+			  		},
+			  		{
+						"name": "size",
+						"type": "double",
+						"size": 3
+			  		}
+				]
+	  		},
+
+	  		{
+				"group": "universe",
+				"attributes": 
+				[
+					{
+						"name": "hubble",
+						"type": "double",
+						"size": 1 
+					},
+
+			  		{
+						"name": "omega_b",
+						"type": "double",
+						"size": 1
+			 		},
+
+			  		{
+						"name": "omega_l",
+						"type": "double",
+						"size": 1
+			  		},
+
+					{
+						"name": "omega_m",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "redshift",
+						"type": "double",
+						"size": 1
+					}
+				]
+	  		}
+		]
+  	},
+
+	"output" :
+	{
+		"run-path" : "build/",
+
+		"output-decompressed": true,
+		"output-decompressed-location" : "_NYX_TEST_",
+		
+		"logfname-comment": "name of output log file",
+		"logfname" : "runlog_NYX_all_",
+
+		"metricsfname-comment": "name of file with output",
+		"metricsfname" : "metrics_NYX_all_"
+	},
+
+	"compressor-comment" : "which compressors to test",
+	"compressors" : 
+	[
+		{
+			"name": "BLOSC",
+			"output-prefix" : "BLOSC_"
+		},
+
+		{
+			"name": "BigCrunch",
+			"output-prefix" : "BigCrunch_",
+			"tolerance": 1E-3
+		},
+
+		{
+            "name": "SZ",
+            "output-prefix" : "zfp_abs_002_",
+            "abs" : 2E-3
+		},
+
+		{
+			"name": "zfp",
+			"output-prefix" : "zfp_abs_001_",
+			"abs": 1E-3
+		}
+	],
+
+	"metrics-comment" : "which metrics to use",
+	"metrics": [
+		{
+			"name" : "absolute_error"
+		},
+
+		{
+			"name" : "relative_error"
+		},
+
+		{
+			"name" : "mse"
+		},
+
+		{
+			"name" : "psnr"
+		}
+	],
+
+
+	"simulation-analysis" :
+	{
+		"evn_path" : "/projects/exasky/HACC.darwin_analysis",
+		"analysis-folder" : "_nyx_test_",
+
+		"analysis-tool" :
+		{
+			"hdf5_path" : "/projects/exasky/hdf5/install/bin/",
+			"gimlet-home" : "/projects/exasky/gimlet2",
+
+			"analytics": 
+			[
+                {
+                    "name": "sim_stats", 
+                    "type" : ["rhob", "rhom", "rhodm", "temp", "velmag", "vz"],
+                    "postfix" : "_ps3d.txt",
+                    "path": "/projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex"
+                }, 
+                {
+                    "name": "lya_all_axes", 
+                    "type" : ["x", "y", "z"],
+                    "postfix" : "_flux_ps1d.txt",
+                    "path": "/projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex"
+                }
+            ]
+		},
+
+		"input-files" : [],
+
+		"analysis" : []
+	}
+}

@@ -7,7 +7,7 @@ Creates a ratio of different metrics used
 A sample input is specified in gimletInput.json
 
 
-## Questions:
+## Gimlet Fields
 /native_fields:
 * baryon_density
 * dark_matter_density
@@ -25,8 +25,8 @@ gimlet (sim_stats.ex) metrics:
 *    _vz_ps3d.txt - vz 
 
 
-### What is _rhom_ps3d.txt"
-Apps in gimlet:
+
+## Apps in gimlet to use:
 1. lya_all_axes (yes)
 2. lya_all_axes_rhoT
 3. master_pk
@@ -34,6 +34,10 @@ Apps in gimlet:
 5. process_gadget_lya
 6. sim_stats (yes)
 
-### Which app to use?
 
-Range of k: 0-10
+Range of k (x-axis) to plot : 0-10
+
+
+## Running:
+1. Create an input file in the inputs file folder (e.g. gimletAnalysis)
+2. Run gimletAnalysis as follows: python gimletAnalysis.py inputs/gimletAnalysis.py

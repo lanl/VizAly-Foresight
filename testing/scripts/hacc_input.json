@@ -1,0 +1,95 @@
+{
+	"project-home" : "",
+	
+	"input": 
+	{
+		"filetype": "HACC",
+		"filename": "../testing/data/m000.full.mpicosmo.50",
+		"scalars": ["x", "y", "z", "vx", "vy", "vz"]
+	},
+
+	"output" :
+	{
+		"run-path" : "build/",
+
+		"output-decompressed": true,
+		"output-decompressed-location" : "HACC_Travis_",
+		
+		"logfname" : "runlog_HACC_Travis_",
+		"metricsfname" : "metrics_HACC_Travis_"
+	},
+
+	"compressor-comment" : "which compressors to test",
+	"compressors" : 
+	[
+		{
+			"name": "BLOSC",
+			"output-prefix" : "BLOSC_HACC_"
+		},
+
+		{
+			"name": "SZ",
+			"output-prefix" : "SZ_HACC_pos_vel_",
+			"compressor-params" :
+			[
+				{
+					"scalar" : ["x", "y", "z"],
+					"abs" : 1E-3
+				},
+
+				{
+					"scalar" : ["vx", "vy", "vz"],
+					"pw_rel" : 1E-2
+				}
+			]
+		}
+	],
+
+	"metrics-comment" : "which metrics to use",
+	"metrics": [
+		{
+			"name" : "absolute_error"
+		},
+
+		{
+			"name" : "relative_error"
+		},
+
+		{
+			"name" : "mse"
+		},
+
+		{
+			"name" : "psnr"
+		}
+	],
+
+ 
+	"simulation-analysis" :
+	{
+		"evn_path" : "/projects/exasky/HACC.darwin_analysis",
+		"analysis-folder" : "HACC_Travis_",
+
+		"analysis-tool" :
+		{
+			"HACC-home" : "/projects/exasky/HACC",
+
+			"analytics": 
+			[
+				{
+					"name": "Halo-Finder", 
+					"path": "/projects/exasky/HACC/run/runHaloBatch__256_16_16__scaling.sh"
+				}, 
+				{
+					"name": "Power-Spectrum", 
+					"path": "/projects/exasky/HACC/run/runPowBatch__512_32_16_scaling.sh "
+				}
+			]
+		},
+
+		"input-files" : [],
+
+		"analysis" : []
+	}
+}
+

@@ -1,8 +1,11 @@
 {
+	"project-home" : "",
+
 	"input": {
 		"filetype-comment": "type of file to load; HACC or NYX",
 		"filetype": "HACC",
 
+		
 		"filename-comment": "name of input file",
 		"filename": "../testing/data/m000.full.mpicosmo.50",
 
@@ -11,7 +14,10 @@
 	},
 
 	"output": {
-		"output-decompressed": false,
+		"run-path" : "build/",
+
+		"output-decompressed": true,
+		"output-decompressed-location" : "HACC_All_",
 
 		"logfname-comment": "name of output log file",
 		"logfname": "runlog_HACC_all_",
@@ -23,12 +29,8 @@
 	"compressor-comment": "which compressors to test and parameters for that compressor",
 	"compressors": [
 		{
-			"name": "BLOSC"
-		},
-
-		{
-			"name": "BigCrunch",
-			"tolerance": 1E-3
+			"name": "BLOSC",
+			"output-prefix" : "BLOSC_"
 		},
 
 		{
@@ -37,12 +39,14 @@
             [
                 {
                     "scalar" : ["x", "y", "z"],
-                    "abs" : 2E-3
+                    "abs" : 2E-3,
+                    "output-prefix" : "SZ_pos_"
                 },
 
                 {
                     "scalar" : ["vx", "vy", "vz"],
-                    "tolerance" : 2E-2
+                    "pw_rel" : 1E-2,
+					"output-prefix" : "SZ_vel_"
                 }
             ]
 		},
@@ -59,7 +63,8 @@
 	],
 
 	"metrics-comment": "which metrics to use",
-	"metrics": [
+	"metrics": 
+	[
 		{
 			"name" : "absolute_error",
 			"histogram" : ["x", "y", "z"]
@@ -76,5 +81,33 @@
 		{
 			"name" : "psnr"
 		}
-	]
+	],
+
+
+	"simulation-analysis" :
+	{
+		"evn_path" : "/projects/exasky/HACC.darwin_analysis",
+		"analysis-folder" : "HACC_Test_",
+
+		"analysis-tool" :
+		{
+			"HACC-home" : "/projects/exasky/HACC",
+
+			"analytics": 
+			[
+				{
+					"name": "Halo-Finder", 
+					"path": "/projects/exasky/HACC/run/runHaloBatch__256_16_16__scaling.sh"
+				}, 
+				{
+					"name": "Power-Spectrum", 
+					"path": "/projects/exasky/HACC/run/runPowBatch__512_32_16_scaling.sh "
+				}
+			]
+		},
+
+		"input-files" : [],
+
+		"analysis" : []
+	}
 }

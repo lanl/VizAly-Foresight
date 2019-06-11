@@ -1,0 +1,8 @@
+#include "BLOSC/blosccompressor.hpp"
+#include "BigCrunch/BigCrunchcompressor.hpp"
+#include "Isabela/Isabelacompressor.hpp"
+#include "LossyWave/LossyWavecompressor.hpp"
+#include "MGARD/MGARDcompressor.hpp"
+#include "SZ/SZcompressor.hpp"
+#include "fpzip/fpzipcompressor.hpp"
+#include "zfp/zfpCompressor.hpp"
