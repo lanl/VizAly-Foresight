@@ -99,7 +99,6 @@ for arg in $*; do
 		buildOpt="osx"
 	fi
 
-	index = index+1
 done
  
 
@@ -111,6 +110,7 @@ if [ $buildPlatform = "cori" ]; then
 
 	opt = "-DCMAKE_C_FLAGS=-dynamic -DCMAKE_CXX_FLAGS=-dynamic "
 
+	mv CBench/CMakeLists.txt CBench/CMakeLists.txt.old
 	mv scripts/Cori.CMakeLists.txt CBench/CMakeLists.txt
 fi
 
