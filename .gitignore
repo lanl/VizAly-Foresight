@@ -101,7 +101,6 @@ temp/
 # workflow files
 analysisWorkflow/*/*
 
-CMakeLists.txt
 CMakeCache\.txt
 CMakeFiles/cmake\.check_cache
 src/CMakeLists.txt.cori

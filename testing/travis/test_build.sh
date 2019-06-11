@@ -13,13 +13,13 @@ source buildDependencies.sh	# build dependencies
 source build.sh				# build the code
 
 # run example
-mpirun -np 4 --allow-run-as-root ./CBench ../testing/hacc_input.json
-#mpirun -np 4 --allow-run-as-root ./CBench ../testing/nyx_input.json
+mpirun -np 4 --allow-run-as-root ./CBench ../testing/scripts/hacc_input.json
+mpirun -np 4 --allow-run-as-root ./CBench ../testing/scripts/nyx_input.json
 
 # Compare output with previous run
 python ../testing/travis/test_output.py
 
 # view output
-cat metrics_HACC_all_
+cat metrics_HACC_Travis_.csv
+cat metrics_NYX_Travis_.csv
 
-# 
