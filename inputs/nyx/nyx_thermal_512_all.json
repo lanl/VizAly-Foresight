@@ -52,22 +52,22 @@
           },
           {
             "name": "omega_b",
-            "type": "double"
+            "type": "double",
             "size": 1
           },
           {
             "name": "omega_l",
-            "type": "double"
+            "type": "double",
             "size": 1
           },
           {
             "name": "omega_m",
-            "type": "double"
+            "type": "double",
             "size": 1
           },
           {
             "name": "redshift",
-            "type": "double"
+            "type": "double",
             "size": 1
           }
         ]

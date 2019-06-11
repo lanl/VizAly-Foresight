@@ -1,0 +1,102 @@
+{
+	"project-home" : "",
+	
+	"input": 
+	{
+		"filetype": "NYX",
+		"filename": "../testing/data/z255_32.h5",
+
+		"scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ],
+		"group" : "native_fields"
+	},
+
+	"output" :
+	{
+		"run-path" : "build/",
+
+		"output-decompressed": false,
+		"output-decompressed-location" : "NYX_Travis_",
+		
+		"logfname" : "runlog_NYX_Travis_",
+		"metricsfname" : "metrics_NYX_Travis_"
+	},
+
+	"compressor-comment" : "which compressors to test",
+	"compressors" : 
+	[
+		{
+			"name": "BLOSC",
+			"output-prefix" : "BLOSC_"
+		},
+
+		{
+			"name": "SZ",
+			"output-prefix" : "SZ_",
+			"compressor-params" :
+			[
+				{
+					"scalar" : ["baryon_density", "dark_matter_density", "temperature"],
+					"abs" : 1E-3
+				},
+
+				{
+					"scalar" : ["velocity_x", "velocity_y", "velocity_z"],
+					"pw_rel" : 1E-2
+				}
+			]
+		}
+	],
+
+	"metrics-comment" : "which metrics to use",
+	"metrics": 
+	[
+		{
+			"name" : "absolute_error"
+		},
+
+		{
+			"name" : "relative_error"
+		},
+
+		{
+			"name" : "mse"
+		},
+
+		{
+			"name" : "psnr"
+		}
+	],
+
+
+	"simulation-analysis" :
+	{
+		"evn_path" : "/projects/exasky/HACC.darwin_analysis",
+		"analysis-folder" : "NYX_Travis_",
+
+		"analysis-tool" :
+		{
+			"hdf5_path" : "/projects/exasky/hdf5/install/bin/",
+			"gimlet-home" : "/projects/exasky/gimlet2",
+
+			"analytics": 
+			[
+				{
+					"name": "sim_stats", 
+					"type" : ["rhob", "rhom", "rhodm", "temp", "velmag", "vz"],
+					"postfix" : "_ps3d.txt",
+					"path": "/projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex"
+				}, 
+				{
+					"name": "lya_all_axes", 
+					"type" : ["x", "y", "z"],
+					"postfix" : "_flux_ps1d.txt",
+					"path": "/projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex"
+				}
+			]
+		},
+
+		"input-files" : [],
+
+		"analysis" : []
+	}
+}

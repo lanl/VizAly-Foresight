@@ -14,6 +14,21 @@ Authors:
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <sys/stat.h>
+
+
+inline int createFolder(std::string folderName)
+{
+    const int dir_err = mkdir(folderName.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    if (-1 == dir_err)
+    {
+        std::cout << "Could not create directory " << folderName << std::endl;
+        return 0;
+    }
+
+    return 1;
+}
+
 
 inline bool fileExisits(char *filename) 
 {
@@ -23,7 +38,7 @@ inline bool fileExisits(char *filename)
 
 
 
-bool isPowerOfTwo(int n) 
+inline bool isPowerOfTwo(int n) 
 { 
   	if (n == 0) 
     	return 0; 
@@ -38,7 +53,7 @@ bool isPowerOfTwo(int n)
 } 
 
 
-std::string extractFileName(std::string inputString)
+inline std::string extractFileName(std::string inputString)
 {
 	std::size_t pos = inputString.find_last_of("/\\");
 	return inputString.substr(pos+1); 

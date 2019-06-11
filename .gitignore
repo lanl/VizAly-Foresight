@@ -12,6 +12,7 @@ src/compressors/compressorIncludes.h
 build-*
 ExternalDependencies/
 cmake-build-*
+temp/
 
 # garbage files
 *.swp
