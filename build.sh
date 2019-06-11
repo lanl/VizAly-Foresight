@@ -8,9 +8,12 @@ buildOpt="Default"
 buildPlatform="Default"
 opts=""
 
+
 # Process arguments
-for arg in $*; do
-	echo $arg
+index=0
+for ((i=1; i<=$#; i++ )); do
+	arg=${!i}
+
 	#help
 	if [ $arg = "-h" ]; then
 
@@ -36,18 +39,22 @@ for arg in $*; do
 
 	# build location
 	if [ $arg = "--path" ]; then
-		echo "currently not working"
+		index=i
+		index=$((index+1))
+		buildDir=${!index}
 	fi
 
 	if [ $arg = "--clean" ]; then
-		next_arg=$((arg+1))
 		if  [ -z "$2" ]; then
 			echo "removing build"
 			rm -rf build
 		else
-			echo "currently not working"
-			echo "removing folder" $next_arg
-			rm -rf  $next_arg
+			index=i
+			index=$((index+1))
+			buildDir=${!index}
+
+			echo "removing folder" $buildDir
+			rm -rf $buildDir
 		fi
 		return
 	fi
@@ -59,9 +66,12 @@ for arg in $*; do
 			echo "removing build"
 			rm -rf build
 		else
-			echo "currently not working"
-			echo "removing folder" $next_arg
-			rm -rf  $next_arg
+			index=i
+			index=$((index+1))
+			buildDir=${!index}
+
+			echo "removing folder" $buildDir
+			rm -rf $buildDir
 		fi
 
 		rm -rf ExternalDependencies
@@ -99,6 +109,7 @@ for arg in $*; do
 		buildOpt="osx"
 	fi
 
+	index=$((index+1))
 done
  
 
