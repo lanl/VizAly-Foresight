@@ -1,180 +1,228 @@
 {
-  "input":{
-    "filetype-comment":"type of file to load; HACC or NYX",
-    "filetype":"NYX",
-    "filename-comment":"name of input file",
-    "filename":"/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z54.hdf5",
-    "scalars-comment":"which scalars to test",
-    "group" : "native_fields",
-    "scalars":[
-      "baryon_density",
-      "dark_matter_density",
-      "temperature",
-      "velocity_x",
-      "velocity_y",
-      "velocity_z"
-    ],
-    "uncompressed": [
-      {
-        "group": "derived_fields",
-        "scalars": [
-          "HI_number_density",
-          "HeIII_number_density",
-          "tau_local",
-          "tau_real",
-          "tau_red",
-          "tau_red_heii",
-          "taubeta_red"
-        ]
-      },
-      {
-        "group": "domain",
-        "attributes": [
-          {
-            "name": "shape",
-            "type": "int",
-            "size": 3
-          },
-          {
-            "name": "size",
-            "type": "double",
-            "size": 3
-          }
-        ]
-      },
-      {
-        "group": "universe",
-        "attributes": [
-          {
-            "name": "hubble",
-            "type": "double",
-            "size": 1 
-          },
-          {
-            "name": "omega_b",
-            "type": "double",
-            "size": 1
-          },
-          {
-            "name": "omega_l",
-            "type": "double",
-            "size": 1
-          },
-          {
-            "name": "omega_m",
-            "type": "double",
-            "size": 1
-          },
-          {
-            "name": "redshift",
-            "type": "double",
-            "size": 1
-          }
-        ]
-      }
-    ]
-  },
-  "output":{
-    "output-decompressed":true,
-    "output-prefix":"test_write",
-    "logfname-comment":"name of output log file",
-    "logfname":"runlog_nyx_thermal",
-    "metricsfname-comment":"name of file with output",
-    "metricsfname":"metrics_nyx_thermal"
-  },
-  "compressor-comment":"which compressors to test",
-  "compressors":[
-    {
-      "name":"BigCrunch",
-      "compressor-params":[
-        {
-          "scalar":[
-            "baryon_density",
-            "dark_matter_density",
-            "temperature"
-          ],
-          "tolerance": 1E-3
-        },
-        {
-          "scalar":[
-            "velocity_x",
-            "velocity_y",
-            "velocity_z"
-          ],
-          "tolerance": 1E-3
-        }
-      ]
-    },
-    {
-      "name":"fpzip",
-      "bits":16
-    },
-    {
-      "name":"Isabela",
-      "tolerance":1,
-      "pcnt":50,
-      "window-size":1024
-    },
-    {
-      "name":"SZ",
-      "compressor-params":[
-        {
-          "scalar":[
-            "baryon_density",
-            "dark_matter_density"
-          ],
-          "abs":0.01
-        },
-        {
-          "scalar":"temperature",
-          "abs":20
-        },
-        {
-          "scalar":[
-            "velocity_x",
-            "velocity_y",
-            "velocity_z"
-          ],
-          "tolerance":0.01
-        }
-      ]
-    },
-    {
-      "name":"zfp",
-      "compressor-params":[
-        {
-          "scalar":[
-            "baryon_density",
-            "dark_matter_density"
-          ],
-          "abs":0.028
-        },
-        {
-          "scalar":"temperature",
-          "abs":70
-        },
-        {
-          "scalar":"velocity_x",
-          "abs":0.063
-        },
-        {
-          "scalar":"velocity_y",
-          "abs":0.04
-        },
-        {
-          "scalar":"velocity_z",
-          "abs":0.039
-        }
-      ]
-    }
-  ],
-  "metrics-comment":"which metrics to use",
-  "metrics":[
-    {
-      "name":"relative_error"
-    },
-    {
-      "name":"psnr"
-    }
-  ]
+	"project-home" : "/projects/exasky/VizAly-CBench/",
+
+	"input": 
+	{
+		"run-path" : "/projects/exasky/VizAly-CBench/build/",
+
+		"filetype-comment": "type of file to load; HACC or NYX",
+		"filetype": "NYX",
+
+		"filename-comment": "name of input file",
+		"filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z54.hdf5",
+
+		"scalars-comment": "which scalars to test",
+		"group": "native_fields",
+		"scalars": 
+		[
+			"baryon_density",
+			"dark_matter_density",
+			"temperature",
+			"velocity_x",
+			"velocity_y",
+			"velocity_z"
+		],
+
+		"uncompressed": 
+		[
+			{
+				"group": "domain",
+				"attributes": [{
+						"name": "shape",
+						"type": "int",
+						"size": 3
+					},
+					{
+						"name": "size",
+						"type": "double",
+						"size": 3
+					}
+				]
+			},
+			{
+				"group": "universe",
+				"attributes": [{
+						"name": "hubble",
+						"type": "double",
+						"size": 1
+					},
+					{
+						"name": "omega_b",
+						"type": "double",
+						"size": 1
+					},
+					{
+						"name": "omega_l",
+						"type": "double",
+						"size": 1
+					},
+					{
+						"name": "omega_m",
+						"type": "double",
+						"size": 1
+					},
+					{
+						"name": "redshift",
+						"type": "double",
+						"size": 1
+					}
+				]
+			}
+		]
+	},
+
+	"output": 
+	{
+		"output-decompressed": true,
+		"output-decompressed-location": "NYX_512_z54_",
+
+		"logfname-comment": "name of output log file",
+		"logfname": "runlog_NYX_512_z54_",
+
+		"metricsfname-comment": "name of file with output",
+		"metricsfname": "metrics_NYX_512_z54_"
+	},
+	"compressor-comment": "which compressors to test",
+	"compressors": [{
+			"name": "BigCrunch",
+			"compressor-params": 
+			[
+				{
+					"scalar": [
+						"baryon_density",
+						"dark_matter_density",
+						"temperature"
+					],
+					"tolerance": 1E-3
+				},
+				{
+					"scalar": [
+						"velocity_x",
+						"velocity_y",
+						"velocity_z"
+					],
+					"tolerance": 1E-3
+				}
+			]
+		},
+
+		{
+			"name": "fpzip",
+			"bits": 16,
+			"output-prefix" : "fpzip_"
+		},
+		{
+			"name": "Isabela",
+			"output-prefix" : "Isabela_",
+			"tolerance": 1,
+			"pcnt": 50,
+			"window-size": 1024
+		},
+		{
+			"name": "SZ",
+			"output-prefix" : "SZ_",
+			"compressor-params": 
+			[
+				{
+					"scalar": [
+						"baryon_density",
+						"dark_matter_density"
+					],
+					"abs": 0.01
+				},
+				{
+					"scalar": "temperature",
+					"abs": 20
+				},
+				{
+					"scalar": [
+						"velocity_x",
+						"velocity_y",
+						"velocity_z"
+					],
+					"tolerance": 0.01
+				}
+			]
+		},
+		{
+			"name": "zfp",
+			"output-prefix" : "zfp_",
+			"compressor-params": 
+			[
+				{
+					"scalar": [
+						"baryon_density",
+						"dark_matter_density"
+					],
+					"abs": 0.028
+				},
+				{
+					"scalar": "temperature",
+					"abs": 70
+				},
+				{
+					"scalar": "velocity_x",
+					"abs": 0.063
+				},
+				{
+					"scalar": "velocity_y",
+					"abs": 0.04
+				},
+				{
+					"scalar": "velocity_z",
+					"abs": 0.039
+				}
+			]
+		}
+	],
+
+	"metrics-comment": "which metrics to use",
+	"metrics": 
+	[
+		{
+			"name": "relative_error"
+		},
+
+		{
+			"name": "psnr"
+		}
+	],
+
+	"simulation-analysis" :
+	{
+		"evn_path" : "/projects/exasky/HACC.darwin_setup",
+		"analysis-folder" : "NYX_512_z54_",
+		"plotting": {
+            "x-range": [
+                0, 
+                11
+            ]
+        }, 
+
+		"analysis-tool" :
+		{
+			"hdf5_path" : "/projects/exasky/hdf5/install/bin/",
+			"gimlet-home" : "/projects/exasky/gimlet2",
+
+			"analytics": 
+			[
+                {
+                    "name": "sim_stats", 
+                    "type" : ["rhob", "rhom", "rhodm", "temp", "velmag", "vz"],
+                    "postfix" : "_ps3d.txt",
+                    "path": "/projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex"
+                }, 
+                {
+                    "name": "lya_all_axes", 
+                    "type" : ["x", "y", "z"],
+                    "postfix" : "_flux_ps1d.txt",
+                    "path": "/projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex"
+                }
+            ]
+		},
+
+		"input-files" : [],
+
+		"analysis" : []
+	}
 }

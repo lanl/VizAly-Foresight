@@ -6,9 +6,8 @@
 	    "filetype-comment": "type of file to load; HACC or NYX",
 	    "filetype": "NYX",
 
-	    
 	    "filename-comment": "name of input file",
-	    "filename": "../testing/data/z255_32.h5",
+	    "filename": "/projects/exasky/pascal-projects/VizAly-CBench/testing/data/z255_32.h5",
 
 	    "scalars-comment": "which scalars to test",
 	    "group" : "native_fields",
@@ -72,10 +71,10 @@
 
 	"output" :
 	{
-		"run-path" : "build/",
+		"run-path" : "/projects/exasky/VizAly-CBench/build/",
 
 		"output-decompressed": true,
-		"output-decompressed-location" : "_NYX_TEST_",
+		"output-decompressed-location" : "NYX_TEST_",
 		
 		"logfname-comment": "name of output log file",
 		"logfname" : "runlog_NYX_all_",
@@ -91,13 +90,7 @@
 			"name": "BLOSC",
 			"output-prefix" : "BLOSC_"
 		},
-
-		{
-			"name": "BigCrunch",
-			"output-prefix" : "BigCrunch_",
-			"tolerance": 1E-3
-		},
-
+		
 		{
             "name": "SZ",
             "output-prefix" : "zfp_abs_002_",
@@ -133,8 +126,12 @@
 
 	"simulation-analysis" :
 	{
-		"evn_path" : "/projects/exasky/HACC.darwin_analysis",
-		"analysis-folder" : "_nyx_test_",
+		"evn_path" : "/projects/exasky/HACC.darwin_setup",
+		"analysis-folder" : "NYX_TEST_",
+		"plotting" :
+		{
+			"x-range" : [0, 11]
+		},
 
 		"analysis-tool" :
 		{

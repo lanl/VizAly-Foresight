@@ -1,16 +1,19 @@
 {
-  "input": {
-    "filetype-comment": "type of file to load; HACC or NYX",
-    "filetype": "NYX",
+	"project-home" : "/projects/exasky/VizAly-CBench/",
 
-    "filename-comment": "name of input file",
-    "filename": "/projects/exasky/data/NYX/highz/2048/NVB_C009_l40n2048_S12345T692_z42.hdf5",
+  	"input": 
+  	{
+    	"filetype-comment": "type of file to load; HACC or NYX",
+    	"filetype": "NYX",
+
+    	"filename-comment": "name of input file",
+    	"filename": "/projects/exasky/data/NYX/highz/2048/NVB_C009_l40n2048_S12345T692_z42.hdf5",
 
  
-    "scalars-comment": "which scalars to test",
-	"group" : "native_fields",
-    "scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ]
-  },
+    	"scalars-comment": "which scalars to test",
+		"group" : "native_fields",
+    	"scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ]
+  	},
 
 	"output" :
 	{

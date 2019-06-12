@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 import file_utilities as f
 import plot_utilities as p
-import job as j
+import Job as j
 
 
 class Analysis_Workflow:

@@ -7,7 +7,9 @@ md5_hashes = {
 	"metrics_HACC_Travis_.csv" : "75763e77c6880ab6c49bd1779d6aaa19",
 	"HACC_Travis_/BLOSC_HACC___m000.full.mpicosmo.50" : "5c31f4c4639788ae1d69ffeb36c859a4",
 	"HACC_Travis_/SZ_HACC_pos_vel___m000.full.mpicosmo.50" : "f8e1dd7a7aab0dca39440b80f3b733e9",
-	"metrics_NYX_Travis_.csv": "193eac46691fd68c73844b83118554df"
+	"metrics_NYX_Travis_.csv": "193eac46691fd68c73844b83118554df",
+	"NYX_Travis_/BLOSC___z255_32.h5" :  "403631b63e8c00678d7c22d2a2ef9fd4",
+	"NYX_Travis_/SZ___z255_32.h5" : "fd6f176f8e929180db4b2b94cb9166c5"
 }
 
 def computeMD5Hash(file):

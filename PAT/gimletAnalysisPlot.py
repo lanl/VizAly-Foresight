@@ -63,7 +63,8 @@ class Gimlet_Analysis(Analysis_Workflow):
 		for file in self.json_data['simulation-analysis']['input-files']:
 			if (file["output-prefix"] != "orig"):
 				break
-			
+		
+		"""	
 		# Copy uncompressed attributes from original to compressed; needed for gimlet
 		for file in self.json_data['simulation-analysis']['input-files']:
 			if (file["output-prefix"] != "orig"):
@@ -77,7 +78,7 @@ class Gimlet_Analysis(Analysis_Workflow):
 				# universe group
 				command = createCommand(hdf5_path, self.json_data['simulation-analysis']["input-files"][index_orig]["path"], file["path"], "/universe")
 				os.system(command)
-
+		"""
 
 		# Create Folder for analytics
 		path = os.getcwd()
