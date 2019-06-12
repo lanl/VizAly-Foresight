@@ -9,8 +9,8 @@ source /src/env.sh
 cd /src/VizAly-CBench
 projectPath=$(pwd)
 
-source buildDependencies.sh	# build dependencies
-source build.sh				# build the code
+source buildDependencies.sh	-all # build dependencies
+source build.sh	-all    	     # build the code
 
 # run example
 mpirun -np 4 --allow-run-as-root ./CBench ../testing/scripts/hacc_input.json
