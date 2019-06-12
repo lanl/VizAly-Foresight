@@ -62,7 +62,7 @@
   },
   "output": {
     "run-path": "build/",
-    "output-decompressed": false,
+    "output-decompressed": true,
     "output-decompressed-location": "NYX_Travis_",
     "logfname": "runlog_NYX_Travis_",
     "metricsfname": "metrics_NYX_Travis_"
