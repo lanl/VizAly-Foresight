@@ -33,26 +33,24 @@ def autoscale_y(ax,margin=0.1):
 
 
 
-def plotGraph(x, x_label, y_label, title, list_of_tuples):
-	fig = plt.figure()
-	ax = plt.subplot(1,1,1)
+def plotScatterGraph(x, x_label, y_label, title, path, x_range, list_of_tuples):
+    fig = plt.figure()
+    ax = plt.subplot(1,1,1)
 
-	plt.title(title)
-	plt.xlabel(x_label)
-	plt.ylabel(y_label)
-	plt.grid(True)
+    plt.title(title)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.grid(True)
 
-	marker = itertools.cycle(('o', 's', '*', 'P', 'D', 'X', 'v', 'H'))
+    marker = itertools.cycle(('o', 's', '*', 'P', 'D', 'X', 'v', 'H'))
 
-	for item in list_of_tuples:
-		ax.semilogx(x, item[0], label=item[1], marker=marker.next())
-		ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.00), shadow=True, ncol=2)
+    for item in list_of_tuples:
+        ax.semilogx(x, item[0], label=item[1], marker=marker.next())
+        ax.legend(bbox_to_anchor=[1.05,1],loc='upper left',borderaxespad=0)
 
-	plt.xlim(0, 12)
+    plt.xlim(x_range[0], x_range[1])
 
-	
-
-	fig = plt.gcf()
-	autoscale_y(ax)
-	plt.show()
-	fig.savefig(title + '.png', dpi=100)
+    fig = plt.gcf()
+    autoscale_y(ax)
+    plt.show()
+    fig.savefig(path +'/' + title + '.png', dpi=100, bbox_inches="tight")

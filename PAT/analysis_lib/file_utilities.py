@@ -3,6 +3,17 @@
 import sys, os, json, csv
 
 
+def list_files_in_folder(folder):
+	files = []
+
+	# r=root, d=directories, f = files
+	for r, d, f in os.walk(folder):
+		for file in f:
+			files.append(file)
+
+	return files
+
+
 
 def create_folder(path):
 	try:  
@@ -13,7 +24,6 @@ def create_folder(path):
 		print ("Successfully created the directory %s " % path)
 
 
-
 def validate_num_args(num_arguments, min_count):
 	if num_arguments < min_count:
 		print ("At least " + str(min_count) + " arguments are needed!")
@@ -22,17 +32,15 @@ def validate_num_args(num_arguments, min_count):
 	return True
 
 
-
 def splitString(filename, char):
 	k = filename.rfind(char)
 	return filename[:k+1], filename[k+1:]
 
 
-
 def extract_csv_col(filename, delimiter_char, colpos):
 	if ( not os.path.isfile(filename) ):
 		print( filename + " does not exist! ")
-		exit(1)
+		return None
 
 	with open(filename) as csv_file:
 		try:
@@ -46,6 +54,7 @@ def extract_csv_col(filename, delimiter_char, colpos):
 		except ValueError, e:
 			print ("CSV file " + filename + " is invalid! " + e)
 			exit(1)
+	
 		
 
 
@@ -53,7 +62,7 @@ def read_json(filename):
 	# Check if file exists
 	if ( not os.path.isfile(filename) ):
 		print( filename + " does not exist! ")
-		exit(1)
+		return None
 		
 	# Open json file
 	with open(filename, "r") as read_file:
@@ -62,4 +71,6 @@ def read_json(filename):
 			return json_data
 		except ValueError, e:
 			print ("Json file " + filename + " is invalid! " + e)
-			exit(1)
+			return None
+
+
