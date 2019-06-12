@@ -293,9 +293,7 @@ inline herr_t NYXDataLoader::loadGroupDataSet(
 	hid_t dataset   = H5Dopen(in_file, param_name.c_str(), H5P_DEFAULT);
 	hid_t dataspace = H5Dget_space(dataset);
 
-	int ndims = H5Sget_simple_extent_dims(dataspace, tdims, NULL);
-//  log << "origDims:("<< origDims[0] <<", "<< origDims[1] <<", "<< origDims[2] <<")"<< std::endl;
-//  log << "tdims:("<< (unsigned) tdims[0] <<", "<< (unsigned) tdims[1] <<", "<< (unsigned) tdims[2] <<")"<< std::endl;
+	H5Sget_simple_extent_dims(dataspace, tdims, NULL);
 
 	origDims[0] = tdims[0];
 	origDims[1] = tdims[1];
@@ -484,8 +482,8 @@ inline void NYXDataLoader::writeGroupAttrib(
 
 	// create a HDF5 group
 	hid_t group = H5Gcreate2(
-					  in_file_id, ("/" + in_group_name).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT
-				  );
+		in_file_id, ("/" + in_group_name).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT
+	);
 
 	auto write = [](hid_t const & attrib, hid_t const & datatype, auto & item)
 	{
@@ -529,6 +527,9 @@ inline void NYXDataLoader::writeGroupAttrib(
 		H5Sclose(dataspace);
 	}
 
+	// clear it to avoid duplicated attribute writing on next compressor
+	group_attrib.clear();
+
 	H5Gclose(group);
 	log << "Attributes writing finished for: " << in_group_name << std::endl;
 }
@@ -551,8 +552,8 @@ inline void NYXDataLoader::writeGroupData(
 	// step 1: initialization
 	// retrieve group fields data
 	auto& group_data = (
-						   in_group_name == defaultGroup ? toWriteData : groupsData[in_group_name]
-					   );
+		in_group_name == defaultGroup ? toWriteData : groupsData[in_group_name]
+	);
 
 	assert(not group_data.empty());
 	int const num_fields = group_data.size();
@@ -560,8 +561,8 @@ inline void NYXDataLoader::writeGroupData(
 
 	// create a HDF5 group
 	hid_t group = H5Gcreate2(
-					  in_file_id, ("/" + in_group_name).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT
-				  );
+		in_file_id, ("/" + in_group_name).c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT
+	);
 
 	// step 2: create metadata
 	int field_index = 0;
@@ -571,9 +572,10 @@ inline void NYXDataLoader::writeGroupData(
 		hid_t data_type = getNativeDataType(item.dataType);
 
 		dset_id[field_index] = H5Dcreate(
-								   in_file_id, fieldname.c_str(), data_type, in_filespace,
-								   H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT
-							   );
+			in_file_id, fieldname.c_str(), data_type, in_filespace,
+			H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT
+    );
+
 		auto const status = (dset_id[field_index] == -1);
 		log << "creating fieldname" << fieldname << ", status: " << status << std::endl;
 		field_index++;
@@ -595,8 +597,8 @@ inline void NYXDataLoader::writeGroupData(
 		auto write = [&](auto * data)
 		{
 			herr_t const status = H5Dwrite(
-									  dset_id[field_index], data_type, in_memspace, filespace, plist_id, data
-								  );
+				dset_id[field_index], data_type, in_memspace, filespace, plist_id, data
+			);
 
 			log << "writing field: " << item.paramName
 				<< ", status: " << (status == -1) << std::endl
@@ -762,17 +764,6 @@ inline bool NYXDataLoader::loadUncompressedFields(nlohmann::json const& jsonInpu
 
 	hid_t file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 
-	/*struct Metadata {
-	  std::string name;
-	  std::string type;
-	  int size;
-	};
-
-	// 1. register scalars to be forwarded
-	std::unordered_map<std::string, std::vector<std::string>> scalars;
-	std::unordered_map<std::string, std::vector<Metadata>> attribs;
-	*/
-
 	// parse fields to be stored
 	auto const& uncompressed_fields = jsonInput["input"]["uncompressed"];
 	for (auto && entry : uncompressed_fields)
@@ -800,9 +791,6 @@ inline bool NYXDataLoader::loadUncompressedFields(nlohmann::json const& jsonInpu
 			// then handle group attributes
 			for (auto && attribute : entry["attributes"])
 			{
-				/*        attribs[name].emplace_back(
-						  attribute["name"], attribute["type"], attribute["size"]
-						);*/
 				std::string const& name = attribute["name"];
 				std::string const& type = attribute["type"];
 				int const size = attribute["size"];
@@ -819,32 +807,7 @@ inline bool NYXDataLoader::loadUncompressedFields(nlohmann::json const& jsonInpu
 		}
 	}
 
-	/*
-	  // 2. load them
-	  log << "Loading group datasets:" << std::endl;
-	  for (auto&& entry : scalars) {
-		auto const& group = entry.first;
-		for (auto&& field : entry.second) {
-		  log << "- current field: /" << group << "/" << field << std::endl;
-		  loadGroupDataSet(file, group, field);
-		}
-	  }
-
-	  // 3. load attributes
-	  log << "Loading group attributes" << std::endl;
-	  for (auto&& entry : attribs) {
-		auto const& group = entry.first;
-		for (auto&& attrib : entry.second) {
-		  log << "- current attribute: /" << group << "/" << attrib << std::endl;
-		}
-	  }
-	*/
-
 	H5Fclose(file);
-	//scalars.clear();
-	//values.clear();
-
-	// 3. write them
 	return true;
 }
 
