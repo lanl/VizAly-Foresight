@@ -66,6 +66,7 @@ public:
 };
 
 /* static*/ std::map<std::string, size_t> Memory::sizeOf = {
+  {   "int", sizeof(int)},
   {   "float", sizeof(float)},
   {  "double", sizeof(double)},
   {  "int8_t", sizeof(int8_t)},
@@ -103,7 +104,9 @@ inline void Memory::stop()
 inline bool Memory::allocate(
   void*& data, std::string datatype, size_t num_elems, int offset
 ) {
-  if (datatype == "float")
+  if (datatype == "int")
+    data = new int[num_elems + offset];
+  else if (datatype == "float")
     data = new float[num_elems + offset];
   else if (datatype == "double")
     data = new double[num_elems + offset];
@@ -134,7 +137,9 @@ inline bool Memory::release(void*& data, std::string datatype) {
   if (data == nullptr) // already deallocated!
     return true;
 
-  if (datatype == "float")
+  if (datatype == "int")
+    delete[](int *) data;
+  else if (datatype == "float")
     delete[](float *) data;
   else if (datatype == "double")
     delete[](double *) data;
