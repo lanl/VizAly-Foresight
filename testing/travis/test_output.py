@@ -4,19 +4,22 @@ import os.path
 from os import path
 
 md5_hashes = {
-	"metrics_HACC_Travis_.csv" : "75763e77c6880ab6c49bd1779d6aaa19",
-	"HACC_Travis_/BLOSC_HACC___m000.full.mpicosmo.50" : "5c31f4c4639788ae1d69ffeb36c859a4",
-	"HACC_Travis_/SZ_HACC_pos_vel___m000.full.mpicosmo.50" : "f8e1dd7a7aab0dca39440b80f3b733e9",
-	"metrics_NYX_Travis_.csv": "193eac46691fd68c73844b83118554df",
-	"NYX_Travis_/BLOSC___z255_32.h5" :  "403631b63e8c00678d7c22d2a2ef9fd4",
-	"NYX_Travis_/SZ___z255_32.h5" : "fd6f176f8e929180db4b2b94cb9166c5"
+	"metrics_HACC_Travis_.csv" : "d424f552b91c360e79e7f9bba44fcc6c",
+	"HACC_Travis_/SZ_HACC_pos_vel___m000.full.mpicosmo.50" : "90a620e32a09202389cfdbd24ead6ec0",
+	"metrics_NYX_Travis_.csv": "382c19f8b6cf0b39ab5c3cfcef29b2de",
+	"NYX_Travis_/SZ___z255_32.h5" : "db4a04885122ff9957f60c6102325528"
 }
+
 
 def computeMD5Hash(file):
 	if ( not path.exists(file) ):
 		print file + " does not exit!!!!!"
 		return ""
-	return hashlib.md5(file).hexdigest()
+
+	with open(file, 'rb') as afile:
+    	buf = afile.read()
+    	hasher.update(buf)
+		return hasher.hexdigest()
 
 if __name__ == "__main__":
 
@@ -26,8 +29,10 @@ if __name__ == "__main__":
 		computed_hash = computeMD5Hash(item)
 
 		if (md5_hashes[item] != computed_hash):
-			print "   Error in " + md5_hashes[item] + "\n"
+			print "   Error in " + item + "\n"
 			all_passed = False
+		else:
+			print "   " + item + " is identical\n"
 		
 
 	if all_passed == True:

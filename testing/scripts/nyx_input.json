@@ -67,10 +67,7 @@
 		"metricsfname": "metrics_NYX_Travis_"
 	},
 	"compressor-comment": "which compressors to test",
-	"compressors": [{
-			"name": "BLOSC",
-			"output-prefix": "BLOSC_"
-		},
+	"compressors": [
 		{
 			"name": "SZ",
 			"output-prefix": "SZ_",
