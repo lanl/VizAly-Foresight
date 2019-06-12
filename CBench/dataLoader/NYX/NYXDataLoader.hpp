@@ -529,6 +529,9 @@ inline void NYXDataLoader::writeGroupAttrib(
 		H5Sclose(dataspace);
 	}
 
+	// clear it to avoid duplicated attribute writing on next compressor
+	group_attrib.clear();
+
 	H5Gclose(group);
 	log << "Attributes writing finished for: " << in_group_name << std::endl;
 }
