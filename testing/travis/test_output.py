@@ -17,8 +17,8 @@ def computeMD5Hash(file):
 		return ""
 
 	with open(file, 'rb') as afile:
-    	buf = afile.read()
-    	hasher.update(buf)
+    		buf = afile.read()
+    		hasher.update(buf)
 		return hasher.hexdigest()
 
 if __name__ == "__main__":
