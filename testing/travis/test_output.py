@@ -15,11 +15,13 @@ def computeMD5Hash(file):
 	if ( not path.exists(file) ):
 		print file + " does not exit!!!!!"
 		return ""
-
+	
+	hasher = hashlib.md5()
 	with open(file, 'rb') as afile:
     		buf = afile.read()
     		hasher.update(buf)
-		return hasher.hexdigest()
+		
+	return hasher.hexdigest()
 
 if __name__ == "__main__":
 
