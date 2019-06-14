@@ -122,7 +122,7 @@ if [ $buildPlatform = "cori" ]; then
 	opt = "-DCMAKE_C_FLAGS=-dynamic -DCMAKE_CXX_FLAGS=-dynamic "
 
 	mv CBench/CMakeLists.txt CBench/CMakeLists.txt.old
-	mv scripts/Cori.CMakeLists.txt CBench/CMakeLists.txt
+	cp scripts/Cori.CMakeLists.txt CBench/CMakeLists.txt
 fi
 
 
@@ -140,34 +140,58 @@ if [ $buildOpt = "min" ]; then
 
 elif [ $buildOpt = "Default" ]; then
 	echo "Default build on ..."
-	cmake ../CBench $opt\
-	    -DCBENCH_ENABLE_NYX_LOADER=ON \
-		-DHDF5_DIR=$projectPath/ExternalDependencies/hdf5/install/share/cmake/hdf5 \
-	    -DCBENCH_ENABLE_BLOSC=ON \
-	    -DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
-		-DBLOSC_LIBRARY=$projectPath/ExternalDependencies/c-blosc/install/lib/libblosc.so \
-		-DCBENCH_ENABLE_SZ=ON \
-		-DSZ_INCLUDE_PATH=$projectPath/ExternalDependencies/SZ/sz/include \
-		-DSZ_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libSZ.so \
-		-DZLIB_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libzlib.so \
-		-DZSTD_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libzstd.so \
-		-DCBENCH_ENABLE_ZFP=ON \
-		-DZFP_INCLUDE_PATH=$projectPath/ExternalDependencies/zfp/install/include \
-		-DZFP_LIBRARY=$projectPath/ExternalDependencies/zfp/install/lib64/libzfp.so \
-		-DCBENCH_ENABLE_FPZIP=ON \
-		-DFPZIP_INCLUDE_PATH=$projectPath/ExternalDependencies/fpzip-1.2.0/inc/ \
-		-DFPZIP_LIBRARY=$projectPath/ExternalDependencies/fpzip-1.2.0/lib/libfpzip.a \
-		-DCBENCH_ENABLE_ISABELA=ON \
-		-DISABELA_INCLUDE_PATH=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/include \
-		-DISABELA_LIBRARY=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
-		-DCMAKE_BUILD_TYPE=$buildType
+	if [ $buildPlatform = "cori" ]; then
+		cmake ../CBench $opt\
+			-DCBENCH_ENABLE_NYX_LOADER=ON \
+			-DHDF5_DIR=$projectPath/ExternalDependencies/hdf5/install/share/cmake/hdf5 \
+			-DCBENCH_ENABLE_BLOSC=ON \
+			-DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
+			-DBLOSC_LIBRARY=$projectPath/ExternalDependencies/c-blosc/install/lib/libblosc.so \
+			-DCBENCH_ENABLE_SZ=ON \
+			-DSZ_INCLUDE_PATH=$projectPath/ExternalDependencies/SZ/sz/include \
+			-DSZ_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libSZ.a \
+			-DZLIB_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libzlib.a \
+			-DZSTD_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libzstd.a \
+			-DCBENCH_ENABLE_ZFP=ON \
+			-DZFP_INCLUDE_PATH=$projectPath/ExternalDependencies/zfp/install/include \
+			-DZFP_LIBRARY=$projectPath/ExternalDependencies/zfp/install/lib64/libzfp.a \
+			-DCBENCH_ENABLE_FPZIP=ON \
+			-DFPZIP_INCLUDE_PATH=$projectPath/ExternalDependencies/fpzip-1.2.0/inc/ \
+			-DFPZIP_LIBRARY=$projectPath/ExternalDependencies/fpzip-1.2.0/lib/libfpzip.a \
+			-DCBENCH_ENABLE_ISABELA=ON \
+			-DISABELA_INCLUDE_PATH=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/include \
+			-DISABELA_LIBRARY=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
+			-DCMAKE_BUILD_TYPE=$buildType
+	else
+		cmake ../CBench $opt\
+			-DCBENCH_ENABLE_NYX_LOADER=ON \
+			-DHDF5_DIR=$projectPath/ExternalDependencies/hdf5/install/share/cmake/hdf5 \
+			-DCBENCH_ENABLE_BLOSC=ON \
+			-DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
+			-DBLOSC_LIBRARY=$projectPath/ExternalDependencies/c-blosc/install/lib/libblosc.so \
+			-DCBENCH_ENABLE_SZ=ON \
+			-DSZ_INCLUDE_PATH=$projectPath/ExternalDependencies/SZ/sz/include \
+			-DSZ_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libSZ.so \
+			-DZLIB_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libzlib.so \
+			-DZSTD_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libzstd.so \
+			-DCBENCH_ENABLE_ZFP=ON \
+			-DZFP_INCLUDE_PATH=$projectPath/ExternalDependencies/zfp/install/include \
+			-DZFP_LIBRARY=$projectPath/ExternalDependencies/zfp/install/lib64/libzfp.so \
+			-DCBENCH_ENABLE_FPZIP=ON \
+			-DFPZIP_INCLUDE_PATH=$projectPath/ExternalDependencies/fpzip-1.2.0/inc/ \
+			-DFPZIP_LIBRARY=$projectPath/ExternalDependencies/fpzip-1.2.0/lib/libfpzip.a \
+			-DCBENCH_ENABLE_ISABELA=ON \
+			-DISABELA_INCLUDE_PATH=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/include \
+			-DISABELA_LIBRARY=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
+			-DCMAKE_BUILD_TYPE=$buildType
+	fi
 
 elif [ $buildOpt = "hacc" ]; then
 	echo "Building for HACC, no hdf5 ..."
 
 	cmake ../CBench $opt\
-	    -DCBENCH_ENABLE_BLOSC=ON \
-	    -DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
+		-DCBENCH_ENABLE_BLOSC=ON \
+		-DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
 		-DBLOSC_LIBRARY=$projectPath/ExternalDependencies/c-blosc/install/lib/libblosc.so \
 		-DCBENCH_ENABLE_SZ=ON \
 		-DSZ_INCLUDE_PATH=$projectPath/ExternalDependencies/SZ/sz/include \
@@ -189,10 +213,10 @@ elif [ $buildOpt = "all" ]; then
 	echo "Building with all dependencies ..."
 
 	cmake ../CBench $opt\
-	    -DCBENCH_ENABLE_NYX_LOADER=ON \
+		-DCBENCH_ENABLE_NYX_LOADER=ON \
 		-DHDF5_DIR=$projectPath/ExternalDependencies/hdf5/install/share/cmake/hdf5 \
-	    -DCBENCH_ENABLE_BLOSC=ON \
-	    -DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
+		-DCBENCH_ENABLE_BLOSC=ON \
+		-DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
 		-DBLOSC_LIBRARY=$projectPath/ExternalDependencies/c-blosc/install/lib/libblosc.so \
 		-DCBENCH_ENABLE_SZ=ON \
 		-DSZ_INCLUDE_PATH=$projectPath/ExternalDependencies/SZ/sz/include \
@@ -225,9 +249,9 @@ elif [ $buildOpt = "osx" ]; then
 
 	# OSX for Hoby
 	cmake ../CBench \
-	    -DCMAKE_BUILD_TYPE=Debug \
-	    -DCBENCH_ENABLE_BLOSC=ON \
-	    -DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
+		-DCMAKE_BUILD_TYPE=Debug \
+		-DCBENCH_ENABLE_BLOSC=ON \
+		-DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
 		-DBLOSC_LIBRARY=$projectPath/ExternalDependencies/c-blosc/install/lib/libblosc.a \
 		-DCBENCH_ENABLE_SZ=ON \
 		-DSZ_INCLUDE_PATH=$projectPath/ExternalDependencies/SZ/sz/include \

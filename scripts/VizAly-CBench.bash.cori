@@ -3,7 +3,6 @@ module load PrgEnv-gnu
 module load cmake/3.11.4
 module load gsl/2.1
 module load cray-mpich/7.7.3
-module load python/3.6-anaconda-4.4
 module load fftw
 module load vim
 module load openmpi
@@ -21,3 +20,9 @@ export HDF5_USE_FILE_LOCKING=FALSE
 export CPLUS_INCLUDE_PATH=$CPLUS_INLUDE_PATH:/usr/common/software/gsl/2.1/gnu/include
 export C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/common/software/gsl/2.1/gnu/include
 export LD_LIBRARY_PATH=/usr/common/software/gsl/2.1/gnu/lib:$LD_LIBRARY_PATH
+
+
+# python
+export PATH=/project/projectdirs/m2848/lanl/Python-2.7.16/install/bin:$PATH
+export LD_LIBRARY_PATH=/project/projectdirs/m2848/lanl/Python-2.7.16/install/lib:$LD_LIBRARY_PATH
+export PYTHONPATH="/project/projectdirs/m2848/lanl/Python-2.7.16/install/lib":$PYTHONPATH
