@@ -7,7 +7,7 @@
 	    "filetype": "NYX",
 
 	    "filename-comment": "name of input file",
-	    "filename": "/projects/exasky/pascal-projects/VizAly-CBench/testing/data/z255_32.h5",
+	    "filename": "../testing/data/z255_32.h5",
 
 	    "scalars-comment": "which scalars to test",
 	    "group" : "native_fields",

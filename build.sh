@@ -123,6 +123,8 @@ if [ $buildPlatform = "cori" ]; then
 
 	mv CBench/CMakeLists.txt CBench/CMakeLists.txt.old
 	cp scripts/Cori.CMakeLists.txt CBench/CMakeLists.txt
+else
+	cp scripts/CMakeLists.txt CBench/CMakeLists.txt
 fi
 
 

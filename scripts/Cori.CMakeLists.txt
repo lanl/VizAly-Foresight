@@ -143,7 +143,5 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 endif()
 
 
-# Remove output files
-add_custom_target(clean-output
-    COMMAND rm -f *.log
-)
+# Build log folder
+add_custom_target(build-time-make-directory ALL COMMAND ${CMAKE_COMMAND} -E make_directory logs)
