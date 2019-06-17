@@ -4,7 +4,7 @@ projectPath=$(pwd)
 
 # Default arguments
 buildType="Default"
-externalDependenciesPath = $projectPath"/ExternalDependencies"
+externalDependenciesPath=$projectPath"/ExternalDependencies"
 
 
 # Process arguments
