@@ -33,6 +33,40 @@ def autoscale_y(ax,margin=0.1):
 
 
 
+def plotScatterGraph(opts, x_data, y_data, label):
+    # Type of plot
+    if opts.ylog and opts.xlog:
+        plt_func = plt.loglog
+    elif opts.ylog:
+        plt_func = plt.semilogy
+    elif opts.xlog:
+        plt_func = plt.semilogx
+    else:
+        plt_func = plt.plot
+
+
+    plt_func(x_data, y_data, label)
+
+
+    # format plot
+    if opts.xlim:
+        xlim = opts.xlim[0] if len(opts.xlim) == 1 else opts.xlim
+        plt.xlim(xlim)
+    if opts.ylim:
+        ylim = opts.ylim[0] if len(opts.ylim) == 1 else opts.ylim
+        plt.ylim(ylim)
+
+    plt.xlabel(opts.xlabel)
+    plt.ylabel(opts.ylabel)
+    plt.grid()
+    plt.legend()
+
+    # display + print
+    plt.show()
+    plt.savefig(opts.output_file)
+
+
+
 def plotScatterGraph(x, x_label, y_label, title, path, x_range, list_of_tuples):
     fig = plt.figure()
     ax = plt.subplot(1,1,1)
