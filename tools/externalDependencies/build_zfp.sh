@@ -5,7 +5,7 @@ echo "Building zfp ... "
 
 git clone https://github.com/LLNL/zfp.git
 cd zfp/
-git checkout 0.5.4
+git checkout 0.5.5
 mkdir install
 mkdir build
 cd build

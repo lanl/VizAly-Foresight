@@ -16,7 +16,7 @@
 	"output": {
 		"run-path" : "build/",
 
-		"output-decompressed": true,
+		"output-decompressed": false,
 		"output-decompressed-location" : "HACC_All_",
 
 		"logfname-comment": "name of output log file",
@@ -49,6 +49,7 @@
             ],
              "output-prefix" : "SZ_"
 		},
+
 
 		{
 			"name": "Isabela",

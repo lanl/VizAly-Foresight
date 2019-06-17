@@ -7,6 +7,7 @@ buildType="Debug"
 buildOpt="Default"
 buildPlatform="Default"
 opts=""
+externalDependencies=$externalDependencies
 
 
 # Process arguments
@@ -20,6 +21,8 @@ for ((i=1; i<=$#; i++ )); do
 		echo ""
 		echo "Build Arguments:"
 		echo "  --path <folder> : build exec in that folder"
+		echo ""
+		echo " --externalDependencies: path where external dependencies was built"
 		echo ""
 		echo "  -all : build with all options on"
 		echo "  -min : build with minimal options on"
@@ -42,6 +45,13 @@ for ((i=1; i<=$#; i++ )); do
 		index=i
 		index=$((index+1))
 		buildDir=${!index}
+	fi
+
+	# external dependencies location
+	if [ $arg = "--externalDependencies" ]; then
+		index=i
+		index=$((index+1))
+		externalDependencies=${!index}
 	fi
 
 	if [ $arg = "--clean" ]; then
@@ -145,46 +155,46 @@ elif [ $buildOpt = "Default" ]; then
 	if [ $buildPlatform = "cori" ]; then
 		cmake ../CBench $opt\
 			-DCBENCH_ENABLE_NYX_LOADER=ON \
-			-DHDF5_DIR=$projectPath/ExternalDependencies/hdf5/install/share/cmake/hdf5 \
+			-DHDF5_DIR=$externalDependencies/hdf5/install/share/cmake/hdf5 \
 			-DCBENCH_ENABLE_BLOSC=ON \
-			-DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
-			-DBLOSC_LIBRARY=$projectPath/ExternalDependencies/c-blosc/install/lib/libblosc.so \
+			-DBLOSC_INCLUDE_PATH=$externalDependencies/c-blosc/install/include \
+			-DBLOSC_LIBRARY=$externalDependencies/c-blosc/install/lib/libblosc.so \
 			-DCBENCH_ENABLE_SZ=ON \
-			-DSZ_INCLUDE_PATH=$projectPath/ExternalDependencies/SZ/sz/include \
-			-DSZ_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libSZ.a \
-			-DZLIB_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libzlib.a \
-			-DZSTD_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libzstd.a \
+			-DSZ_INCLUDE_PATH=$externalDependencies/SZ/sz/include \
+			-DSZ_LIBRARY=$externalDependencies/SZ/install/lib/libSZ.a \
+			-DZLIB_LIBRARY=$externalDependencies/SZ/install/lib/libzlib.a \
+			-DZSTD_LIBRARY=$externalDependencies/SZ/install/lib/libzstd.a \
 			-DCBENCH_ENABLE_ZFP=ON \
-			-DZFP_INCLUDE_PATH=$projectPath/ExternalDependencies/zfp/install/include \
-			-DZFP_LIBRARY=$projectPath/ExternalDependencies/zfp/install/lib64/libzfp.a \
+			-DZFP_INCLUDE_PATH=$externalDependencies/zfp/install/include \
+			-DZFP_LIBRARY=$externalDependencies/zfp/install/lib64/libzfp.a \
 			-DCBENCH_ENABLE_FPZIP=ON \
-			-DFPZIP_INCLUDE_PATH=$projectPath/ExternalDependencies/fpzip-1.2.0/inc/ \
-			-DFPZIP_LIBRARY=$projectPath/ExternalDependencies/fpzip-1.2.0/lib/libfpzip.a \
+			-DFPZIP_INCLUDE_PATH=$externalDependencies/fpzip-1.2.0/inc/ \
+			-DFPZIP_LIBRARY=$externalDependencies/fpzip-1.2.0/lib/libfpzip.a \
 			-DCBENCH_ENABLE_ISABELA=ON \
-			-DISABELA_INCLUDE_PATH=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/include \
-			-DISABELA_LIBRARY=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
+			-DISABELA_INCLUDE_PATH=$externalDependencies/ISABELA-compress-0.2.1/include \
+			-DISABELA_LIBRARY=$externalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
 			-DCMAKE_BUILD_TYPE=$buildType
 	else
 		cmake ../CBench $opt\
 			-DCBENCH_ENABLE_NYX_LOADER=ON \
-			-DHDF5_DIR=$projectPath/ExternalDependencies/hdf5/install/share/cmake/hdf5 \
+			-DHDF5_DIR=$externalDependencies/hdf5/install/share/cmake/hdf5 \
 			-DCBENCH_ENABLE_BLOSC=ON \
-			-DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
-			-DBLOSC_LIBRARY=$projectPath/ExternalDependencies/c-blosc/install/lib/libblosc.so \
+			-DBLOSC_INCLUDE_PATH=$externalDependencies/c-blosc/install/include \
+			-DBLOSC_LIBRARY=$externalDependencies/c-blosc/install/lib/libblosc.so \
 			-DCBENCH_ENABLE_SZ=ON \
-			-DSZ_INCLUDE_PATH=$projectPath/ExternalDependencies/SZ/sz/include \
-			-DSZ_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libSZ.so \
-			-DZLIB_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libzlib.so \
-			-DZSTD_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libzstd.so \
+			-DSZ_INCLUDE_PATH=$externalDependencies/SZ/sz/include \
+			-DSZ_LIBRARY=$externalDependencies/SZ/install/lib/libSZ.so \
+			-DZLIB_LIBRARY=$externalDependencies/SZ/install/lib/libzlib.so \
+			-DZSTD_LIBRARY=$externalDependencies/SZ/install/lib/libzstd.so \
 			-DCBENCH_ENABLE_ZFP=ON \
-			-DZFP_INCLUDE_PATH=$projectPath/ExternalDependencies/zfp/install/include \
-			-DZFP_LIBRARY=$projectPath/ExternalDependencies/zfp/install/lib64/libzfp.so \
+			-DZFP_INCLUDE_PATH=$externalDependencies/zfp/install/include \
+			-DZFP_LIBRARY=$externalDependencies/zfp/install/lib64/libzfp.so \
 			-DCBENCH_ENABLE_FPZIP=ON \
-			-DFPZIP_INCLUDE_PATH=$projectPath/ExternalDependencies/fpzip-1.2.0/inc/ \
-			-DFPZIP_LIBRARY=$projectPath/ExternalDependencies/fpzip-1.2.0/lib/libfpzip.a \
+			-DFPZIP_INCLUDE_PATH=$externalDependencies/fpzip-1.2.0/inc/ \
+			-DFPZIP_LIBRARY=$externalDependencies/fpzip-1.2.0/lib/libfpzip.a \
 			-DCBENCH_ENABLE_ISABELA=ON \
-			-DISABELA_INCLUDE_PATH=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/include \
-			-DISABELA_LIBRARY=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
+			-DISABELA_INCLUDE_PATH=$externalDependencies/ISABELA-compress-0.2.1/include \
+			-DISABELA_LIBRARY=$externalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
 			-DCMAKE_BUILD_TYPE=$buildType
 	fi
 
@@ -193,22 +203,22 @@ elif [ $buildOpt = "hacc" ]; then
 
 	cmake ../CBench $opt\
 		-DCBENCH_ENABLE_BLOSC=ON \
-		-DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
-		-DBLOSC_LIBRARY=$projectPath/ExternalDependencies/c-blosc/install/lib/libblosc.so \
+		-DBLOSC_INCLUDE_PATH=$externalDependencies/c-blosc/install/include \
+		-DBLOSC_LIBRARY=$externalDependencies/c-blosc/install/lib/libblosc.so \
 		-DCBENCH_ENABLE_SZ=ON \
-		-DSZ_INCLUDE_PATH=$projectPath/ExternalDependencies/SZ/sz/include \
-		-DSZ_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libSZ.so \
-		-DZLIB_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libzlib.so \
-		-DZSTD_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libzstd.so \
+		-DSZ_INCLUDE_PATH=$externalDependencies/SZ/sz/include \
+		-DSZ_LIBRARY=$externalDependencies/SZ/install/lib/libSZ.so \
+		-DZLIB_LIBRARY=$externalDependencies/SZ/install/lib/libzlib.so \
+		-DZSTD_LIBRARY=$externalDependencies/SZ/install/lib/libzstd.so \
 		-DCBENCH_ENABLE_ZFP=ON \
-		-DZFP_INCLUDE_PATH=$projectPath/ExternalDependencies/zfp/install/include \
-		-DZFP_LIBRARY=$projectPath/ExternalDependencies/zfp/install/lib64/libzfp.so \
+		-DZFP_INCLUDE_PATH=$externalDependencies/zfp/install/include \
+		-DZFP_LIBRARY=$externalDependencies/zfp/install/lib64/libzfp.so \
 		-DCBENCH_ENABLE_FPZIP=ON \
-		-DFPZIP_INCLUDE_PATH=$projectPath/ExternalDependencies/fpzip-1.2.0/inc/ \
-		-DFPZIP_LIBRARY=$projectPath/ExternalDependencies/fpzip-1.2.0/lib/libfpzip.a \
+		-DFPZIP_INCLUDE_PATH=$externalDependencies/fpzip-1.2.0/inc/ \
+		-DFPZIP_LIBRARY=$externalDependencies/fpzip-1.2.0/lib/libfpzip.a \
 		-DCBENCH_ENABLE_ISABELA=ON \
-		-DISABELA_INCLUDE_PATH=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/include \
-		-DISABELA_LIBRARY=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
+		-DISABELA_INCLUDE_PATH=$externalDependencies/ISABELA-compress-0.2.1/include \
+		-DISABELA_LIBRARY=$externalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
 		-DCMAKE_BUILD_TYPE=$buildType
 
 elif [ $buildOpt = "all" ]; then
@@ -216,34 +226,34 @@ elif [ $buildOpt = "all" ]; then
 
 	cmake ../CBench $opt\
 		-DCBENCH_ENABLE_NYX_LOADER=ON \
-		-DHDF5_DIR=$projectPath/ExternalDependencies/hdf5/install/share/cmake/hdf5 \
+		-DHDF5_DIR=$externalDependencies/hdf5/install/share/cmake/hdf5 \
 		-DCBENCH_ENABLE_BLOSC=ON \
-		-DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
-		-DBLOSC_LIBRARY=$projectPath/ExternalDependencies/c-blosc/install/lib/libblosc.so \
+		-DBLOSC_INCLUDE_PATH=$externalDependencies/c-blosc/install/include \
+		-DBLOSC_LIBRARY=$externalDependencies/c-blosc/install/lib/libblosc.so \
 		-DCBENCH_ENABLE_SZ=ON \
-		-DSZ_INCLUDE_PATH=$projectPath/ExternalDependencies/SZ/sz/include \
-		-DSZ_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libSZ.so \
-		-DZLIB_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libzlib.so \
-		-DZSTD_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libzstd.so \
+		-DSZ_INCLUDE_PATH=$externalDependencies/SZ/sz/include \
+		-DSZ_LIBRARY=$externalDependencies/SZ/install/lib/libSZ.so \
+		-DZLIB_LIBRARY=$externalDependencies/SZ/install/lib/libzlib.so \
+		-DZSTD_LIBRARY=$externalDependencies/SZ/install/lib/libzstd.so \
 		-DCBENCH_ENABLE_ZFP=ON \
-		-DZFP_INCLUDE_PATH=$projectPath/ExternalDependencies/zfp/install/include \
-		-DZFP_LIBRARY=$projectPath/ExternalDependencies/zfp/install/lib64/libzfp.so \
+		-DZFP_INCLUDE_PATH=$externalDependencies/zfp/install/include \
+		-DZFP_LIBRARY=$externalDependencies/zfp/install/lib64/libzfp.so \
 		-DCBENCH_ENABLE_FPZIP=ON \
-		-DFPZIP_INCLUDE_PATH=$projectPath/ExternalDependencies/fpzip-1.2.0/inc/ \
-		-DFPZIP_LIBRARY=$projectPath/ExternalDependencies/fpzip-1.2.0/lib/libfpzip.a \
+		-DFPZIP_INCLUDE_PATH=$externalDependencies/fpzip-1.2.0/inc/ \
+		-DFPZIP_LIBRARY=$externalDependencies/fpzip-1.2.0/lib/libfpzip.a \
 		-DCBENCH_ENABLE_ISABELA=ON \
-		-DISABELA_INCLUDE_PATH=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/include \
-		-DISABELA_LIBRARY=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
+		-DISABELA_INCLUDE_PATH=$externalDependencies/ISABELA-compress-0.2.1/include \
+		-DISABELA_LIBRARY=$externalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
 		-DCBENCH_ENABLE_MGARD=ON \
-		-DMGARD_INCLUDE_PATH=$projectPath/ExternalDependencies/MGARD/install/include \
-		-DMGARD_LIBRARY=$projectPath/ExternalDependencies/MGARD/install/lib/libmgard.so \
+		-DMGARD_INCLUDE_PATH=$externalDependencies/MGARD/install/include \
+		-DMGARD_LIBRARY=$externalDependencies/MGARD/install/lib/libmgard.so \
 		-DCBENCH_ENABLE_LOSSY_WAVE=ON \
-		-DLOSSYWAVE_INCLUDE_PATH=$projectPath/ExternalDependencies/VizAly-LossyWave/install/include \
-		-DLOSSYWAVE_LIBRARY=$projectPath/ExternalDependencies/VizAly-LossyWave/install/lib/liblossywave.so \
-		-DLOSSYWAVE_LZ4_LIBRARY=$projectPath/ExternalDependencies/VizAly-LossyWave/build/3rdparty/lz4/lz4-external/src/lz4-external/lib/liblz4.a \
+		-DLOSSYWAVE_INCLUDE_PATH=$externalDependencies/VizAly-LossyWave/install/include \
+		-DLOSSYWAVE_LIBRARY=$externalDependencies/VizAly-LossyWave/install/lib/liblossywave.so \
+		-DLOSSYWAVE_LZ4_LIBRARY=$externalDependencies/VizAly-LossyWave/build/3rdparty/lz4/lz4-external/src/lz4-external/lib/liblz4.a \
 		-DCBENCH_ENABLE_BIG_CRUNCH=ON \
-		-DBIGCRUNCH_INCLUDE_PATH=$projectPath/ExternalDependencies/VizAly-BigCrunch/install/include \
-		-DBIGCRUNCH_LIBRARY=$projectPath/ExternalDependencies/VizAly-BigCrunch/install/lib/libbigcrunch.so \
+		-DBIGCRUNCH_INCLUDE_PATH=$externalDependencies/VizAly-BigCrunch/install/include \
+		-DBIGCRUNCH_LIBRARY=$externalDependencies/VizAly-BigCrunch/install/lib/libbigcrunch.so \
 		-DCMAKE_BUILD_TYPE=$buildType
 
 elif [ $buildOpt = "osx" ]; then
@@ -253,34 +263,34 @@ elif [ $buildOpt = "osx" ]; then
 	cmake ../CBench \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DCBENCH_ENABLE_BLOSC=ON \
-		-DBLOSC_INCLUDE_PATH=$projectPath/ExternalDependencies/c-blosc/install/include \
-		-DBLOSC_LIBRARY=$projectPath/ExternalDependencies/c-blosc/install/lib/libblosc.a \
+		-DBLOSC_INCLUDE_PATH=$externalDependencies/c-blosc/install/include \
+		-DBLOSC_LIBRARY=$externalDependencies/c-blosc/install/lib/libblosc.a \
 		-DCBENCH_ENABLE_SZ=ON \
-		-DSZ_INCLUDE_PATH=$projectPath/ExternalDependencies/SZ/sz/include \
-		-DSZ_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libSZ.dylib \
-		-DZLIB_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libzlib.dylib \
-		-DZSTD_LIBRARY=$projectPath/ExternalDependencies/SZ/install/lib/libzstd.dylib \
+		-DSZ_INCLUDE_PATH=$externalDependencies/SZ/sz/include \
+		-DSZ_LIBRARY=$externalDependencies/SZ/install/lib/libSZ.dylib \
+		-DZLIB_LIBRARY=$externalDependencies/SZ/install/lib/libzlib.dylib \
+		-DZSTD_LIBRARY=$externalDependencies/SZ/install/lib/libzstd.dylib \
 		-DCBENCH_ENABLE_BIG_CRUNCH=ON \
-		-DBIGCRUNCH_INCLUDE_PATH=$projectPath/ExternalDependencies/VizAly-BigCrunch/install/include \
-		-DBIGCRUNCH_LIBRARY=$projectPath/ExternalDependencies/VizAly-BigCrunch/install/lib/libbigcrunch.dylib \
+		-DBIGCRUNCH_INCLUDE_PATH=$externalDependencies/VizAly-BigCrunch/install/include \
+		-DBIGCRUNCH_LIBRARY=$externalDependencies/VizAly-BigCrunch/install/lib/libbigcrunch.dylib \
 		-DCBENCH_ENABLE_LOSSY_WAVE=ON \
-		-DLOSSYWAVE_INCLUDE_PATH=$projectPath/ExternalDependencies/VizAly-LossyWave/install/include \
-		-DLOSSYWAVE_LIBRARY=$projectPath/ExternalDependencies/VizAly-LossyWave/install/lib/liblossywave.dylib \
-		-DLOSSYWAVE_LZ4_LIBRARY=$projectPath/ExternalDependencies/VizAly-LossyWave/build/3rdparty/lz4/lz4-external/src/lz4-external/lib/liblz4.a \
+		-DLOSSYWAVE_INCLUDE_PATH=$externalDependencies/VizAly-LossyWave/install/include \
+		-DLOSSYWAVE_LIBRARY=$externalDependencies/VizAly-LossyWave/install/lib/liblossywave.dylib \
+		-DLOSSYWAVE_LZ4_LIBRARY=$externalDependencies/VizAly-LossyWave/build/3rdparty/lz4/lz4-external/src/lz4-external/lib/liblz4.a \
 		-DCBENCH_ENABLE_MGARD=OFF \
-		-DMGARD_INCLUDE_PATH=$projectPath/ExternalDependencies/MGARD/install/include \
-		-DMGARD_LIBRARY=$projectPath/ExternalDependencies/MGARD/install/lib/libmgard.dylib \
+		-DMGARD_INCLUDE_PATH=$externalDependencies/MGARD/install/include \
+		-DMGARD_LIBRARY=$externalDependencies/MGARD/install/lib/libmgard.dylib \
 		-DCBENCH_ENABLE_ZFP=ON \
-		-DZFP_INCLUDE_PATH=$projectPath/ExternalDependencies/zfp/install/include \
-		-DZFP_LIBRARY=$projectPath/ExternalDependencies/zfp/install/lib/libzfp.dylib \
+		-DZFP_INCLUDE_PATH=$externalDependencies/zfp/install/include \
+		-DZFP_LIBRARY=$externalDependencies/zfp/install/lib/libzfp.dylib \
 		-DCBENCH_ENABLE_NYX_LOADER=ON \
-		-DHDF5_DIR=$projectPath/ExternalDependencies/hdf5/install/share/cmake/hdf5 \
+		-DHDF5_DIR=$externalDependencies/hdf5/install/share/cmake/hdf5 \
 		-DCBENCH_ENABLE_FPZIP=ON \
-		-DFPZIP_INCLUDE_PATH=$projectPath/ExternalDependencies/fpzip-1.2.0/inc/ \
-		-DFPZIP_LIBRARY=$projectPath/ExternalDependencies/fpzip-1.2.0/lib/libfpzip.a \
+		-DFPZIP_INCLUDE_PATH=$externalDependencies/fpzip-1.2.0/inc/ \
+		-DFPZIP_LIBRARY=$externalDependencies/fpzip-1.2.0/lib/libfpzip.a \
 		-DCBENCH_ENABLE_ISABELA=ON \
-		-DISABELA_INCLUDE_PATH=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/include \
-		-DISABELA_LIBRARY=$projectPath/ExternalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a
+		-DISABELA_INCLUDE_PATH=$externalDependencies/ISABELA-compress-0.2.1/include \
+		-DISABELA_LIBRARY=$externalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a
 else
 	echo "Build type " $buildOpt " not supported yet!"
 fi

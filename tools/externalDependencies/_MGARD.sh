@@ -8,6 +8,7 @@ cd MGARD
 # Jan 2019 hash
 git checkout a6db5d03e59c156b1e2df32db845a4c38e74b04a
 
+
 cd include
 if [ ! -f mgard_capi.h.bak ]; then
 	echo "Patching mgard_capi.h"

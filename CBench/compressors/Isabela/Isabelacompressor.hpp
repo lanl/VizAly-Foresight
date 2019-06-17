@@ -65,11 +65,11 @@ inline int IsabelaCompressor::compress(void *input, void *&output, std::string d
         if (compressorParameters["tolerance"] != "")
             tol = strConvert::to_double(compressorParameters["tolerance"]);
 
-    int pcnt = 30;
-    got = compressorParameters.find("pcnt");
+    config.ncoefficients = 30;
+    got = compressorParameters.find("nCoeff");
     if (got != compressorParameters.end())
-        if (compressorParameters["pcnt"] != "")
-            pcnt = strConvert::to_int(compressorParameters["pcnt"]);
+        if (compressorParameters["nCoeff"] != "")
+            config.ncoefficients = strConvert::to_int(compressorParameters["nCoeff"]);
 
     // Compress window_size numebr of elements at a time
     config.window_size = 1024;
@@ -78,8 +78,6 @@ inline int IsabelaCompressor::compress(void *input, void *&output, std::string d
         if (compressorParameters["window-size"] != "")
             config.window_size = strConvert::to_int(compressorParameters["window-size"]);
 
-    // Approximate each window with 30 coefficients
-    config.ncoefficients = pcnt;
 
     // Relative error between approximate and original values should be
     // no more than 5%, default = 1;

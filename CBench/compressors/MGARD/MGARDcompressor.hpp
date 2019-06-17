@@ -66,7 +66,10 @@ inline int MGARDCompressor::compress(void *input, void *&output, std::string dat
 	memcpy (in_buff, input, numel*dataTypeSize);
 
 	//mgard_compress(flag, in_buff, &out_size, nrow, ncol, nfib, &tol)
-    // Note: "tol" must be of same "type" as set iflag
+    // Note: "tol" must be of same "type" as set iflagz
+    std::cout << "n[0]: " << n[0] << std::endl;
+    std::cout << "n[0]: " << n[1] << std::endl;
+    std::cout << "n[0]: " << n[2] << std::endl;
     output = mgard_compress(iflag, in_buff, out_size, n[0], n[1], n[2], &tol );
 	std::uint64_t csize = out_size;
 	cbytes = csize;
@@ -96,7 +99,7 @@ inline int MGARDCompressor::decompress(void *&input, void *&output, std::string 
 
 	Timer dTime; dTime.start();
 
-	output = mgard_decompress(iflag, static_cast<std::uint8_t *>(input), out_size, n[0], n[1], n[2] );
+	//output = mgard_decompress(iflag, static_cast<std::uint8_t *>(input), out_size, n[0], n[1], n[2] );
 
 	std::uint64_t dsize = out_size; // Is out_size updated by mgard?
 
