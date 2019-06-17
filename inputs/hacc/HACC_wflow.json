@@ -1,0 +1,143 @@
+{
+	"project-home" : "/home/pascal/projects/VizAly-CBench/PAT/hacc_wflow",
+
+	"input": {
+		"filetype-comment": "type of file to load; HACC or NYX",
+		"filetype": "HACC",
+
+		
+		"filename-comment": "name of input file",
+		"filename": "../testing/data/m000.full.mpicosmo.50",
+
+		"scalars-comment": "which scalars to test",
+		"scalars": ["x", "y", "z", "vx", "vy", "vz"],
+
+        "path" : "mpirun /path/to/cbench",
+
+        "configuration" : {
+            "partition" : "scaling",
+            "nodes" : 8,
+            "ntasks-per-node" : 8
+        }
+	},
+
+	"output": {
+		"run-path" : "/home/pascal/projects/VizAly-CBench/PAT/hacc_wflow",
+
+		"output-decompressed": true,
+		"output-decompressed-location" : "/cbench",
+
+		"logfname-comment": "name of output log file",
+		"logfname": "runlog_HACC_all_",
+
+		"metricsfname-comment": "name of file with output",
+		"metricsfname": "metrics_HACC_all_"
+	},
+
+	"compressor-comment": "which compressors to test and parameters for that compressor",
+	"compressors": [
+		{
+			"name": "BLOSC",
+			"output-prefix" : "BLOSC_"
+		},
+
+		{
+            "name": "SZ",
+            "compressor-params" :
+            [
+                {
+                    "scalar" : ["x", "y", "z"],
+                    "abs" : 2E-3
+                },
+
+                {
+                    "scalar" : ["vx", "vy", "vz"],
+                    "pw_rel" : 1E-2
+                }
+            ],
+             "output-prefix" : "SZ_"
+		},
+
+		{
+			"name": "Isabela",
+			"tolerance" : 27,
+			"nCoeff" : 30,
+			"window-size" : 2048,
+			"output-prefix" : "Isabela_"
+		},
+
+		{
+			"name": "fpzip",
+			"bits": 27,
+			"output-prefix" : "fpzip_"
+		},
+
+		{
+			"name": "zfp",
+			"abs": 1E-3,
+			"output-prefix" : "zfp_"
+		}
+	],
+
+	"metrics-comment": "which metrics to use",
+	"metrics": 
+	[
+		{
+			"name" : "absolute_error",
+			"histogram" : ["x", "y", "z"]
+		},
+
+		{
+			"name" : "relative_error"
+		},
+
+		{
+			"name" : "mse"
+		},
+
+		{
+			"name" : "psnr"
+		}
+	],
+
+
+	"simulation-analysis" :
+	{
+		"evn_path" : "/projects/exasky/HACC.darwin_analysis",
+		"analysis-folder" : "HACC_Test_",
+
+		"analysis-tool" :
+		{
+			"HACC-home" : "/projects/exasky/HACC",
+
+			"analytics": 
+			{
+                "halo" : {
+				    "path": "mpirun /path/to/halofinder",
+                    "config-file" : "/projects/exasky/HACC_GPU/run/haloInputs/cosmotools-config.dat",
+                    "timesteps-file" : "/projects/exasky/HACC_GPU/run/haloInputs/timesteps.dat",
+                    "parameters-file" : "/projects/exasky/HACC_GPU/run/haloInputs/indat.params",
+                    "configuration" : {
+                        "partition" : "general",
+                        "nodes" : 8,
+                        "ntasks-per-node" : 1,
+                        "constraint" : "gpu1_model:Tesla_K40m"
+                    }
+			    },
+                "spectrum" : {
+                    "path" : "mpirun /path/to/spectrum",
+                     "configuration" : {
+                         "partition" : "scaling",
+                         "nodes" : 32,
+                         "ntasks-per-node" : 16
+                    }
+                }
+                
+            }
+		},
+
+		"input-files" : [],
+
+		"analysis" : []
+	}
+}

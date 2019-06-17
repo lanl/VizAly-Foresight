@@ -1,0 +1,577 @@
+{
+    "input": {
+        "filetype-comment": "type of file to load; HACC or NYX", 
+        "filetype": "NYX", 
+        "filename-comment": "name of input file", 
+        "filename": "/projects/exasky/pascal-projects/VizAly-CBench/testing/data/z255_32.h5", 
+        "scalars-comment": "which scalars to test", 
+        "group": "native_fields", 
+        "scalars": [
+            "baryon_density", 
+            "dark_matter_density", 
+            "temperature", 
+            "velocity_x", 
+            "velocity_y", 
+            "velocity_z"
+        ]
+    }, 
+    "output": {
+        "run-path": "/projects/exasky/pascal-projects/VizAly-CBench/build/", 
+        "output-decompressed": true, 
+        "output-decompressed-location": "NYX_Test_", 
+        "logfname-comment": "name of output log file", 
+        "logfname": "runlog_NYX_all_", 
+        "metricsfname-comment": "name of file with output", 
+        "metricsfname": "metrics_NYX_all_"
+    }, 
+    "compressor-comment": "which compressors to test", 
+    "compressors": [
+        {
+            "name": "BLOSC", 
+            "output-prefix": "BLOSC_"
+        }, 
+        {
+            "name": "BigCrunch", 
+            "output-prefix": "BigCrunch_", 
+            "tolerance": 0.001
+        }, 
+        {
+            "name": "SZ", 
+            "output-prefix": "zfp_abs_002_", 
+            "abs": 0.002
+        }, 
+        {
+            "name": "zfp", 
+            "output-prefix": "zfp_abs_001_", 
+            "abs": 0.001
+        }
+    ], 
+    "metrics-comment": "which metrics to use", 
+    "metrics": [
+        {
+            "name": "absolute_error"
+        }, 
+        {
+            "name": "relative_error"
+        }, 
+        {
+            "name": "mse"
+        }, 
+        {
+            "name": "psnr"
+        }
+    ], 
+    "simulation-analysis": {
+        "evn_path": "/projects/exasky/HACC.darwin_analysis", 
+        "analysis-folder": "NYX_Test_", 
+        "plotting": {
+            "x-range": [
+                0, 
+                11
+            ]
+        }, 
+        "analysis-tool": {
+            "hdf5_path": "/projects/exasky/pascal-projects/VizAly-CBench/ExternalDependencies/hdf5/install/bin/", 
+            "gimlet-home": "/projects/exasky/gimlet2", 
+            "analytics": [
+                {
+                    "name": "sim_stats", 
+                    "type": [
+                        "rhob", 
+                        "rhom", 
+                        "rhodm", 
+                        "temp", 
+                        "velmag", 
+                        "vz"
+                    ], 
+                    "postfix": "_ps3d.txt", 
+                    "path": "/projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex"
+                }, 
+                {
+                    "name": "lya_all_axes", 
+                    "type": [
+                        "x", 
+                        "y", 
+                        "z"
+                    ], 
+                    "postfix": "_flux_ps1d.txt", 
+                    "path": "/projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex"
+                }
+            ]
+        }, 
+        "input-files": [
+            {
+                "output-prefix": "orig", 
+                "path": "/projects/exasky/pascal-projects/VizAly-CBench/testing/data/z255_32.h5"
+            }, 
+            {
+                "output-prefix": "BLOSC_", 
+                "path": "/projects/exasky/pascal-projects/VizAly-CBench/build/NYX_Test_/BLOSC___z255_32.h5"
+            }, 
+            {
+                "output-prefix": "BigCrunch_", 
+                "path": "/projects/exasky/pascal-projects/VizAly-CBench/build/NYX_Test_/BigCrunch___z255_32.h5"
+            }, 
+            {
+                "output-prefix": "zfp_abs_002_", 
+                "path": "/projects/exasky/pascal-projects/VizAly-CBench/build/NYX_Test_/zfp_abs_002___z255_32.h5"
+            }, 
+            {
+                "output-prefix": "zfp_abs_001_", 
+                "path": "/projects/exasky/pascal-projects/VizAly-CBench/build/NYX_Test_/zfp_abs_001___z255_32.h5"
+            }
+        ], 
+        "analysis": [
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/origrhob_ps3d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BLOSC_rhob_ps3d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BigCrunch_rhob_ps3d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_002_rhob_ps3d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_001_rhob_ps3d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "sim_stats_rhob"
+            }, 
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/origrhom_ps3d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BLOSC_rhom_ps3d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BigCrunch_rhom_ps3d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_002_rhom_ps3d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_001_rhom_ps3d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "sim_stats_rhom"
+            }, 
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/origrhodm_ps3d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BLOSC_rhodm_ps3d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BigCrunch_rhodm_ps3d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_002_rhodm_ps3d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_001_rhodm_ps3d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "sim_stats_rhodm"
+            }, 
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/origtemp_ps3d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BLOSC_temp_ps3d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BigCrunch_temp_ps3d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_002_temp_ps3d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_001_temp_ps3d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "sim_stats_temp"
+            }, 
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/origvelmag_ps3d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BLOSC_velmag_ps3d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BigCrunch_velmag_ps3d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_002_velmag_ps3d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_001_velmag_ps3d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "sim_stats_velmag"
+            }, 
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/origvz_ps3d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BLOSC_vz_ps3d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BigCrunch_vz_ps3d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_002_vz_ps3d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_001_vz_ps3d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "sim_stats_vz"
+            }, 
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/origx_flux_ps1d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/BLOSC_x_flux_ps1d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/BigCrunch_x_flux_ps1d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/zfp_abs_002_x_flux_ps1d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/zfp_abs_001_x_flux_ps1d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "lya_all_axes_x"
+            }, 
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/origy_flux_ps1d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/BLOSC_y_flux_ps1d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/BigCrunch_y_flux_ps1d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/zfp_abs_002_y_flux_ps1d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/zfp_abs_001_y_flux_ps1d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "lya_all_axes_y"
+            }, 
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/origz_flux_ps1d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/BLOSC_z_flux_ps1d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/BigCrunch_z_flux_ps1d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/zfp_abs_002_z_flux_ps1d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/zfp_abs_001_z_flux_ps1d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "lya_all_axes_z"
+            }, 
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/origrhob_ps3d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BLOSC_rhob_ps3d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BigCrunch_rhob_ps3d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_002_rhob_ps3d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_001_rhob_ps3d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "sim_stats_rhob"
+            }, 
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/origrhom_ps3d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BLOSC_rhom_ps3d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BigCrunch_rhom_ps3d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_002_rhom_ps3d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_001_rhom_ps3d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "sim_stats_rhom"
+            }, 
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/origrhodm_ps3d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BLOSC_rhodm_ps3d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BigCrunch_rhodm_ps3d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_002_rhodm_ps3d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_001_rhodm_ps3d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "sim_stats_rhodm"
+            }, 
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/origtemp_ps3d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BLOSC_temp_ps3d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BigCrunch_temp_ps3d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_002_temp_ps3d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_001_temp_ps3d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "sim_stats_temp"
+            }, 
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/origvelmag_ps3d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BLOSC_velmag_ps3d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BigCrunch_velmag_ps3d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_002_velmag_ps3d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_001_velmag_ps3d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "sim_stats_velmag"
+            }, 
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/origvz_ps3d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BLOSC_vz_ps3d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/BigCrunch_vz_ps3d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_002_vz_ps3d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/sim_stats/zfp_abs_001_vz_ps3d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "sim_stats_vz"
+            }, 
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/origx_flux_ps1d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/BLOSC_x_flux_ps1d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/BigCrunch_x_flux_ps1d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/zfp_abs_002_x_flux_ps1d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/zfp_abs_001_x_flux_ps1d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "lya_all_axes_x"
+            }, 
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/origy_flux_ps1d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/BLOSC_y_flux_ps1d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/BigCrunch_y_flux_ps1d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/zfp_abs_002_y_flux_ps1d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/zfp_abs_001_y_flux_ps1d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "lya_all_axes_y"
+            }, 
+            {
+                "files": [
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/origz_flux_ps1d.txt", 
+                        "name": "orig"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/BLOSC_z_flux_ps1d.txt", 
+                        "name": "BLOSC_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/BigCrunch_z_flux_ps1d.txt", 
+                        "name": "BigCrunch_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/zfp_abs_002_z_flux_ps1d.txt", 
+                        "name": "zfp_abs_002_"
+                    }, 
+                    {
+                        "path": "/projects/exasky/pascal-projects/VizAly-CBench/analysisWorkflow/NYX_Test_/lya_all_axes/zfp_abs_001_z_flux_ps1d.txt", 
+                        "name": "zfp_abs_001_"
+                    }
+                ], 
+                "title": "lya_all_axes_z"
+            }
+        ]
+    }
+}
