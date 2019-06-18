@@ -15,6 +15,9 @@ class HACCWorkflow(workflow.Workflow):
         # get CBench job which is parent to all jobs in this function
         cbench_job = self.jobs[0]
 
+        # get environment script
+        environment = self.environment_from_json_data()
+
         # get halo finder information from configuration file
         halo_section = "halo"
         halo_exe = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
@@ -28,7 +31,6 @@ class HACCWorkflow(workflow.Workflow):
 
         # get halo finder run specifications from configuration file
         halo_config = self.configuration_from_json_data(halo_section)
-        environment = self.environment_from_json_data()
 
         # get spectrum information from configuration file
         spectrum_section = "spectrum"
@@ -42,16 +44,35 @@ class HACCWorkflow(workflow.Workflow):
         # create job to run 
         for path in self.json_data["simulation-analysis"]["input-files"]:
             print("Creating analysis jobs for", path)
+            prefix = path["output-prefix"]
+
+            # write halo finder parameters file
+            # specify location of parsed configuration file inside
+            new_parameters_path = halo_section + "/" + prefix + "_halo_params.txt"
+            new_config_path = halo_section + "/" + prefix + "_halo_config.txt"
+            os.system("sed \"s/^COSMOTOOLS_CONFIG.*/COSMOTOOLS_CONFIG .\/{}/\" {} > {}".format(os.path.basename(new_config_path),
+                                                                                               parameters_path,
+                                                                                               self.workflow_dir + "/" + new_parameters_path))
+
+            # write halo finder configuration file
+            # specify output prefix inside
+            tmp_path = "tmp.out"
+            os.system("sed \"s/^BASE_OUTPUT_FILE_NAME.*/BASE_OUTPUT_FILE_NAME .\/{}/\" {} > {}".format(prefix,
+                                                                                                       config_path,
+                                                                                                       tmp_path))
+            os.system("sed \"s/^ACCUMULATE_CORE_NAME.*/ACCUMULATE_CORE_NAME .\/{}/\" {} > {}".format(prefix,
+                                                                                                     tmp_path,
+                                                                                                     self.workflow_dir + "/" + new_config_path))
+            os.remove(tmp_path)
 
             # create job for halo finder
-            prefix = path["output-prefix"]
             halo_job = j.Job(name="{}_{}".format(prefix, halo_section),
                            execute_dir=halo_section,
                            executable=halo_exe,
-                           arguments=["--config", config_path,
+                           arguments=["--config", os.path.basename(new_config_path),
                                       "--timesteps", timesteps_path,
                                       "--prefix", prefix,
-                                      parameters_path],
+                                      os.path.basename(new_parameters_path)],
                            configurations=halo_config,
                            environment=environment)
 
