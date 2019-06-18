@@ -96,6 +96,7 @@
             	},
                 "spectrum" : {
                     "path" : "echo",
+                    "config-file" : "/projects/exasky/HACC/run/inputs/indat.params",
                     "configuration" : {
                         "partition" : "scaling",
                         "nodes" : 32,
