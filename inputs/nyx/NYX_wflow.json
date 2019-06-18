@@ -12,10 +12,13 @@
 
 	    "path" : "mpirun /path/to/cbench",
 
-        "configuration" : {
-            "partition" : "scaling",
-            "nodes" : 8,
-            "ntasks-per-node" : 8
+        "configuration": 
+        {
+            "nodes": 4, 
+            "constraing" : "haswell",
+            "qos" : "debug",
+            "time" : "00:20:00",
+            "allocation" : "m2848"
         },
 
 	    "scalars-comment": "which scalars to test",
@@ -144,7 +147,6 @@
 
 		"analysis-tool" :
 		{
-			"hdf5_path" : "/projects/exasky/hdf5/install/bin/",
 			"gimlet-home" : "/projects/exasky/gimlet2",
 
 			"analytics": 
@@ -155,9 +157,11 @@
                     "postfix" : "_ps3d.txt",
                     "path": "/projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex",
                     "configuration": {
-                        "partition": "scaling", 
-                        "nodes": 32, 
-                        "ntasks-per-node": 16
+                        "nodes": 4, 
+                        "constraing" : "haswell",
+                        "qos" : "debug",
+                        "time" : "00:20:00",
+                        "allocation" : "m2848"
                     }
                 }, 
                 {
@@ -166,9 +170,11 @@
                     "postfix" : "_flux_ps1d.txt",
                     "path": "/projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex",
                     "configuration": {
-                        "partition": "scaling", 
-                        "nodes": 32, 
-                        "ntasks-per-node": 16
+                        "nodes": 4, 
+                        "constraing" : "haswell",
+                        "qos" : "debug",
+                        "time" : "00:20:00",
+                        "allocation" : "m2848"
                     }
                 }
             ]

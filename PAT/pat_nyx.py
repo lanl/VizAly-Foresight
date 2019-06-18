@@ -15,57 +15,35 @@ class NYXWorkflow(workflow.Workflow):
 		# get CBench job which is parent to all jobs in this function
 		cbench_job = self.jobs[0]
 
-		# get halo information from configuration file
-		gimlet = "halo"
-		halo_exe = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section]["path"]
-		timesteps_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section]["timesteps-file"]
-		config_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section]["config-file"]
-		parameters_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section]["parameters-file"]
-		if "configuration" in self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section].keys():
-			configurations = list(sum(self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section]["configuration"].items(), ()))
-		else:
-			configurations = None
+
+		# Get environment
 		if "evn_path" in self.json_data["simulation-analysis"]:
-			environment = self.json_data["simulation-analysis"]["evn_path"]
+			environment = 
 		else:
 			environment = None
 
-		# get spectrum information from configuration file
-		spectrum_section = "spectrum"
-		spectrum_exe = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][spectrum_section]["path"]
 
-		# create job to run halo finder on each output file from CBench
-		# create job to run 
-		for path in self.json_data["simulation-analysis"]["input-files"]:
-			print "Creating analysis jobs for", path
+		# create job to run sim_stat and lya
+		for analysis in self.json_data["simulation-analysis"]["analysis-tool"]["analytics"]:
+			for item in self.json_data["simulation-analysis"]["input-files"]:
 
-			# create job for sim_stats
-			prefix = path["output-prefix"]
-			sim_stats_job = j.Job(name="{}_{}".format(prefix, halo_section),
-						   	execute_dir=halo_section,
-						   executable=halo_exe,
-						   arguments=["--config", config_path,
-									  "--timesteps", timesteps_path,
-									  "--prefix", prefix,
-									  parameters_path],
-						   configurations=configurations,
-						   environment=environment)
+				print "Creating analysis jobs for", path
 
-			# make dependent on CBench job and add to workflow
-			halo_job.add_parents(cbench_job)
-			self.add_job(halo_job)
+				# create job for sim_stats
+				prefix = 
+				sim_stats_job = j.Job(name="{}_{}".format(prefix, analysis["name"]),
+						   				execute_dir=self.json_data["project-home"] + "/" + analysis["name"],
+						   				executable=analysis["path"],
+						   				arguments=["", item["path"],
+						   					"", item["output-prefix"]
+									  		"-c", 64],
+						   				configurations=analysis["configuration"],
+						   				environment=self.json_data["simulation-analysis"]["evn_path"])
 
-			#  create job for lya_all_axes
-			spectrum_job = j.Job(name="{}_{}".format(prefix, spectrum_section),
-								 execute_dir=spectrum_section,
-								 executable=spectrum_exe,
-								 arguments=["-n", "FILE", 499],
-								 configurations=configurations,
-								 environment=environment)
+				# make dependent on CBench job and add to workflow
+				halo_job.add_parents(cbench_job)
+				self.add_job(halo_job)
 
-			# make dependent on CBench job and add to workflow
-			spectrum_job.add_parents(cbench_job)
-			self.add_job(spectrum_job)
 
 	def add_plotting_jobs(self):
 		print "Plotting Jobs"
