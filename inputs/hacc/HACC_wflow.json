@@ -1,5 +1,5 @@
 {
-	"project-home" : "/home/pascal/projects/VizAly-CBench/PAT/hacc_wflow",
+	"project-home" : "/projects/exasky/cmbiwer-projects/pat_refactor/PAT/hacc_wflow",
 
 	"input": {
 		"filetype-comment": "type of file to load; HACC or NYX",
@@ -7,12 +7,12 @@
 
 		
 		"filename-comment": "name of input file",
-		"filename": "../testing/data/m000.full.mpicosmo.50",
+		"filename": "/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP499/m000.full.mpicosmo.499",
 
 		"scalars-comment": "which scalars to test",
 		"scalars": ["x", "y", "z", "vx", "vy", "vz"],
 
-        "path" : "mpirun /path/to/cbench",
+        "path" : "mpirun /projects/exasky/cmbiwer-projects/VizAly-CBench/build/CBench",
 
         "configuration" : {
             "partition" : "scaling",
@@ -103,7 +103,7 @@
 
 	"simulation-analysis" :
 	{
-		"evn_path" : "/projects/exasky/HACC.darwin_analysis",
+		"evn_path" : "/projects/exasky/HACC_GPU.darwin_setup",
 		"analysis-folder" : "HACC_Test_",
 
 		"analysis-tool" :
@@ -112,28 +112,27 @@
 
 			"analytics": 
 			{
-                "halo" : {
-				    "path": "mpirun /path/to/halofinder",
-                    "config-file" : "/projects/exasky/HACC_GPU/run/haloInputs/cosmotools-config.dat",
-                    "timesteps-file" : "/projects/exasky/HACC_GPU/run/haloInputs/timesteps.dat",
-                    "parameters-file" : "/projects/exasky/HACC_GPU/run/haloInputs/indat.params",
-                    "configuration" : {
-                        "partition" : "general",
-                        "nodes" : 8,
-                        "ntasks-per-node" : 1,
-                        "constraint" : "gpu1_model:Tesla_K40m"
-                    }
-			    },
-                "spectrum" : {
-                    "path" : "mpirun /path/to/spectrum",
-                     "configuration" : {
-                         "partition" : "scaling",
-                         "nodes" : 32,
-                         "ntasks-per-node" : 16
-                    }
-                }
-                
-            }
+                            "halo" : {
+            	                "path": "echo",
+                                "config-file" : "/projects/exasky/HACC_GPU/run/haloInputs/cosmotools-config.dat",
+                                "timesteps-file" : "/projects/exasky/HACC_GPU/run/haloInputs/timesteps.dat",
+                                "parameters-file" : "/projects/exasky/HACC_GPU/run/haloInputs/indat.params",
+                                "configuration" : {
+                                    "partition" : "general",
+                                    "nodes" : 8,
+                                    "ntasks-per-node" : 1,
+                                    "constraint" : "gpu1_model:Tesla_K40m"
+                                }
+            	            },
+                            "spectrum" : {
+                                "path" : "echo",
+                                "configuration" : {
+                                     "partition" : "scaling",
+                                     "nodes" : 32,
+                                     "ntasks-per-node" : 16
+                                }
+                            }
+                        }
 		},
 
 		"input-files" : [],
