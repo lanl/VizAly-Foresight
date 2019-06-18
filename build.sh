@@ -7,7 +7,7 @@ buildType="Debug"
 buildOpt="Default"
 buildPlatform="Default"
 opts=""
-externalDependencies=$externalDependencies
+externalDependencies=$projectPath"/ExternalDependencies"
 
 
 # Process arguments
