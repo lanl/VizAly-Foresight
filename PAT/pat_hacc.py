@@ -36,6 +36,8 @@ class HACCWorkflow(workflow.Workflow):
         spectrum_section = "spectrum"
         spectrum_exe = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
                                      [spectrum_section]["path"]
+        spectrum_config_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+                                             [spectrum_section]["config-file"]
 
         # get halo finder run specifications from configuration file
         spectrum_config = self.configuration_from_json_data(spectrum_section)
@@ -45,6 +47,8 @@ class HACCWorkflow(workflow.Workflow):
         for path in self.json_data["simulation-analysis"]["input-files"]:
             print("Creating analysis jobs for", path)
             prefix = path["output-prefix"]
+            cbench_path = path["path"]
+            timestep = 499
 
             # write halo finder parameters file
             # specify location of parsed configuration file inside
@@ -84,7 +88,7 @@ class HACCWorkflow(workflow.Workflow):
             spectrum_job = j.Job(name="{}_{}".format(prefix, spectrum_section),
                                  execute_dir=spectrum_section,
                                  executable=spectrum_exe,
-                                 arguments=["-n", "FILE", 499],
+                                 arguments=[spectrum_config_file, "-n", cbench_path, prefix + "spectrum", timestep],
                                  configurations=spectrum_config,
                                  environment=environment)
 
