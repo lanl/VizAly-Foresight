@@ -5,53 +5,110 @@ import os
 from pat import file_utilities as futils
 from pat import plot_utilities as putils
 from pat import workflow
+from pat import Job as j
+
 
 
 
 class NYXWorkflow(workflow.Workflow):
 
+
+	# Re-write the json data to include the analysis
+	def add_analysis_input(self):		
+		# Create analysis settings
+		analyis_path = self.json_data["project-home"]
+		
+
+		for ana in self.json_data['simulation-analysis']['analysis-tool']['analytics']:
+			for item in ana['type']:
+				json_item = {
+					"title" : ana['name'] + "_" + item,
+					"files" : []
+				}
+
+				for inputItem in self.json_data['simulation-analysis']['input-files']:
+					input_item = { 
+						'name' : inputItem["output-prefix"],
+						'path' : analyis_path + "/" + ana['name'] + "/" + inputItem['output-prefix'] + item + ana['postfix']
+					}
+
+					json_item['files'].append(input_item)
+
+				self.json_data['simulation-analysis']['analysis'].append(json_item)
+
+
+
+	# Create the analysis job
 	def add_analysis_jobs(self):
 
 		# get CBench job which is parent to all jobs in this function
 		cbench_job = self.jobs[0]
 
-
-		# Get environment
-		if "evn_path" in self.json_data["simulation-analysis"]:
-			environment = 
-		else:
-			environment = None
-
-
 		# create job to run sim_stat and lya
 		for analysis in self.json_data["simulation-analysis"]["analysis-tool"]["analytics"]:
-			for item in self.json_data["simulation-analysis"]["input-files"]:
 
-				print "Creating analysis jobs for", path
+			if "evn_path" in self.json_data["simulation-analysis"]:
+				environment = self.json_data["simulation-analysis"]["evn_path"]
+			else:
+				environment = None
+
+			if "configuration" in analysis:
+				configurations = list( sum( analysis["configuration"].items(), () ) )
+			else:
+				configurations = None
+
+
+			for item in self.json_data["simulation-analysis"]["input-files"]:
+				print "Creating analysis jobs for", analysis, " on ", item
 
 				# create job for sim_stats
-				prefix = 
-				sim_stats_job = j.Job(name="{}_{}".format(prefix, analysis["name"]),
+				gimlet_job = j.Job(name="{}_{}".format(item["output-prefix"], analysis["name"]),
 						   				execute_dir=self.json_data["project-home"] + "/" + analysis["name"],
-						   				executable=analysis["path"],
-						   				arguments=["", item["path"],
-						   					"", item["output-prefix"]
-									  		"-c", 64],
-						   				configurations=analysis["configuration"],
-						   				environment=self.json_data["simulation-analysis"]["evn_path"])
+						   				executable=analysis["path"], 
+						   				arguments=[ item["path"], item["output-prefix"] ],
+						   				configurations=configurations,
+						   				environment=environment )
 
 				# make dependent on CBench job and add to workflow
-				halo_job.add_parents(cbench_job)
-				self.add_job(halo_job)
+				gimlet_job.add_parents(cbench_job)
+				self.add_job(gimlet_job)
+
+		self.add_analysis_input()
+		"""
+		# Rewrite analysis
+		workflow_file = self.json_data["project-home"] + "/cbench/wflow.json"
+		print workflow_file
+		self.write_analysis_input(workflow_file)
+		self.json_data = futils.read_json(workflow_file)
+		"""
 
 
+	# Create plots
 	def add_plotting_jobs(self):
 		print "Plotting Jobs"
 
-		halo_images = []
-		spectrum_images = []
+		if "evn_path" in self.json_data["simulation-analysis"]:
+			environment = self.json_data["simulation-analysis"]["evn_path"]
+		else:
+			environment = None
 
-		create_CinemaDB()
+		configuration = ["nodes", 1, "constraint", "haswell", "qos", "debug", "time", "00:10:00", "allocation", "m2848" ]
+
+        
+
+		cinema_job = j.Job(name="cinema_",
+			execute_dir=self.json_data["project-home"],
+			executable="python pat_nyx_cinema.py", 
+			arguments=[ "wflow.json" ],
+			configurations=configuration,
+			environment=environment )
+
+		# make dependent on CBench job and add to workflow
+		print self.jobs
+		for job in self.jobs:
+			cinema_job.add_parents(job)
+		self.add_job(cinema_job)
+
 
 
 # Parse Input
@@ -66,7 +123,6 @@ wflow_data = futils.read_json(opts.input_file)
 # create Workflow instance
 wflow_dir = wflow_data["project-home"]
 wflow = NYXWorkflow("wflow", wflow_data, workflow_dir=wflow_dir)
-
 
 # add jobs to workflow
 wflow.add_cbench_job()
@@ -87,135 +143,3 @@ if opts.submit:
 python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow.json 
 """
 
-
-"""
-def write_analysis_input(analysis_json_filename):
-	temp_json_data =  futils.read_json(analysis_json_filename)
-	
-	# Create analysis settings
-	currentPath = os.getcwd()
-
-	for ana in temp_json_data['simulation-analysis']['analysis-tool']['analytics']:
-		for item in ana['type']:
-			json_item = {
-				"title" : ana['name'] + "_" + item,
-				"files" : []
-			}
-
-			for inputItem in temp_json_data['simulation-analysis']['input-files']:
-				input_item = { 
-					'name' : inputItem["output-prefix"],
-					'path' : currentPath + "/" + temp_json_data['simulation-analysis']['analysis-folder'] + "/" + ana['name'] + "/" + inputItem['output-prefix'] + item + ana['postfix']
-				}
-
-				json_item['files'].append(input_item)
-
-			
-			temp_json_data['simulation-analysis']['analysis'].append(json_item)
-
-	futils.write_json_file(analysis_json_filename, temp_json_data)
-
-	return analysis_json_filename
-	
-
-def run_analysis(json_file):
-	json_data = futils.read_json(json_file)
-
-	# Set some environment variables
-	os.system("cd " + json_data['simulation-analysis']['analysis-tool']['gimlet-home'])
-
-
-	# Create Folder for analytics
-	path = os.getcwd()
-	path = path + "/" + self.json_data['simulation-analysis']['analysis-folder']
-	if not os.path.exists(path):
-		os.mkdir(path)
-
-
-	# Run analytics
-	for sim_analytics in self.json_data['simulation-analysis']['analysis-tool']['analytics']:
-		for file in self.json_data['simulation-analysis']['input-files']:
-			# Run gimlet analysis
-			analysis_path = path + "/" + sim_analytics['name']
-			if not os.path.exists(analysis_path):
-				os.mkdir(analysis_path)
-
-			cmd = "mpirun -np 16 " + sim_analytics['path'] + " " + file['path'] + " " + analysis_path + "/" + file['output-prefix']
-			os.system(cmd)
-
-
-def create_cinema(json_file):
-	# Read Json file
-	json_data = futils.read_json(json_file)
-
-	# Open CSV file
-	metrics_csv = self.json_data['output']['run-path'] + self.json_data['output']['metricsfname'] + ".csv "
-	reader = futils.open_csv_file(metrics_csv)
-
-	# Modify Cinema files
-	all = []
-	row = next(reader)
-	row.append('FILE_SimStats_Pk')
-	row.append('FILE_lya_all_axes_x_Pk')
-	row.append('FILE_lya_all_axes_y_Pk')
-	row.append('FILE_lya_all_axes_z_Pk')
-	all.append(row)
-
-
-	values = ["sim_stats_rhob.png", "sim_stats_rhodm.png", "sim_stats_temp.png", "sim_stats_velmag.png", "sim_stats_velmag.png", "sim_stats_vz.png"]
-	count = 0
-	for row in reader:
-		row.append(values[count])
-		row.append("lya_all_axes_x.png")
-		row.append("lya_all_axes_y.png")
-		row.append("lya_all_axes_z.png")
-		all.append(row)
-
-		count = count + 1
-		if (count == 6):
-			count = 0
-
-	futils.write_csv("data.csv", all)
-
-
-	# Create cinema database
-	cinema_database = self.json_data['simulation-analysis']['analysis-folder'] + ".cdb"
-	img_files = list_files_in_folder( self.json_data['simulation-analysis']['analysis-folder'] )
-	self.create_CinemaDB(cinema_database, "data.csv", img_files)
-
-
-def create_plots(self):
-	# Read Json file
-	json_data = futils.read_json(json_file)
-
-	path = self.json_data['simulation-analysis']['analysis-folder']
-	csv_file_path = self.json_data['output']['run-path'] + self.json_data['output']['metricsfname'] + ".csv"
-	x_range = self.json_data['simulation-analysis']['plotting']['x-range']
-
-	for ana in self.json_data['simulation-analysis']['analysis']:
-		plot_title = ana['title']
-		to_plot = []  # all the items to plot
-
-		k_list = []
-		orig_pk = []
-
-		# Find the original file
-		for file in ana['files']:
-			if (file['name']=="orig"):
-				k_list  = f.extract_csv_col(file['path'], ' ', 2)
-				orig_pk = f.extract_csv_col(file['path'], ' ', 3)
-
-		for file in ana['files']:
-			if (file['name']!="orig"):
-				print (file['path'])
-
-				temp_pk = f.extract_csv_col(file['path'], ' ', 3)
-				if (temp_pk is not None):
-					pk_ratio = [i / j for i, j in zip(temp_pk, orig_pk)]
-					this_tuple = (pk_ratio, file['name']) #array, name
-					to_plot.append(this_tuple)
-
-		putils.plotScatterGraph(k_list, 'k', 'pk', plot_title, path, x_range, to_plot)
-
-
-"""
