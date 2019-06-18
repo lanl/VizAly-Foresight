@@ -1,15 +1,7 @@
-#!/usr/bin/python
-
-import sys, os, json, csv
-from collections import OrderedDict
-
-import file_utilities as futils
-import plot_utilities as putils
-
 #! /usr/bin/env python
 
-import argparse
-import os
+import argparse, os, csv
+
 from pat import file_utilities as futils
 from pat import plot_utilities as putils
 from pat import cinema
@@ -17,41 +9,48 @@ from pat import Job as j
 
 
 
-class pat_nyx_cinema(cinema.Cinema):
+class pat_nyx_cinema(cinema.CinemaWorkflow):
 
 	def prepare_cinema(self):
 		# Open CSV file
-		metrics_csv = self.json_data['output']['run-path'] + self.json_data['output']['metricsfname'] + ".csv "
-		reader = futils.open_csv_file(metrics_csv)
+		metrics_csv 	 = self.json_data["project-home"] + "/cbench/" + self.json_data['output']['metricsfname'] + ".csv"
+		output_file_name = self.json_data["project-home"] + "/cbench/" + "data.csv"
+		#reader = futils.open_csv_file(metrics_csv)
+		print metrics_csv
+		print output_file_name
 
-		# Modify Cinema files
 		all = []
-		row = next(reader)
-		row.append('FILE_SimStats_Pk')
-		row.append('FILE_lya_all_axes_x_Pk')
-		row.append('FILE_lya_all_axes_y_Pk')
-		row.append('FILE_lya_all_axes_z_Pk')
-		all.append(row)
+		with open(metrics_csv,'r') as csvinput:
+			reader = csv.reader(csvinput)
 
-
-		values = ["sim_stats_rhob.png", "sim_stats_rhodm.png", "sim_stats_temp.png", "sim_stats_velmag.png", "sim_stats_velmag.png", "sim_stats_vz.png"]
-		count = 0
-		for row in reader:
-			row.append(values[count])
-			row.append("lya_all_axes_x.png")
-			row.append("lya_all_axes_y.png")
-			row.append("lya_all_axes_z.png")
+			# Modify Cinema files
+		
+			row = next(reader)
+			row.append('FILE_SimStats_Pk')
+			#row.append('FILE_lya_all_axes_x_Pk')
+			#row.append('FILE_lya_all_axes_y_Pk')
+			#row.append('FILE_lya_all_axes_z_Pk')
 			all.append(row)
 
-			count = count + 1
-			if (count == 6):
-				count = 0
+			values = ["sim_stats_rhob.png", "sim_stats_rhodm.png", "sim_stats_temp.png", "sim_stats_velmag.png", "sim_stats_velmag.png", "sim_stats_vz.png"]
+			count = 0
+			for row in reader:
+				row.append(values[count])
+				#row.append("lya_all_axes_x.png")
+				#row.append("lya_all_axes_y.png")
+				#row.append("lya_all_axes_z.png")
+				all.append(row)
 
-		futils.write_csv("data.csv", all)
+				count = count + 1
+				if (count == 6):
+					count = 0
+
+			
+			futils.write_csv(output_file_name, all)
 
 
 	def create_plots(self):
-		path = self.json_data['simulation-analysis']['analysis-folder']
+		output_path = self.json_data['project-home'] + "/cinema"
 		csv_file_path = self.json_data['output']['run-path'] + self.json_data['output']['metricsfname'] + ".csv"
 		x_range = self.json_data['simulation-analysis']['plotting']['x-range']
 
@@ -65,20 +64,20 @@ class pat_nyx_cinema(cinema.Cinema):
 			# Find the original file
 			for file in ana['files']:
 				if (file['name']=="orig"):
-					k_list  = f.extract_csv_col(file['path'], ' ', 2)
-					orig_pk = f.extract_csv_col(file['path'], ' ', 3)
+					k_list  = futils.extract_csv_col(file['path'], ' ', 2)
+					orig_pk = futils.extract_csv_col(file['path'], ' ', 3)
 
 			for file in ana['files']:
 				if (file['name']!="orig"):
 					print (file['path'])
 
-					temp_pk = f.extract_csv_col(file['path'], ' ', 3)
+					temp_pk = futils.extract_csv_col(file['path'], ' ', 3)
 					if (temp_pk is not None):
 						pk_ratio = [i / j for i, j in zip(temp_pk, orig_pk)]
 						this_tuple = (pk_ratio, file['name']) #array, name
 						to_plot.append(this_tuple)
 
-			putils.plotScatterGraph(k_list, 'k', 'pk', plot_title, path, x_range, to_plot)
+			putils.plotScatterGraph(k_list, 'k', 'pk', plot_title, output_path, x_range, to_plot)
 
 
 

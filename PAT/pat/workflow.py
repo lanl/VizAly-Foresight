@@ -51,7 +51,7 @@ class Workflow(object):
         for _file in self.json_data['compressors']:
             json_item = {
                 "output-prefix" : _file["output-prefix"],
-                "path" : self.json_data['output']['run-path'] + self.json_data['output']['output-decompressed-location'] + "/" + _file['output-prefix'] + "__" + orig_path_filename[1]
+                "path" : self.json_data['project-home'] + "/cbench/" + self.json_data['output']['output-decompressed-location'] + "/" + _file['output-prefix'] + "__" + orig_path_filename[1]
             }
 
             self.json_data['simulation-analysis']['input-files'].append(json_item)
