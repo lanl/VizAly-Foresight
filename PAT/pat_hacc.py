@@ -88,7 +88,7 @@ class HACCWorkflow(workflow.Workflow):
             spectrum_job = j.Job(name="{}_{}".format(prefix, spectrum_section),
                                  execute_dir=spectrum_section,
                                  executable=spectrum_exe,
-                                 arguments=[spectrum_config_file, "-n", cbench_path, prefix + "spectrum", timestep],
+                                 arguments=[spectrum_config_path, "-n", cbench_path, prefix + "spectrum", timestep],
                                  configurations=spectrum_config,
                                  environment=environment)
 

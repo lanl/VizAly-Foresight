@@ -44,7 +44,7 @@
             "output-prefix" : "Isabela",
             "tolerance" : 27,
             "nCoeff" : 30,
-            "window-size" : 2048,
+            "window-size" : 2048
 	},
         {
             "name": "fpzip",
