@@ -3,9 +3,9 @@
 import sys, os, json, csv
 from collections import OrderedDict
 
-import file_utilities as futils
-import plot_utilities as putils
-import Job as j
+from pat import file_utilities as futils
+from pat import plot_utilities as putils
+from pat import Job as j
 
 import os
 
@@ -68,8 +68,6 @@ class Workflow(object):
         else:
             environment = None
 
-        print environment
-
         # add a single CBench job to workflow for entire sweep
         cbench_job = j.Job(name="cbench",
                          execute_dir=execute_dir,
@@ -104,7 +102,7 @@ class Workflow(object):
         cmd = "cp " + csv_file + " " + cinema_database + "/data.csv"
         os.system(cmd)
 
-        print "Create cinema database " + cinema_database
+        print("Create cinema database " + cinema_database)
 
 
     def write_submit(self):
