@@ -35,6 +35,7 @@ class Workflow(object):
         """
         self.jobs.append(job)
 
+
     def add_cbench_job(self):
         """ Adds a CBench job to the workflow.
         """
@@ -76,6 +77,7 @@ class Workflow(object):
                          configurations=configurations,
                          environment=environment)
         self.add_job(cbench_job)
+
 
     def add_analysis_jobs(self):
         """ Adds analysis jobs to workflow that do not produce final products.
@@ -169,3 +171,19 @@ class Workflow(object):
         """
         os.system("bash {}".format(self.submit_path))
 
+
+    def configuration_from_json_data(self, name):
+        if "configuration" in self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][name].keys():
+            configurations = list(sum(self.json_data["simulation-analysis"]["analysis-tool"]["analytics"]
+                                                    [name]["configuration"].items(), ()))
+        else:
+            configurations = None
+        return configurations
+
+
+    def environment_from_json_data(self):
+        if "evn_path" in self.json_data["simulation-analysis"]:
+            environment = self.json_data["simulation-analysis"]["evn_path"]
+        else:
+            environment = None
+        return environment
