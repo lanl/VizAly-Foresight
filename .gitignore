@@ -78,6 +78,9 @@ temp/
 *.a
 *.lib
 
+# Compiled Python
+*.pyc
+
 # Executables
 *.exe
 *.out
