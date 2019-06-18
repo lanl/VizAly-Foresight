@@ -61,26 +61,20 @@ class NYXWorkflow(workflow.Workflow):
 			for item in self.json_data["simulation-analysis"]["input-files"]:
 				print "Creating analysis jobs for", analysis, " on ", item
 
+				#execute_dir=self.json_data["project-home"] + "/" + analysis["name"],
 				# create job for sim_stats
 				gimlet_job = j.Job(name="{}_{}".format(item["output-prefix"], analysis["name"]),
-						   				execute_dir=self.json_data["project-home"] + "/" + analysis["name"],
-						   				executable=analysis["path"], 
-						   				arguments=[ item["path"], item["output-prefix"] ],
-						   				configurations=configurations,
-						   				environment=environment )
+										execute_dir=analysis["name"],
+										executable=analysis["path"], 
+										arguments=[ item["path"], item["output-prefix"] ],
+										configurations=configurations,
+										environment=environment )
 
 				# make dependent on CBench job and add to workflow
 				gimlet_job.add_parents(cbench_job)
 				self.add_job(gimlet_job)
 
 		self.add_analysis_input()
-		"""
-		# Rewrite analysis
-		workflow_file = self.json_data["project-home"] + "/cbench/wflow.json"
-		print workflow_file
-		self.write_analysis_input(workflow_file)
-		self.json_data = futils.read_json(workflow_file)
-		"""
 
 
 	# Create plots
@@ -92,14 +86,14 @@ class NYXWorkflow(workflow.Workflow):
 		else:
 			environment = None
 
-		configuration = ["nodes", 1, "constraint", "haswell", "qos", "debug", "time", "00:10:00", "allocation", "m2848" ]
+		configuration = ["nodes", 1, "partition", "scaling", "ntasks-per-node", 8 ]
 
-        
+		arg1 = self.json_data["project-home"] + "/cbench/wflow.json"
 
 		cinema_job = j.Job(name="cinema_",
-			execute_dir=self.json_data["project-home"],
-			executable="python pat_nyx_cinema.py", 
-			arguments=[ "wflow.json" ],
+			execute_dir="cinema",
+			executable="python " + os.getcwd() + "/" + "pat_nyx_cinema.py", 
+			arguments=[ "--input-file", arg1 ],
 			configurations=configuration,
 			environment=environment )
 
@@ -136,10 +130,12 @@ wflow.write_submit()
 
 # submit workflow
 if opts.submit:
-    wflow.submit()
+	wflow.submit()
 
 
 """
 python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow.json 
+python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow.json --submit
+python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow_darwin.json --submit
 """
 

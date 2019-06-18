@@ -44,6 +44,19 @@ def list_files_in_folder(folder):
 	return files
 
 
+def list_files_in_folder(folder, extension):
+	files = []
+
+	# r=root, d=directories, f = files
+	for r, d, f in os.walk(folder):
+		for file in f:
+			if file.endswith(extension):
+				files.append( folder + "/" + file)
+
+	return files
+
+
+
 
 # CSV
 def open_csv_file(csv_file):

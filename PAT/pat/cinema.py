@@ -12,12 +12,13 @@ class CinemaWorkflow():
 
 	def __init__(self, json_file):
 		self.json_file = json_file
+		print self.json_file
 		self.json_data = futils.read_json(self.json_file)
 
 
-	def create_Cinema_Database(self, cinema_database, csv_file, image_files):
+	def create_cinema_database(self, cinema_database, csv_file, image_files):
 		#create cdb file
-		f.create_folder(cinema_database)
+		futils.create_folder(cinema_database)
 
 		# Copy files to cinema
 		for img in image_files:
@@ -44,8 +45,10 @@ class CinemaWorkflow():
 
 		# Create cinema database
 		cinema_database = self.json_data['simulation-analysis']['analysis-folder'] + ".cdb"
-		img_files = list_files_in_folder( self.json_data['simulation-analysis']['analysis-folder'] )
-		putils.create_Cinema_Database(cinema_database, "data.csv", img_files)
+		img_files = futils.list_files_in_folder( self.json_data['project-home'] + "/cinema/" , ".png")
+		cinema_csv = self.json_data["project-home"] + "/cbench/" + "data.csv"
+
+		self.create_cinema_database(cinema_database, cinema_csv, img_files)
 
 
 	
