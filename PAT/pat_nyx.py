@@ -7,6 +7,110 @@ from pat import plot_utilities as putils
 from pat import workflow
 
 
+
+class NYXWorkflow(workflow.Workflow):
+
+	def add_analysis_jobs(self):
+
+		# get CBench job which is parent to all jobs in this function
+		cbench_job = self.jobs[0]
+
+		# get halo information from configuration file
+		gimlet = "halo"
+		halo_exe = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section]["path"]
+		timesteps_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section]["timesteps-file"]
+		config_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section]["config-file"]
+		parameters_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section]["parameters-file"]
+		if "configuration" in self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section].keys():
+			configurations = list(sum(self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section]["configuration"].items(), ()))
+		else:
+			configurations = None
+		if "evn_path" in self.json_data["simulation-analysis"]:
+			environment = self.json_data["simulation-analysis"]["evn_path"]
+		else:
+			environment = None
+
+		# get spectrum information from configuration file
+		spectrum_section = "spectrum"
+		spectrum_exe = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][spectrum_section]["path"]
+
+		# create job to run halo finder on each output file from CBench
+		# create job to run 
+		for path in self.json_data["simulation-analysis"]["input-files"]:
+			print "Creating analysis jobs for", path
+
+			# create job for sim_stats
+			prefix = path["output-prefix"]
+			sim_stats_job = j.Job(name="{}_{}".format(prefix, halo_section),
+						   	execute_dir=halo_section,
+						   executable=halo_exe,
+						   arguments=["--config", config_path,
+									  "--timesteps", timesteps_path,
+									  "--prefix", prefix,
+									  parameters_path],
+						   configurations=configurations,
+						   environment=environment)
+
+			# make dependent on CBench job and add to workflow
+			halo_job.add_parents(cbench_job)
+			self.add_job(halo_job)
+
+			#  create job for lya_all_axes
+			spectrum_job = j.Job(name="{}_{}".format(prefix, spectrum_section),
+								 execute_dir=spectrum_section,
+								 executable=spectrum_exe,
+								 arguments=["-n", "FILE", 499],
+								 configurations=configurations,
+								 environment=environment)
+
+			# make dependent on CBench job and add to workflow
+			spectrum_job.add_parents(cbench_job)
+			self.add_job(spectrum_job)
+
+	def add_plotting_jobs(self):
+		print "Plotting Jobs"
+
+		halo_images = []
+		spectrum_images = []
+
+		create_CinemaDB()
+
+
+# Parse Input
+parser = argparse.ArgumentParser()
+parser.add_argument("--input-file")
+parser.add_argument("--submit", action="store_true")
+opts = parser.parse_args()
+
+# Read input JSON file
+wflow_data = futils.read_json(opts.input_file)
+
+# create Workflow instance
+wflow_dir = wflow_data["project-home"]
+wflow = NYXWorkflow("wflow", wflow_data, workflow_dir=wflow_dir)
+
+
+# add jobs to workflow
+wflow.add_cbench_job()
+wflow.add_analysis_jobs()
+wflow.add_plotting_jobs()
+
+
+# write submission script
+wflow.write_submit()
+
+
+# submit workflow
+if opts.submit:
+    wflow.submit()
+
+
+"""
+python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow.json 
+"""
+
+
+"""
 def write_analysis_input(analysis_json_filename):
 	temp_json_data =  futils.read_json(analysis_json_filename)
 	
@@ -136,37 +240,4 @@ def create_plots(self):
 		putils.plotScatterGraph(k_list, 'k', 'pk', plot_title, path, x_range, to_plot)
 
 
-
-
-# Parse Input
-parser = argparse.ArgumentParser()
-parser.add_argument("--input-file")
-parser.add_argument("--submit", action="store_true")
-opts = parser.parse_args()
-
-# Read input JSON file
-wflow_data = futils.read_json(opts.input_file)
-
-# create Workflow instance
-wflow_dir = wflow_data["project-home"]
-wflow = workflow.Workflow("wflow", wflow_data, workflow_dir=wflow_dir)
-
-
-# add CBench job
-wflow.add_cbench_job()
-wflow.add_analysis_jobs()
-wflow.add_plotting_jobs()
-
-
-# write submission script
-wflow.write_submit()
-
-
-# submit workflow
-if opts.submit:
-    wflow.submit()
-
-
-"""
-python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow.json 
 """
