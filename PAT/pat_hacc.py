@@ -1,4 +1,6 @@
 #! /usr/bin/env python
+""" This script generates a workflow that runs CBench and HACC data analysis executables.
+"""
 
 import argparse
 import os
@@ -13,29 +15,33 @@ class HACCWorkflow(workflow.Workflow):
         # get CBench job which is parent to all jobs in this function
         cbench_job = self.jobs[0]
 
-        # get halo information from configuration file
+        # get halo finder information from configuration file
         halo_section = "halo"
-        halo_exe = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section]["path"]
-        timesteps_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section]["timesteps-file"]
-        config_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section]["config-file"]
-        parameters_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section]["parameters-file"]
-        if "configuration" in self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section].keys():
-            configurations = list(sum(self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][halo_section]["configuration"].items(), ()))
-        else:
-            configurations = None
-        if "evn_path" in self.json_data["simulation-analysis"]:
-            environment = self.json_data["simulation-analysis"]["evn_path"]
-        else:
-            environment = None
+        halo_exe = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+                                 [halo_section]["path"]
+        timesteps_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+                                       [halo_section]["timesteps-file"]
+        config_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+                                    [halo_section]["config-file"]
+        parameters_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+                                        [halo_section]["parameters-file"]
+
+        # get halo finder run specifications from configuration file
+        halo_config = self.configuration_from_json_data(halo_section)
+        environment = self.environment_from_json_data()
 
         # get spectrum information from configuration file
         spectrum_section = "spectrum"
-        spectrum_exe = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][spectrum_section]["path"]
+        spectrum_exe = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+                                     [spectrum_section]["path"]
+
+        # get halo finder run specifications from configuration file
+        spectrum_config = self.configuration_from_json_data(spectrum_section)
 
         # create job to run halo finder on each output file from CBench
         # create job to run 
         for path in self.json_data["simulation-analysis"]["input-files"]:
-            print "Creating analysis jobs for", path
+            print("Creating analysis jobs for", path)
 
             # create job for halo finder
             prefix = path["output-prefix"]
@@ -46,7 +52,7 @@ class HACCWorkflow(workflow.Workflow):
                                       "--timesteps", timesteps_path,
                                       "--prefix", prefix,
                                       parameters_path],
-                           configurations=configurations,
+                           configurations=halo_config,
                            environment=environment)
 
             # make dependent on CBench job and add to workflow
@@ -58,7 +64,7 @@ class HACCWorkflow(workflow.Workflow):
                                  execute_dir=spectrum_section,
                                  executable=spectrum_exe,
                                  arguments=["-n", "FILE", 499],
-                                 configurations=configurations,
+                                 configurations=spectrum_config,
                                  environment=environment)
 
             # make dependent on CBench job and add to workflow
@@ -66,12 +72,12 @@ class HACCWorkflow(workflow.Workflow):
             self.add_job(spectrum_job)
 
     def add_plotting_jobs(self):
-        print "PLOTTING JOBS"
+        print("PLOTTING JOBS")
 
         halo_images = []
         spectrum_images = []
 
-        create_CinemaDB()
+        #create_CinemaDB()
 
 # parse command li9ne
 parser = argparse.ArgumentParser()
