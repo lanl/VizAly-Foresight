@@ -1,5 +1,5 @@
 {
-	"project-home" : "/projects/exasky/VizAly-CBench/",
+	"project-home" : "/projects/exasky/VizAly-CBench/PAT/nyx_wflow",
 
   	"input": 
   	{
@@ -8,6 +8,13 @@
 
 	    "filename-comment": "name of input file",
 	    "filename": "../testing/data/z255_32.h5",
+
+	    "path": "mpirun /path/to/cbench", 
+        "configuration": {
+            "partition": "scaling", 
+            "nodes": 8, 
+            "ntasks-per-node": 8
+        }
 
 	    "scalars-comment": "which scalars to test",
 	    "group" : "native_fields",
@@ -144,13 +151,23 @@
                     "name": "sim_stats", 
                     "type" : ["rhob", "rhom", "rhodm", "temp", "velmag", "vz"],
                     "postfix" : "_ps3d.txt",
-                    "path": "/projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex"
+                    "path": "/projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex",
+                    "configuration": {
+                        "partition": "scaling", 
+                        "nodes": 32, 
+                        "ntasks-per-node": 16
+                    }
                 }, 
                 {
                     "name": "lya_all_axes", 
                     "type" : ["x", "y", "z"],
                     "postfix" : "_flux_ps1d.txt",
-                    "path": "/projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex"
+                    "path": "/projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex",
+                    "configuration": {
+                        "partition": "scaling", 
+                        "nodes": 32, 
+                        "ntasks-per-node": 16
+                    }
                 }
             ]
 		},
