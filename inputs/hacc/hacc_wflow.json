@@ -16,8 +16,8 @@
     "output": {
         "run-path" : "/home/pascal/projects/VizAly-CBench/PAT/hacc_wflow",
         "output-decompressed-location" : "/cbench",
-        "logfname": "runlog_HACC_all_",
-        "metricsfname": "metrics_HACC_all_"
+        "logfname": "runlog",
+        "metricsfname": "metrics"
     },
 
     "compressors": [
