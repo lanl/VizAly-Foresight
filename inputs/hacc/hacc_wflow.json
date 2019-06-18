@@ -1,142 +1,110 @@
 {
-	"project-home" : "/projects/exasky/cmbiwer-projects/pat_refactor/PAT/hacc_wflow",
+    "project-home" : "/projects/exasky/cmbiwer-projects/pat_refactor/PAT/hacc_wflow",
 
-	"input": {
-		"filetype-comment": "type of file to load; HACC or NYX",
-		"filetype": "HACC",
-
-		
-		"filename-comment": "name of input file",
-		"filename": "/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP499/m000.full.mpicosmo.499",
-
-		"scalars-comment": "which scalars to test",
-		"scalars": ["x", "y", "z", "vx", "vy", "vz"],
-
-        "path" : "mpirun /projects/exasky/cmbiwer-projects/VizAly-CBench/build/CBench",
-
+    "input": {
+        "filetype": "HACC",
+        "filename": "/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP499/m000.full.mpicosmo.499",
+        "scalars": ["x", "y", "z", "vx", "vy", "vz"],
+        "path" : "/projects/opt/centos7/openmpi/2.1.3-gcc_6.4.0/bin/mpirun /projects/exasky/cmbiwer-projects/VizAly-CBench/build/CBench",
         "configuration" : {
             "partition" : "scaling",
             "nodes" : 8,
             "ntasks-per-node" : 8
         }
-	},
+    },
 
-	"output": {
-		"run-path" : "/home/pascal/projects/VizAly-CBench/PAT/hacc_wflow",
+    "output": {
+        "run-path" : "/home/pascal/projects/VizAly-CBench/PAT/hacc_wflow",
+        "output-decompressed-location" : "/cbench",
+        "logfname": "runlog_HACC_all_",
+        "metricsfname": "metrics_HACC_all_"
+    },
 
-		"output-decompressed": true,
-		"output-decompressed-location" : "/cbench",
-
-		"logfname-comment": "name of output log file",
-		"logfname": "runlog_HACC_all_",
-
-		"metricsfname-comment": "name of file with output",
-		"metricsfname": "metrics_HACC_all_"
-	},
-
-	"compressor-comment": "which compressors to test and parameters for that compressor",
-	"compressors": [
-		{
-			"name": "BLOSC",
-			"output-prefix" : "BLOSC_"
-		},
-
-		{
+    "compressors": [
+        {
+            "name": "BLOSC",
+            "output-prefix" : "BLOSC"
+        },
+        {
             "name": "SZ",
-            "compressor-params" :
-            [
+            "output-prefix" : "SZ",
+            "compressor-params" : [
                 {
                     "scalar" : ["x", "y", "z"],
                     "abs" : 2E-3
                 },
-
                 {
                     "scalar" : ["vx", "vy", "vz"],
                     "pw_rel" : 1E-2
                 }
-            ],
-             "output-prefix" : "SZ_"
-		},
+            ]
+        },
+        {
+            "name": "Isabela",
+            "output-prefix" : "Isabela",
+            "tolerance" : 27,
+            "nCoeff" : 30,
+            "window-size" : 2048,
+	},
+        {
+            "name": "fpzip",
+            "output-prefix" : "fpzip",
+            "bits": 27
+        },
+        {
+            "name": "zfp",
+            "output-prefix" : "zfp",
+            "abs": 1E-3
+        }
+    ],
 
-		{
-			"name": "Isabela",
-			"tolerance" : 27,
-			"nCoeff" : 30,
-			"window-size" : 2048,
-			"output-prefix" : "Isabela_"
-		},
-
-		{
-			"name": "fpzip",
-			"bits": 27,
-			"output-prefix" : "fpzip_"
-		},
-
-		{
-			"name": "zfp",
-			"abs": 1E-3,
-			"output-prefix" : "zfp_"
-		}
-	],
-
-	"metrics-comment": "which metrics to use",
-	"metrics": 
-	[
-		{
-			"name" : "absolute_error",
-			"histogram" : ["x", "y", "z"]
-		},
-
-		{
-			"name" : "relative_error"
-		},
-
-		{
-			"name" : "mse"
-		},
-
-		{
-			"name" : "psnr"
-		}
-	],
+    "metrics": [
+        {
+            "name" : "absolute_error",
+            "histogram" : ["x", "y", "z"]
+        },
+        {
+            "name" : "relative_error"
+        },
+        {
+            "name" : "mse"
+        },
+        {
+            "name" : "psnr"
+        }
+    ],
 
 
-	"simulation-analysis" :
-	{
-		"evn_path" : "/projects/exasky/HACC_GPU.darwin_setup",
-		"analysis-folder" : "HACC_Test_",
+    "simulation-analysis" : {
 
-		"analysis-tool" :
-		{
-			"HACC-home" : "/projects/exasky/HACC",
-
-			"analytics": 
-			{
-                            "halo" : {
-            	                "path": "echo",
-                                "config-file" : "/projects/exasky/HACC_GPU/run/haloInputs/cosmotools-config.dat",
-                                "timesteps-file" : "/projects/exasky/HACC_GPU/run/haloInputs/timesteps.dat",
-                                "parameters-file" : "/projects/exasky/HACC_GPU/run/haloInputs/indat.params",
-                                "configuration" : {
-                                    "partition" : "general",
-                                    "nodes" : 8,
-                                    "ntasks-per-node" : 1,
-                                    "constraint" : "gpu1_model:Tesla_K40m"
-                                }
-            	            },
-                            "spectrum" : {
-                                "path" : "echo",
-                                "configuration" : {
-                                     "partition" : "scaling",
-                                     "nodes" : 32,
-                                     "ntasks-per-node" : 16
-                                }
-                            }
-                        }
-		},
-
-		"input-files" : [],
-
-		"analysis" : []
-	}
+        "evn_path" : "/projects/exasky/HACC_GPU.darwin_setup",
+        "analysis-folder" : "HACC_Test_",
+        "analysis-tool" : {
+            "HACC-home" : "/projects/exasky/HACC",
+            "analytics": {
+                "halo" : {
+            	    "path": "/projects/opt/centos7/openmpi/2.1.3-gcc_6.4.0/bin/mpirun /projects/exasky/HACC_GPU/trunk/Darwin_GPU/mpi/bin/cosmotools-driver",
+                    "config-file" : "/projects/exasky/HACC_GPU/run/haloInputs/cosmotools-config.dat",
+                    "timesteps-file" : "/projects/exasky/HACC_GPU/run/haloInputs/timesteps.dat",
+                    "parameters-file" : "/projects/exasky/HACC_GPU/run/haloInputs/indat.params",
+                    "configuration" : {
+                        "partition" : "general",
+                        "nodes" : 8,
+                        "ntasks-per-node" : 1,
+                        "constraint" : "gpu1_model:Tesla_K40m"
+                    }
+            	},
+                "spectrum" : {
+                    "path" : "echo",
+                    "configuration" : {
+                        "partition" : "scaling",
+                        "nodes" : 32,
+                        "ntasks-per-node" : 16
+                    }
+                }
+            }
+        },
+        "input-files" : [],
+        "analysis" : []
+    }
 }
