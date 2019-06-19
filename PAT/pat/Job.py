@@ -20,6 +20,7 @@ class Job(object):
         self.execute_dir = execute_dir
         self.executable = executable
         self.arguments = arguments if arguments != None else []
+        self.command = ""
 
         # store dependencies
         self._parents = []
@@ -27,6 +28,10 @@ class Job(object):
 
     def __repr__(self):
         return str(self.name)
+
+    def add_command(self, command):
+        self.command = command
+        
 
     def add_parents(self, *jobs):
         self._parents += jobs
