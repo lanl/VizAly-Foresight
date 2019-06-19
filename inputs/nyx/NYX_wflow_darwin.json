@@ -158,6 +158,19 @@
 			            "nodes" : 1,
 			            "ntasks-per-node" : 8
 			        }
+                },
+
+                {
+                    "name": "lya_all_axes", 
+                    "type" : ["x", "y", "z"],
+                    "postfix" : "_flux_ps1d.txt",
+                    "path": "/projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex",
+                    "command" : "cp /projects/exasky/gimlet2/apps/lya_all_axes/TREECOOL_middle .",
+                    "configuration" : {
+			            "partition" : "scaling",
+			            "nodes" : 1,
+			            "ntasks-per-node" : 8
+			        }
                 }
             ]
 		},

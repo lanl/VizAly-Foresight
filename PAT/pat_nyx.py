@@ -8,10 +8,7 @@ from pat import workflow
 from pat import Job as j
 
 
-
-
 class NYXWorkflow(workflow.Workflow):
-
 
 	# Re-write the json data to include the analysis
 	def add_analysis_input(self):		
@@ -69,6 +66,10 @@ class NYXWorkflow(workflow.Workflow):
 										arguments=[ item["path"], item["output-prefix"] ],
 										configurations=configurations,
 										environment=environment )
+
+				if "command" in analysis:
+					gimlet_job.add_command(analysis["command"])
+
 
 				# make dependent on CBench job and add to workflow
 				gimlet_job.add_parents(cbench_job)
