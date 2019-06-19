@@ -1,4 +1,4 @@
-This [cinema database](https://lanl.github.io/VizAly-CBench/)
+This [cinema database](https://lanl.github.io/VizAly-Foresight/)
  shows the results of a small lossy compression study that we ran on the HACC data using the following compressors:
 * BigCrunch
 * SZ
