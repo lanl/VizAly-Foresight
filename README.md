@@ -9,7 +9,7 @@ Foresight has three components:
 * Cinema: The tool used to visualize the results of this project
 
 ## Current Visualization results
-* Link to the live cinema database with results : [https://lanl.github.io/VizAly-Foresight/](https://lanl.github.io/lanl/VizAly-Foresight/)
+* Link to the live cinema database with results : [https://lanl.github.io/VizAly-Foresight/](https://lanl.github.io/VizAly-Foresight/)
 * Cinema comparison is at: [https://lanl.github.io/VizAly-Foresight/cinema_compare/](https://lanl.github.io/VizAly-Foresight/cinema_compare/)
 
 # Building VizAly-Foresight
