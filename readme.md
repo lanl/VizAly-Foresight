@@ -6,5 +6,5 @@ This [cinema database](https://lanl.github.io/VizAly-CBench/)
 * fpzip
 
 ## Visualizations
-* Link to the live cinema database:[https://lanl.github.io/VizAly-CBench/](https://lanl.github.io/VizAly-CBench/)
-* Cinema comparison is at: https://lanl.github.io/VizAly-CBench/cinema_compare/
+* Link to the live cinema database with results : [https://lanl.github.io/VizAly-Foresight/](https://lanl.github.io/VizAly-Foresight/)
+* Cinema comparison is at: [https://lanl.github.io/VizAly-Foresight/cinema_compare/](https://lanl.github.io/VizAly-Foresight/cinema_compare/)
