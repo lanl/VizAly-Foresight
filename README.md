@@ -9,8 +9,8 @@ Foresight has three components:
 * Cinema: The tool used to visualize the results of this project
 
 ## Current Visualization results
-* Link to the live cinema database with results : [https://lanl.github.io/VizAly-CBench/](https://lanl.github.io/VizAly-CBench/)
-* Cinema comparison is at: https://lanl.github.io/VizAly-CBench/cinema_compare/
+* Link to the live cinema database with results : [https://lanl.github.io/VizAly-Foresight/](https://github.com/lanl/VizAly-Foresight/)
+* Cinema comparison is at: https://lanl.github.io/VizAly-Foresight/cinema_compare/
 
 # Building VizAly-Foresight
 The default master branch should always point to the latest working version. However, for more stable releases, you should checkout the latest tag release.
