@@ -80,8 +80,6 @@ class NYXWorkflow(workflow.Workflow):
 
 	# Create plots
 	def add_plotting_jobs(self):
-		print "Plotting Jobs"
-
 		if "evn_path" in self.json_data["simulation-analysis"]:
 			environment = self.json_data["simulation-analysis"]["evn_path"]
 		else:
