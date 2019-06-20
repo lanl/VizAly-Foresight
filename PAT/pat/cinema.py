@@ -44,7 +44,7 @@ class CinemaWorkflow():
 		self.prepare_cinema()
 
 		# Create cinema database
-		cinema_database = self.json_data['simulation-analysis']['analysis-folder'] + ".cdb"
+		cinema_database = self.json_data['project-home'] + "/" + self.json_data['simulation-analysis']['cinema-database'] + ".cdb"
 		img_files = futils.list_files_in_folder( self.json_data['project-home'] + "/cinema/" , ".png")
 		cinema_csv = self.json_data["project-home"] + "/cbench/" + "data.csv"
 

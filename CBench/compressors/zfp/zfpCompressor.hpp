@@ -77,7 +77,7 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
             numDims++;
         }
 
-
+ std::cout << n[0] << ", " << n[1] << ", " << n[2] << std::endl;
     // Read in json compression parameters
     double abs = 1E-3;
     int rel = 32;
@@ -101,11 +101,13 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
     // allocate meta data for the 1D input array
     zfp_field* field;
     if (numDims == 1)
-        field = zfp_field_1d(input, type, numel);
+        zfp_field* field = zfp_field_1d(input, type, numel);
     else if (numDims == 2)
         field = zfp_field_2d(input, type, n[1], n[0]);
     else if (numDims == 3)
+    {
         field = zfp_field_3d(input, type, n[2], n[1], n[0]);
+    }
     else if (numDims == 4)
         field = zfp_field_4d(input, type, n[3], n[2], n[1], n[0]);
    

@@ -15,30 +15,28 @@ class pat_nyx_cinema(cinema.CinemaWorkflow):
 		# Open CSV file
 		metrics_csv 	 = self.json_data["project-home"] + "/cbench/" + self.json_data['output']['metricsfname'] + ".csv"
 		output_file_name = self.json_data["project-home"] + "/cbench/" + "data.csv"
-		#reader = futils.open_csv_file(metrics_csv)
-		print metrics_csv
-		print output_file_name
+
 
 		all = []
+		#reader = futils.open_csv_file(metrics_csv)
 		with open(metrics_csv,'r') as csvinput:
 			reader = csv.reader(csvinput)
 
 			# Modify Cinema files
-		
 			row = next(reader)
 			row.append('FILE_SimStats_Pk')
-			#row.append('FILE_lya_all_axes_x_Pk')
-			#row.append('FILE_lya_all_axes_y_Pk')
-			#row.append('FILE_lya_all_axes_z_Pk')
+			row.append('FILE_lya_all_axes_x_Pk')
+			row.append('FILE_lya_all_axes_y_Pk')
+			row.append('FILE_lya_all_axes_z_Pk')
 			all.append(row)
 
 			values = ["sim_stats_rhob.png", "sim_stats_rhodm.png", "sim_stats_temp.png", "sim_stats_velmag.png", "sim_stats_velmag.png", "sim_stats_vz.png"]
 			count = 0
 			for row in reader:
 				row.append(values[count])
-				#row.append("lya_all_axes_x.png")
-				#row.append("lya_all_axes_y.png")
-				#row.append("lya_all_axes_z.png")
+				row.append("lya_all_axes_x.png")
+				row.append("lya_all_axes_y.png")
+				row.append("lya_all_axes_z.png")
 				all.append(row)
 
 				count = count + 1

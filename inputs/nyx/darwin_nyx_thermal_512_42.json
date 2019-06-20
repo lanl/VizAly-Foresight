@@ -1,21 +1,17 @@
 {
-	"project-home" : "/projects/exasky/pascal-projects/VizAly-CBench/PAT/nyx_wflow",
+	"project-home" : "/projects/exasky/pascal-projects/VizAly-CBench/PAT/nyx_512_42_zfp_",
 
   	"input": 
   	{
-	    "filetype-comment": "type of file to load; HACC or NYX",
 	    "filetype": "NYX",
-
-	    "filename-comment": "name of input file",
-	    "filename": "/projects/exasky/pascal-projects/VizAly-CBench/testing/data/z255_32.h5",
-
+	    "filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",
 
 	    "path" : "mpirun /projects/exasky/pascal-projects/VizAly-CBench/build/CBench",
 
         "configuration" : {
             "partition" : "scaling",
             "nodes" : 1,
-            "ntasks-per-node" : 8
+            "ntasks-per-node" : 16
         },
 
 	    "scalars-comment": "which scalars to test",
@@ -80,16 +76,13 @@
 
 	"output" :
 	{
-		"run-path" : "/projects/exasky/VizAly-CBench/build/",
+		"run-path" : "/projects/exasky/pascal-projects/VizAly-CBench/build/",
 
 		"output-decompressed": true,
 		"output-decompressed-location" : "NYX_TEST_",
 		
-		"logfname-comment": "name of output log file",
-		"logfname" : "runlog_NYX_all_",
-
-		"metricsfname-comment": "name of file with output",
-		"metricsfname" : "metrics_NYX_all_"
+		"logfname" : "runlog_NYX_512_42_zfp_",
+		"metricsfname" : "metrics_NYX_512_42_zfp_"
 	},
 
 	"compressor-comment" : "which compressors to test",
@@ -101,41 +94,41 @@
 		},
 		
 		{
-            "name": "SZ",
-            "output-prefix" : "sz_002_",
-            "abs" : 2E-3
+			"name": "zfp",
+			"output-prefix" : "zfp_abs_27_",
+			"rel": 27
 		},
 
 		{
 			"name": "zfp",
-			"output-prefix" : "zfp_abs_001_",
-			"abs": 1E-3
+			"output-prefix" : "zfp_abs_23_",
+			"rel": 23
+		},
+
+		{
+			"name": "zfp",
+			"output-prefix" : "zfp_abs_19_",
+			"rel": 19
+		},
+
+		{
+			"name": "zfp",
+			"output-prefix" : "zfp_abs_15_",
+			"rel": 15
 		}
 	],
 
 	"metrics-comment" : "which metrics to use",
 	"metrics": [
 		{
-			"name" : "absolute_error"
-		},
-
-		{
 			"name" : "relative_error"
-		},
-
-		{
-			"name" : "mse"
-		},
-
-		{
-			"name" : "psnr"
 		}
 	],
 
 
 	"simulation-analysis" :
 	{
-		"cinema-database" : "NYX_TEST_",
+		"cinema-database" : "NYX_512_42_zfp_",
 		"evn_path" : "/projects/exasky/HACC.darwin_setup",
 
 		"plotting" :
