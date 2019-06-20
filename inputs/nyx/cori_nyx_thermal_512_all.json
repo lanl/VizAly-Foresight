@@ -1,124 +1,82 @@
 {
-	"project-home" : "/project/projectdirs/m2848/lanl/VizAly-CBench/",
+	"project-home" : "/project/projectdirs/m2848/lanl/pascal_projects/VizAly-Foresight/",
+	"project-run-home" : "PAT/nyx_512_42_zfp_",
 
-	"input": 
-	{
-		"run-path" : "/project/projectdirs/m2848/lanl/VizAly-CBench/build/",
+  	"input": 
+  	{
+	    "filetype": "NYX",
+	    "filename": "/project/projectdirs/nyx/www/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",
 
-		"filetype-comment": "type of file to load; HACC or NYX",
-		"filetype": "NYX",
+	    "group" : "native_fields",
+	    "scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ],
 
-		"filename-comment": "name of input file",
-		"filename": "/project/projectdirs/nyx/www/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",
-			  
-		"scalars-comment": "which scalars to test",
-		"group": "native_fields",
-		"scalars": 
+	    "uncompressed": 
 		[
-			"baryon_density",
-			"dark_matter_density",
-			"temperature",
-			"velocity_x",
-			"velocity_y",
-			"velocity_z"
-		],
-
-		"uncompressed": 
-		[
-			{
+	  		{
 				"group": "domain",
-				"attributes": [{
+				"attributes": [
+			  		{
 						"name": "shape",
 						"type": "int",
 						"size": 3
-					},
-					{
+			  		},
+			  		{
 						"name": "size",
 						"type": "double",
 						"size": 3
-					}
+			  		}
 				]
-			},
-			{
+	  		},
+
+	  		{
 				"group": "universe",
-				"attributes": [
+				"attributes": 
+				[
 					{
 						"name": "hubble",
 						"type": "double",
-						"size": 1
+						"size": 1 
 					},
-					{
+
+			  		{
 						"name": "omega_b",
 						"type": "double",
 						"size": 1
-					},
-					{
+			 		},
+
+			  		{
 						"name": "omega_l",
 						"type": "double",
 						"size": 1
-					},
+			  		},
+
 					{
 						"name": "omega_m",
 						"type": "double",
 						"size": 1
 					},
+
 					{
 						"name": "redshift",
 						"type": "double",
 						"size": 1
 					}
 				]
-			}
+	  		}
 		]
-	},
+  	},
 
-	"output": 
-	{
-		"output-decompressed": true,
-		"output-decompressed-location": "NYX_512_z42_",
-
-		"logfname-comment": "name of output log file",
-		"logfname": "runlog_NYX_512_z42_",
-
-		"metricsfname-comment": "name of file with output",
-		"metricsfname": "metrics_NYX_512_z42_"
-	},
-	"compressor-comment": "which compressors to test",
-	"compressors": [
-		{
-			"name": "zfp",
-			"output-prefix" : "zfp_",
-			"compressor-params": 
-			[
-				{
-					"scalar": [
-						"baryon_density",
-						"dark_matter_density"
-					],
-					"abs": 0.028
-				},
-				{
-					"scalar": "temperature",
-					"abs": 0.1
-				},
-				{
-					"scalar": "velocity_x",
-					"abs": 0.1
-				},
-				{
-					"scalar": "velocity_y",
-					"abs": 0.1
-				},
-				{
-					"scalar": "velocity_z",
-					"abs": 0.1
-				}
-			]
-		},
-
+	"compressors" : 
+	[
 		{
 			"name": "BLOSC",
 			"output-prefix" : "BLOSC_"
+		},
+		
+		{
+			"name": "zfp",
+			"output-prefix" : "zfp_abs_27_",
+			"rel": 16
 		},
 
 		{
@@ -126,49 +84,60 @@
 			"bits": 16,
 			"output-prefix" : "fpzip_"
 		},
-		
-		{
-			"name": "SZ",
-			"output-prefix" : "SZ_",
-			"abs": 0.01
-		},
 
 		{
-			"name": "Isabela",
-			"output-prefix" : "Isabela_",
-			"tolerance": 1,
-			"pcnt": 50,
-			"window-size": 1024
+            "name": "SZ",
+            "pw_rel" : 0.01,
+            "output-prefix" : "SZ_"
 		}
 	],
- 
-	"metrics-comment": "which metrics to use",
-	"metrics": 
-	[
+
+
+	"cbench" :
+	{
+		"evn_path" : "/projects/exasky/HACC.darwin_setup",
+	    "path" : "srun -n 32 -c 4 /project/projectdirs/m2848/lanl/pascal_projects/VizAly-Foresight/build/CBench",
+	    "evn_path" : "/project/projectdirs/m2848/lanl/pascal_projects/VizAly-Foresight/scripts/VizAly-CBench.bash.cori",
+
+		"configuration" : {
+        	"nodes" : 2,
+            "constraint" : "haswell",
+            "qos" : "regular",
+            "time" : "00:20:00",
+            "account" : "m2848"
+        },
+
+        "output" :
 		{
-			"name": "relative_error"
+			"output-decompressed": true,
+			"output-decompressed-location" : "NYX_TEST_",
+			
+			"logfname" : "runlog_NYX_512_42_zfp_",
+			"metricsfname" : "metrics_NYX_512_42_zfp_"
 		},
 
-		{
-			"name": "psnr"
-		}
-	],
+
+		"metrics-comment" : "which metrics to use",
+		"metrics": [
+			{
+				"name" : "relative_error"
+			}
+		],
+	},
+
 
 	"simulation-analysis" :
 	{
-		"evn_path" : "/project/projectdirs/m2848/lanl/moduleLoad.sh",
-		"analysis-folder" : "NYX_512_z42_",
-		"plotting": {
-            "x-range": [
-                0, 
-                11
-            ]
-        }, 
+		"evn_path" : "/project/projectdirs/m2848/lanl/moduleLoadAnalysis.sh",
+
+		"plotting" :
+		{
+			"x-range" : [0, 11]
+		},
 
 		"analysis-tool" :
 		{
-			"hdf5_path" : "/projects/exasky/hdf5/install/bin/",
-			"gimlet-home" : "/project/projectdirs/m2848/lanl/gimlet2",
+			"gimlet-home" : "/projects/exasky/gimlet2",
 
 			"analytics": 
 			[
@@ -176,19 +145,50 @@
                     "name": "sim_stats", 
                     "type" : ["rhob", "rhom", "rhodm", "temp", "velmag", "vz"],
                     "postfix" : "_ps3d.txt",
-                    "path": "/project/projectdirs/m2848/lanl/gimlet2/apps/sim_stats/sim_stats.ex"
-                }, 
+                    "path": "/projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex",
+                    "configuration" : {
+			        	"nodes" : 2,
+			            "constraint" : "haswell",
+			            "qos" : "regular",
+			            "time" : "00:20:00",
+			            "account" : "m2848"
+			        }
+                },
+
                 {
                     "name": "lya_all_axes", 
                     "type" : ["x", "y", "z"],
                     "postfix" : "_flux_ps1d.txt",
-                    "path": "/project/projectdirs/m2848/lanl/gimlet2/apps/lya_all_axes/lya_all_axes.ex"
+                    "path": "/projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex",
+                    "command" : "cp /projects/exasky/gimlet2/apps/lya_all_axes/TREECOOL_middle .",
+                    "configuration" : {
+			        	"nodes" : 2,
+			            "constraint" : "haswell",
+			            "qos" : "regular",
+			            "time" : "00:20:00",
+			            "account" : "m2848"
+			        }
                 }
             ]
 		},
 
+		
 		"input-files" : [],
-
 		"analysis" : []
+	},
+
+
+	"cinema-plots" :
+	{
+		"db-name" : "nyx_",
+		"evn_path" : "/project/projectdirs/m2848/lanl/moduleLoadAnalysis.sh",
+
+		"configuration" : {
+        	"nodes" : 2,
+            "constraint" : "haswell",
+            "qos" : "regular",
+            "time" : "00:20:00",
+            "account" : "m2848"
+        }
 	}
 }

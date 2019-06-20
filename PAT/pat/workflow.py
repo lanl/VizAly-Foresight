@@ -51,7 +51,7 @@ class Workflow(object):
         for _file in self.json_data['compressors']:
             json_item = {
                 "output-prefix" : _file["output-prefix"],
-                "path" : self.json_data['project-home'] + "/cbench/" + self.json_data['output']['output-decompressed-location'] + "/" + _file['output-prefix'] + "__" + orig_path_filename[1]
+                "path" : self.json_data['project-home'] +  self.json_data['wflow-path'] + "/cbench/" + self.json_data['['cbench]['output']['output-decompressed-location'] + "/" + _file['output-prefix'] + "__" + orig_path_filename[1]
             }
 
             self.json_data['simulation-analysis']['input-files'].append(json_item)
@@ -65,7 +65,7 @@ class Workflow(object):
             configurations = None
 
         if "evn_path" in self.json_data["simulation-analysis"]:
-            environment = self.json_data["simulation-analysis"]["evn_path"]
+            environment = self.json_data["input"]["evn_path"]
         else:
             environment = None
 
@@ -76,6 +76,7 @@ class Workflow(object):
                          arguments=[os.path.basename(self.json_path)],
                          configurations=configurations,
                          environment=environment)
+        cbench_job.add_command("mkdir logs")
         self.add_job(cbench_job)
 
 

@@ -89,7 +89,7 @@ int validateInput(int argc, char *argv[], int myRank, int numRanks)
 
 
 	// Check if powers of 2 number of ranks
-	if (jsonInput["output"].find("output-decompressed") != jsonInput["output"].end())
+	if (jsonInput["cbench"]["output"].find("output-decompressed") != jsonInput["cbench"]["output"].end())
 		if (!isPowerOfTwo(numRanks))
 		{
 			if (myRank == 0)
@@ -135,10 +135,10 @@ int main(int argc, char *argv[])
 	std::string inputFileType = jsonInput["input"]["filetype"];
 	std::string inputFile = jsonInput["input"]["filename"];
 
-	std::string _outputLogFile =  jsonInput["output"]["logfname"];
+	std::string _outputLogFile =  jsonInput["cbench"]["output"]["logfname"];
 	std::string outputLogFile = "logs/" + _outputLogFile + "_" + std::to_string(myRank);
 
-	std::string metricsFile = jsonInput["output"]["metricsfname"];
+	std::string metricsFile = jsonInput["cbench"]["output"]["metricsfname"];
 
 	std::vector<std::string> scalars;
 	for (int i = 0; i < jsonInput["input"]["scalars"].size(); i++)
@@ -154,9 +154,9 @@ int main(int argc, char *argv[])
 
 	bool writeData = false;
 	std::string outputFile = "";
-	if (jsonInput["output"].find("output-decompressed") != jsonInput["output"].end())
+	if (jsonInput["cbench"]["output"].find("output-decompressed") != jsonInput["cbench"]["output"].end())
 	{
-		writeData = jsonInput["output"]["output-decompressed"];
+		writeData = jsonInput["cbench"]["output"]["output-decompressed"];
 		if (writeData)
 			outputFile = extractFileName(inputFile);
 
@@ -165,9 +165,9 @@ int main(int argc, char *argv[])
 	}
 
 	std::string outputPath = ".";
-	if ( jsonInput["output"].find("output-decompressed-location") != jsonInput["output"].end() )
+	if ( jsonInput["cbench"]["output"].find("output-decompressed-location") != jsonInput["cbench"]["output"].end() )
 	{
-		outputPath = jsonInput["output"]["output-decompressed-location"];
+		outputPath = jsonInput["cbench"]["output"]["output-decompressed-location"];
 		if (myRank == 0)
 			createFolder(outputPath);
 	}

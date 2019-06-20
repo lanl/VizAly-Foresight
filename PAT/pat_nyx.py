@@ -13,7 +13,7 @@ class NYXWorkflow(workflow.Workflow):
 	# Re-write the json data to include the analysis
 	def add_analysis_input(self):		
 		# Create analysis settings
-		analyis_path = self.json_data["project-home"]
+		analyis_path = self.json_data["project-home"] +  self.json_data['wflow-path']
 		
 
 		for ana in self.json_data['simulation-analysis']['analysis-tool']['analytics']:
@@ -85,9 +85,10 @@ class NYXWorkflow(workflow.Workflow):
 		else:
 			environment = None
 
-		configuration = ["nodes", 1, "partition", "scaling", "ntasks-per-node", 8 ]
+		#configuration = ["nodes", 1, "partition", "scaling", "ntasks-per-node", 8 ]
+		configuration = ["nodes", 2, "constraint", "haswell", "qos", "regular", "time", "00:20:00", "account", "m2848" ]
 
-		arg1 = self.json_data["project-home"] + "/cbench/wflow.json"
+		arg1 = self.json_data["project-home"] +  self.json_data['wflow-path'] + "/cbench/wflow.json"
 
 		cinema_job = j.Job(name="cinema_",
 			execute_dir="cinema",
@@ -114,7 +115,7 @@ opts = parser.parse_args()
 wflow_data = futils.read_json(opts.input_file)
 
 # create Workflow instance
-wflow_dir = wflow_data["project-home"]
+wflow_dir = wflow_data["project-home"] + self.json_data['wflow-path']
 wflow = NYXWorkflow("wflow", wflow_data, workflow_dir=wflow_dir)
 
 # add jobs to workflow

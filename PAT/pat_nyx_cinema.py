@@ -13,8 +13,8 @@ class pat_nyx_cinema(cinema.CinemaWorkflow):
 
 	def prepare_cinema(self):
 		# Open CSV file
-		metrics_csv 	 = self.json_data["project-home"] + "/cbench/" + self.json_data['output']['metricsfname'] + ".csv"
-		output_file_name = self.json_data["project-home"] + "/cbench/" + "data.csv"
+		metrics_csv 	 = self.json_data["project-home"] +  self.json_data['wflow-path'] + "/cbench/" + self.json_data['output']['metricsfname'] + ".csv"
+		output_file_name = self.json_data["project-home"] +  self.json_data['wflow-path'] + "/cbench/" + "data.csv"
 
 
 		all = []
@@ -48,8 +48,8 @@ class pat_nyx_cinema(cinema.CinemaWorkflow):
 
 
 	def create_plots(self):
-		output_path = self.json_data['project-home'] + "/cinema"
-		csv_file_path = self.json_data['output']['run-path'] + self.json_data['output']['metricsfname'] + ".csv"
+		output_path = self.json_data['project-home'] +  self.json_data['wflow-path'] + "/plots"
+		csv_file_path = self.json_data['cbench']['output'] + self.json_data['cbench']['output']['metricsfname'] + ".csv"
 		x_range = self.json_data['simulation-analysis']['plotting']['x-range']
 
 		for ana in self.json_data['simulation-analysis']['analysis']:
