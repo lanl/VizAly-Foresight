@@ -65,18 +65,17 @@ target_link_libraries(CBench PRIVATE GenericIO)
 if (CBENCH_ENABLE_NYX_LOADER)
     # NYX Loader
     set(HDF5_USE_STATIC_LIBRARIES ON)
-    find_package(HDF5 REQUIRED COMPONENTS C)
 
     # assume that CBENCH_PLATFORM is set by the user
     if (${CBENCH_PLATFORM} MATCHES "Cori")
-        set(HDF5_LOCAL "/usr/common/software/hdf5-parallel/1.10.1/gnu")
-        link_directories(CBench PRIVATE "${HDF5_LOCAL}/lib")
-        target_include_directories(CBench PRIVATE "${HDF5_LOCAL}/include")
+        set(HDF5_CORI "/usr/common/software/hdf5-parallel/1.10.1/gnu")
+        find_package(HDF5 REQUIRED PATHS ${HDF5_CORI} NO_DEFAULT_PATH COMPONENTS C)
         target_link_libraries(CBench PRIVATE dl m z hdf5 hdf5_hl)
-    else () # darwin
-        target_include_directories(CBench PRIVATE "${HDF5_INCLUDE_DIRS}")
+    else ()
+        find_package(HDF5 REQUIRED COMPONENTS C)
         target_link_libraries(CBench PRIVATE ${HDF5_LIBRARIES})
     endif()
+    target_include_directories(CBench PRIVATE "${HDF5_INCLUDE_DIRS}")
     target_compile_definitions(CBench PRIVATE -DCBENCH_HAS_NYX)
     target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}/dataLoader/NYX")
 endif()
@@ -93,38 +92,14 @@ file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/compressors/compressorIncludes.h ${incls}
 
 # Add external compressors
 target_include_directories(CBench PRIVATE ${CMAKE_SOURCE_DIR}/compressors)
-file(GLOB subdir "${CMAKE_SOURCE_DIR}/compressors/*")
-foreach (dir ${subdir})
-    # Skip files ending in .h
-    if ("${dir}" MATCHES "\\.h$")
-        continue()
-    # Skip files ending in .hpp
-    elseif ("${dir}" MATCHES "\\.hpp$")
-        continue()
-    # Skip files ending in .md
-    elseif ("${dir}" MATCHES "\\.md$")
-        continue()
-    endif()
-
-
-    target_include_directories(CBench PRIVATE ${dir})
-
+file(GLOB SUBDIR "${CMAKE_SOURCE_DIR}/compressors/*")
+foreach (COMPRESSOR ${SUBDIR})
     # Only process folders with a CMakelists.txt
-    if (EXISTS ${dir}/CMakeLists.txt)
-        set_target_properties(CBench PROPERTIES includeDirectories "" linkLibraries "" definitions "")
-
-        add_subdirectory(${dir})
-
-        #include directories to add
-        get_target_property(COMPRESSOR_INC CBench includeDirectories)
-        get_target_property(COMPRESSOR_LIB CBench linkLibraries)
-        get_target_property(COMPRESSOR_DEF CBench definitions)
-
-        target_compile_definitions(CBench PRIVATE ${COMPRESSOR_DEF})
-        target_include_directories(CBench PRIVATE ${COMPRESSOR_INC})
-        target_include_directories(GenericIO PRIVATE ${COMPRESSOR_INC})
-        target_link_libraries(CBench PRIVATE ${COMPRESSOR_LIB})
-    endif()
+    if ((IS_DIRECTORY ${COMPRESSOR}) AND (EXISTS ${COMPRESSOR}/CMakeLists.txt))
+        add_subdirectory(${COMPRESSOR})
+        get_target_property(CURRENT_LIB CBench LIB)
+        target_link_libraries(CBench PRIVATE ${CURRENT_LIB})
+    endif ()
 endforeach()
 
 
@@ -146,7 +121,6 @@ find_package(OpenMP)
 if (OPENMP_FOUND)
     target_link_libraries(CBench PRIVATE OpenMP::OpenMP_CXX)
 endif()
-
 
 
 # Remove output files
