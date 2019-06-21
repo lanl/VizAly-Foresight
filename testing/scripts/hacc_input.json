@@ -1,5 +1,6 @@
 {
-	"project-home" : "",
+	"project-home": "",
+	"wflow-path": "hacc_Travis_test_",
 	
 	"input": 
 	{
@@ -8,17 +9,7 @@
 		"scalars": ["x", "y", "z", "vx", "vy", "vz"]
 	},
 
-	"output" :
-	{
-		"run-path" : "build/",
-
-		"output-decompressed": true,
-		"output-decompressed-location" : "HACC_Travis_",
-		
-		"logfname" : "runlog_HACC_Travis_",
-		"metricsfname" : "metrics_HACC_Travis_"
-	},
-
+	
 	"compressor-comment" : "which compressors to test",
 	"compressors" : 
 	[
@@ -46,50 +37,37 @@
 	],
 
 	"metrics-comment" : "which metrics to use",
-	"metrics": [
-		{
-			"name" : "absolute_error"
-		},
+	
 
-		{
-			"name" : "relative_error"
-		},
-
-		{
-			"name" : "mse"
-		},
-
-		{
-			"name" : "psnr"
-		}
-	],
-
- 
-	"simulation-analysis" :
+	"cbench" :
 	{
-		"evn_path" : "/projects/exasky/HACC.darwin_analysis",
-		"analysis-folder" : "HACC_Travis_",
-
-		"analysis-tool" :
+		"output" :
 		{
-			"HACC-home" : "/projects/exasky/HACC",
-
-			"analytics": 
-			[
-				{
-					"name": "Halo-Finder", 
-					"path": "/projects/exasky/HACC/run/runHaloBatch__256_16_16__scaling.sh"
-				}, 
-				{
-					"name": "Power-Spectrum", 
-					"path": "/projects/exasky/HACC/run/runPowBatch__512_32_16_scaling.sh "
-				}
-			]
+			"output-decompressed": true,
+			"output-decompressed-location" : "HACC_Travis_",
+			
+			"log-file" : "runlog_HACC_Travis_",
+			"metrics-file" : "metrics_HACC_Travis_"
 		},
 
-		"input-files" : [],
+		"metrics": 
+		[
+			{
+				"name" : "absolute_error"
+			},
 
-		"analysis" : []
+			{
+				"name" : "relative_error"
+			},
+
+			{
+				"name" : "mse"
+			},
+
+			{
+				"name" : "psnr"
+			}
+		]
 	}
 }
 

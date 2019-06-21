@@ -89,7 +89,7 @@ int validateInput(int argc, char *argv[], int myRank, int numRanks)
 
 
 	// Check if powers of 2 number of ranks
-	if (jsonInput["cbench"]["output"].find("output-decompressed") != jsonInput["cbench"]["output"].end())
+	if (jsonInput["cbench"]["output"].find("output-decompressed-location") != jsonInput["cbench"]["output"].end())
 		if (!isPowerOfTwo(numRanks))
 		{
 			if (myRank == 0)
@@ -135,10 +135,10 @@ int main(int argc, char *argv[])
 	std::string inputFileType = jsonInput["input"]["filetype"];
 	std::string inputFile = jsonInput["input"]["filename"];
 
-	std::string _outputLogFile =  jsonInput["cbench"]["output"]["logfname"];
+	std::string _outputLogFile =  jsonInput["cbench"]["output"]["log-file"];
 	std::string outputLogFile = "logs/" + _outputLogFile + "_" + std::to_string(myRank);
 
-	std::string metricsFile = jsonInput["cbench"]["output"]["metricsfname"];
+	std::string metricsFile = jsonInput["cbench"]["output"]["metrics-file"];
 
 	std::vector<std::string> scalars;
 	for (int i = 0; i < jsonInput["input"]["scalars"].size(); i++)
@@ -149,8 +149,8 @@ int main(int argc, char *argv[])
 		compressors.push_back(jsonInput["compressors"][i]["name"]);
 
 	std::vector<std::string> metrics;
-	for (int i = 0; i < jsonInput["metrics"].size(); i++)
-		metrics.push_back(jsonInput["metrics"][i]["name"]);
+	for (int i = 0; i < jsonInput["cbench"]["metrics"].size(); i++)
+		metrics.push_back(jsonInput["cbench"]["metrics"][i]["name"]);
 
 	bool writeData = false;
 	std::string outputFile = "";
@@ -392,11 +392,11 @@ int main(int argc, char *argv[])
 
 
 				// Read in additional params for metrics
-				for (auto it = jsonInput["metrics"][m].begin(); it != jsonInput["metrics"][m].end(); it++)
+				for (auto it = jsonInput["cbench"]["metrics"][m].begin(); it != jsonInput["cbench"]["metrics"][m].end(); it++)
 				{
 					if (it.key() != "name")
-						for (auto it2 = jsonInput["metrics"][m][it.key()].begin();
-								it2 != jsonInput["metrics"][m][it.key()].end(); it2++)
+						for (auto it2 = jsonInput["cbench"]["metrics"][m][it.key()].begin();
+								it2 != jsonInput["cbench"]["metrics"][m][it.key()].end(); it2++)
 							if (*it2 != scalars[i])
 								continue;
 							else

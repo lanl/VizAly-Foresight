@@ -1,5 +1,5 @@
 {
-	"project-home" : "/projects/exasky/pascal-projects/VizAly-CBench/PAT/nyx_512_42_zfp_",
+	"project-home" : "/projects/exasky/pascal-projects/VizAly-CBench/PAT/nyx_512_42_",
 
   	"input": 
   	{
@@ -81,8 +81,8 @@
 		"output-decompressed": true,
 		"output-decompressed-location" : "NYX_TEST_",
 		
-		"logfname" : "runlog_NYX_512_42_zfp_",
-		"metricsfname" : "metrics_NYX_512_42_zfp_"
+		"logfname" : "runlog_NYX_512_42_",
+		"metricsfname" : "metrics_NYX_512_42_"
 	},
 
 	"compressor-comment" : "which compressors to test",
@@ -94,9 +94,9 @@
 		},
 		
 		{
-			"name": "zfp",
-			"output-prefix" : "zfp_abs_27_",
-			"rel": 27
+			"name": "SZ",
+			"output-prefix" : "sz_01_",
+			"pw_rel": 0.1
 		},
 
 		{
@@ -106,15 +106,17 @@
 		},
 
 		{
-			"name": "zfp",
+			"name": "fpzip",
 			"output-prefix" : "zfp_abs_19_",
-			"rel": 19
+			"bits": 19
 		},
 
 		{
-			"name": "zfp",
-			"output-prefix" : "zfp_abs_15_",
-			"rel": 15
+			"name": "Isabela",
+			"output-prefix" : "Isabela_",
+			"tolerance": 1,
+			"nCoeff": 50,
+			"window-size": 1024
 		}
 	],
 
@@ -128,7 +130,7 @@
 
 	"simulation-analysis" :
 	{
-		"cinema-database" : "NYX_512_42_zfp_",
+		"cinema-database" : "NYX_512_42_",
 		"evn_path" : "/projects/exasky/HACC.darwin_setup",
 
 		"plotting" :

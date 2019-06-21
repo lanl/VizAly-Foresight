@@ -16,14 +16,14 @@ class NYXWorkflow(workflow.Workflow):
 		analyis_path = self.json_data["project-home"] +  self.json_data['wflow-path']
 		
 
-		for ana in self.json_data['simulation-analysis']['analysis-tool']['analytics']:
+		for ana in self.json_data['pat']['analysis-tool']['analytics']:
 			for item in ana['type']:
 				json_item = {
 					"title" : ana['name'] + "_" + item,
 					"files" : []
 				}
 
-				for inputItem in self.json_data['simulation-analysis']['input-files']:
+				for inputItem in self.json_data['pat']['input-files']:
 					input_item = { 
 						'name' : inputItem["output-prefix"],
 						'path' : analyis_path + "/" + ana['name'] + "/" + inputItem['output-prefix'] + item + ana['postfix']
@@ -31,7 +31,7 @@ class NYXWorkflow(workflow.Workflow):
 
 					json_item['files'].append(input_item)
 
-				self.json_data['simulation-analysis']['analysis'].append(json_item)
+				self.json_data['pat']['analysis'].append(json_item)
 
 
 
@@ -42,10 +42,10 @@ class NYXWorkflow(workflow.Workflow):
 		cbench_job = self.jobs[0]
 
 		# create job to run sim_stat and lya
-		for analysis in self.json_data["simulation-analysis"]["analysis-tool"]["analytics"]:
+		for analysis in self.json_data["pat"]["analysis-tool"]["analytics"]:
 
-			if "evn_path" in self.json_data["simulation-analysis"]:
-				environment = self.json_data["simulation-analysis"]["evn_path"]
+			if "evn_path" in self.json_data["pat"]:
+				environment = self.json_data["pat"]["evn_path"]
 			else:
 				environment = None
 
@@ -55,7 +55,7 @@ class NYXWorkflow(workflow.Workflow):
 				configurations = None
 
 
-			for item in self.json_data["simulation-analysis"]["input-files"]:
+			for item in self.json_data["pat"]["input-files"]:
 				print "Creating analysis jobs for", analysis, " on ", item
 
 				#execute_dir=self.json_data["project-home"] + "/" + analysis["name"],
@@ -80,22 +80,26 @@ class NYXWorkflow(workflow.Workflow):
 
 	# Create plots
 	def add_plotting_jobs(self):
-		if "evn_path" in self.json_data["simulation-analysis"]:
-			environment = self.json_data["simulation-analysis"]["evn_path"]
+		if "evn_path" in self.json_data["cinema-plots"]:
+			environment = self.json_data["cinema-plots"]["evn_path"]
 		else:
 			environment = None
 
-		#configuration = ["nodes", 1, "partition", "scaling", "ntasks-per-node", 8 ]
-		configuration = ["nodes", 2, "constraint", "haswell", "qos", "regular", "time", "00:20:00", "account", "m2848" ]
+		if "configuration" in self.json_data["cinema-plots"]:
+			configurations = list( sum( self.json_data["cinema-plots"]["configuration"].items(), () ) )
+		else:
+			configurations = None
 
 		arg1 = self.json_data["project-home"] +  self.json_data['wflow-path'] + "/cbench/wflow.json"
+		plot_path = self.json_data['project-home'] + self.json_data['wflow-path'] + "/plots"
 
 		cinema_job = j.Job(name="cinema_",
 			execute_dir="cinema",
 			executable="python " + os.getcwd() + "/" + "pat_nyx_cinema.py", 
 			arguments=[ "--input-file", arg1 ],
-			configurations=configuration,
+			configurations=configurations,
 			environment=environment )
+		cinema_job.add_command("mkdir " + plot_path)
 
 		# make dependent on CBench job and add to workflow
 		print self.jobs
@@ -115,7 +119,7 @@ opts = parser.parse_args()
 wflow_data = futils.read_json(opts.input_file)
 
 # create Workflow instance
-wflow_dir = wflow_data["project-home"] + self.json_data['wflow-path']
+wflow_dir = wflow_data["project-home"] + wflow_data['wflow-path']
 wflow = NYXWorkflow("wflow", wflow_data, workflow_dir=wflow_dir)
 
 # add jobs to workflow

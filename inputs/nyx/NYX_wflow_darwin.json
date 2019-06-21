@@ -1,22 +1,11 @@
 {
-	"project-home" : "/projects/exasky/pascal-projects/VizAly-CBench/PAT/nyx_wflow",
+	"project-home" : "/projects/exasky/pascal-projects/VizAly-CBench/",
+	"wflow-path": "nyx_wflow",
 
   	"input": 
   	{
-	    "filetype-comment": "type of file to load; HACC or NYX",
 	    "filetype": "NYX",
-
-	    "filename-comment": "name of input file",
-	    "filename": "/projects/exasky/pascal-projects/VizAly-CBench/testing/data/z255_32.h5",
-
-
-	    "path" : "mpirun /projects/exasky/pascal-projects/VizAly-CBench/build/CBench",
-
-        "configuration" : {
-            "partition" : "scaling",
-            "nodes" : 1,
-            "ntasks-per-node" : 8
-        },
+	    "filename": "/projects/exasky/pascal-projects/VizAly-CBench/testing/data/z255_32.h5",  
 
 	    "scalars-comment": "which scalars to test",
 	    "group" : "native_fields",
@@ -78,20 +67,6 @@
 		]
   	},
 
-	"output" :
-	{
-		"run-path" : "/projects/exasky/VizAly-CBench/build/",
-
-		"output-decompressed": true,
-		"output-decompressed-location" : "NYX_TEST_",
-		
-		"logfname-comment": "name of output log file",
-		"logfname" : "runlog_NYX_all_",
-
-		"metricsfname-comment": "name of file with output",
-		"metricsfname" : "metrics_NYX_all_"
-	},
-
 	"compressor-comment" : "which compressors to test",
 	"compressors" : 
 	[
@@ -113,35 +88,60 @@
 		}
 	],
 
-	"metrics-comment" : "which metrics to use",
-	"metrics": [
-		{
-			"name" : "absolute_error"
-		},
-
-		{
-			"name" : "relative_error"
-		},
-
-		{
-			"name" : "mse"
-		},
-
-		{
-			"name" : "psnr"
-		}
-	],
-
-
-	"simulation-analysis" :
+	
+	"cbench": 
 	{
-		"cinema-database" : "NYX_TEST_",
-		"evn_path" : "/projects/exasky/HACC.darwin_setup",
+		"path" : "mpirun /projects/exasky/pascal-projects/VizAly-CBench/build/CBench",
 
-		"plotting" :
+        "output" :
 		{
-			"x-range" : [0, 11]
+			"run-path" : "/projects/exasky/VizAly-CBench/build/",
+
+			"output-decompressed": true,
+			"output-decompressed-location" : "NYX_wflow_",
+			
+			"logfname-comment": "name of output log file",
+			"log-file" : "runlog_NYX_all_",
+
+			"metricsfname-comment": "name of file with output",
+			"metrics-file" : "metrics_NYX_all_"
 		},
+
+
+		"metrics-comment" : "which metrics to use",
+		"metrics": 
+		[
+			{
+				"name" : "absolute_error"
+			},
+
+			{
+				"name" : "relative_error"
+			},
+
+			{
+				"name" : "mse"
+			},
+
+			{
+				"name" : "psnr"
+			}
+		],
+
+		"evn_path": "/projects/exasky/HACC.darwin_setup",
+
+		"configuration": {
+			"partition": "scaling",
+			"nodes": 1,
+			"ntasks-per-node": 16
+		}
+
+	},
+
+
+	"pat" :
+	{
+		"evn_path" : "/projects/exasky/HACC.darwin_setup",
 
 		"analysis-tool" :
 		{
@@ -179,5 +179,22 @@
 		"input-files" : [],
 
 		"analysis" : []
+	},
+
+	"cinema-plots": 
+	{
+		"cinema-database" : "NYX_wflow_",
+		"plotting" :
+		{
+			"x-range" : [0, 11]
+		},
+
+		"evn_path": "/projects/exasky/HACC.darwin_setup",
+		"configuration": 
+		{
+			"partition": "scaling",
+			"nodes": 2,
+			"ntasks-per-node": 8
+		}
 	}
 }

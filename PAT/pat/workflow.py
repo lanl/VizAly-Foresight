@@ -40,39 +40,41 @@ class Workflow(object):
         """ Adds a CBench job to the workflow.
         """
 
+        base_path = self.json_data['project-home'] +  self.json_data['wflow-path']
+
         # Create input settings
         orig_path_filename = futils.splitString(self.json_data['input']['filename'],'/')
         orig_item = {
             "output-prefix" : "orig",
             "path" : self.json_data['input']['filename']
         }
-        self.json_data['simulation-analysis']['input-files'].append(orig_item)
+        self.json_data['pat']['input-files'].append(orig_item)
 
         for _file in self.json_data['compressors']:
             json_item = {
                 "output-prefix" : _file["output-prefix"],
-                "path" : self.json_data['project-home'] +  self.json_data['wflow-path'] + "/cbench/" + self.json_data['['cbench]['output']['output-decompressed-location'] + "/" + _file['output-prefix'] + "__" + orig_path_filename[1]
+                "path" : base_path + "/cbench/" + self.json_data['cbench']['output']['output-decompressed-location'] + "/" + _file['output-prefix'] + "__" + orig_path_filename[1]
             }
 
-            self.json_data['simulation-analysis']['input-files'].append(json_item)
+            self.json_data['pat']['input-files'].append(json_item)
 
         execute_dir = "cbench"
         self.json_path = execute_dir + "/" + self.name + ".json"
 
-        if "configuration" in self.json_data["input"].keys():
-            configurations = list(sum(self.json_data["input"]["configuration"].items(), ()))
+        if "configuration" in self.json_data["cbench"].keys():
+            configurations = list(sum(self.json_data["cbench"]["configuration"].items(), ()))
         else:
             configurations = None
 
-        if "evn_path" in self.json_data["simulation-analysis"]:
-            environment = self.json_data["input"]["evn_path"]
+        if "evn_path" in self.json_data["cbench"]:
+            environment = self.json_data["cbench"]["evn_path"]
         else:
             environment = None
 
         # add a single CBench job to workflow for entire sweep
         cbench_job = j.Job(name="cbench",
                          execute_dir=execute_dir,
-                         executable=self.json_data["input"]["path"],
+                         executable=self.json_data["cbench"]["path"],
                          arguments=[os.path.basename(self.json_path)],
                          configurations=configurations,
                          environment=environment)
@@ -180,17 +182,10 @@ class Workflow(object):
 
 
     def configuration_from_json_data(self, name):
-        if "configuration" in self.json_data["simulation-analysis"]["analysis-tool"]["analytics"][name].keys():
-            configurations = list(sum(self.json_data["simulation-analysis"]["analysis-tool"]["analytics"]
+        if "configuration" in self.json_data["pat"]["analysis-tool"]["analytics"][name].keys():
+            configurations = list(sum(self.json_data["pat"]["analysis-tool"]["analytics"]
                                                     [name]["configuration"].items(), ()))
         else:
             configurations = None
         return configurations
 
-
-    def environment_from_json_data(self):
-        if "evn_path" in self.json_data["simulation-analysis"]:
-            environment = self.json_data["simulation-analysis"]["evn_path"]
-        else:
-            environment = None
-        return environment

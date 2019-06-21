@@ -29,6 +29,7 @@ class Job(object):
     def __repr__(self):
         return str(self.name)
 
+
     def add_command(self, command):
         self.command = command
         

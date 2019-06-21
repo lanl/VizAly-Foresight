@@ -13,7 +13,7 @@ class pat_nyx_cinema(cinema.CinemaWorkflow):
 
 	def prepare_cinema(self):
 		# Open CSV file
-		metrics_csv 	 = self.json_data["project-home"] +  self.json_data['wflow-path'] + "/cbench/" + self.json_data['output']['metricsfname'] + ".csv"
+		metrics_csv 	 = self.json_data["project-home"] +  self.json_data['wflow-path'] + "/cbench/" + self.json_data['cbench']['output']['metrics-file'] + ".csv"
 		output_file_name = self.json_data["project-home"] +  self.json_data['wflow-path'] + "/cbench/" + "data.csv"
 
 
@@ -48,11 +48,12 @@ class pat_nyx_cinema(cinema.CinemaWorkflow):
 
 
 	def create_plots(self):
-		output_path = self.json_data['project-home'] +  self.json_data['wflow-path'] + "/plots"
-		csv_file_path = self.json_data['cbench']['output'] + self.json_data['cbench']['output']['metricsfname'] + ".csv"
-		x_range = self.json_data['simulation-analysis']['plotting']['x-range']
+		output_path = self.json_data['project-home'] + self.json_data['wflow-path']
+		output_plot_path = output_path + "/plots"
+		csv_file_path = output_path + "/cbench/" + self.json_data['cbench']['output']['metrics-file'] + ".csv"
+		x_range = self.json_data['cinema-plots']['plotting']['x-range']
 
-		for ana in self.json_data['simulation-analysis']['analysis']:
+		for ana in self.json_data['pat']['analysis']:
 			plot_title = ana['title']
 			to_plot = []  # all the items to plot
 
@@ -75,7 +76,7 @@ class pat_nyx_cinema(cinema.CinemaWorkflow):
 						this_tuple = (pk_ratio, file['name']) #array, name
 						to_plot.append(this_tuple)
 
-			putils.plotScatterGraph(k_list, 'k', 'pk', plot_title, output_path, x_range, to_plot)
+			putils.plotScatterGraph(k_list, 'k', 'pk', plot_title, output_plot_path, x_range, to_plot)
 
 
 
