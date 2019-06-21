@@ -1,4 +1,3 @@
-option(CBENCH_ENABLE_FPZIP "Enable FPZIP." OFF)
 
 if (CBENCH_ENABLE_FPZIP)
 	set(MY_LIBS "")

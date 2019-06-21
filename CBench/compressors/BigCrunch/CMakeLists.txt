@@ -1,4 +1,3 @@
-option(CBENCH_ENABLE_BIG_CRUNCH "Enable BigCrunch." OFF)
 
 if (CBENCH_ENABLE_BIG_CRUNCH)
 	set(MY_LIBS "")
@@ -11,7 +10,7 @@ if (CBENCH_ENABLE_BIG_CRUNCH)
     else()
     	set(MY_LIBS ${MY_LIBS} ${BIGCRUNCH_LIBRARY})
 	    set(MY_LIBS ${MY_LIBS} -fopenmp)
-	   
+
 	    #Asks for BigCrunch include files and includes it in the project
 	    set (BIGCRUNCH_INCLUDE_PATH ${BIGCRUNCH_INCLUDE_PATH} CACHE PATH "BIGCRUNCH include directory")
 

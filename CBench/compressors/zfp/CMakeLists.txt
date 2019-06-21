@@ -1,4 +1,3 @@
-option(CBENCH_ENABLE_ZFP "use the zfp compressor" OFF)
 
 if(CBENCH_ENABLE_ZFP)
 	set(MY_LIBS "")

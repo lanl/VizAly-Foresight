@@ -6,9 +6,9 @@ project(CBench VERSION 1.0.0 LANGUAGES CXX)
 
 # Prevent in source builds since they are evil
 if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
-    message(FATAL_ERROR "In source build is not supported, please restore modified files, 
+    message(FATAL_ERROR "In source build is not supported, please restore modified files,
                         delete CMake generated things (CMakeFiles folder and CMakeCache.txt)
-                        , and build out of source") 
+                        , and build out of source")
 endif()
 
 # Set the main executable
@@ -31,6 +31,14 @@ endif()
 
 # Set build options
 option(CBENCH_ENABLE_NYX_LOADER "Enables NYX HDF5 data loader" OFF)
+option(CBENCH_ENABLE_BIG_CRUNCH "Enable BigCrunch." OFF)
+option(CBENCH_ENABLE_BLOSC      "Enable BLOSC." OFF)
+option(CBENCH_ENABLE_FPZIP      "Enable FPZIP." OFF)
+option(CBENCH_ENABLE_ISABELA    "Enable ISABELA." OFF)
+option(CBENCH_ENABLE_LOSSY_WAVE "Enable LossyWave." OFF)
+option(CBENCH_ENABLE_MGARD      "Enable MGARD." OFF)
+option(CBENCH_ENABLE_SZ         "Enable SZ." OFF)
+option(CBENCH_ENABLE_ZFP        "Enable ZFP." OFF)
 
 # include dirs
 target_sources(CBench PRIVATE main.cpp)
@@ -75,7 +83,7 @@ if (CBENCH_ENABLE_NYX_LOADER)
         message(FATAL_ERROR "HDF5 library not found")
     endif()
 endif()
-    
+
 
 # Creates header file, compressorIncludes.h, with all available compressors
 file(GLOB_RECURSE header_files "${CMAKE_SOURCE_DIR}/compressors/*/*.hpp")
@@ -93,15 +101,11 @@ foreach (dir ${subdir})
     # Skip files ending in .h
     if ("${dir}" MATCHES "\\.h$")
         continue()
-    endif()
-
     # Skip files ending in .hpp
-    if ("${dir}" MATCHES "\\.hpp$")
+    elseif ("${dir}" MATCHES "\\.hpp$")
         continue()
-    endif()
-    
     # Skip files ending in .md
-    if ("${dir}" MATCHES "\\.md$")
+    elseif ("${dir}" MATCHES "\\.md$")
         continue()
     endif()
 
@@ -115,7 +119,7 @@ foreach (dir ${subdir})
         set_property(GLOBAL PROPERTY includeDirectories "")
         set_property(GLOBAL PROPERTY linkLibraries "")
         set_property(GLOBAL PROPERTY definitions "")
-        
+
         add_subdirectory(${dir})
 
         #include directories to add
@@ -145,6 +149,7 @@ if(NOT TARGET MPI::MPI_C)
     set_target_properties(MPI::MPI_C PROPERTIES INTERFACE_LINK_LIBRARIES "${MPI_LINK_FLAGS}")
 endif()
 target_link_libraries(CBench PRIVATE MPI::MPI_C)
+target_link_libraries(GenericIO PRIVATE MPI::MPI_C)
 
 # OpenMP
 find_package(OpenMP)
