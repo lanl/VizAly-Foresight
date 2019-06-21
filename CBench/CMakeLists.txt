@@ -66,22 +66,19 @@ if (CBENCH_ENABLE_NYX_LOADER)
     # NYX Loader
     set(HDF5_USE_STATIC_LIBRARIES ON)
     find_package(HDF5 REQUIRED COMPONENTS C)
-    if(HDF5_FOUND)
-        # assume that CBENCH_PLATFORM is set by the user
-        if (${CBENCH_PLATFORM} MATCHES "Cori")
-            set(HDF5_LOCAL "/usr/common/software/hdf5-parallel/1.10.1/gnu")
-            link_directories(CBench PRIVATE "${HDF5_LOCAL}/lib")
-            target_include_directories(CBench PRIVATE "${HDF5_LOCAL}/include")
-            target_link_libraries(CBench PRIVATE dl m z hdf5 hdf5_hl)
-        else () # darwin
-            target_include_directories(CBench PRIVATE "${HDF5_INCLUDE_DIRS}")
-            target_link_libraries(CBench PRIVATE ${HDF5_LIBRARIES})
-        endif()
-        target_compile_definitions(CBench PRIVATE -DCBENCH_HAS_NYX)
-        target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}/dataLoader/NYX")
-    else()
-        message(FATAL_ERROR "HDF5 library not found")
+
+    # assume that CBENCH_PLATFORM is set by the user
+    if (${CBENCH_PLATFORM} MATCHES "Cori")
+        set(HDF5_LOCAL "/usr/common/software/hdf5-parallel/1.10.1/gnu")
+        link_directories(CBench PRIVATE "${HDF5_LOCAL}/lib")
+        target_include_directories(CBench PRIVATE "${HDF5_LOCAL}/include")
+        target_link_libraries(CBench PRIVATE dl m z hdf5 hdf5_hl)
+    else () # darwin
+        target_include_directories(CBench PRIVATE "${HDF5_INCLUDE_DIRS}")
+        target_link_libraries(CBench PRIVATE ${HDF5_LIBRARIES})
     endif()
+    target_compile_definitions(CBench PRIVATE -DCBENCH_HAS_NYX)
+    target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}/dataLoader/NYX")
 endif()
 
 
@@ -113,27 +110,20 @@ foreach (dir ${subdir})
     target_include_directories(CBench PRIVATE ${dir})
 
     # Only process folders with a CMakelists.txt
-    if (NOT EXISTS ${dir}/CMakeLists.txt)
-        continue()
-    else()
-        set_property(GLOBAL PROPERTY includeDirectories "")
-        set_property(GLOBAL PROPERTY linkLibraries "")
-        set_property(GLOBAL PROPERTY definitions "")
+    if (EXISTS ${dir}/CMakeLists.txt)
+        set_target_properties(CBench PROPERTIES includeDirectories "" linkLibraries "" definitions "")
 
         add_subdirectory(${dir})
 
         #include directories to add
-        get_property(incDir GLOBAL PROPERTY includeDirectories)
-        target_include_directories(CBench PRIVATE ${incDir})
-        target_include_directories(GenericIO PRIVATE ${incDir})
+        get_target_property(COMPRESSOR_INC CBench includeDirectories)
+        get_target_property(COMPRESSOR_LIB CBench linkLibraries)
+        get_target_property(COMPRESSOR_DEF CBench definitions)
 
-        #link libraries to add directories to add
-        get_property(linkLibs GLOBAL PROPERTY linkLibraries)
-        target_link_libraries(CBench PRIVATE ${linkLibs})
-
-        # add defintions
-        get_property(def GLOBAL PROPERTY definitions)
-        target_compile_definitions(CBench PRIVATE ${def})
+        target_compile_definitions(CBench PRIVATE ${COMPRESSOR_DEF})
+        target_include_directories(CBench PRIVATE ${COMPRESSOR_INC})
+        target_include_directories(GenericIO PRIVATE ${COMPRESSOR_INC})
+        target_link_libraries(CBench PRIVATE ${COMPRESSOR_LIB})
     endif()
 endforeach()
 
