@@ -1,0 +1,170 @@
+{
+	"project-home": "/projects/exasky/pascal-projects/VizAly-CBench/",
+	"wflow-path": "nyx_512_42__SZ_rel__",
+
+	"input": {
+		"filetype": "NYX",
+		"filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",
+
+		"group": "native_fields",
+		"scalars": ["baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z"],
+
+		"uncompressed": 
+		[
+			{
+				"group": "domain",
+				"attributes": [{
+						"name": "shape",
+						"type": "int",
+						"size": 3
+					},
+					{
+						"name": "size",
+						"type": "double",
+						"size": 3
+					}
+				]
+			},
+
+			{
+				"group": "universe",
+				"attributes": [{
+						"name": "hubble",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "omega_b",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "omega_l",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "omega_m",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "redshift",
+						"type": "double",
+						"size": 1
+					}
+				]
+			}
+		]
+	},
+
+
+	"compressors": 
+	[
+
+	],
+
+
+	"cbench": 
+	{
+		"path": "mpirun /projects/exasky/pascal-projects/VizAly-CBench/build/CBench",
+
+		"output": {
+			"output-decompressed": true,
+			"output-decompressed-location": "NYX_SZ_abs_",
+
+			"log-file": "runlog_",
+			"metrics-file": "metrics_"
+		},
+
+		"metrics-comment": "which metrics to use",
+		"metrics": [
+			{
+				"name": "absolute_error"
+			},
+
+			{
+				"name": "relative_error"
+			},
+
+			{
+				"name": "mse"
+			},
+
+			{
+				"name": "psnr"
+			}
+		],
+
+
+		"evn_path": "/projects/exasky/HACC.darwin_setup",
+
+		"configuration": {
+			"partition": "galton",
+			"nodes": 1,
+			"ntasks-per-node": 16
+		}
+	},
+
+
+	"pat": 
+	{
+		"evn_path": "/projects/exasky/HACC.darwin_setup",
+
+		"analysis-tool": 
+		{
+			"gimlet-home": "/projects/exasky/gimlet2",
+
+			"analytics": 
+			[
+				{
+					"name": "sim_stats",
+					"type": ["rhob", "rhom", "rhodm", "temp", "velmag", "vz"],
+					"postfix": "_ps3d.txt",
+					"path": "/projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex",
+					"configuration": {
+						"partition": "scaling",
+						"nodes": 8,
+						"ntasks-per-node": 8
+					}
+				},
+
+				{
+					"name": "lya_all_axes",
+					"type": ["x", "y", "z"],
+					"postfix": "_flux_ps1d.txt",
+					"path": "/projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex",
+					"command": "cp /projects/exasky/gimlet2/apps/lya_all_axes/TREECOOL_middle .",
+					"configuration": {
+						"partition": "scaling",
+						"nodes": 8,
+						"ntasks-per-node": 8
+					}
+				}
+			]
+		},
+
+		"input-files": [],
+
+		"analysis": []
+	},
+
+	"cinema-plots": 
+	{
+		"cinema-db-name": "NYX_cinema_",
+		"plotting": {
+			"x-range": [0, 11]
+		},
+
+		"evn_path": "/projects/exasky/HACC.darwin_setup",
+		"configuration": {
+			"partition": "galton",
+			"nodes": 1,
+			"ntasks-per-node": 8
+		}
+	}
+}
