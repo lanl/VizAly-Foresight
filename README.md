@@ -95,7 +95,7 @@ For information on Travis CI and Docker image, look at the [travis folder](testi
 * Jesus Pulido
 * Hoby Rakotoarivelo
 
-[![Build Status](https://travis-ci.org/lanl/VizAly-CBench.svg?branch=master)](https://travis-ci.org/lanl/VizAly-CBench)
+[![Build Status](https://travis-ci.org/lanl/VizAly-Foresight.svg?branch=master)](https://travis-ci.org/lanl/VizAly-Foresight)
 
 
 # Copyright and License
