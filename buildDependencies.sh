@@ -1,7 +1,6 @@
 #!/bin/bash 
 projectPath=$(pwd)
 
-echo "Current Platform: $PLATFORM"
 
 # Default arguments
 buildType="Default"

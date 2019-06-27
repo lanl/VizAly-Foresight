@@ -224,8 +224,8 @@ elif [ $buildOpt = "hacc" ]; then
 elif [ $buildOpt = "all" ]; then
 	echo "Building with all dependencies ..."
 
-	if [ "$PLATFORM" = "travis" ]
-	  echo "Travis: Using docker HDF5 build"
+	if [ "$PLATFORM" = "travis" ]; then
+	  echo "Travis: Using internal HDF5 build"
 	  cmake ../CBench $opt\
 		-DCBENCH_ENABLE_NYX_LOADER=ON \
 		-DCBENCH_ENABLE_BLOSC=ON \
