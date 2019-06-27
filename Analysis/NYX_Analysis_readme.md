@@ -39,5 +39,4 @@ Range of k (x-axis) to plot : 0-10
 
 
 ## Running:
-1. Create an input file in the inputs file folder (e.g. gimletAnalysis)
-2. Run gimletAnalysis as follows: python gimletAnalysis.py inputs/gimletAnalysis.py
+Run analysis as follows: python pat_nyx.py --input-file ../inputs/nyx/darwin-nyx-template.json --submit
