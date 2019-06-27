@@ -1,32 +1,19 @@
-option(CBENCH_ENABLE_LOSSY_WAVE "Enable LossyWave." OFF)
 
 if (CBENCH_ENABLE_LOSSY_WAVE)
-	set(MY_LIBS "")
 
     #Asks for LossyWave library
     find_library(LOSSYWAVE_LIBRARY ${LOSSYWAVE_LIBRARY} CACHE STRING "LOSSYWAVE_LIBRARY library")
 
-    if (NOT LOSSYWAVE_LIBRARY)
-    	message(FATAL_ERROR "Could NOT find LossyWave")
-    else()
-            
-    	set(MY_LIBS ${MY_LIBS} ${LOSSYWAVE_LIBRARY})
-	    set(MY_LIBS ${MY_LIBS} -fopenmp)
-       
-	    #Asks for LossyWave include files and includes it in the project
-	    set (LOSSYWAVE_INCLUDE_PATH ${LOSSYWAVE_INCLUDE_PATH} CACHE PATH "LOSSYWAVE include directory")
+	if (LOSSYWAVE_LIBRARY)
+		# Find lz4 dependency
+		find_library(LOSSYWAVE_LZ4_LIBRARY ${LOSSYWAVE_LZ4_LIBRARY} CACHE STRING "LOSSYWAVE_LZ4_LIBRARY library")
 
-		# Find lz4 dependency (only on Win32)
-		#if(WIN32)
-			find_library(LOSSYWAVE_LZ4_LIBRARY ${LOSSYWAVE_LZ4_LIBRARY} CACHE STRING "LOSSYWAVE_LZ4_LIBRARY library")
-			set(MY_LIBS ${MY_LIBS} ${LOSSYWAVE_LZ4_LIBRARY})
-			set(LOSSYWAVE_LZ4_INCLUDE_PATH ${LOSSYWAVE_LZ4_INCLUDE_PATH} CACHE PATH "LOSSYWAVE LZ4 include directory")
-			set(LOSSYWAVE_INCLUDE_PATH ${LOSSYWAVE_INCLUDE_PATH} ${LOSSYWAVE_LZ4_INCLUDE_PATH})
-		#endif()
-
-	    set_property(GLOBAL APPEND PROPERTY definitions "-DCBENCH_HAS_LOSSY_WAVE")
-	   	set_property(GLOBAL APPEND PROPERTY includeDirectories ${LOSSYWAVE_INCLUDE_PATH})
-	    set_property(GLOBAL APPEND PROPERTY linkLibraries ${MY_LIBS})
-        
+		target_compile_definitions(CBench PRIVATE -DCBENCH_HAS_LOSSY_WAVE)
+		target_include_directories(CBench PRIVATE ${LOSSYWAVE_INCLUDE_PATH} ${LOSSYWAVE_LZ4_INCLUDE_PATH})
+		target_include_directories(GenericIO PRIVATE ${LOSSYWAVE_INCLUDE_PATH} ${LOSSYWAVE_LZ4_INCLUDE_PATH})
+		set_property(TARGET CBench APPEND PROPERTY LIB "${LOSSYWAVE_LIBRARY}")
+		set_property(TARGET CBench APPEND PROPERTY LIB "${LOSSYWAVE_LZ4_LIBRARY}")
+	else()
+		message(FATAL_ERROR "Could NOT find LossyWave")
 	endif()
 endif()

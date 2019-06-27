@@ -129,19 +129,15 @@ if [ $buildPlatform = "cori" ]; then
 	export CPATH=/usr/common/software/hdf5-parallel/1.10.1/gnu/include:$CPATH
 	export LD_LIBRARY_PATH=/usr/common/software/hdf5-parallel/1.10.1/gnu/lib:$LD_LIBRARY_PATH
 
-	opt = "-DCMAKE_C_FLAGS=-dynamic -DCMAKE_CXX_FLAGS=-dynamic "
-
-	mv CBench/CMakeLists.txt CBench/CMakeLists.txt.old
-	cp scripts/Cori.CMakeLists.txt CBench/CMakeLists.txt
+	opt="-DCMAKE_C_FLAGS=-dynamic -DCMAKE_CXX_FLAGS=-dynamic -DCBENCH_PLATFORM=Cori "
 else
-	cp scripts/CMakeLists.txt CBench/CMakeLists.txt
+    opt="-DCBENCH_PLATFORM=Default "
 fi
 
 
 # Create build directory 
 mkdir $buildDir 
 cd $buildDir 
- 
 
 
 # build
