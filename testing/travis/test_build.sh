@@ -5,6 +5,8 @@ set -e
 # get GCC compiler
 source /src/env.sh
 
+export PLATFORM="travis"
+
 # build
 cd /src/VizAly-CBench
 projectPath=$(pwd)
