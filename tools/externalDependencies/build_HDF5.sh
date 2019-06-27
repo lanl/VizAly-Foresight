@@ -3,7 +3,7 @@
 # HDF5
 echo "Building HDF5 ... "
 
-if [ "$PLATFORM" = "travis" ]
+if [ "$PLATFORM" = "travis" ]; then
 	echo "Travis: Using docker HDF5 build"
 else
 	git clone https://bitbucket.hdfgroup.org/scm/hdffv/hdf5.git
