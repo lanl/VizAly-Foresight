@@ -3,6 +3,8 @@
 # HDF5
 echo "Building HDF5 ... "
 
+echo $PLATFORM
+
 if [ "$PLATFORM" = "travis" ]; then
 	echo "Travis: Using docker HDF5 build"
 else
