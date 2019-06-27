@@ -9,7 +9,7 @@ Foresight has three components:
 * Cinema: The tool used to visualize the results of this project
 
 ## Current Visualization results
-* Link to the live cinema database with results : [https://lanl.github.io/VizAly-CBench/](https://lanl.github.io/VizAly-CBench/)
+* Link to the live cinema database with results : [https://lanl.github.io/VizAly-Foresight/](https://lanl.github.io/VizAly-CBench/)
 * Cinema comparison is at: https://lanl.github.io/VizAly-CBench/cinema_compare/
 
 # Building VizAly-Foresight
@@ -23,7 +23,7 @@ The default master branch should always point to the latest working version. How
 ## Building:
 The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @ ANL and Darwin @ LANL . These build a base version of Foresight:
 ```
-$ git clone https://github.com/lanl/VizAly-CBench.git
+$ git clone https://github.com/lanl/VizAly-Foresight.git
 
 $ cd VizAly-CBench
 $ source buildDependencies.sh
@@ -32,7 +32,7 @@ $ source build.sh
 
 To build a master (all) version of Foresight, run the following scripts:
 ```
-$ git clone https://github.com/lanl/VizAly-CBench.git
+$ git clone https://github.com/lanl/VizAly-Foresight.git
 
 $ cd VizAly-CBench
 $ source buildAllDependencies.sh
@@ -41,7 +41,7 @@ $ source buildAll.sh
 
 ## Running:
 ```
-$ mpirun -np 2 ./CBench ../inputs/HACC_all.json
+$ mpirun -np 2 ./CBench ../inputs/hacc/HACC_all.json
 $ cat metrics_HACC_all_
 ```
 
