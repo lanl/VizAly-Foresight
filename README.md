@@ -25,7 +25,7 @@ The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @
 ```
 $ git clone https://github.com/lanl/VizAly-Foresight.git
 
-$ cd VizAly-CBench
+$ cd VizAly-Foresight
 $ source buildDependencies.sh
 $ source build.sh
 ```
@@ -34,7 +34,7 @@ To build a master (all) version of Foresight, run the following scripts:
 ```
 $ git clone https://github.com/lanl/VizAly-Foresight.git
 
-$ cd VizAly-CBench
+$ cd VizAly-Foresight
 $ source buildAllDependencies.sh
 $ source buildAll.sh
 ```
