@@ -9,13 +9,21 @@ Authors:
 ================================================================================*/
 #pragma once
 
-#include<stdio.h> 
-#include<stdbool.h> 
+#include <stdio.h> 
+#include <stdbool.h> 
 #include <string>
 #include <fstream>
 #include <iostream>
 #include <sys/stat.h>
 
+#ifdef _WIN32
+
+#define S_IRUSR _S_IREAD
+#define S_IWUSR _S_IWRITE
+#include <direct.h>
+#define mkdir(a, b) _mkdir((a))
+
+#endif
 
 inline int createFolder(std::string folderName)
 {
