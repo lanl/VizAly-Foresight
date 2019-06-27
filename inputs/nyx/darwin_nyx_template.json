@@ -1,13 +1,13 @@
 {
 	"project-home" : "/projects/exasky/pascal-projects/VizAly-CBench/",
-	"wflow-path": "nyx_wflow",
+	"wflow-path": "nyx_ADD_NAME_HERE",
 
   	"input": 
   	{
 	    "filetype": "NYX",
 	    "filename": "/projects/exasky/pascal-projects/VizAly-CBench/testing/data/z255_32.h5",  
 
-	    "scalars-comment": "which scalars to test",
+
 	    "group" : "native_fields",
 	    "scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ],
 
@@ -70,22 +70,7 @@
 	"compressor-comment" : "which compressors to test",
 	"compressors" : 
 	[
-		{
-			"name": "BLOSC",
-			"output-prefix" : "BLOSC_"
-		},
-		
-		{
-            "name": "SZ",
-            "output-prefix" : "sz_002_",
-            "abs" : 2E-3
-		},
 
-		{
-			"name": "zfp",
-			"output-prefix" : "zfp_abs_001_",
-			"abs": 1E-3
-		}
 	],
 
 	
@@ -98,17 +83,16 @@
 			"run-path" : "/projects/exasky/VizAly-CBench/build/",
 
 			"output-decompressed": true,
-			"output-decompressed-location" : "NYX_wflow_",
+			"output-decompressed-location" : "decompressed_files",
 			
 			"logfname-comment": "name of output log file",
-			"log-file" : "runlog_NYX_all_",
+			"log-file" : "runlog_",
 
 			"metricsfname-comment": "name of file with output",
-			"metrics-file" : "metrics_NYX_all_"
+			"metrics-file" : "metrics_"
 		},
 
 
-		"metrics-comment" : "which metrics to use",
 		"metrics": 
 		[
 			{
@@ -130,12 +114,12 @@
 
 		"evn_path": "/projects/exasky/HACC.darwin_setup",
 
-		"configuration": {
+		"configuration": 
+		{
 			"partition": "scaling",
 			"nodes": 1,
 			"ntasks-per-node": 16
 		}
-
 	},
 
 
@@ -156,7 +140,7 @@
                     "path": "/projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex",
                     "configuration" : {
 			            "partition" : "scaling",
-			            "nodes" : 2,
+			            "nodes" : 8,
 			            "ntasks-per-node" : 8
 			        }
                 },
@@ -169,7 +153,7 @@
                     "command" : "cp /projects/exasky/gimlet2/apps/lya_all_axes/TREECOOL_middle .",
                     "configuration" : {
 			            "partition" : "scaling",
-			            "nodes" : 2,
+			            "nodes" : 8,
 			            "ntasks-per-node" : 8
 			        }
                 }
@@ -181,9 +165,10 @@
 		"analysis" : []
 	},
 
+
 	"cinema-plots": 
 	{
-		"cinema-database" : "NYX_wflow_",
+		"cinema-database" : "cinema.cdb",
 		"plotting" :
 		{
 			"x-range" : [0, 11]
@@ -193,7 +178,7 @@
 		"configuration": 
 		{
 			"partition": "scaling",
-			"nodes": 2,
+			"nodes": 1,
 			"ntasks-per-node": 8
 		}
 	}
