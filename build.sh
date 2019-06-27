@@ -106,6 +106,9 @@ for ((i=1; i<=$#; i++ )); do
 		buildOpt="all"
 	fi
 
+	if [ $arg = "-travis" ]; then
+		buildOpt="travis"
+	fi
 
 	if [ $arg = "-hacc" ]; then
 		buildOpt="cori"
@@ -254,6 +257,31 @@ elif [ $buildOpt = "all" ]; then
 		-DCBENCH_ENABLE_BIG_CRUNCH=ON \
 		-DBIGCRUNCH_INCLUDE_PATH=$externalDependencies/VizAly-BigCrunch/install/include \
 		-DBIGCRUNCH_LIBRARY=$externalDependencies/VizAly-BigCrunch/install/lib/libbigcrunch.so \
+		-DCMAKE_BUILD_TYPE=$buildType
+
+
+elif [ $buildOpt = "travis" ]; then
+	echo "Building with all dependencies ..."
+
+	cmake ../CBench $opt\
+		-DCBENCH_ENABLE_NYX_LOADER=ON \
+		-DCBENCH_ENABLE_BLOSC=ON \
+		-DBLOSC_INCLUDE_PATH=$externalDependencies/c-blosc/install/include \
+		-DBLOSC_LIBRARY=$externalDependencies/c-blosc/install/lib/libblosc.so \
+		-DCBENCH_ENABLE_SZ=ON \
+		-DSZ_INCLUDE_PATH=$externalDependencies/SZ/sz/include \
+		-DSZ_LIBRARY=$externalDependencies/SZ/install/lib/libSZ.so \
+		-DZLIB_LIBRARY=$externalDependencies/SZ/install/lib/libzlib.so \
+		-DZSTD_LIBRARY=$externalDependencies/SZ/install/lib/libzstd.so \
+		-DCBENCH_ENABLE_ZFP=ON \
+		-DZFP_INCLUDE_PATH=$externalDependencies/zfp/install/include \
+		-DZFP_LIBRARY=$externalDependencies/zfp/install/lib64/libzfp.so \
+		-DCBENCH_ENABLE_FPZIP=ON \
+		-DFPZIP_INCLUDE_PATH=$externalDependencies/fpzip-1.2.0/inc/ \
+		-DFPZIP_LIBRARY=$externalDependencies/fpzip-1.2.0/lib/libfpzip.a \
+		-DCBENCH_ENABLE_ISABELA=ON \
+		-DISABELA_INCLUDE_PATH=$externalDependencies/ISABELA-compress-0.2.1/include \
+		-DISABELA_LIBRARY=$externalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
 		-DCMAKE_BUILD_TYPE=$buildType
 
 elif [ $buildOpt = "osx" ]; then
