@@ -14,6 +14,7 @@ Authors:
 
 #include <algorithm>
 #include <sstream>
+#include <climits>
 #include "thirdparty/genericio/GenericIO.h"
 #include "gioData.hpp"
 #include "dataLoaderInterface.hpp"

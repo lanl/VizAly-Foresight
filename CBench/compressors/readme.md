@@ -1,4 +1,4 @@
-The VizAly-CBench framework is based on the [factory design pattern](https://www.tutorialspoint.com/design_pattern/factory_pattern.htm). 
+The CBench framework is based on the [factory design pattern](https://www.tutorialspoint.com/design_pattern/factory_pattern.htm). 
 We expect that developers who contribute to this project will add new compressors and error metrics. 
 
 ### The compressor interface has the following functions:

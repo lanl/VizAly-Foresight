@@ -1089,8 +1089,8 @@ static inline uint64_t crc64_omp(const void* input, size_t nbytes)
     if (nbytes < nthreads * crc64_min_thread_bytes)
       nthreads = nbytes / crc64_min_thread_bytes;
 
-    uint64_t thread_cs[nthreads];
-    size_t thread_sz[nthreads];
+    uint64_t * thread_cs = new uint64_t[nthreads];
+    size_t * thread_sz = new size_t[nthreads];
 
     const unsigned char* data = (const unsigned char*)input;
 #pragma omp parallel num_threads(nthreads)
@@ -1113,6 +1113,9 @@ static inline uint64_t crc64_omp(const void* input, size_t nbytes)
     {
       cs = crc64_combine(cs, thread_cs[i], thread_sz[i]);
     }
+
+	delete [] thread_cs;
+	delete [] thread_sz;
 
     return cs;
   }
