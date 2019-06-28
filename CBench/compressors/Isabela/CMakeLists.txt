@@ -4,6 +4,7 @@ if (CBENCH_ENABLE_ISABELA)
     find_library(ISABELA_LIBRARY ${ISABELA_LIBRARY} CACHE STRING "ISABELA library")
 
 	if (ISABELA_LIBRARY)
+		set(ISABELA_INCLUDE_PATH ${ISABELA_INCLUDE_PATH} CACHE PATH "Isabela include directory")
 		#Find other libraries
 		find_package(GSL REQUIRED)
 		target_compile_definitions(CBench PRIVATE -DCBENCH_HAS_ISABELA)
