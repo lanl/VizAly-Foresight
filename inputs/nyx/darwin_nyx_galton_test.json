@@ -1,12 +1,12 @@
 {
 	"project-home" : "/projects/exasky/pascal-projects/VizAly-CBench/",
-	"wflow-path": "nyx_ADD_NAME_HERE",
-	"foresight-home" : "ADD_HERE",
+	"wflow-path": "galton-wflow_test",
+	"foresight-home" : "/projects/exasky/pascal-projects/VizAly-CBench/",
 
 	"input": 
 	{
 		"filetype": "NYX",
-		"filename": "/projects/exasky/pascal-projects/VizAly-CBench/testing/data/z255_32.h5",  
+		"filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",  
 
 
 		"group" : "native_fields",

@@ -77,7 +77,7 @@ class Workflow(object):
         # Find exewcutable command
         exec_command = self.json_data["cbench"]["path"]
         foresight_home = self.json_data["foresight-home"]
-        exec_command.replace("$foresight-home$", foresight_home)
+        exec_command = exec_command.replace("$foresight-home$", foresight_home)
 
 
         # add a single CBench job to workflow for entire sweep
