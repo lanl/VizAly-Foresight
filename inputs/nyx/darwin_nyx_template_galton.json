@@ -1,35 +1,36 @@
 {
 	"project-home" : "/projects/exasky/pascal-projects/VizAly-CBench/",
 	"wflow-path": "nyx_ADD_NAME_HERE",
+	"foresight-home" : "ADD_HERE",
 
-  	"input": 
-  	{
-	    "filetype": "NYX",
-	    "filename": "/projects/exasky/pascal-projects/VizAly-CBench/testing/data/z255_32.h5",  
+	"input": 
+	{
+		"filetype": "NYX",
+		"filename": "/projects/exasky/pascal-projects/VizAly-CBench/testing/data/z255_32.h5",  
 
 
-	    "group" : "native_fields",
-	    "scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ],
+		"group" : "native_fields",
+		"scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ],
 
-	    "uncompressed": 
+		"uncompressed": 
 		[
-	  		{
+			{
 				"group": "domain",
 				"attributes": [
-			  		{
+					{
 						"name": "shape",
 						"type": "int",
 						"size": 3
-			  		},
-			  		{
+					},
+					{
 						"name": "size",
 						"type": "double",
 						"size": 3
-			  		}
+					}
 				]
-	  		},
+			},
 
-	  		{
+			{
 				"group": "universe",
 				"attributes": 
 				[
@@ -39,17 +40,17 @@
 						"size": 1 
 					},
 
-			  		{
+					{
 						"name": "omega_b",
 						"type": "double",
 						"size": 1
-			 		},
+					},
 
-			  		{
+					{
 						"name": "omega_l",
 						"type": "double",
 						"size": 1
-			  		},
+					},
 
 					{
 						"name": "omega_m",
@@ -63,9 +64,9 @@
 						"size": 1
 					}
 				]
-	  		}
+			}
 		]
-  	},
+	},
 
 	"compressor-comment" : "which compressors to test",
 	"compressors" : 
@@ -76,9 +77,9 @@
 	
 	"cbench": 
 	{
-		"path" : "mpirun /projects/exasky/pascal-projects/VizAly-CBench/build/CBench",
+		"path" : "mpirun $foresight-home$build/CBench",
 
-        "output" :
+		"output" :
 		{
 			"run-path" : "/projects/exasky/VizAly-CBench/build/",
 
@@ -112,13 +113,13 @@
 			}
 		],
 
-		"evn_path": "/projects/exasky/HACC.darwin_setup",
+		"evn_path": "scripts/VizAly-CBench.bash.darwin",
 
 		"configuration": 
 		{
-			"partition": "scaling",
+			"partition": "galton",
 			"nodes": 1,
-			"ntasks-per-node": 16
+			"ntasks-per-node": 8
 		}
 	},
 
@@ -133,31 +134,31 @@
 
 			"analytics": 
 			[
-                {
-                    "name": "sim_stats", 
-                    "type" : ["rhob", "rhom", "rhodm", "temp", "velmag", "vz"],
-                    "postfix" : "_ps3d.txt",
-                    "path": "/projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex",
-                    "configuration" : {
-			            "partition" : "scaling",
-			            "nodes" : 8,
-			            "ntasks-per-node" : 8
-			        }
-                },
+				{
+					"name": "sim_stats", 
+					"type" : ["rhob", "rhom", "rhodm", "temp", "velmag", "vz"],
+					"postfix" : "_ps3d.txt",
+					"path": "/projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex",
+					"configuration" : {
+						"partition" : "galton",
+						"nodes" : 8,
+						"ntasks-per-node" : 8
+					}
+				},
 
-                {
-                    "name": "lya_all_axes", 
-                    "type" : ["x", "y", "z"],
-                    "postfix" : "_flux_ps1d.txt",
-                    "path": "/projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex",
-                    "command" : "cp /projects/exasky/gimlet2/apps/lya_all_axes/TREECOOL_middle .",
-                    "configuration" : {
-			            "partition" : "scaling",
-			            "nodes" : 8,
-			            "ntasks-per-node" : 8
-			        }
-                }
-            ]
+				{
+					"name": "lya_all_axes", 
+					"type" : ["x", "y", "z"],
+					"postfix" : "_flux_ps1d.txt",
+					"path": "/projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex",
+					"command" : "cp /projects/exasky/gimlet2/apps/lya_all_axes/TREECOOL_middle .",
+					"configuration" : {
+						"partition" : "galton",
+						"nodes" : 8,
+						"ntasks-per-node" : 8
+					}
+				}
+			]
 		},
 
 		"input-files" : [],
@@ -174,10 +175,10 @@
 			"x-range" : [0, 11]
 		},
 
-		"evn_path": "/projects/exasky/HACC.darwin_setup",
+		"evn_path": "scripts/VizAly-CBench.bash.darwin",
 		"configuration": 
 		{
-			"partition": "scaling",
+			"partition": "galton",
 			"nodes": 1,
 			"ntasks-per-node": 8
 		}

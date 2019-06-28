@@ -32,13 +32,6 @@ class CinemaWorkflow():
 		print "Create cinema database " + cinema_database
 
 
-	def create_plots(self):
-		pass
-
-
-	def prepare_cinema(self):
-		pass
-
 
 	def create_cinema(self):
 		self.prepare_cinema()
@@ -52,7 +45,13 @@ class CinemaWorkflow():
 		self.create_cinema_database(cinema_database, cinema_csv, img_files)
 
 
-	
+
+	def create_plots(self):
+		# Adds plotting jobs to workflow that produce final products.
+		raise NotImplementedError("Implement the `create_plots` function to your workflow!")
 
 
 
+	def prepare_cinema(self):
+		# Adds plotting jobs to workflow that produce final products.
+		raise NotImplementedError("Implement the `prepare_cinema` function to your workflow!")

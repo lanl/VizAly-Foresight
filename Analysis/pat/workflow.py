@@ -30,10 +30,13 @@ class Workflow(object):
         # attributes for workflow construction
         self.submit_file = None
 
+
+
     def add_job(self, job, dependencies=None):
         """ Adds a job to the workflow.
         """
         self.jobs.append(job)
+
 
 
     def add_cbench_job(self):
@@ -67,19 +70,26 @@ class Workflow(object):
             configurations = None
 
         if "evn_path" in self.json_data["cbench"]:
-            environment = self.json_data["cbench"]["evn_path"]
+            environment =  self.json_data["foresight-home"] + self.json_data["cbench"]["evn_path"]
         else:
             environment = None
+
+        # Find exewcutable command
+        exec_command = self.json_data["cbench"]["path"]
+        foresight_home = self.json_data["foresight-home"]
+        exec_command.replace("$foresight-home$", foresight_home)
+
 
         # add a single CBench job to workflow for entire sweep
         cbench_job = j.Job(name="cbench",
                          execute_dir=execute_dir,
-                         executable=self.json_data["cbench"]["path"],
+                         executable=exec_command,
                          arguments=[os.path.basename(self.json_path)],
                          configurations=configurations,
                          environment=environment)
         cbench_job.add_command("mkdir logs")
         self.add_job(cbench_job)
+
 
 
     def add_analysis_jobs(self):
@@ -88,26 +98,12 @@ class Workflow(object):
         raise NotImplementedError("Implement the `add_analysis` function to your workflow!")
 
 
-    def add_plotting_jobs(self):
+
+    def add_cinema_plotting_jobs(self):
         """ Adds plotting jobs to workflow that produce final products.
         """
         raise NotImplementedError("Implement the `add_plotting_jobs` function to your workflow!")
 
-
-    def create_CinemaDB(self, cinema_database, csv_file, image_files):
-        #create cdb file
-        f.create_folder(cinema_database)
-
-        # Copy files to cinema
-        for img in image_files:
-            cmd = "cp " + img + " " + cinema_database
-            os.system(cmd)
-
-        # Copy data to cinema
-        cmd = "cp " + csv_file + " " + cinema_database + "/data.csv"
-        os.system(cmd)
-
-        print("Create cinema database " + cinema_database)
 
 
     def write_submit(self):
@@ -175,6 +171,7 @@ class Workflow(object):
                 fp.write("jid{}=$(echo $jid{} | rev | cut -f 1 -d ' ' | rev)".format(job._idx, job._idx))
     
     
+
     def submit(self):
         """ Submits Slurm workflow.
         """

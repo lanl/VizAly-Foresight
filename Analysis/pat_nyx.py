@@ -45,7 +45,7 @@ class NYXWorkflow(workflow.Workflow):
 		for analysis in self.json_data["pat"]["analysis-tool"]["analytics"]:
 
 			if "evn_path" in self.json_data["pat"]:
-				environment = self.json_data["pat"]["evn_path"]
+				environment = self.json_data["foresight-home"] + self.json_data["pat"]["evn_path"]
 			else:
 				environment = None
 
@@ -78,10 +78,11 @@ class NYXWorkflow(workflow.Workflow):
 		self.add_analysis_input()
 
 
+
 	# Create plots
-	def add_plotting_jobs(self):
+	def add_cinema_plotting_jobs(self):
 		if "evn_path" in self.json_data["cinema-plots"]:
-			environment = self.json_data["cinema-plots"]["evn_path"]
+			environment = self.json_data["foresight-home"] + self.json_data["cinema-plots"]["evn_path"]
 		else:
 			environment = None
 
@@ -109,6 +110,7 @@ class NYXWorkflow(workflow.Workflow):
 
 
 
+
 # Parse Input
 parser = argparse.ArgumentParser()
 parser.add_argument("--input-file")
@@ -125,7 +127,7 @@ wflow = NYXWorkflow("wflow", wflow_data, workflow_dir=wflow_dir)
 # add jobs to workflow
 wflow.add_cbench_job()
 wflow.add_analysis_jobs()
-wflow.add_plotting_jobs()
+wflow.add_cinema_plotting_jobs()
 
 
 # write submission script

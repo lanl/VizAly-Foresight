@@ -1,6 +1,7 @@
 {
 	"project-home": "/global/cscratch1/sd/pascal/exasky",
 	"wflow-path": "Nyx__512_42__fpzip__",
+	"foresight-home" : "/project/projectdirs/m2848/lanl/pascal_projects/VizAly-Foresight/",
 
 	"input": 
 	{
@@ -145,7 +146,7 @@
 
 	"cbench": 
 	{
-		"path": "srun -n 64 -c 6 /project/projectdirs/m2848/lanl/pascal_projects/VizAly-Foresight/build/CBench",
+		"path": "srun -n 64 -c 6 $foresight-home$build/CBench",
 
 		"output": 
 		{
@@ -177,7 +178,7 @@
 		],
 
 
-		"evn_path": "/project/projectdirs/m2848/lanl/pascal_projects/VizAly-Foresight/scripts/VizAly-CBench.bash.cori",
+		"evn_path": "scripts/VizAly-CBench.bash.cori",
 		"configuration" : 
 		{
 			"nodes" : 8,
@@ -191,7 +192,7 @@
 
 	"pat": 
 	{
-		"evn_path": "/project/projectdirs/m2848/lanl/moduleLoadAnalysis.sh",
+		"evn_path": "scripts/VizAly-CBench.bash.cori_analysis",
 
 		"analysis-tool": 
 		{
@@ -210,7 +211,7 @@
 						"constraint" : "haswell",
 						"qos" : "regular",
 						"time" : "08:59:59",
-						"account" : "m2848"
+						"account" : "m2294"
 					}
 				},
 
@@ -226,7 +227,7 @@
 						"constraint" : "haswell",
 						"qos" : "regular",
 						"time" : "08:59:59",
-						"account" : "m2848"
+						"account" : "m2294"
 					}
 				}
 			]
@@ -237,6 +238,7 @@
 		"analysis": []
 	},
 
+
 	"cinema-plots": 
 	{
 		"cinema-db-name": "cinema.cdb",
@@ -245,14 +247,14 @@
 			"x-range": [0, 11]
 		},
 
-		"evn_path": "/project/projectdirs/m2848/lanl/moduleLoadAnalysis.sh",
+		"evn_path": "scripts/VizAly-CBench.bash.cori_analysis",
 		"configuration" : 
 		{
 			"nodes" : 1,
 			"constraint" : "haswell",
 			"qos" : "debug",
 			"time" : "00:29:59",
-			"account" : "m2848"
+			"account" : "m2294"
 		}
 	}
 }
