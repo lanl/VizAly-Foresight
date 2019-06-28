@@ -7,6 +7,9 @@ source /src/env.sh
 
 export PLATFORM="travis"
 
+# load OpenMPI
+module load mpi
+
 # build
 cd /src/VizAly-CBench
 projectPath=$(pwd)
