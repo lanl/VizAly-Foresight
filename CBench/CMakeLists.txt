@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.6.2)
 cmake_policy(SET CMP0048 NEW)
 
 # version actually set for Cori
-project(CBench VERSION 1.0.0 LANGUAGES CXX)
+project(CBench VERSION 1.0.0 LANGUAGES CXX C)
 
 # Prevent in source builds since they are evil
 if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
