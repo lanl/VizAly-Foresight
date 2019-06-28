@@ -72,16 +72,12 @@ if (CBENCH_ENABLE_NYX_LOADER)
         find_package(HDF5 REQUIRED PATHS ${HDF5_CORI} NO_DEFAULT_PATH COMPONENTS C)
         target_link_libraries(CBench PRIVATE dl m z hdf5 hdf5_hl)
     else ()
-        find_package(HDF5 REQUIRED)
+        find_package(HDF5 REQUIRED COMPONENTS C)
         target_link_libraries(CBench PRIVATE ${HDF5_LIBRARIES})
     endif()
     target_include_directories(CBench PRIVATE "${HDF5_INCLUDE_DIRS}")
     target_compile_definitions(CBench PRIVATE -DCBENCH_HAS_NYX)
     target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}/dataLoader/NYX")
-
-	if(HDF5_FOUND)
-		message(STATUS "HDF5_INCLUDE_DIRS: " ${HDF5_INCLUDE_DIRS})
-	endif()
 endif()
 
 
