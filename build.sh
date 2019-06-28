@@ -224,7 +224,40 @@ elif [ $buildOpt = "hacc" ]; then
 elif [ $buildOpt = "all" ]; then
 	echo "Building with all dependencies ..."
 
-	cmake ../CBench $opt\
+	if [ "$PLATFORM" = "travis" ]; then
+	  echo "Travis: Using internal HDF5 build"
+	  cmake ../CBench $opt\
+		-DCBENCH_ENABLE_NYX_LOADER=ON \
+		-DCBENCH_ENABLE_BLOSC=ON \
+		-DBLOSC_INCLUDE_PATH=$externalDependencies/c-blosc/install/include \
+		-DBLOSC_LIBRARY=$externalDependencies/c-blosc/install/lib/libblosc.so \
+		-DCBENCH_ENABLE_SZ=ON \
+		-DSZ_INCLUDE_PATH=$externalDependencies/SZ/sz/include \
+		-DSZ_LIBRARY=$externalDependencies/SZ/install/lib/libSZ.so \
+		-DZLIB_LIBRARY=$externalDependencies/SZ/install/lib/libzlib.so \
+		-DZSTD_LIBRARY=$externalDependencies/SZ/install/lib/libzstd.so \
+		-DCBENCH_ENABLE_ZFP=ON \
+		-DZFP_INCLUDE_PATH=$externalDependencies/zfp/install/include \
+		-DZFP_LIBRARY=$externalDependencies/zfp/install/lib64/libzfp.so \
+		-DCBENCH_ENABLE_FPZIP=ON \
+		-DFPZIP_INCLUDE_PATH=$externalDependencies/fpzip-1.2.0/inc/ \
+		-DFPZIP_LIBRARY=$externalDependencies/fpzip-1.2.0/lib/libfpzip.a \
+		-DCBENCH_ENABLE_ISABELA=ON \
+		-DISABELA_INCLUDE_PATH=$externalDependencies/ISABELA-compress-0.2.1/include \
+		-DISABELA_LIBRARY=$externalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
+		-DCBENCH_ENABLE_MGARD=ON \
+		-DMGARD_INCLUDE_PATH=$externalDependencies/MGARD/install/include \
+		-DMGARD_LIBRARY=$externalDependencies/MGARD/install/lib/libmgard.so \
+		-DCBENCH_ENABLE_LOSSY_WAVE=ON \
+		-DLOSSYWAVE_INCLUDE_PATH=$externalDependencies/VizAly-LossyWave/install/include \
+		-DLOSSYWAVE_LIBRARY=$externalDependencies/VizAly-LossyWave/install/lib/liblossywave.so \
+		-DLOSSYWAVE_LZ4_LIBRARY=$externalDependencies/VizAly-LossyWave/build/3rdparty/lz4/lz4-external/src/lz4-external/lib/liblz4.a \
+		-DCBENCH_ENABLE_BIG_CRUNCH=ON \
+		-DBIGCRUNCH_INCLUDE_PATH=$externalDependencies/VizAly-BigCrunch/install/include \
+		-DBIGCRUNCH_LIBRARY=$externalDependencies/VizAly-BigCrunch/install/lib/libbigcrunch.so \
+		-DCMAKE_BUILD_TYPE=$buildType
+	else
+	  cmake ../CBench $opt\
 		-DCBENCH_ENABLE_NYX_LOADER=ON \
 		-DHDF5_DIR=$externalDependencies/hdf5/install/share/cmake/hdf5 \
 		-DCBENCH_ENABLE_BLOSC=ON \
@@ -255,7 +288,8 @@ elif [ $buildOpt = "all" ]; then
 		-DBIGCRUNCH_INCLUDE_PATH=$externalDependencies/VizAly-BigCrunch/install/include \
 		-DBIGCRUNCH_LIBRARY=$externalDependencies/VizAly-BigCrunch/install/lib/libbigcrunch.so \
 		-DCMAKE_BUILD_TYPE=$buildType
-
+	fi
+	
 elif [ $buildOpt = "osx" ]; then
 	echo "Building for osx ..."
 
