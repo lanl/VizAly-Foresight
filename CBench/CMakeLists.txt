@@ -12,7 +12,7 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 endif()
 
 # Set the main executable
-add_executable(CBench main.cpp)
+add_executable(CBench)
 
 set(DEFAULT_BUILD_TYPE "Debug")
 
@@ -53,11 +53,12 @@ target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}/dataLoader/HACC")
 
 # HACC Loader
 target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}/thirdparty/genericio")
+target_compile_definitions(CBench PRIVATE -DGENERICIO_NO_COMPRESSION)
 
 add_library(GenericIO STATIC)
-target_compile_definitions(GenericIO PRIVATE -DGENERICIO_NO_COMPRESSION)
 target_sources(GenericIO PRIVATE "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO.cxx")
 set_target_properties(GenericIO PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_compile_definitions(GenericIO PRIVATE -DGENERICIO_NO_COMPRESSION)
 target_link_libraries(CBench PRIVATE GenericIO)
 
 
@@ -109,14 +110,14 @@ endforeach()
 find_package(MPI REQUIRED)
 
 # For supporting CMake < 3.9:
-if(NOT TARGET MPI::MPI_C)
-    add_library(MPI::MPI_C IMPORTED INTERFACE)
-    set_target_properties(MPI::MPI_C PROPERTIES INTERFACE_COMPILE_OPTIONS "${MPI_COMPILE_FLAGS}")
-    set_target_properties(MPI::MPI_C PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${MPI_INCLUDE_PATH}")
-    set_target_properties(MPI::MPI_C PROPERTIES INTERFACE_LINK_LIBRARIES "${MPI_LINK_FLAGS}")
+if(NOT TARGET MPI::MPI_CXX)
+    add_library(MPI::MPI_CXX IMPORTED INTERFACE)
+    set_target_properties(MPI::MPI_CXX PROPERTIES INTERFACE_COMPILE_OPTIONS "${MPI_COMPILE_FLAGS}")
+    set_target_properties(MPI::MPI_CXX PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${MPI_INCLUDE_PATH}")
+    set_target_properties(MPI::MPI_CXX PROPERTIES INTERFACE_LINK_LIBRARIES "${MPI_LINK_FLAGS}")
 endif()
-target_link_libraries(CBench PRIVATE MPI::MPI_C)
-target_link_libraries(GenericIO PRIVATE MPI::MPI_C)
+target_link_libraries(CBench PRIVATE MPI::MPI_CXX)
+target_link_libraries(GenericIO PRIVATE MPI::MPI_CXX)
 
 # OpenMP
 find_package(OpenMP)
