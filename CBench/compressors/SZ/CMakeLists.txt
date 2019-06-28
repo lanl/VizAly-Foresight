@@ -5,6 +5,7 @@ if (CBENCH_ENABLE_SZ)
     find_library(SZ_LIBRARY ${SZ_LIBRARY} CACHE STRING "SZ library")
 
 	if (SZ_LIBRARY)
+		set(SZ_INCLUDE_PATH ${SZ_INCLUDE_PATH} CACHE PATH "SZ include directory")
 		#Find other libraries
 		find_library(ZLIB_LIBRARY ${ZLIB_LIBRARY} CACHE STRING "ZLIB library")
 		find_library(ZSTD_LIBRARY ${ZSTD_LIBRARY} CACHE STRING "ZSTD library")

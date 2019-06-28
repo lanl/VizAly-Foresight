@@ -12,7 +12,7 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 endif()
 
 # Set the main executable
-add_executable(CBench)
+add_executable(CBench main.cpp)
 
 set(DEFAULT_BUILD_TYPE "Debug")
 
@@ -41,7 +41,6 @@ option(CBENCH_ENABLE_SZ         "Enable SZ." OFF)
 option(CBENCH_ENABLE_ZFP        "Enable ZFP." OFF)
 
 # include dirs
-target_sources(CBench PRIVATE main.cpp)
 target_compile_features(CBench PUBLIC cxx_std_14)
 target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}")
 target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}/metrics")
