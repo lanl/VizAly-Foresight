@@ -12,7 +12,7 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 endif()
 
 # Set the main executable
-add_executable(CBench)
+add_executable(CBench main.cpp)
 
 set(DEFAULT_BUILD_TYPE "Debug")
 
@@ -53,9 +53,9 @@ target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}/dataLoader/HACC")
 
 # HACC Loader
 target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}/thirdparty/genericio")
-target_compile_definitions(CBench PRIVATE -DGENERICIO_NO_COMPRESSION)
 
 add_library(GenericIO STATIC)
+target_compile_definitions(GenericIO PRIVATE -DGENERICIO_NO_COMPRESSION)
 target_sources(GenericIO PRIVATE "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO.cxx")
 set_target_properties(GenericIO PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(CBench PRIVATE GenericIO)
