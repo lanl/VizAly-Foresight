@@ -18,7 +18,7 @@ Authors:
 #include <mpi.h>
 
 
-inline std::string python_histogram(int numBins, float max_val, std::vector<float> histogram)
+inline std::string python_histogram(int numBins, float min_val, float max_val, std::vector<float> histogram)
 {
     std::stringstream outputFileSS;
     outputFileSS << "import sys" << std::endl;
@@ -31,12 +31,13 @@ inline std::string python_histogram(int numBins, float max_val, std::vector<floa
         outputFileSS << std::to_string(histogram[i]) << ", ";
     outputFileSS << std::to_string(histogram[i]) << "]" << std::endl;
 
+	outputFileSS << "minVal=" << std::to_string(min_val) << std::endl;
     outputFileSS << "maxVal=" << std::to_string(max_val) << std::endl;
     outputFileSS << "plotName=sys.argv[0]" << std::endl;
     outputFileSS << "plotName = plotName.replace('.py','.png')" << std::endl;
 
     outputFileSS << "numVals = len(y)" << std::endl;
-    outputFileSS << "x = np.linspace(0, maxVal, numVals+1)[1:]" << std::endl;
+    outputFileSS << "x = np.linspace(minVal, maxVal, numVals+1)[1:]" << std::endl;
     outputFileSS << "plt.plot(x,y, linewidth=0.5)" << std::endl;
     outputFileSS << "plt.title(plotName)" << std::endl;
     outputFileSS << "plt.ylabel(\"Frequency\")" << std::endl;

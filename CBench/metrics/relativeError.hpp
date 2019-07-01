@@ -136,7 +136,7 @@ inline void relativeError::execute(void *original, void *approx, size_t n) {
 
 			// Output histogram as a python script file
 			if (myRank == 0)
-				additionalOutput = python_histogram(numBins, total_max_rel_err, histogram);
+				additionalOutput = python_histogram(numBins,0.0, total_max_rel_err, histogram);
 		}
 	}
 
