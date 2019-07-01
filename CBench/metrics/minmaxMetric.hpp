@@ -91,7 +91,7 @@ inline void minmaxMetric::execute(void *original, void *approx, size_t n) {
 		if (global_max != 0)
 		{
 			std::vector<float>histogram;
-			int numBins = 1024;
+			size_t numBins = 1024;
 			std::vector<int> localHistogram(numBins, 0);
 			double binSize = (global_max-global_min) / numBins;
 
@@ -110,7 +110,7 @@ inline void minmaxMetric::execute(void *original, void *approx, size_t n) {
 				localHistogram[binPos]++;
 			}
 
-			//histogram.resize(numBins);
+			histogram.resize(numBins);
 
 			std::vector<int> globalHistogram(numBins, 0);
 			MPI_Allreduce(&localHistogram[0], &globalHistogram[0], numBins, MPI_INT, MPI_SUM, comm);

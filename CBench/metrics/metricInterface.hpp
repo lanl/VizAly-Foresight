@@ -18,7 +18,7 @@ Authors:
 #include <mpi.h>
 
 
-inline std::string python_histogram(int numBins, float min_val, float max_val, std::vector<float> histogram)
+inline std::string python_histogram(size_t numBins, float min_val, float max_val, std::vector<float> histogram)
 {
     std::stringstream outputFileSS;
     outputFileSS << "import sys" << std::endl;
