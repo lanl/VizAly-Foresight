@@ -43,8 +43,8 @@ $ python Analysis/pat_nyx.py --input-files inputs/nyx/nyx_darwin_test.json --sub
 
 ## Running CBench as stand-alone:
 ```
-$ mpirun -np 2 build/CBench ../inputs/hacc/HACC_all.json
-$ cat metrics_HACC_all_
+$ mpirun -np 2 build/CBench ../inputs/hacc/hacc_cbench_test.json
+$ cat metrics_hacc_test_.csv
 ```
 
 **Note:**  The above will only run a toy dataset meant for testing if the code runs. The results should **NOT** be used as an indicator for the performance of the compressors!
