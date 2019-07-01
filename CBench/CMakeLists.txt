@@ -40,6 +40,8 @@ if (CBENCH_ENABLE_NYX_LOADER)
 
     if(HDF5_FOUND)
         add_definitions (-DCBENCH_HAS_NYX)
+        include_directories(${CMAKE_SOURCE_DIR}/dataLoader/NYX)
+
 
         if (${CBENCH_PLATFORM} MATCHES "Cori")
             include_directories("/usr/common/software/hdf5-parallel/1.10.1/gnu/include")
@@ -51,10 +53,7 @@ if (CBENCH_ENABLE_NYX_LOADER)
             set (EXTRA_LIBS ${EXTRA_LIBS} hdf5_hl.a)
         else()
             include_directories(${HDF5_INCLUDE_DIRS})
-            set(EXTRA_LIBS ${EXTRA_LIBS} ${HDF5_LIBRARIES})
-
-            # include NYX data loader file here
-            include_directories(${CMAKE_SOURCE_DIR}/dataLoader/NYX)
+            set(EXTRA_LIBS ${EXTRA_LIBS} ${HDF5_LIBRARIES})  
         endif()
     else()
         message(FATAL_ERROR "HDF5 library not found")
