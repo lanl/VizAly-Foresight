@@ -3,11 +3,13 @@ FROM centos:7
 
 # install packages
 RUN yum install -y epel-release && \
-    yum install -y doxygen git gsl-devel hdf5-devel help2man make \
-                   perl-CPAN perl-Thread-Queue perl-devel \
-                   openssl-devel selinux-policy sudo wget
+    yum install -y doxygen git gsl-devel hdf5 hdf5-static \
+                   hdf5-openmpi-devel hdf5-openmpi-static \
+                   help2man make perl-CPAN perl-Thread-Queue \
+                   perl-devel openmpi openmpi-devel openssl-devel \
+                   selinux-policy sudo wget
 
-## install gcc
+# install gcc
 RUN yum install -y centos-release-scl && \
     yum install -y devtoolset-6-gcc devtoolset-6-gcc-c++ \
                    devtoolset-6-libquadmath-devel devtoolset-6-gcc-gfortran
@@ -22,20 +24,6 @@ RUN source /opt/rh/devtoolset-6/enable && \
     tar -zxvf cmake-3.11.0.tar.gz && cd cmake-3.11.0 && \
     ./bootstrap --prefix=/usr/local && \
     make -j $(getconf _NPROCESSORS_ONLN) install
-
-# install OpenMPI
-ENV MPI_URL https://www.open-mpi.org/software/ompi/v2.1/downloads
-ENV MPI_VERSION 2.1.3
-RUN wget -nv ${MPI_URL}/openmpi-${MPI_VERSION}.tar.gz
-RUN tar -xf openmpi-${MPI_VERSION}.tar.gz
-RUN source /opt/rh/devtoolset-6/enable && cd openmpi-${MPI_VERSION} && \
-    CFLAGS=-O3 && \
-    CXXFLAGS=-O3 && \
-    ./configure --prefix=/usr \
-                --sysconfdir=/mnt/0 \
-                --with-slurm=no && \
-    make -j $(getconf _NPROCESSORS_ONLN) install
-RUN echo 'plm_rsh_agent = false' >> /mnt/0/openmpi-mca-params.conf
 
 # install M4
 RUN source /opt/rh/devtoolset-6/enable && \
