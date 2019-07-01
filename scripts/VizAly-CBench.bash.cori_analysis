@@ -1,0 +1,6 @@
+module load cray-fftw gsl cray-hdf5-parallel
+
+# python
+export PATH=/project/projectdirs/m2848/lanl/Python-2.7.16/install/bin:$PATH
+export LD_LIBRARY_PATH=/project/projectdirs/m2848/lanl/Python-2.7.16/install/lib:$LD_LIBRARY_PATH
+export PYTHONPATH="/project/projectdirs/m2848/lanl/Python-2.7.16/install/lib":$PYTHONPATH

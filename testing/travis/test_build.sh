@@ -16,14 +16,13 @@ cd /src/VizAly-CBench
 projectPath=$(pwd)
 
 source buildDependencies.sh # build dependencies
-source build.sh    	        # build the code
+source build.sh    			# build the code
 
 # run example
 mpirun -np 4 --allow-run-as-root ./CBench ../testing/scripts/hacc_input.json
 mpirun -np 4 --allow-run-as-root ./CBench ../testing/scripts/nyx_input.json
 
-
 # view output
 cat metrics_HACC_Travis_.csv
+echo ""
 cat metrics_NYX_Travis_.csv
-

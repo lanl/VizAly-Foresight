@@ -1,10 +1,15 @@
 {
 	"project-home": "",
-	"input": {
+	"wflow-path": "nyx_Travis_test_",
+
+	"input": 
+	{
 		"filetype": "NYX",
 		"filename": "../testing/data/z255_32.h5",
+
 		"group": "native_fields",
-		"scalars": [
+		"scalars": 
+		[
 			"baryon_density",
 			"dark_matter_density",
 			"temperature",
@@ -12,7 +17,10 @@
 			"velocity_y",
 			"velocity_z"
 		],
-		"uncompressed": [{
+
+		"uncompressed": 
+		[
+			{
 				"group": "domain",
 				"attributes": [{
 						"name": "shape",
@@ -28,7 +36,9 @@
 			},
 			{
 				"group": "universe",
-				"attributes": [{
+				"attributes": 
+				[
+					{
 						"name": "hubble",
 						"type": "double",
 						"size": 1
@@ -57,21 +67,16 @@
 			}
 		]
 	},
-	"output": {
-		"run-path" : "/projects/exasky/VizAly-CBench/build/",
 
-		"output-decompressed": true,
-		"output-decompressed-location": "NYX_Travis_",
-
-		"logfname": "runlog_NYX_Travis_",
-		"metricsfname": "metrics_NYX_Travis_"
-	},
 	"compressor-comment": "which compressors to test",
-	"compressors": [
+	"compressors": 
+	[
 		{
 			"name": "SZ",
 			"output-prefix": "SZ_",
-			"compressor-params": [{
+			"compressor-params": 
+			[
+				{
 					"scalar": [
 						"baryon_density",
 						"dark_matter_density",
@@ -80,7 +85,8 @@
 					"abs": 1E-3
 				},
 				{
-					"scalar": [
+					"scalar": 
+					[
 						"velocity_x",
 						"velocity_y",
 						"velocity_z"
@@ -90,56 +96,35 @@
 			]
 		}
 	],
-	"metrics-comment": "which metrics to use",
-	"metrics": [{
-			"name": "absolute_error"
-		},
+
+	"cbench": 
+	{
+		"path": "build/CBench",
+
+		"output": 
 		{
-			"name": "relative_error"
+			"output-decompressed": true,
+			"output-decompressed-location": "NYX_Travis_",
+
+			"log-file": "runlog_NYX_Travis_",
+			"metrics-file": "metrics_NYX_Travis_"
 		},
-		{
-			"name": "mse"
-		},
-		{
-			"name": "psnr"
-		}
-	],
-	"simulation-analysis": {
-		"evn_path": "/projects/exasky/HACC.darwin_setup",
-		"analysis-folder": "NYX_Travis_",
-		"plotting" :
-		{
-			"x-range" : [0, 11]
-		},
-		"analysis-tool": {
-			"hdf5_path": "/projects/exasky/hdf5/install/bin/",
-			"gimlet-home": "/projects/exasky/gimlet2",
-			"analytics": [{
-					"name": "sim_stats",
-					"type": [
-						"rhob",
-						"rhom",
-						"rhodm",
-						"temp",
-						"velmag",
-						"vz"
-					],
-					"postfix": "_ps3d.txt",
-					"path": "/projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex"
-				},
-				{
-					"name": "lya_all_axes",
-					"type": [
-						"x",
-						"y",
-						"z"
-					],
-					"postfix": "_flux_ps1d.txt",
-					"path": "/projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex"
-				}
-			]
-		},
-		"input-files": [],
-		"analysis": []
+
+		"metrics-comment": "which metrics to use",
+		"metrics": 
+		[
+			{
+				"name": "absolute_error"
+			},
+			{
+				"name": "relative_error"
+			},
+			{
+				"name": "mse"
+			},
+			{
+				"name": "psnr"
+			}
+		]
 	}
 }

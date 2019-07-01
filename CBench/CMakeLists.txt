@@ -5,8 +5,16 @@ project(CBench)
 set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel.")
 
+
+# OS things
+if(WIN32)
+	add_definitions(-DNOMINMAX)
+endif()
+
+
 # add libs
 set (EXTRA_LIBS "")
+
 
 # inclue dirs
 include_directories(${CMAKE_SOURCE_DIR})
@@ -18,14 +26,6 @@ include_directories(${CMAKE_SOURCE_DIR}/dataLoader/Binary)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader/HACC)
 
 
-
-
-
-if(WIN32)
-    add_definitions(-DNOMINMAX)
-endif()
-
-
 # HACC Loader
 include_directories(${CMAKE_SOURCE_DIR}/thirdparty/genericio)
 add_definitions(-DGENERICIO_NO_COMPRESSION)
@@ -33,40 +33,39 @@ add_library(GenericIO STATIC "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO
 set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # NYX Loader
-option(CBENCH_ENABLE_NYX_LOADER "Enables the reading of NyX HDF5 data" OFF )
+option(CBENCH_ENABLE_NYX_LOADER "Enables the reading of NyX HDF5 data" OFF)
 if (CBENCH_ENABLE_NYX_LOADER)
-    set(HDF5_USE_STATIC_LIBRARIES ON)
-    find_package(HDF5 REQUIRED COMPONENTS C)
+	set(HDF5_USE_STATIC_LIBRARIES ON)
+	find_package(HDF5 REQUIRED COMPONENTS C)
 
-    if(HDF5_FOUND)
-        add_definitions (-DCBENCH_HAS_NYX)
-        include_directories(${CMAKE_SOURCE_DIR}/dataLoader/NYX)
+	if(HDF5_FOUND)
+		add_definitions (-DCBENCH_HAS_NYX)
+		include_directories(${CMAKE_SOURCE_DIR}/dataLoader/NYX)
 
-
-        if (${CBENCH_PLATFORM} MATCHES "Cori")
-            include_directories("/usr/common/software/hdf5-parallel/1.10.1/gnu/include")
-            link_directories("/usr/common/software/hdf5-parallel/1.10.1//gnu/lib")
-            set (EXTRA_LIBS ${EXTRA_LIBS} dl)
-            set (EXTRA_LIBS ${EXTRA_LIBS} m)
-            set (EXTRA_LIBS ${EXTRA_LIBS} z)
-            set (EXTRA_LIBS ${EXTRA_LIBS} hdf5.a)
-            set (EXTRA_LIBS ${EXTRA_LIBS} hdf5_hl.a)
-        else()
-            include_directories(${HDF5_INCLUDE_DIRS})
-            set(EXTRA_LIBS ${EXTRA_LIBS} ${HDF5_LIBRARIES})  
-        endif()
-    else()
-        message(FATAL_ERROR "HDF5 library not found")
-    endif()
+		if (${CBENCH_PLATFORM} MATCHES "Cori")
+			include_directories("/usr/common/software/hdf5-parallel/1.10.1/gnu/include")
+			link_directories("/usr/common/software/hdf5-parallel/1.10.1//gnu/lib")
+			set (EXTRA_LIBS ${EXTRA_LIBS} dl)
+			set (EXTRA_LIBS ${EXTRA_LIBS} m)
+			set (EXTRA_LIBS ${EXTRA_LIBS} z)
+			set (EXTRA_LIBS ${EXTRA_LIBS} hdf5.a)
+			set (EXTRA_LIBS ${EXTRA_LIBS} hdf5_hl.a)
+		else()
+			include_directories(${HDF5_INCLUDE_DIRS})
+			set(EXTRA_LIBS ${EXTRA_LIBS} ${HDF5_LIBRARIES})  
+		endif()
+	else()
+		message(FATAL_ERROR "HDF5 library not found")
+	endif()
 endif()
 
-    
+	
 
 # Creates header file, compressorIncludes.h, with all available compressors
 file(GLOB_RECURSE header_files "${CMAKE_SOURCE_DIR}/compressors/*/*.hpp")
 foreach(f ${header_files})
-    file(RELATIVE_PATH fr "${CMAKE_CURRENT_SOURCE_DIR}/compressors/" ${f})
-    list(APPEND incls "#include \"${fr}\"\n")
+	file(RELATIVE_PATH fr "${CMAKE_CURRENT_SOURCE_DIR}/compressors/" ${f})
+	list(APPEND incls "#include \"${fr}\"\n")
 endforeach()
 file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/compressors/compressorIncludes.h ${incls})
 
@@ -75,64 +74,65 @@ file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/compressors/compressorIncludes.h ${incls}
 include_directories(${CMAKE_SOURCE_DIR}/compressors)
 file(GLOB subdir "${CMAKE_SOURCE_DIR}/compressors/*")
 foreach (dir ${subdir})
-    # Skip files ending in .h
-    if ("${dir}" MATCHES "\\.h$")
-        continue()
-    endif()
+	# Skip files ending in .h
+	if ("${dir}" MATCHES "\\.h$")
+		continue()
+	endif()
 
-    # Skip files ending in .hpp
-    if ("${dir}" MATCHES "\\.hpp$")
-        continue()
-    endif()
-    
-    # Skip files ending in .md
-    if ("${dir}" MATCHES "\\.md$")
-        continue()
-    endif()
+	# Skip files ending in .hpp
+	if ("${dir}" MATCHES "\\.hpp$")
+		continue()
+	endif()
+	
+	# Skip files ending in .md
+	if ("${dir}" MATCHES "\\.md$")
+		continue()
+	endif()
 
 
-    include_directories(${dir})
+	include_directories(${dir})
 
-    if (NOT EXISTS ${dir}/CMakeLists.txt)
-        continue()
-    else()
-        # Only process folders with a CMakelists.txt
-        set_property(GLOBAL PROPERTY includeDirectories "")
-        set_property(GLOBAL PROPERTY linkLibraries "")
-        set_property(GLOBAL PROPERTY definitions "")
-        
-        add_subdirectory(${dir})
+	if (NOT EXISTS ${dir}/CMakeLists.txt)
+		continue()
+	else()
+		# Only process folders with a CMakelists.txt
+		set_property(GLOBAL PROPERTY includeDirectories "")
+		set_property(GLOBAL PROPERTY linkLibraries "")
+		set_property(GLOBAL PROPERTY definitions "")
+		
+		add_subdirectory(${dir})
 
-        #include directories to add
-        get_property(incDir GLOBAL PROPERTY includeDirectories)
-        include_directories(${incDir})
+		#include directories to add
+		get_property(incDir GLOBAL PROPERTY includeDirectories)
+		include_directories(${incDir})
 
-        #link libraries to add directories to add
-        get_property(linkLibs GLOBAL PROPERTY linkLibraries)
-        set(EXTRA_LIBS ${EXTRA_LIBS}  ${linkLibs})
+		#link libraries to add directories to add
+		get_property(linkLibs GLOBAL PROPERTY linkLibraries)
+		set(EXTRA_LIBS ${EXTRA_LIBS}  ${linkLibs})
 
-        # add defintions
-        get_property(def GLOBAL PROPERTY definitions)
-        add_definitions (${def})
-    endif()
+		# add defintions
+		get_property(def GLOBAL PROPERTY definitions)
+		add_definitions (${def})
+	endif()
 endforeach()
+
 
 
 # MPI
 find_package(MPI)
 if (MPI_FOUND)
-    include_directories(${MPI_INCLUDE_PATH})
-   if (${CBENCH_PLATFORM} MATCHES "Cori")
-     set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
-     set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
-  else()
-       set(CMAKE_CXX_COMPILE_FLAGS "${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS}")
-       set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS}")
-       set(CMAKE_C_COMPILER mpicc)
-      set(CMAKE_CXX_COMPILER mpicxx)
-  endif()
+	include_directories(${MPI_INCLUDE_PATH})
+	if (${CBENCH_PLATFORM} MATCHES "Cori")
+		set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
+		set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
+	else()
+		set(CMAKE_CXX_COMPILE_FLAGS "${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS}")
+		set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS}")
+		set(CMAKE_C_COMPILER mpicc)
+		set(CMAKE_CXX_COMPILER mpicxx)
+	endif()
 else()
-    message(FATAL_ERROR "Could not find any MPI installation!!!") 
+	message(FATAL_ERROR "Could not find any MPI installation!!!") 
 endif()
 
 
@@ -140,10 +140,11 @@ endif()
 # OpenMP
 find_package(OpenMP)
 if (OPENMP_FOUND)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+	set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
+
 
 
 # Build executable
@@ -153,9 +154,9 @@ target_link_libraries(CBench ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO)
 
 # Prevent in source builds since they are evil
 if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
-    message(FATAL_ERROR "In source build is not supported, please restore modified files, 
-                        delete CMake generated things (CMakeFiles folder and CMakeCache.txt)
-                        , and build out of source") 
+	message(FATAL_ERROR "In source build is not supported, please restore modified files, 
+						delete CMake generated things (CMakeFiles folder and CMakeCache.txt)
+						, and build out of source") 
 endif()
 
 

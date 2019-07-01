@@ -9,8 +9,8 @@ Foresight has three components:
 * Cinema: The tool used to visualize the results of this project
 
 ## Current Visualization results
-* Link to the live cinema database with results : [https://lanl.github.io/VizAly-Foresight/](https://lanl.github.io/VizAly-Foresight/)
-* Cinema comparison is at: [https://lanl.github.io/VizAly-Foresight/cinema_compare/](https://lanl.github.io/VizAly-Foresight/cinema_compare/)
+* Link to the live cinema database with results : [https://lanl.github.io/VizAly-Foresight/](https://lanl.github.io/VizAly-CBench/)
+* Cinema comparison is at: https://lanl.github.io/VizAly-CBench/cinema_compare/
 
 # Building VizAly-Foresight
 The default master branch should always point to the latest working version. However, for more stable releases, you should checkout the latest tag release.
@@ -21,7 +21,7 @@ The default master branch should always point to the latest working version. How
 * OpenMPI 2 or higher
 
 ## Building:
-The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @ ANL and Darwin @ LANL . These build a base version of Foresight:
+The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @ ANL, Cori @ NERSC, and Darwin @ LANL . These build a base version of Foresight:
 ```
 $ git clone https://github.com/lanl/VizAly-Foresight.git
 
@@ -38,17 +38,17 @@ $ cd VizAly-Foresight
 $ source buildAllDependencies.sh
 $ source buildAll.sh
 ```
+## Running Foresight
+$ python Analysis/pat_nyx.py --input-files inputs/nyx/nyx_darwin_test.json --submit
 
-## Running:
+## Running CBench as stand-alone:
 ```
-$ mpirun -np 2 ./CBench ../inputs/HACC_all.json
-$ cat metrics_HACC_all_
+$ mpirun -np 2 build/CBench ../inputs/hacc/hacc_cbench_test.json
+$ cat metrics_hacc_test_.csv
 ```
 
 **Note:**  The above will only run a toy dataset meant for testing if the code runs. The results should **NOT** be used as an indicator for the performance of the compressors!
 
-### Tools:
-[tools/plotting](tools/plotting) contains a python program for easy graphing on the csv results
 
 # Usage
 Foresight takes as input a json file (examples of input json files are in the **_[inputs](inputs)_** folder) that specifies the input parameters. The list of parameters to specify are:
@@ -95,7 +95,7 @@ For information on Travis CI and Docker image, look at the [travis folder](testi
 * Jesus Pulido
 * Hoby Rakotoarivelo
 
-[![Build Status](https://travis-ci.org/lanl/VizAly-Foresight.svg?branch=master)](https://travis-ci.org/lanl/VizAly-Foresight)
+[![Build Status](https://travis-ci.org/lanl/VizAly-Foresight.svg?branch=pat_refactor_pascal;)](https://travis-ci.org/lanl/VizAly-Foresight)
 
 
 # Copyright and License

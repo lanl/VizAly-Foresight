@@ -1,0 +1,77 @@
+{
+	"project-home" : "",
+	"foresight-home" : "",
+
+	"input": 
+	{
+		"filetype": "HACC",
+		"filename": "../testing/data/m000.full.mpicosmo.50",
+
+		"scalars": ["x", "y", "z", "vx", "vy", "vz"]	
+	},
+
+	"compressor-comment" : "which compressors to test",
+	"compressors" : 
+	[
+		{
+			"name": "BLOSC",
+			"output-prefix" : "BLOSC_"
+		},
+
+		{
+			"name": "fpzip",
+			"bits" : 32,
+			"output-prefix" : "fpzip_32_"
+		},
+
+		{
+            "name": "SZ",
+            "output-prefix" : "sz_abs_001_",
+            "abs" : 1E-3
+		},
+
+		{
+            "name": "zfp",
+            "output-prefix" : "zfp_abs_001_",
+            "abs" : 1E-3
+		}
+	],
+
+	
+	"cbench": 
+	{
+		"path" : "",
+
+		"output" :
+		{
+			"run-path" : "build/",
+
+			"output-decompressed": true,
+			"output-decompressed-location" : "decompressed_files",
+			
+			"log-file" : "runlog_hacc_test_",
+			"metrics-file" : "metrics_hacc_test_"
+		},
+
+
+		"metrics": 
+		[
+			{
+				"name" : "absolute_error",
+				"histogram" : ["x", "y", "z"]
+			},
+
+			{
+				"name" : "relative_error"
+			},
+
+			{
+				"name" : "mse"
+			},
+
+			{
+				"name" : "psnr"
+			}
+		]
+	}
+}

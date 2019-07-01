@@ -16,7 +16,7 @@ for ((i=1; i<=$#; i++ )); do
 	arg=${!i}
 
 	#help
-	if [ $arg = "-h" ]; then
+	if [ $arg = "-h" ] || [ $arg = "--h" ]; then
 
 		echo ""
 		echo "Build Arguments:"
@@ -106,6 +106,9 @@ for ((i=1; i<=$#; i++ )); do
 		buildOpt="all"
 	fi
 
+	if [ $arg = "-travis" ]; then
+		buildOpt="travis"
+	fi
 
 	if [ $arg = "-hacc" ]; then
 		buildOpt="cori"
@@ -343,6 +346,8 @@ make -j
 
 # --cleanAll <folder>: remove build folder and ExternalDependencies
 # --clean <folder>: remove build folder
+
+# -h or --help : help
 
 # No argument is default:
 # 	build path is build
