@@ -570,8 +570,8 @@ int main(int argc, char *argv[])
 
 /*
 Run:
-mpirun -np 4 CBench ../inputs/HACC_all.json
-mpirun -np 4 CBench ../inputs/nyx_all.json
+mpirun -np 4 CBench ../inputs/hacc/HACC_all.json
+mpirun -np 4 CBench ../inputs/nyx/nyx_all.json
 */
 
 
