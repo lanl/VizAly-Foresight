@@ -1,85 +1,67 @@
 cmake_minimum_required(VERSION 3.6.2)
-cmake_policy(SET CMP0048 NEW)
 
-# version actually set for Cori
-project(CBench VERSION 1.0.0 LANGUAGES CXX C)
+project(CBench)
 
-# Prevent in source builds since they are evil
-if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
-    message(FATAL_ERROR "In source build is not supported, please restore modified files,
-                        delete CMake generated things (CMakeFiles folder and CMakeCache.txt)
-                        , and build out of source")
-endif()
+set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel.")
 
-# Set the main executable
-add_executable(CBench main.cpp)
+# add libs
+set (EXTRA_LIBS "")
 
-set(DEFAULT_BUILD_TYPE "Debug")
+# inclue dirs
+include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/metrics)
+include_directories(${CMAKE_SOURCE_DIR}/utils)
 
-# Set build type
-if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-    message(STATUS "Setting build type to '${DEFAULT_BUILD_TYPE}' as none was specified.")
-    set(CMAKE_BUILD_TYPE "${DEFAULT_BUILD_TYPE}" CACHE STRING "Choose the type of build." FORCE)
-    # Set the possible values of build type for cmake-gui
-    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
-endif ()
+include_directories(${CMAKE_SOURCE_DIR}/dataLoader)
+include_directories(${CMAKE_SOURCE_DIR}/dataLoader/Binary)
+include_directories(${CMAKE_SOURCE_DIR}/dataLoader/HACC)
+
+
+
 
 
 if(WIN32)
-    target_compile_definitions(CBench PRIVATE -DNOMINMAX)
+    add_definitions(-DNOMINMAX)
 endif()
-
-# Set build options
-option(CBENCH_ENABLE_NYX_LOADER "Enables NYX HDF5 data loader" OFF)
-option(CBENCH_ENABLE_BIG_CRUNCH "Enable BigCrunch." OFF)
-option(CBENCH_ENABLE_BLOSC      "Enable BLOSC." OFF)
-option(CBENCH_ENABLE_FPZIP      "Enable FPZIP." OFF)
-option(CBENCH_ENABLE_ISABELA    "Enable ISABELA." OFF)
-option(CBENCH_ENABLE_LOSSY_WAVE "Enable LossyWave." OFF)
-option(CBENCH_ENABLE_MGARD      "Enable MGARD." OFF)
-option(CBENCH_ENABLE_SZ         "Enable SZ." OFF)
-option(CBENCH_ENABLE_ZFP        "Enable ZFP." OFF)
-
-# include dirs
-target_compile_features(CBench PUBLIC cxx_std_14)
-target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}")
-target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}/metrics")
-target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}/utils")
-target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}/dataLoader")
-target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}/dataLoader/Binary")
-target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}/dataLoader/HACC")
 
 
 # HACC Loader
-target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}/thirdparty/genericio")
-target_compile_definitions(CBench PRIVATE -DGENERICIO_NO_COMPRESSION)
+include_directories(${CMAKE_SOURCE_DIR}/thirdparty/genericio)
+add_definitions(-DGENERICIO_NO_COMPRESSION)
+add_library(GenericIO STATIC "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO.cxx")
+set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-add_library(GenericIO STATIC)
-target_sources(GenericIO PRIVATE "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO.cxx")
-set_target_properties(GenericIO PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_compile_definitions(GenericIO PRIVATE -DGENERICIO_NO_COMPRESSION)
-target_link_libraries(CBench PRIVATE GenericIO)
-
-
-# NYX loader
+# NYX Loader
+option(CBENCH_ENABLE_NYX_LOADER "Enables the reading of NyX HDF5 data" OFF )
 if (CBENCH_ENABLE_NYX_LOADER)
-    # NYX Loader
     set(HDF5_USE_STATIC_LIBRARIES ON)
+    find_package(HDF5 REQUIRED COMPONENTS C)
 
-    # assume that CBENCH_PLATFORM is set by the user
-    if (${CBENCH_PLATFORM} MATCHES "Cori")
-        set(HDF5_CORI "/usr/common/software/hdf5-parallel/1.10.1/gnu")
-        find_package(HDF5 REQUIRED PATHS ${HDF5_CORI} NO_DEFAULT_PATH COMPONENTS C)
-        target_link_libraries(CBench PRIVATE dl m z hdf5 hdf5_hl)
-    else ()
-        find_package(HDF5 REQUIRED COMPONENTS C)
-        target_link_libraries(CBench PRIVATE ${HDF5_LIBRARIES})
+    if(HDF5_FOUND)
+        add_definitions (-DCBENCH_HAS_NYX)
+
+        if (${CBENCH_PLATFORM} MATCHES "Cori")
+            include_directories("/usr/common/software/hdf5-parallel/1.10.1/gnu/include")
+            link_directories("/usr/common/software/hdf5-parallel/1.10.1//gnu/lib")
+            set (EXTRA_LIBS ${EXTRA_LIBS} dl)
+            set (EXTRA_LIBS ${EXTRA_LIBS} m)
+            set (EXTRA_LIBS ${EXTRA_LIBS} z)
+            set (EXTRA_LIBS ${EXTRA_LIBS} hdf5.a)
+            set (EXTRA_LIBS ${EXTRA_LIBS} hdf5_hl.a)
+        else()
+            include_directories(${HDF5_INCLUDE_DIRS})
+            set(EXTRA_LIBS ${EXTRA_LIBS} ${HDF5_LIBRARIES})
+
+            # include NYX data loader file here
+            include_directories(${CMAKE_SOURCE_DIR}/dataLoader/NYX)
+        endif()
+    else()
+        message(FATAL_ERROR "HDF5 library not found")
     endif()
-    target_include_directories(CBench PRIVATE "${HDF5_INCLUDE_DIRS}")
-    target_compile_definitions(CBench PRIVATE -DCBENCH_HAS_NYX)
-    target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}/dataLoader/NYX")
 endif()
 
+    
 
 # Creates header file, compressorIncludes.h, with all available compressors
 file(GLOB_RECURSE header_files "${CMAKE_SOURCE_DIR}/compressors/*/*.hpp")
@@ -91,39 +73,92 @@ file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/compressors/compressorIncludes.h ${incls}
 
 
 # Add external compressors
-target_include_directories(CBench PRIVATE ${CMAKE_SOURCE_DIR}/compressors)
-file(GLOB SUBDIR "${CMAKE_SOURCE_DIR}/compressors/*")
-foreach (COMPRESSOR ${SUBDIR})
-    # Only process folders with a CMakelists.txt
-    if ((IS_DIRECTORY ${COMPRESSOR}) AND (EXISTS ${COMPRESSOR}/CMakeLists.txt))
-        add_subdirectory(${COMPRESSOR})
-        get_target_property(CURRENT_LIB CBench LIB)
-        if (CURRENT_LIB)
-          target_link_libraries(CBench PRIVATE ${CURRENT_LIB})
-        endif()
-    endif ()
+include_directories(${CMAKE_SOURCE_DIR}/compressors)
+file(GLOB subdir "${CMAKE_SOURCE_DIR}/compressors/*")
+foreach (dir ${subdir})
+    # Skip files ending in .h
+    if ("${dir}" MATCHES "\\.h$")
+        continue()
+    endif()
+
+    # Skip files ending in .hpp
+    if ("${dir}" MATCHES "\\.hpp$")
+        continue()
+    endif()
+    
+    # Skip files ending in .md
+    if ("${dir}" MATCHES "\\.md$")
+        continue()
+    endif()
+
+
+    include_directories(${dir})
+
+    if (NOT EXISTS ${dir}/CMakeLists.txt)
+        continue()
+    else()
+        # Only process folders with a CMakelists.txt
+        set_property(GLOBAL PROPERTY includeDirectories "")
+        set_property(GLOBAL PROPERTY linkLibraries "")
+        set_property(GLOBAL PROPERTY definitions "")
+        
+        add_subdirectory(${dir})
+
+        #include directories to add
+        get_property(incDir GLOBAL PROPERTY includeDirectories)
+        include_directories(${incDir})
+
+        #link libraries to add directories to add
+        get_property(linkLibs GLOBAL PROPERTY linkLibraries)
+        set(EXTRA_LIBS ${EXTRA_LIBS}  ${linkLibs})
+
+        # add defintions
+        get_property(def GLOBAL PROPERTY definitions)
+        add_definitions (${def})
+    endif()
 endforeach()
 
 
 # MPI
-find_package(MPI REQUIRED)
-
-# For supporting CMake < 3.9:
-if(NOT TARGET MPI::MPI_CXX)
-    add_library(MPI::MPI_CXX IMPORTED INTERFACE)
-    set_target_properties(MPI::MPI_CXX PROPERTIES INTERFACE_COMPILE_OPTIONS "${MPI_COMPILE_FLAGS}")
-    set_target_properties(MPI::MPI_CXX PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${MPI_INCLUDE_PATH}")
-    set_target_properties(MPI::MPI_CXX PROPERTIES INTERFACE_LINK_LIBRARIES "${MPI_LINK_FLAGS}")
+find_package(MPI)
+if (MPI_FOUND)
+    include_directories(${MPI_INCLUDE_PATH})
+   if (${CBENCH_PLATFORM} MATCHES "Cori")
+     set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
+     set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
+  else()
+       set(CMAKE_CXX_COMPILE_FLAGS "${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS}")
+       set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS}")
+       set(CMAKE_C_COMPILER mpicc)
+      set(CMAKE_CXX_COMPILER mpicxx)
+  endif()
+else()
+    message(FATAL_ERROR "Could not find any MPI installation!!!") 
 endif()
-target_link_libraries(CBench PRIVATE MPI::MPI_CXX)
-target_link_libraries(GenericIO PRIVATE MPI::MPI_CXX)
+
+
 
 # OpenMP
 find_package(OpenMP)
 if (OPENMP_FOUND)
-    target_link_libraries(CBench PRIVATE OpenMP::OpenMP_CXX)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
 
-# Remove output files
-add_custom_target(clean-output COMMAND rm -f *.log)
+# Build executable
+add_executable(CBench main.cpp)
+target_link_libraries(CBench ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO)
+
+
+# Prevent in source builds since they are evil
+if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+    message(FATAL_ERROR "In source build is not supported, please restore modified files, 
+                        delete CMake generated things (CMakeFiles folder and CMakeCache.txt)
+                        , and build out of source") 
+endif()
+
+
+# Build log folder
+add_custom_target(build-time-make-directory ALL COMMAND ${CMAKE_COMMAND} -E make_directory logs)
