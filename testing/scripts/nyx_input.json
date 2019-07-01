@@ -106,8 +106,8 @@
 			"output-decompressed": true,
 			"output-decompressed-location": "NYX_Travis_",
 
-			"log-file": "runlog_NYX__Travis_",
-			"metrics-file": "metrics_NYX__Travis_"
+			"log-file": "runlog_NYX_Travis_",
+			"metrics-file": "metrics_NYX_Travis_"
 		},
 
 		"metrics-comment": "which metrics to use",
