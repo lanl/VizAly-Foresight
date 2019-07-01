@@ -1,15 +1,20 @@
+option(CBENCH_ENABLE_FPZIP "Enable FPZIP." OFF)
 
 if (CBENCH_ENABLE_FPZIP)
+    set(MY_LIBS "")
 
+    #Asks for fpzip library + set that in EXTRA_LIBS
     find_library(FPZIP_LIBRARY ${FPZIP_LIBRARY} CACHE STRING "FPZIP library")
-
-    if (FPZIP_LIBRARY)
-        set(FPZIP_INCLUDE_PATH ${FPZIP_INCLUDE_PATH} CACHE PATH "FPZIP include directory")
-		target_compile_definitions(CBench PRIVATE -DCBENCH_HAS_FPZIP)
-		target_include_directories(CBench PRIVATE ${FPZIP_INCLUDE_PATH})
-        target_include_directories(GenericIO PRIVATE ${FPZIP_INCLUDE_PATH})
-        set_property(TARGET CBench APPEND PROPERTY LIB "${FPZIP_LIBRARY}")
+    if (NOT FPZIP_LIBRARY)
+        message(FATAL_ERROR "Could NOT find FPZIP")
     else()
-		message(FATAL_ERROR "Could NOT find FPZIP")
+        set(MY_LIBS ${MY_LIBS} ${FPZIP_LIBRARY})
+
+        #Asks for fpzip include files + includes it in the project
+        set (FPZIP_INCLUDE_PATH ${FPZIP_INCLUDE_PATH} CACHE PATH "FPZIP include directory")
+
+        set_property(GLOBAL APPEND PROPERTY definitions "-DCBENCH_HAS_FPZIP")
+        set_property(GLOBAL APPEND PROPERTY includeDirectories ${FPZIP_INCLUDE_PATH})
+        set_property(GLOBAL APPEND PROPERTY linkLibraries ${MY_LIBS})
     endif()
 endif()

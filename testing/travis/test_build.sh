@@ -15,15 +15,13 @@ module load mpi
 cd /src/VizAly-CBench
 projectPath=$(pwd)
 
-source buildDependencies.sh	-all # build dependencies
-source build.sh	-all    	     # build the code
+source buildDependencies.sh # build dependencies
+source build.sh    	        # build the code
 
 # run example
 mpirun -np 4 --allow-run-as-root ./CBench ../testing/scripts/hacc_input.json
 mpirun -np 4 --allow-run-as-root ./CBench ../testing/scripts/nyx_input.json
 
-# Compare output with previous run
-python ../testing/travis/test_output.py
 
 # view output
 cat metrics_HACC_Travis_.csv
