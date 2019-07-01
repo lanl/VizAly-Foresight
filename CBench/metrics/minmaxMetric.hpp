@@ -65,7 +65,7 @@ inline void minmaxMetric::execute(void *original, void *approx, size_t n) {
 			local_min = static_cast<float *>(original)[i];
 
 	}
-
+	
 	// Global max value
 	double global_max = 0;
 	MPI_Allreduce(&local_max, &global_max, 1, MPI_DOUBLE, MPI_MAX, comm);
@@ -79,6 +79,51 @@ inline void minmaxMetric::execute(void *original, void *approx, size_t n) {
 	log << "-minmax: " << global_min << " " << global_max << std::endl;
 
 	MPI_Barrier(comm);
+
+	// Just report max for now
+	val = local_max;
+	total_val = global_max;
+
+	auto found = parameters.find("histogram");
+	if (found != parameters.end())
+	{
+		// Compute histogram of values
+		if (global_max != 0)
+		{
+			std::vector<float>histogram;
+			int numBins = 1024;
+			std::vector<int> localHistogram(numBins, 0);
+			double binSize = (global_max-global_min) / numBins;
+
+			for (std::size_t i = 0; i < n; ++i)
+			{
+				// Retrieve the "approximated" value
+				// Lossless comp: Original data
+				// Lossy comp: Approx data
+				double value = static_cast<float*>(approx)[i];
+
+				int binPos = ( (global_max - global_min) * ((value - global_min)/ (global_max - global_min)) ) / binSize;
+
+				if (binPos >= numBins)
+					binPos = binPos - 1;
+
+				localHistogram[binPos]++;
+			}
+
+			//histogram.resize(numBins);
+
+			std::vector<int> globalHistogram(numBins, 0);
+			MPI_Allreduce(&localHistogram[0], &globalHistogram[0], numBins, MPI_INT, MPI_SUM, comm);
+
+			// Output histogram as a python script file
+			if (myRank == 0)
+				//additionalOutput = python_histogram(numBins, total_max_abs_err, histogram);
+				//additionalOutput = csv_histogram(numBins, global_max, histogram);
+				return;
+		}
+	}
+
+
 	return;
 }
 

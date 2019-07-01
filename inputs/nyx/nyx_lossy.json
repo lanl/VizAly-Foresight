@@ -66,8 +66,12 @@
 			"name" : "mse"
 		},
 
-		{
-			"name" : "psnr"
-		}
+    {
+      "name": "psnr"
+    },
+
+    {
+      "name": "minmax"
+    }
 	]
 }

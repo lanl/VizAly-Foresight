@@ -30,8 +30,6 @@ class MetricsFactory
 			return new psnrError();
 		else if (metricName == "minmax")
 			return new minmaxMetric();
-		else if (metricName == "hist")
-			return new histMetric();
         else
             return NULL;
     }
