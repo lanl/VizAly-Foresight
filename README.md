@@ -30,14 +30,6 @@ $ source buildDependencies.sh
 $ source build.sh
 ```
 
-To build a master (all) version of Foresight, run the following scripts:
-```
-$ git clone https://github.com/lanl/VizAly-Foresight.git
-
-$ cd VizAly-Foresight
-$ source buildAllDependencies.sh
-$ source buildAll.sh
-```
 ## Running Foresight
 This will run the full analysis workflow and generate a cinema database
 ```
