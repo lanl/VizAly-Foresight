@@ -5,15 +5,18 @@
 PROJECT_DIR=$(pwd)/.. 
 SCRIPTS_DIR=${PROJECT_DIR}/scripts
 BUILD_DIR=${PROJECT_DIR}/build_test
+DEPS_DIR=${PROJECT_DIR}/ExternalDependencies
 BUILD_OPT=""
 ENV_SCRIPT=""
-PLATFORM=""
+CLUSTER=""
+COMPRESSORS=("")
 
 print_usage() {
   echo -e "Usage: ./test_build [options]"
   echo -e "options:"
   echo -e "  -h, --help              show this help message and exit"
-  echo -e "  -p, --platform <STRING> current platform [Darwin|Cori]"
+  echo -e "  -c, --cluster <STRING>  current cluster [darwin|cori]"
+  echo -e "  -d, --deps <PATH>       specific external dependencies path"
   exit 1
 }
 
@@ -22,7 +25,11 @@ parse() {
   options=""
 
   # parse options (requires GNU getopt).
-  if [ "$#" -ne 2 ] || ! options=$(getopt -o hp: -l help,platform: -- $@)
+  if [ "$#" -eq 0 ]
+  then
+    echo -e "Please provide at least a cluster name"
+    print_usage
+  elif ! options=$(getopt -o "hc:" -l "help,cluster:,deps:" -- "$@")
   then
     print_usage
   fi
@@ -34,7 +41,8 @@ parse() {
   while [ "$#" -gt 0 ]; do
     case "$1" in
       -h|--help) print_usage;;
-      -p|--platform) PLATFORM="$2"; shift;;
+      -c|--cluster) CLUSTER="$2"; shift;;
+      -d|--deps) DEPS_DIR="$2"; shift;;
       (--) shift; break;;
       (-*) print_usage;;
       (*) break;;
@@ -45,18 +53,26 @@ parse() {
 
 reset() {
 
-  if [ "${PLATFORM}" = "Darwin" ]
+  if [ "${CLUSTER}" = "cori" ]
   then
-    ENV_SCRIPT="VizAly-CBench.bash.darwin"
-    BUILD_OPT="-all"
-  elif [ "${PLATFORM}" = "Cori" ]
-  then
-    ENV_SCRIPT="VizAly-CBench.bash.cori"
     BUILD_OPT="-cori"
+    COMPRESSORS=( "blosc" "sz" "zfp" "isabela" "fpzip" )
+  elif [ "${CLUSTER}" = "darwin" ]
+  then
+    BUILD_OPT="-all"
+    COMPRESSORS=( "blosc" "sz" "zfp" "isabela" "fpzip" "mgard" "lossywave" )
   else
-    echo -e "\e[31mError: wrong platform ${PLATFORM}\e[0m"
+    echo -e "\e[31mError: wrong platform ${CLUSTER}\e[0m"
     exit 1
   fi 
+
+  if [ -f "${DEPS_DIR}" ]
+  then
+    echo -e "\e[31mError: directory ${CLUSTER} does not exist\e[0m"
+  fi
+  
+  # set environment script
+  ENV_SCRIPT="VizAly-CBench.bash.${CLUSTER}"
 
   # load modules and set environment variables
   cd ${SCRIPTS_DIR} && source ${ENV_SCRIPT} &&
@@ -66,9 +82,75 @@ reset() {
 
 build() {
   case "$1" in
-    --core) cmake -DCBENCH_PLATFORM=${PLATFORM} ../CBench;; 
-    --hdf5) cmake -DCBENCH_PLATFORM=${PLATFORM} -DCBENCH_ENABLE_NYX_LOADER=ON ../CBench;; 
-    --all)  cd .. && source build.sh ${BUILD_OPT} --path ${BUILD_DIR};;  
+    --core) 
+      cmake ../CBench;; 
+    --hdf5)
+      cmake -DCBENCH_PLATFORM=${CLUSTER^} -DCBENCH_ENABLE_NYX_LOADER=ON ../CBench;; 
+    --all)
+      cd .. && rm -rf ${BUILD_DIR} && source build.sh ${BUILD_OPT} --path ${BUILD_DIR} --DEPS_DIR ${DEPS_DIR};; 
+    --blosc) 
+        cmake -DCBENCH_ENABLE_BLOSC=ON \
+              -DBLOSC_INCLUDE_PATH="${DEPS_DIR}/c-blosc/install/include" \
+              -DBLOSC_LIBRARY="${DEPS_DIR}/c-blosc/install/lib/libblosc.so" \
+              ../CBench;;
+    --sz) 
+      if [ ${CLUSTER} = "cori" ]
+      then
+        cmake  -DCBENCH_ENABLE_SZ=ON \
+              -DSZ_INCLUDE_PATH="${DEPS_DIR}/SZ/sz/include" \
+              -DSZ_LIBRARY="${DEPS_DIR}/SZ/install/lib/libSZ.a" \
+              -DZLIB_LIBRARY="${DEPS_DIR}/SZ/install/lib/libzlib.a" \
+              -DZSTD_LIBRARY="${DEPS_DIR}/SZ/install/lib/libzstd.a" \
+              ../CBench
+      else
+        cmake -DCBENCH_ENABLE_SZ=ON \
+              -DSZ_INCLUDE_PATH="${DEPS_DIR}/SZ/sz/include" \
+              -DSZ_LIBRARY="${DEPS_DIR}/SZ/install/lib/libSZ.so" \
+              -DZLIB_LIBRARY="${DEPS_DIR}/SZ/install/lib/libzlib.so" \
+              -DZSTD_LIBRARY="${DEPS_DIR}/SZ/install/lib/libzstd.so" \
+              ../CBench
+      fi;;
+    --zfp)
+      if [ ${CLUSTER} = "cori" ]
+      then
+        cmake -DCBENCH_ENABLE_ZFP=ON \
+              -DZFP_INCLUDE_PATH="${DEPS_DIR}/zfp/install/include" \
+              -DZFP_LIBRARY="${DEPS_DIR}/zfp/install/lib64/libzfp.a" \
+              ../CBench
+      else
+        cmake -DCBENCH_ENABLE_ZFP=ON \
+              -DZFP_INCLUDE_PATH="${DEPS_DIR}/zfp/install/include" \
+              -DZFP_LIBRARY="${DEPS_DIR}/zfp/install/lib64/libzfp.so" \
+              ../CBench
+      fi;;
+    --fpzip)
+        cmake -DCBENCH_ENABLE_FPZIP=ON \
+              -DFPZIP_INCLUDE_PATH="${DEPS_DIR}/fpzip-1.2.0/inc/" \
+              -DFPZIP_LIBRARY="${DEPS_DIR}/fpzip-1.2.0/lib/libfpzip.a" \
+              ../CBench;;
+    --isabela)
+        cmake -DCBENCH_ENABLE_ISABELA=ON \
+              -DISABELA_INCLUDE_PATH="${DEPS_DIR}/ISABELA-compress-0.2.1/include" \
+              -DISABELA_LIBRARY="${DEPS_DIR}/ISABELA-compress-0.2.1/lib/libisabela.a" \
+              ../CBench;;
+    --lossywave)
+      if [ ${CLUSTER} = "darwin" ]; then
+        LZ4_LIB="${DEPS_DIR}/VizAly-LossyWave/build/"
+        LZ4_LIB+="3rdparty/lz4/lz4-external/src/lz4-external/lib/liblz4.a"
+        
+        cmake -DCBENCH_ENABLE_LOSSY_WAVE=ON \
+              -DLOSSYWAVE_INCLUDE_PATH="${DEPS_DIR}/VizAly-LossyWave/install/include" \
+              -DLOSSYWAVE_LIBRARY="${DEPS_DIR}/VizAly-LossyWave/install/lib/liblossywave.so" \
+              -DLOSSYWAVE_LZ4_LIBRARY=${LZ4_LIB} \
+              ../CBench
+      fi;;
+    --mgard)
+      if [ ${CLUSTER} = "darwin" ]; then
+        cmake -DCBENCH_ENABLE_MGARD=ON \
+              -DMGARD_INCLUDE_PATH="${DEPS_DIR}/MGARD/install/include" \
+              -DMGARD_LIBRARY="${DEPS_DIR}/MGARD/install/lib/libmgard.so" \
+              ../CBench
+      fi;;
     (*) echo -e "\e[31mError: invalid argument in build\e[0m"; exit;;
   esac
 }
@@ -81,7 +163,7 @@ run() {
   OUTPUT_HACC="${BUILD_DIR}/metrics_HACC_Travis_.csv"
   OUTPUT_NYX="${BUILD_DIR}/metrics_NYX_Travis_.csv"
 
-  if [ "${PLATFORM}" = "Darwin" ]
+  if [ "${CLUSTER}" = "darwin" ]
   then
     # run examples
     mpirun -np 4 ${BINARY} ${INPUT_HACC} && 
@@ -91,7 +173,7 @@ run() {
     cat ${OUTPUT_HACC} && rm ${OUTPUT_HACC} &&
     cat ${OUTPUT_NYX}  && rm ${OUTPUT_NYX}
 
-  elif [ "${PLATFORM}" = "Cori" ]
+  elif [ "${CLUSTER}" = "cori" ]
   then
     SCRIPT="run-hacc"
     echo "#!/bin/bash -l"                          > ${SCRIPT}
@@ -125,8 +207,8 @@ run() {
 
     cd ${BUILD_DIR} &&
     echo "Once batch jobs completed, please check:"
-    echo "- slurm-\$JOB_ID_HACC'.out"
-    echo "- slurm-\$JOB_ID_NYX'.out" 
+    echo "- slurm-hacc-job.out"
+    echo "- slurm-nyx-job.out" 
     echo "- metrics_HACC_Travis_.csv"
     echo "- metrics_NYX_Travis_.csv"
   fi 
@@ -140,6 +222,11 @@ reset && build --core && make &&
 
 echo -e "\e[31mBuild with HDF5 enabled\e[0m" &&
 reset && build --hdf5 && make &&
+
+for compressor in ${COMPRESSORS[@]}; do
+  echo -e "\e[31mBuild with ${compressor} compressor enabled\e[0m" &&
+  reset && build "--${compressor}" && make
+done
 
 echo -e "\e[31mBuild with all options using build script\e[0m" &&
 reset && build --all && make && run 
