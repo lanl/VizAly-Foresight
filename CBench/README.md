@@ -1,5 +1,5 @@
 # CBench
-The default master branch should always point to the latest working version. However, for more stable releases, you should checkout the latest tag release.
+This is the compression benchmark part of Foresight. It can be run on its own or part of the Foresight workflow.
 
 ## Prerequisites:
 * CMake 3.6.2 or higher
@@ -16,26 +16,17 @@ The default master branch should always point to the latest working version. How
 ## Building:
 The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @ ANL and Darwin @ LANL . These build a base version of CBench:
 ```
-$ git clone https://github.com/lanl/VizAly-CBench.git
+$ git clone https://github.com/lanl/VizAly-Foresight.git
 
-$ cd VizAly-CBench
+$ cd VizAly-Foresight
 $ source buildDependencies.sh
 $ source build.sh
 ```
 
-To build a master (all) version of CBench, run the following scripts:
-```
-$ git clone https://github.com/lanl/VizAly-CBench.git
-
-$ cd VizAly-CBench
-$ source buildAllDependencies.sh
-$ source buildAll.sh
-```
-
 ## Running:
 ```
-$ mpirun -np 2 ./CBench ../inputs/HACC_all.json
-$ cat metrics_HACC_all_
+$ mpirun -np 2 ./CBench ../inputs/hacc/hacc_cbench_test.json
+$ cat metrics_hacc_test_.csv
 ```
 **Note:**  The above will only run a toy dataset meant for testing if the code runs. The results should **NOT** be used as an indicator for the performance of the compressors!
 
