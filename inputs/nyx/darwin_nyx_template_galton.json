@@ -151,7 +151,7 @@
 					"type" : ["x", "y", "z"],
 					"postfix" : "_flux_ps1d.txt",
 					"path": "/projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex",
-					"command" : "cp /projects/exasky/gimlet2/apps/lya_all_axes/TREECOOL_middle .",
+					"command" : "cp /projects/exasky/gimlet2/treecools/TREECOOL_middle .",
 					"configuration" : {
 						"partition" : "galton",
 						"nodes" : 8,
