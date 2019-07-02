@@ -115,6 +115,9 @@ inline void minmaxMetric::execute(void *original, void *approx, size_t n) {
 			std::vector<int> globalHistogram(numBins, 0);
 			MPI_Allreduce(&localHistogram[0], &globalHistogram[0], numBins, MPI_INT, MPI_SUM, comm);
 
+			for (std::size_t i = 0; i < numBins; ++i)
+				histogram[i] = ((float)globalHistogram[i]);
+
 			// Output histogram as a python script file
 			if (myRank == 0)
 				additionalOutput = python_histogram(numBins, global_min, global_max, histogram);
