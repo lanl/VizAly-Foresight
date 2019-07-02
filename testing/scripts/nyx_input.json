@@ -94,6 +94,23 @@
 					"pw_rel": 1E-2
 				}
 			]
+		},
+
+		{
+			"name": "BLOSC",
+			"output-prefix" : "BLOSC_"
+		},
+
+		{
+			"name": "fpzip",
+			"bits" : 24,
+			"output-prefix" : "fpzip_24_"
+		},
+
+		{
+            "name": "zfp",
+            "output-prefix" : "zfp_abs_.01_",
+            "abs" : 1E-2
 		}
 	],
 
@@ -114,7 +131,8 @@
 		"metrics": 
 		[
 			{
-				"name": "absolute_error"
+				"name": "absolute_error",
+				"histogram" : ["baryon_density", "temperature", "velocity_x"]
 			},
 			{
 				"name": "relative_error"

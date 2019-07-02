@@ -111,7 +111,7 @@ for ((i=1; i<=$#; i++ )); do
 	fi
 
 	if [ $arg = "-hacc" ]; then
-		buildOpt="cori"
+		buildOpt="hacc"
 	fi
 
 	if [ $arg = "-min" ]; then

@@ -135,7 +135,9 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
 
 			// Output histogram as a python script file
 			if (myRank == 0)
+			{
 				additionalOutput = python_histogram(numBins, total_max_abs_err, histogram);
+			}
 		}
 	}
 	

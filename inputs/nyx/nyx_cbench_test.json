@@ -77,20 +77,20 @@
 
 		{
 			"name": "fpzip",
-			"bits" : 32,
-			"output-prefix" : "fpzip_32_"
+			"bits" : 26,
+			"output-prefix" : "fpzip_26_"
 		},
 
 		{
             "name": "SZ",
-            "output-prefix" : "sz_abs_001_",
-            "abs" : 1E-3
+            "output-prefix" : "sz_abs_.01_",
+            "abs" : 1E-2
 		},
 
 		{
             "name": "zfp",
-            "output-prefix" : "zfp_abs_001_",
-            "abs" : 1E-3
+            "output-prefix" : "zfp_abs_.01_",
+            "abs" : 1E-2
 		}
 	],
 
@@ -114,7 +114,7 @@
 		[
 			{
 				"name" : "absolute_error",
-				"histogram" : ["x", "y", "z"]
+				"histogram" : ["baryon_density", "temperature", "velocity_x"]
 			},
 
 			{
