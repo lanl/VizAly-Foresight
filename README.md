@@ -9,8 +9,8 @@ Foresight has three components:
 * Cinema: The tool used to visualize the results of this project
 
 ## Current Visualization results
-* Link to the live cinema database with results : [https://lanl.github.io/VizAly-Foresight/](https://lanl.github.io/VizAly-CBench/)
-* Cinema comparison is at: https://lanl.github.io/VizAly-CBench/cinema_compare/
+* Link to the live cinema database with results : [https://lanl.github.io/VizAly-Foresight/](https://lanl.github.io/VizAly-Foresight/)
+* Cinema comparison is at: https://lanl.github.io/VizAly-Foresight/cinema_compare/
 
 # Building VizAly-Foresight
 The default master branch should always point to the latest working version. However, for more stable releases, you should checkout the latest tag release.
@@ -39,8 +39,10 @@ $ source buildAllDependencies.sh
 $ source buildAll.sh
 ```
 ## Running Foresight
+This will run the full analysis workflow and generate a cinema database
+```
 $ python Analysis/pat_nyx.py --input-files inputs/nyx/nyx_darwin_test.json --submit
-
+```
 ## Running CBench as stand-alone:
 ```
 $ mpirun -np 2 build/CBench ../inputs/hacc/hacc_cbench_test.json
@@ -95,7 +97,7 @@ For information on Travis CI and Docker image, look at the [travis folder](testi
 * Jesus Pulido
 * Hoby Rakotoarivelo
 
-[![Build Status](https://travis-ci.org/lanl/VizAly-Foresight.svg?branch=pat_refactor_pascal;)](https://travis-ci.org/lanl/VizAly-Foresight)
+[![Build Status](https://travis-ci.org/lanl/VizAly-Foresight.svg?branch=master;)](https://travis-ci.org/lanl/VizAly-Foresight)
 
 
 # Copyright and License
