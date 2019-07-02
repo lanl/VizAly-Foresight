@@ -3,5 +3,4 @@ Scripts to load modules on supercomputers:
 2. Cooley @ ANL : VizAly-CBench.bash.cooley
 3. Cori @ NERSC: VizAly-CBench.bash.cori
 
-Scripts to run VizAly-CBench on:
-1. runJob.darwin.sh : example batch script for darwin. Run as: sbatch runJob.darwin.sh
+It also has scripts to run CBench on supercomputers, e.g  runJob_cori_NYX_test.sh is an example batch script for darwin
