@@ -68,31 +68,44 @@
 	},
 
 	"compressor-comment" : "which compressors to test",
-	"compressors" : 
-	[
-		{
-			"name": "BLOSC",
-			"output-prefix" : "BLOSC_"
-		},
+  "compressors": [
+    {
+      "name": "BLOSC",
+      "output-prefix": "BLOSC_"
+    },
 
-		{
-			"name": "fpzip",
-			"bits" : 26,
-			"output-prefix" : "fpzip_26_"
-		},
+    {
+      "name": "fpzip",
+      "bits": 26,
+      "output-prefix": "fpzip_26_"
+    },
 
-		{
-            "name": "SZ",
-            "output-prefix" : "sz_abs_.01_",
-            "abs" : 1E-2
-		},
+    {
+      "name": "SZ",
+      "output-prefix": "sz_abs_.01_",
+      "abs": 1E-2
+    },
 
-		{
-            "name": "zfp",
-            "output-prefix" : "zfp_abs_.01_",
-            "abs" : 1E-2
-		}
-	],
+    {
+      "name": "zfp",
+      "output-prefix": "zfp_abs_.01_",
+      "abs": 1E-2
+    },
+
+    {
+      "name": "BigCrunch",
+      "output-prefix": "bc_abs_.01_",
+      "tolerance": 1E-3
+    },
+
+    {
+      "name": "LossyWave",
+      "output-prefix": "snwpac_abs_.01_",
+      "pcnt": 50,
+      "quant": 1.0,
+      "tolerance":  1e-03
+    }
+  ],
 
 	
 	"cbench": 
