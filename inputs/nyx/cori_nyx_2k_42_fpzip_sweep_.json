@@ -220,7 +220,7 @@
 					"type": ["x", "y", "z"],
 					"postfix": "_flux_ps1d.txt",
 					"path": "srun -n 64 -c 6 /project/projectdirs/m2848/lanl/gimlet2/apps/lya_all_axes/lya_all_axes.ex",
-					"command": "cp /project/projectdirs/m2848/lanl/gimlet2/apps/lya_all_axes/TREECOOL_middle .",
+					"command": "cp /project/projectdirs/m2848/lanl/gimlet2/treecools/TREECOOL_middle .",
 					"configuration" : 
 					{
 						"nodes" : 8,
