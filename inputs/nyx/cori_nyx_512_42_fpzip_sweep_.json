@@ -6,7 +6,7 @@
 	"input": 
 	{
 		"filetype": "NYX",
-		"filename" : "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",
+		"filename" : "/project/projectdirs/nyx/www/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",
 		"filename-1024" : "/project/projectdirs/nyx/www/highz/1024/NVB_C009_l20n1024_S12345T632_z42.hdf5",
 		"filename-2048" : "/project/projectdirs/nyx/www/highz/2048/NVB_C009_l40n2048_S12345T692_z42.hdf5",
 

@@ -169,7 +169,7 @@
 
 	"cinema-plots": 
 	{
-		"cinema-database" : "cinema.cdb",
+		"cinema-db-name" : "cinema.cdb",
 		"plotting" :
 		{
 			"x-range" : [0, 11]
