@@ -54,24 +54,28 @@
 		},
 
 
-		"metrics": 
-		[
-			{
-				"name" : "absolute_error",
-				"histogram" : ["x", "y", "z"]
-			},
+    "metrics": [
+      {
+        "name": "absolute_error",
+        "histogram": [ "x", "vx" ]
+      },
 
-			{
-				"name" : "relative_error"
-			},
+      {
+        "name": "relative_error"
+      },
 
-			{
-				"name" : "mse"
-			},
+      {
+        "name": "mse"
+      },
 
-			{
-				"name" : "psnr"
-			}
-		]
+      {
+        "name": "psnr"
+      },
+
+      {
+        "name": "minmax",
+        "histogram": [ "x", "vx" ]
+      }
+    ]
 	}
 }
