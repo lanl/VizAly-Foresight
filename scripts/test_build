@@ -1,0 +1,145 @@
+#!/bin/bash
+# Author: Hoby Rakotoarivelo
+
+# init paths
+PROJECT_DIR=$(pwd)/.. 
+SCRIPTS_DIR=${PROJECT_DIR}/scripts
+BUILD_DIR=${PROJECT_DIR}/build_test
+BUILD_OPT=""
+ENV_SCRIPT=""
+PLATFORM=""
+
+print_usage() {
+  echo -e "Usage: ./test_build [options]"
+  echo -e "options:"
+  echo -e "  -h, --help              show this help message and exit"
+  echo -e "  -p, --platform <STRING> current platform [Darwin|Cori]"
+  exit 1
+}
+
+# parse and check args
+parse() {
+  options=""
+
+  # parse options (requires GNU getopt).
+  if [ "$#" -ne 2 ] || ! options=$(getopt -o hp: -l help,platform: -- $@)
+  then
+    print_usage
+  fi
+  
+  # evaluate the option list 
+  eval set -- "${options}"
+ 
+  # process args
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      -h|--help) print_usage;;
+      -p|--platform) PLATFORM="$2"; shift;;
+      (--) shift; break;;
+      (-*) print_usage;;
+      (*) break;;
+    esac
+    shift
+  done
+}
+
+reset() {
+
+  if [ "${PLATFORM}" = "Darwin" ]
+  then
+    ENV_SCRIPT="VizAly-CBench.bash.darwin"
+    BUILD_OPT="-all"
+  elif [ "${PLATFORM}" = "Cori" ]
+  then
+    ENV_SCRIPT="VizAly-CBench.bash.cori"
+    BUILD_OPT="-cori"
+  else
+    echo -e "\e[31mError: wrong platform ${PLATFORM}\e[0m"
+    exit 1
+  fi 
+
+  # load modules and set environment variables
+  cd ${SCRIPTS_DIR} && source ${ENV_SCRIPT} &&
+  # make a clean build directory
+  cd .. && rm -rf ${BUILD_DIR} && mkdir ${BUILD_DIR} && cd ${BUILD_DIR}
+}
+
+build() {
+  case "$1" in
+    --core) cmake -DCBENCH_PLATFORM=${PLATFORM} ../CBench;; 
+    --hdf5) cmake -DCBENCH_PLATFORM=${PLATFORM} -DCBENCH_ENABLE_NYX_LOADER=ON ../CBench;; 
+    --all)  cd .. && source build.sh ${BUILD_OPT} --path ${BUILD_DIR};;  
+    (*) echo -e "\e[31mError: invalid argument in build\e[0m"; exit;;
+  esac
+}
+
+run() {
+
+  BINARY=${BUILD_DIR}/CBench
+  INPUT_HACC="${PROJECT_DIR}/testing/scripts/hacc_input.json"
+  INPUT_NYX="${PROJECT_DIR}/testing/scripts/nyx_input.json"
+  OUTPUT_HACC="${BUILD_DIR}/metrics_HACC_Travis_.csv"
+  OUTPUT_NYX="${BUILD_DIR}/metrics_NYX_Travis_.csv"
+
+  if [ "${PLATFORM}" = "Darwin" ]
+  then
+    # run examples
+    mpirun -np 4 ${BINARY} ${INPUT_HACC} && 
+    mpirun -np 4 ${BINARY} ${INPUT_NYX}
+
+    # view output
+    cat ${OUTPUT_HACC} && rm ${OUTPUT_HACC} &&
+    cat ${OUTPUT_NYX}  && rm ${OUTPUT_NYX}
+
+  elif [ "${PLATFORM}" = "Cori" ]
+  then
+    SCRIPT="run-hacc"
+    echo "#!/bin/bash -l"                          > ${SCRIPT}
+    echo "#SBATCH --qos=debug"                    >> ${SCRIPT}
+    echo "#SBATCH -N 2"                           >> ${SCRIPT}
+    echo "#SBATCH -c 1"                           >> ${SCRIPT}
+    echo "#SBATCH --time=2"                       >> ${SCRIPT}
+    echo "#SBATCH -A m2848"                       >> ${SCRIPT}
+    echo "#SBATCH --constraint=haswell"           >> ${SCRIPT}
+    echo ""                                       >> ${SCRIPT}
+    echo "export HDF5_USE_FILE_LOCKING=FALSE"     >> ${SCRIPT}
+    echo "source ${SCRIPTS_DIR}/${ENV_SCRIPT}"    >> ${SCRIPT}
+    echo "cd ${BUILD_DIR}"                        >> ${SCRIPT}
+    echo "srun -n 2 -c 1 ${BINARY} ${INPUT_HACC}" >> ${SCRIPT}
+    sbatch ${SCRIPT} && rm ${SCRIPT}
+  
+    SCRIPT="run-nyx"
+    echo "#!/bin/bash -l"                          > ${SCRIPT}
+    echo "#SBATCH --qos=debug"                    >> ${SCRIPT}
+    echo "#SBATCH -N 2"                           >> ${SCRIPT}
+    echo "#SBATCH -c 1"                           >> ${SCRIPT}
+    echo "#SBATCH --time=2"                       >> ${SCRIPT}
+    echo "#SBATCH -A m2848"                       >> ${SCRIPT}
+    echo "#SBATCH --constraint=haswell"           >> ${SCRIPT}
+    echo ""                                       >> ${SCRIPT}
+    echo "export HDF5_USE_FILE_LOCKING=FALSE"     >> ${SCRIPT}
+    echo "source ${SCRIPTS_DIR}/${ENV_SCRIPT}"    >> ${SCRIPT}
+    echo "cd ${BUILD_DIR}"                        >> ${SCRIPT}
+    echo "srun -n 2 -c 1 ${BINARY} ${INPUT_NYX}"  >> ${SCRIPT}
+    sbatch ${SCRIPT} && rm ${SCRIPT} &&
+
+    cd ${BUILD_DIR} &&
+    echo "Once batch jobs completed, please check:"
+    echo "- slurm-\$JOB_ID_HACC'.out"
+    echo "- slurm-\$JOB_ID_NYX'.out" 
+    echo "- metrics_HACC_Travis_.csv"
+    echo "- metrics_NYX_Travis_.csv"
+  fi 
+}
+
+# main
+parse "$@" &&
+
+echo -e "\e[31mBuild with no options\e[0m" && 
+reset && build --core && make &&
+
+echo -e "\e[31mBuild with HDF5 enabled\e[0m" &&
+reset && build --hdf5 && make &&
+
+echo -e "\e[31mBuild with all options using build script\e[0m" &&
+reset && build --all && make && run 
