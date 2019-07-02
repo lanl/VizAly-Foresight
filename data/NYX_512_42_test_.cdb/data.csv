@@ -1,0 +1,25 @@
+Compressor_field__params, relative_error, Compression Throughput(MB/s), DeCompression Throughput(MB/s), Compression Ratio,FILE_SimStats_Pk,FILE_lya_all_axes_x_Pk,FILE_lya_all_axes_y_Pk,FILE_lya_all_axes_z_Pk
+BLOSC_baryon_density__, 0, 153.631, 1095.4, 1.21874,sim_stats_rhob.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+BLOSC_dark_matter_density__, 0, 121.326, 967.538, 1.08031,sim_stats_rhodm.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+BLOSC_temperature__, 0, 130.096, 1307.46, 1.26586,sim_stats_temp.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+BLOSC_velocity_x__, 0, 156.433, 1050.73, 1.30574,sim_stats_velmag.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+BLOSC_velocity_y__, 0, 156.193, 1047.13, 1.30268,sim_stats_velmag.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+BLOSC_velocity_z__, 0, 130.945, 1081.8, 1.27147,sim_stats_vz.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+SZ_baryon_density__abs0.002, 0.002, 82.5903, 74.4739, 3.48103,sim_stats_rhob.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+SZ_dark_matter_density__abs0.002, 0.002, 76.0166, 57.5543, 2.92828,sim_stats_rhodm.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+SZ_temperature__abs0.002, 0, 68.1346, 203.368, 1.14443,sim_stats_temp.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+SZ_velocity_x__abs0.002, 0, 97.1608, 202.312, 1.11724,sim_stats_velmag.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+SZ_velocity_y__abs0.002, 0, 96.8667, 202.368, 1.10668,sim_stats_velmag.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+SZ_velocity_z__abs0.002, 0, 97.305, 202.49, 1.09489,sim_stats_vz.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+zfp_baryon_density__abs0.001, 0.000284761, 88.6407, 152.167, 3.2002,sim_stats_rhob.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+zfp_dark_matter_density__abs0.001, 0.000286132, 88.451, 127.81, 2.19442,sim_stats_rhodm.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+zfp_temperature__abs0.001, 2.80363e-05, 58.7683, 87.6086, 1.41116,sim_stats_temp.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+zfp_velocity_x__abs0.001, 0.0149152, 57.9094, 87.4382, 1.43309,sim_stats_velmag.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+zfp_velocity_y__abs0.001, 0.0128536, 57.7926, 86.6233, 1.43746,sim_stats_velmag.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+zfp_velocity_z__abs0.001, 0.00671054, 57.565, 86.9915, 1.43096,sim_stats_vz.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+fpzip_baryon_density__bits20, 0.000487924, 16.2748, 19.6854, 2.36201,sim_stats_rhob.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+fpzip_dark_matter_density__bits20, 0.000487924, 15.1456, 18.2307, 1.95688,sim_stats_rhodm.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+fpzip_temperature__bits20, 0.000487924, 16.8433, 20.0835, 2.81394,sim_stats_temp.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+fpzip_velocity_x__bits20, 0.000487924, 17.4949, 20.3038, 3.13607,sim_stats_velmag.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+fpzip_velocity_y__bits20, 0.000487924, 17.3846, 20.1542, 3.10275,sim_stats_velmag.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png
+fpzip_velocity_z__bits20, 0.000487924, 16.9978, 19.7926, 2.91023,sim_stats_vz.png,lya_all_axes_x.png,lya_all_axes_y.png,lya_all_axes_z.png

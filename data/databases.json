@@ -74,8 +74,55 @@
 		"directory" : "data/nyx_sz_01_.cdb"
 	},
 
+
+	{
+		"name" : "NYX_SZ_42",
+		"directory" : "data/NYX_512_42_SZ_.cdb"
+	},
+
     {
 		"name" : "NYX_fpzip",
 		"directory" : "data/NYX_fpzip_.cdb"
+	},
+
+
+
+    {
+		"name" : "histogram_",
+		"directory" : "data/histogram.cdb"
+	},
+
+
+    {
+		"name" : "NYX_512_42_fpzip_abs",
+		"directory" : "data/NYX_512_42_fpzip_abs_.cdb"
+	},
+
+     {
+		"name" : "NYX_512_42_isabela_",
+		"directory" : "data/NYX_512_42_isabela_.cdb"
+	},
+
+ {
+		"name" : "NYX_512_42_zfp_abs_",
+		"directory" : "data/NYX_512_42_zfp_abs_.cdb"
+	},
+
+ {
+		"name" : "NYX_512_42_SZ_abs_",
+		"directory" : "data/NYX_512_42_SZ_abs_.cdb"
+	},
+
+ {
+		"name" : "NYX_512_42_zfp_rel_.cdb",
+		"directory" : "data/NYX_512_42_zfp_rel_.cdb"
+	},
+
+	{
+		"name" : "Nyx_ZFP_output_extended_.cdb",
+		"directory" : "data/Nyx_ZFP_output_extended_.cdb"
 	}
+
+
+
 ]
