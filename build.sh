@@ -16,13 +16,13 @@ for ((i=1; i<=$#; i++ )); do
 	arg=${!i}
 
 	#help
-	if [ $arg = "-h" ] || [ $arg = "--h" ]; then
+	if [ $arg = "-h" ] || [ $arg = "--help" ]; then
 
 		echo ""
 		echo "Build Arguments:"
 		echo "  --path <folder> : build exec in that folder"
 		echo ""
-		echo " --externalDependencies: path where external dependencies was built"
+		echo " --externalDependencies <folder>: path where external dependencies was built"
 		echo ""
 		echo "  -all : build with all options on"
 		echo "  -min : build with minimal options on"
@@ -334,6 +334,7 @@ make -j
 #
 # Build Arguments
 # --path <foder name> : build exec in that folder
+# --externalDependencies <foder name>: path where external dependencies was built"
 
 # -cooley : build for cooley
 # -cori : build for cori at nersc
