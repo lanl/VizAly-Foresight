@@ -416,6 +416,7 @@ int main(int argc, char *argv[])
 				if (myRank == 0)
 					if (metricsMgr->additionalOutput != "")
 					{
+						createFolder("logs");
 						std::string outputHistogramName = "logs/";
 						outputHistogramName += extractFileName(inputFile) + "_" + compressors[c] + "_" + scalars[i];
 						outputHistogramName += "_" + metrics[m] + "_" + compressorMgr->getParamsInfo() + "_hist.py";

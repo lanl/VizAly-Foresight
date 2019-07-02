@@ -17,16 +17,15 @@ Authors:
 #include <sys/stat.h>
 
 #ifdef _WIN32
-
-#define S_IRUSR _S_IREAD
-#define S_IWUSR _S_IWRITE
 #include <direct.h>
-#define mkdir(a, b) _mkdir((a))
-
+#define mkdir(a, b) _mkdir(a)
 #endif
 
 inline int createFolder(std::string folderName)
 {
+#ifdef _WIN32
+	folderName = ".\\" + folderName;
+#endif
     const int dir_err = mkdir(folderName.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     if (-1 == dir_err)
     {
