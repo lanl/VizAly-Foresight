@@ -107,7 +107,7 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
 		if (total_max_abs_err != 0)
 		{
 			std::vector<float>histogram;
-			int numBins = 1024;
+			size_t numBins = 1024;
 			std::vector<int> localHistogram(numBins,0);
 			double binSize = total_max_abs_err / numBins;
 
@@ -135,9 +135,7 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
 
 			// Output histogram as a python script file
 			if (myRank == 0)
-			{
-				additionalOutput = python_histogram(numBins, total_max_abs_err, histogram);
-			}
+				additionalOutput = python_histogram(numBins, 0.0, total_max_abs_err, histogram);
 		}
 	}
 	

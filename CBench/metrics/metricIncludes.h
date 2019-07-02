@@ -2,3 +2,4 @@
 #include "absoluteError.hpp"
 #include "meansquareError.hpp"
 #include "psnrError.hpp"
+#include "minmaxMetric.hpp"

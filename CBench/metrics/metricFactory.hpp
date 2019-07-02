@@ -28,6 +28,8 @@ class MetricsFactory
 			return new meansquareError();
 		else if (metricName == "psnr")
 			return new psnrError();
+		else if (metricName == "minmax")
+			return new minmaxMetric();
         else
             return NULL;
     }
