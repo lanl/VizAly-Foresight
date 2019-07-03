@@ -29,7 +29,7 @@ parse() {
   then
     echo -e "Please provide at least a cluster name"
     print_usage
-  elif ! options=$(getopt -o "hc:" -l "help,cluster:,deps:" -- "$@")
+  elif ! options=$(getopt -o "hc:d:" -l "help,cluster:,deps:" -- "$@")
   then
     print_usage
   fi
@@ -63,6 +63,12 @@ reset() {
     COMPRESSORS=( "blosc" "sz" "zfp" "isabela" "fpzip" "mgard" "lossywave" )
   else
     echo -e "\e[31mError: wrong platform ${CLUSTER}\e[0m"
+    exit 1
+  fi
+
+  if [ ! -d ${DEPS_DIR} ]
+  then
+    echo -e "\e[31mError: directory ${DEPS_DIR} does not exist\e[0m"
     exit 1
   fi
 
