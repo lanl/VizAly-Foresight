@@ -2,7 +2,7 @@
 # Author: Hoby Rakotoarivelo
 
 # init paths
-PROJECT_DIR=$(pwd)/.. 
+PROJECT_DIR=$(pwd)/..
 SCRIPTS_DIR=${PROJECT_DIR}/scripts
 BUILD_DIR=${PROJECT_DIR}/build_test
 DEPS_DIR=${PROJECT_DIR}/ExternalDependencies
@@ -33,10 +33,10 @@ parse() {
   then
     print_usage
   fi
-  
-  # evaluate the option list 
+
+  # evaluate the option list
   eval set -- "${options}"
- 
+
   # process args
   while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -64,13 +64,8 @@ reset() {
   else
     echo -e "\e[31mError: wrong platform ${CLUSTER}\e[0m"
     exit 1
-  fi 
-
-  if [ -f "${DEPS_DIR}" ]
-  then
-    echo -e "\e[31mError: directory ${CLUSTER} does not exist\e[0m"
   fi
-  
+
   # set environment script
   ENV_SCRIPT="VizAly-CBench.bash.${CLUSTER}"
 
@@ -82,18 +77,18 @@ reset() {
 
 build() {
   case "$1" in
-    --core) 
-      cmake ../CBench;; 
+    --core)
+      cmake ../CBench;;
     --hdf5)
-      cmake -DCBENCH_PLATFORM=${CLUSTER^} -DCBENCH_ENABLE_NYX_LOADER=ON ../CBench;; 
+      cmake -DCBENCH_PLATFORM=${CLUSTER^} -DCBENCH_ENABLE_NYX_LOADER=ON ../CBench;;
     --all)
-      cd .. && rm -rf ${BUILD_DIR} && source build.sh ${BUILD_OPT} --path ${BUILD_DIR} --DEPS_DIR ${DEPS_DIR};; 
-    --blosc) 
+      cd .. && rm -rf ${BUILD_DIR} && source build.sh ${BUILD_OPT} --path ${BUILD_DIR} --DEPS_DIR ${DEPS_DIR};;
+    --blosc)
         cmake -DCBENCH_ENABLE_BLOSC=ON \
               -DBLOSC_INCLUDE_PATH="${DEPS_DIR}/c-blosc/install/include" \
               -DBLOSC_LIBRARY="${DEPS_DIR}/c-blosc/install/lib/libblosc.so" \
               ../CBench;;
-    --sz) 
+    --sz)
       if [ ${CLUSTER} = "cori" ]
       then
         cmake  -DCBENCH_ENABLE_SZ=ON \
@@ -137,7 +132,7 @@ build() {
       if [ ${CLUSTER} = "darwin" ]; then
         LZ4_LIB="${DEPS_DIR}/VizAly-LossyWave/build/"
         LZ4_LIB+="3rdparty/lz4/lz4-external/src/lz4-external/lib/liblz4.a"
-        
+
         cmake -DCBENCH_ENABLE_LOSSY_WAVE=ON \
               -DLOSSYWAVE_INCLUDE_PATH="${DEPS_DIR}/VizAly-LossyWave/install/include" \
               -DLOSSYWAVE_LIBRARY="${DEPS_DIR}/VizAly-LossyWave/install/lib/liblossywave.so" \
@@ -166,7 +161,7 @@ run() {
   if [ "${CLUSTER}" = "darwin" ]
   then
     # run examples
-    mpirun -np 4 ${BINARY} ${INPUT_HACC} && 
+    mpirun -np 4 ${BINARY} ${INPUT_HACC} &&
     mpirun -np 4 ${BINARY} ${INPUT_NYX}
 
     # view output
@@ -189,7 +184,7 @@ run() {
     echo "cd ${BUILD_DIR}"                        >> ${SCRIPT}
     echo "srun -n 2 -c 1 ${BINARY} ${INPUT_HACC}" >> ${SCRIPT}
     sbatch ${SCRIPT} && rm ${SCRIPT}
-  
+
     SCRIPT="run-nyx"
     echo "#!/bin/bash -l"                          > ${SCRIPT}
     echo "#SBATCH --qos=debug"                    >> ${SCRIPT}
@@ -208,16 +203,16 @@ run() {
     cd ${BUILD_DIR} &&
     echo "Once batch jobs completed, please check:"
     echo "- slurm-hacc-job.out"
-    echo "- slurm-nyx-job.out" 
+    echo "- slurm-nyx-job.out"
     echo "- metrics_HACC_Travis_.csv"
     echo "- metrics_NYX_Travis_.csv"
-  fi 
+  fi
 }
 
 # main
 parse "$@" &&
 
-echo -e "\e[31mBuild with no options\e[0m" && 
+echo -e "\e[31mBuild with no options\e[0m" &&
 reset && build --core && make &&
 
 echo -e "\e[31mBuild with HDF5 enabled\e[0m" &&
@@ -229,4 +224,4 @@ for compressor in ${COMPRESSORS[@]}; do
 done
 
 echo -e "\e[31mBuild with all options using build script\e[0m" &&
-reset && build --all && make && run 
+reset && build --all && make && run
