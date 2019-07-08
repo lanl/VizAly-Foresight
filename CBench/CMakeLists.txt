@@ -5,13 +5,6 @@ project(CBench)
 set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel.")
 
-
-# OS things
-if(WIN32)
-	add_definitions(-DNOMINMAX)
-endif()
-
-
 # add libs
 set (EXTRA_LIBS "")
 
@@ -159,6 +152,16 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 						, and build out of source") 
 endif()
 
-
-# Build log folder
-add_custom_target(build-time-make-directory ALL COMMAND ${CMAKE_COMMAND} -E make_directory logs)
+# OS things
+if(WIN32)
+	add_definitions(-DNOMINMAX)
+	file(GLOB_RECURSE EXTRA_DLLS
+		"${CMAKE_SOURCE_DIR}/../ExternalDependencies/*.dll"
+	)
+	message( "Config Types: ${CMAKE_CONFIGURATION_TYPES} Libraries used: ${EXTRA_DLLS}")
+	foreach(DLL ${EXTRA_DLLS})
+		add_custom_command(TARGET CBench POST_BUILD
+			COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${DLL}" "${CMAKE_BINARY_DIR}/$<CONFIG>/"
+		)
+	endforeach()
+endif()
