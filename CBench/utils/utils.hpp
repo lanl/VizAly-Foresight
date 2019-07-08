@@ -30,9 +30,11 @@ inline int createFolder(std::string folderName)
 	folderName = ".\\" + folderName;
 #endif
 
+	int res = stat(folderName.c_str(), &finfo);
+
 	if (finfo.st_mode & S_IFDIR)
 		return 1; // Directory already exists 
-	else if (stat(folderName.c_str(), &finfo) != 0)
+	else if (res != 0)
 	{
 		const int dir_err = mkdir(folderName.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 		if (-1 == dir_err)
@@ -43,7 +45,7 @@ inline int createFolder(std::string folderName)
 	}
 	else 
 	{
-		//std::cout << folderName << " is not a directory!" << std::endl;
+		std::cout << folderName << " is not a directory!" << std::endl;
 		return 0;
 	}
     return 1;
