@@ -23,7 +23,9 @@ inline std::string python_histogram(size_t numBins, float min_val, float max_val
     std::stringstream outputFileSS;
     outputFileSS << "import sys" << std::endl;
     outputFileSS << "import numpy as np" << std::endl;
-    outputFileSS << "import matplotlib.pyplot as plt" << std::endl;
+	outputFileSS << "import matplotlib" << std::endl;
+	outputFileSS << "matplotlib.use(\'agg\')" << std::endl;
+	outputFileSS << "import matplotlib.pyplot as plt" << std::endl;
 
     outputFileSS << "y=[";
     std::size_t i;
