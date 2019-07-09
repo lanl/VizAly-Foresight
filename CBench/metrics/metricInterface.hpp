@@ -40,6 +40,7 @@ inline std::string python_histogram(size_t numBins, float min_val, float max_val
     outputFileSS << "x = np.linspace(minVal, maxVal, numVals+1)[1:]" << std::endl;
     outputFileSS << "plt.plot(x,y, linewidth=0.5)" << std::endl;
     outputFileSS << "plt.title(plotName)" << std::endl;
+	outputFileSS << "plt.yscale(\"linear\") #log,linear,symlog,logit" << std::endl;
     outputFileSS << "plt.ylabel(\"Frequency\")" << std::endl;
     outputFileSS << "plt.xticks(rotation=90)" << std::endl;
     outputFileSS << "plt.tight_layout()" << std::endl;
