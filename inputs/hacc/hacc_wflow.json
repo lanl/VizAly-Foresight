@@ -1,5 +1,6 @@
 {
     "project-home" : "/projects/exasky/cmbiwer-projects/pat_refactor/Analysis/hacc_wflow",
+    "wflow-path" : "",
 
     "input": {
         "filetype": "HACC",
