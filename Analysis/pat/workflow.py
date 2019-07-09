@@ -87,7 +87,7 @@ class Workflow(object):
                          arguments=[os.path.basename(self.json_path)],
                          configurations=configurations,
                          environment=environment)
-        cbench_job.add_command("mkdir logs")
+        cbench_job.add_command("mkdir -p logs")
         self.add_job(cbench_job)
 
 
@@ -186,3 +186,10 @@ class Workflow(object):
             configurations = None
         return configurations
 
+
+    def environment_from_json_data(self):
+        if "evn_path" in self.json_data["pat"].keys():
+            env = self.json_data["pat"]["evn_path"]
+        else:
+            env = None
+        return env

@@ -20,13 +20,13 @@ class HACCWorkflow(workflow.Workflow):
 
         # get halo finder information from configuration file
         halo_section = "halo"
-        halo_exe = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+        halo_exe = self.json_data["pat"]["analysis-tool"]["analytics"] \
                                  [halo_section]["path"]
-        timesteps_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+        timesteps_path = self.json_data["pat"]["analysis-tool"]["analytics"] \
                                        [halo_section]["timesteps-file"]
-        config_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+        config_path = self.json_data["pat"]["analysis-tool"]["analytics"] \
                                     [halo_section]["config-file"]
-        parameters_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+        parameters_path = self.json_data["pat"]["analysis-tool"]["analytics"] \
                                         [halo_section]["parameters-file"]
 
         # get halo finder run specifications from configuration file
@@ -34,9 +34,9 @@ class HACCWorkflow(workflow.Workflow):
 
         # get spectrum information from configuration file
         spectrum_section = "spectrum"
-        spectrum_exe = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+        spectrum_exe = self.json_data["pat"]["analysis-tool"]["analytics"] \
                                      [spectrum_section]["path"]
-        spectrum_config_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+        spectrum_config_path = self.json_data["pat"]["analysis-tool"]["analytics"] \
                                              [spectrum_section]["config-file"]
 
         # get halo finder run specifications from configuration file
@@ -44,7 +44,7 @@ class HACCWorkflow(workflow.Workflow):
 
         # create job to run halo finder on each output file from CBench
         # create job to run 
-        for path in self.json_data["simulation-analysis"]["input-files"]:
+        for path in self.json_data["pat"]["input-files"]:
             print("Creating analysis jobs for", path)
             prefix = path["output-prefix"]
             cbench_path = path["path"]
@@ -75,7 +75,7 @@ class HACCWorkflow(workflow.Workflow):
                            executable=halo_exe,
                            arguments=["--config", os.path.basename(new_config_path),
                                       "--timesteps", timesteps_path,
-                                      "--prefix", prefix,
+                                      "--prefix", cbench_path[:-len(str(timestep)) - 1],
                                       os.path.basename(new_parameters_path)],
                            configurations=halo_config,
                            environment=environment)
@@ -88,7 +88,7 @@ class HACCWorkflow(workflow.Workflow):
             spectrum_job = j.Job(name="{}_{}".format(prefix, spectrum_section),
                                  execute_dir=spectrum_section,
                                  executable=spectrum_exe,
-                                 arguments=[spectrum_config_path, "-n", cbench_path, prefix + "spectrum", timestep],
+                                 arguments=[spectrum_config_path, "-n", cbench_path, prefix + "_spectrum", timestep],
                                  configurations=spectrum_config,
                                  environment=environment)
 
@@ -104,7 +104,7 @@ class HACCWorkflow(workflow.Workflow):
 
         #create_CinemaDB()
 
-# parse command li9ne
+# parse command line
 parser = argparse.ArgumentParser()
 parser.add_argument("--input-file")
 parser.add_argument("--submit", action="store_true")
@@ -116,6 +116,11 @@ wflow_data = futils.read_json(opts.input_file)
 # create Workflow instance
 wflow_dir = wflow_data["project-home"]
 wflow = HACCWorkflow("wflow", wflow_data, workflow_dir=wflow_dir)
+
+# make directories
+os.makedirs(wflow_dir + "/cbench")
+os.makedirs(wflow_dir + "/halo")
+os.makedirs(wflow_dir + "/spectrum")
 
 # add jobs to workflow
 wflow.add_cbench_job()

@@ -77,7 +77,6 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
             numDims++;
         }
 
-
     // Read in json compression parameters
     double abs = 1E-3;
     int rel = 32;

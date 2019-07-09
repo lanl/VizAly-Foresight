@@ -25,12 +25,13 @@ def run_command(cmd):
 
 # Folders
 def create_folder(path):
-	try:  
-		os.mkdir(path)
-	except OSError:  
-		print ("Creation of the directory %s failed" % path)
-	else:  
-		print ("Successfully created the directory %s " % path)
+	if not os.path.exists(path):
+		try:  
+			os.mkdir(path)
+		except OSError:  
+			print ("Creation of the directory %s failed" % path)
+		else:  
+			print ("Successfully created the directory %s " % path)
 
 
 def list_files_in_folder(folder):
