@@ -1,7 +1,7 @@
 {
-	"project-home": "/global/cscratch1/sd/pascal/exasky",
+	"project-home": "/global/cscratch1/sd/pascal/exasky/",
 	"wflow-path": "Nyx__2048_42__fpzip__",
-	"foresight-home" : "/project/projectdirs/m2848/lanl/pascal_projects/VizAly-Foresight/",
+	"foresight-home" : "/project/projectdirs/m2848/lanl/VizAly-Foresight/",
 
 	"input": 
 	{
@@ -183,9 +183,9 @@
 		{
 			"nodes" : 8,
 			"constraint" : "haswell",
-			"qos" : "premium",
+			"qos" : "regular",
 			"time" : "08:59:59",
-			"account" : "m2294"
+			"account" : "m2848"
 		}
 	},
 
