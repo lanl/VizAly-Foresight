@@ -26,3 +26,8 @@ mpirun -np 4 --allow-run-as-root ./CBench ../testing/scripts/nyx_input.json
 cat metrics_HACC_Travis_.csv
 echo ""
 cat metrics_NYX_Travis_.csv
+
+# test HACC workflow generator
+cd ../Analysis
+python pat_hacc.py --input-file ../inputs/hacc/hacc_wflow.json 
+
