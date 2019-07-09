@@ -1,7 +1,7 @@
 {
-	"project-home" : "/projects/exasky/pascal-projects/VizAly-CBench/",
-	"wflow-path": "galton-wflow_test",
-	"foresight-home" : "/projects/exasky/pascal-projects/VizAly-CBench/",
+	"project-home" : "/projects/exasky/VizAly-Foresight/",
+	"wflow-path": "galton-wflow-test-3",
+	"foresight-home" : "/projects/exasky/VizAly-Foresight/",
 
 	"input": 
 	{
@@ -81,6 +81,12 @@
 			"name": "fpzip",
 			"bits" : 30,
 			"output-prefix" : "fpzip_30_"
+		},
+
+		{
+			"name": "fpzip",
+			"bits" : 15,
+			"output-prefix" : "fpzip_15_"
 		}
 	],
 
@@ -91,7 +97,7 @@
 
 		"output" :
 		{
-			"run-path" : "/projects/exasky/VizAly-CBench/build/",
+			"run-path" : "/projects/exasky/VizAly-Foresight/build/",
 
 			"output-decompressed": true,
 			"output-decompressed-location" : "decompressed_files",
@@ -120,6 +126,11 @@
 
 			{
 				"name" : "psnr"
+			},
+
+			{
+				"name" : "minmax",
+				"histogram" : [ "baryon_density" , "temperature" , "velocity_x" ]
 			}
 		],
 
@@ -136,7 +147,7 @@
 
 	"pat" :
 	{
-		"evn_path" : "/projects/exasky/HACC.darwin_setup",
+		"evn_path" : "scripts/VizAly-CBench.bash.darwin",
 
 		"analysis-tool" :
 		{
@@ -182,7 +193,7 @@
 		"cinema-db-name" : "cinemaDB",
 		"plotting" :
 		{
-			"x-range" : [0, 11]
+			"x-range" : [0, 256]
 		},
 
 		"evn_path": "scripts/VizAly-CBench.bash.darwin",
