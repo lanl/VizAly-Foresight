@@ -20,13 +20,13 @@ class HACCWorkflow(workflow.Workflow):
 
         # get halo finder information from configuration file
         halo_section = "halo"
-        halo_exe = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+        halo_exe = self.json_data["pat"]["analysis-tool"]["analytics"] \
                                  [halo_section]["path"]
-        timesteps_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+        timesteps_path = self.json_data["pat"]["analysis-tool"]["analytics"] \
                                        [halo_section]["timesteps-file"]
-        config_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+        config_path = self.json_data["pat"]["analysis-tool"]["analytics"] \
                                     [halo_section]["config-file"]
-        parameters_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+        parameters_path = self.json_data["pat"]["analysis-tool"]["analytics"] \
                                         [halo_section]["parameters-file"]
 
         # get halo finder run specifications from configuration file
@@ -34,9 +34,9 @@ class HACCWorkflow(workflow.Workflow):
 
         # get spectrum information from configuration file
         spectrum_section = "spectrum"
-        spectrum_exe = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+        spectrum_exe = self.json_data["pat"]["analysis-tool"]["analytics"] \
                                      [spectrum_section]["path"]
-        spectrum_config_path = self.json_data["simulation-analysis"]["analysis-tool"]["analytics"] \
+        spectrum_config_path = self.json_data["pat"]["analysis-tool"]["analytics"] \
                                              [spectrum_section]["config-file"]
 
         # get halo finder run specifications from configuration file
@@ -44,7 +44,7 @@ class HACCWorkflow(workflow.Workflow):
 
         # create job to run halo finder on each output file from CBench
         # create job to run 
-        for path in self.json_data["simulation-analysis"]["input-files"]:
+        for path in self.json_data["pat"]["input-files"]:
             print("Creating analysis jobs for", path)
             prefix = path["output-prefix"]
             cbench_path = path["path"]
