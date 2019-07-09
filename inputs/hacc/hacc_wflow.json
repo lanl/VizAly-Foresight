@@ -1,5 +1,5 @@
 {
-    "project-home" : "/projects/exasky/cmbiwer-projects/pat_refactor/PAT/hacc_wflow",
+    "project-home" : "/projects/exasky/cmbiwer-projects/pat_refactor/Analysis/hacc_wflow",
 
     "input": {
         "filetype": "HACC",
@@ -14,7 +14,7 @@
     },
 
     "output": {
-        "run-path" : "/projects/exasky/cmbiwer-projects/pat_refactor/PAT/hacc_wflow",
+        "run-path" : "/projects/exasky/cmbiwer-projects/pat_refactor/Analysis/hacc_wflow",
         "output-decompressed": true,
         "output-decompressed-location" : ".",
         "logfname": "runlog",
