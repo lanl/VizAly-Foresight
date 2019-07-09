@@ -18,6 +18,24 @@ Authors:
 #include <mpi.h>
 
 
+
+inline std::vector<float> syncHistogram(int numBins, size_t numValues, std::vector<size_t> localHistogram, MPI_Comm comm)
+{
+    // Synchronize
+    std::vector<size_t> globalHistogram(numBins, 0);
+    MPI_Allreduce(&localHistogram[0], &globalHistogram[0], numBins, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
+
+    // Get histogram
+    std::vector<float>histogram;
+    histogram.resize(numBins);
+
+    for (std::size_t i=0; i<numBins; ++i)
+        histogram[i] = ( (float)globalHistogram[i] )/( (float)numValues );
+    
+    return histogram;
+}
+
+
 inline std::string python_histogram(size_t numBins, float min_val, float max_val, std::vector<float> histogram)
 {
     std::stringstream outputFileSS;
