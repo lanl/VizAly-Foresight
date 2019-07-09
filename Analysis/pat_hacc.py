@@ -75,7 +75,7 @@ class HACCWorkflow(workflow.Workflow):
                            executable=halo_exe,
                            arguments=["--config", os.path.basename(new_config_path),
                                       "--timesteps", timesteps_path,
-                                      "--prefix", prefix,
+                                      "--prefix", cbench_path[:-len(str(timestep)) - 1],
                                       os.path.basename(new_parameters_path)],
                            configurations=halo_config,
                            environment=environment)
@@ -88,7 +88,7 @@ class HACCWorkflow(workflow.Workflow):
             spectrum_job = j.Job(name="{}_{}".format(prefix, spectrum_section),
                                  execute_dir=spectrum_section,
                                  executable=spectrum_exe,
-                                 arguments=[spectrum_config_path, "-n", cbench_path, prefix + "spectrum", timestep],
+                                 arguments=[spectrum_config_path, "-n", cbench_path, prefix + "_spectrum", timestep],
                                  configurations=spectrum_config,
                                  environment=environment)
 
@@ -104,7 +104,7 @@ class HACCWorkflow(workflow.Workflow):
 
         #create_CinemaDB()
 
-# parse command li9ne
+# parse command line
 parser = argparse.ArgumentParser()
 parser.add_argument("--input-file")
 parser.add_argument("--submit", action="store_true")
@@ -116,6 +116,11 @@ wflow_data = futils.read_json(opts.input_file)
 # create Workflow instance
 wflow_dir = wflow_data["project-home"]
 wflow = HACCWorkflow("wflow", wflow_data, workflow_dir=wflow_dir)
+
+# make directories
+os.makedirs(wflow_dir + "/cbench")
+os.makedirs(wflow_dir + "/halo")
+os.makedirs(wflow_dir + "/spectrum")
 
 # add jobs to workflow
 wflow.add_cbench_job()
