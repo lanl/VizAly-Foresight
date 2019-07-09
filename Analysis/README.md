@@ -13,6 +13,6 @@ All of these packages can be installed as python pip install <package name>
 ## Running Foresight
 This will run the full analysis workflow and generate a cinema database. For example
 ```
-$ python Analysis/pat_nyx.py --input-files inputs/nyx/nyx_darwin_test.json --submit
+$ python Analysis/pat_nyx.py --input-file inputs/nyx/nyx_darwin_test.json --submit
 ```
 will run CBench, PAT, and a plot generator for cinema. The output will be a cinema database
