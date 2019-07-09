@@ -86,7 +86,7 @@ def extract_csv_col(filename, delimiter_char, colpos):
 			return col
 
 		except ValueError as e:
-			print ("CSV file " + filename + " is invalid! " + e)
+			print ("CSV file " + filename + " is invalid! " + str(e))
 			exit(1)
 
 
@@ -109,5 +109,5 @@ def read_json(filename):
 			json_data = json.load(read_file,  object_pairs_hook=OrderedDict)
 			return json_data
 		except ValueError as e:
-			print ("Json file " + filename + " is invalid! " + e)
+			print ("Json file " + filename + " is invalid! " + str(e))
 			return None
