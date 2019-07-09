@@ -6,8 +6,8 @@ RUN yum install -y epel-release && \
     yum install -y doxygen git gsl-devel hdf5 hdf5-static \
                    hdf5-openmpi-devel hdf5-openmpi-static \
                    help2man make perl-CPAN perl-Thread-Queue \
-                   perl-devel openmpi openmpi-devel openssl-devel \
-                   selinux-policy sudo wget
+                   perl-devel python-devel python-pip openmpi \
+                   openmpi-devel openssl-devel selinux-policy sudo wget
 
 # install gcc
 RUN yum install -y centos-release-scl && \
