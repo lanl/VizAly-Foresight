@@ -87,7 +87,7 @@ class Workflow(object):
                          arguments=[os.path.basename(self.json_path)],
                          configurations=configurations,
                          environment=environment)
-        cbench_job.add_command("mkdir logs")
+        cbench_job.add_command("mkdir -p logs")
         self.add_job(cbench_job)
 
 
