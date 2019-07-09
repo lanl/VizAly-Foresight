@@ -108,7 +108,7 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
 		{
 			std::vector<float>histogram;
 			size_t numBins = 1024;
-			std::vector<float> localHistogram(numBins,0);
+			std::vector<size_t> localHistogram(numBins,0);
 			double binSize = total_max_abs_err / numBins;
 
 			for (std::size_t i = 0; i < n; ++i)
@@ -126,11 +126,11 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
 
 			histogram.resize(numBins);
 
-			std::vector<float> globalHistogram(numBins,0);
-			MPI_Allreduce(&localHistogram[0], &globalHistogram[0], numBins, MPI_FLOAT, MPI_SUM, comm);
+			std::vector<size_t> globalHistogram(numBins,0);
+			MPI_Allreduce(&localHistogram[0], &globalHistogram[0], numBins, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
 
 			for (std::size_t i=0; i<numBins; ++i)
-				histogram[i] = ((float)globalHistogram[i])/global_n;
+				histogram[i] = ((float)globalHistogram[i])/(float)global_n;
 
 
 			// Output histogram as a python script file
