@@ -93,7 +93,7 @@ class HACCWorkflow(workflow.Workflow):
                         "--output-file", halo_query_file,
                         "--query", sec["query"][i],
                         "--xlabel", sec["xlabel"][i],
-                        "--ylabel", sec["ylabel"][i],
+                        "--ylabel", sec["ylabel"][i]]
                 if "xlim" in sec.keys():
                     args += ["--xlim", " ".join(sec["xlim"][i])]
                 if "log-bins" in sec.keys():
