@@ -114,7 +114,7 @@
                 },
                 "halo_dist" :
                 {
-                    "path": "python /projects/exasky/cmbiwer-projects/foresight/Analysis/pat_hacc_extract_halo_distribution.py",
+                    "path": "python /projects/exasky/cmbiwer-projects/foresight/Analysis/pat_hacc_query.py",
                     "configuration" :
                     {
                         "partition" : "general",
