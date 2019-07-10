@@ -115,6 +115,27 @@
                 "halo_dist" :
                 {
                     "path": "python /projects/exasky/cmbiwer-projects/foresight/Analysis/pat_hacc_query.py",
+                    "sqlite-file" : "/home/cmbiwer/src/VizAly-Vis_IO/genericio/frontend/GenericIOSQLite.so",
+                    "query" :
+                    [
+                        "select fof_halo_mass from __TABLE__ ORDER BY fof_halo_mass"
+                    ],
+                    "xlabel" :
+                    [
+                        "Halo Mass"
+                    ],
+                    "ylabel" :
+                    [
+                        "Counts"
+                    ],
+                    "xlim" :
+                    [
+                        [1e10, 1e15]
+                    ],
+                    "log-bins" :
+                    [
+                        true
+                    ],
                     "configuration" :
                     {
                         "partition" : "general",
