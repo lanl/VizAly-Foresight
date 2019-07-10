@@ -139,7 +139,8 @@ class HACCWorkflow(workflow.Workflow):
         self.add_job(cinema_job)
 
 # parse command line
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument("--input-file")
 parser.add_argument("--submit", action="store_true")
 opts = parser.parse_args()
