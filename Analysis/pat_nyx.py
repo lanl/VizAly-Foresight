@@ -1,4 +1,10 @@
 #! /usr/bin/env python
+"""
+To run executable do:
+python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow.json
+python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow.json --submit
+python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow_darwin.json --submit
+"""
 
 import argparse
 import os
@@ -56,7 +62,7 @@ class NYXWorkflow(workflow.Workflow):
 
 
 			for item in self.json_data["pat"]["input-files"]:
-				print "Creating analysis jobs for", analysis, " on ", item
+				print("Creating analysis jobs for {} on {}".format(analysis, item))
 
 				#execute_dir=self.json_data["project-home"] + "/" + analysis["name"],
 				# create job for sim_stats
@@ -103,7 +109,7 @@ class NYXWorkflow(workflow.Workflow):
 		cinema_job.add_command("mkdir " + plot_path)
 
 		# make dependent on CBench job and add to workflow
-		print self.jobs
+		print(self.jobs)
 		for job in self.jobs:
 			cinema_job.add_parents(job)
 		self.add_job(cinema_job)
@@ -112,7 +118,8 @@ class NYXWorkflow(workflow.Workflow):
 
 
 # Parse Input
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument("--input-file")
 parser.add_argument("--submit", action="store_true")
 opts = parser.parse_args()
@@ -137,11 +144,4 @@ wflow.write_submit()
 # submit workflow
 if opts.submit:
 	wflow.submit()
-
-
-"""
-python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow.json 
-python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow.json --submit
-python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow_darwin.json --submit
-"""
 
