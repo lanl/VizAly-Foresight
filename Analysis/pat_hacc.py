@@ -20,6 +20,7 @@ class HACCWorkflow(workflow.Workflow):
 
         # get halo finder information from configuration file
         halo_section = "halo"
+        halo_config = self.configuration_from_json_data(halo_section)
         halo_exe = self.json_data["pat"]["analysis-tool"]["analytics"] \
                                  [halo_section]["path"]
         timesteps_path = self.json_data["pat"]["analysis-tool"]["analytics"] \
@@ -29,60 +30,72 @@ class HACCWorkflow(workflow.Workflow):
         parameters_path = self.json_data["pat"]["analysis-tool"]["analytics"] \
                                         [halo_section]["parameters-file"]
 
-        # get halo finder run specifications from configuration file
-        halo_config = self.configuration_from_json_data(halo_section)
+        # get halo distribution information from configuraiton file
+        halo_dist_section = "halo_dist"
+        halo_dist_config = self.configuration_from_json_data(halo_dist_section)
+        halo_dist_exe = self.json_data["pat"]["analysis-tool"]["analytics"] \
+                                 [halo_dist_section]["path"]
 
         # get spectrum information from configuration file
         spectrum_section = "spectrum"
+        spectrum_config = self.configuration_from_json_data(spectrum_section)
         spectrum_exe = self.json_data["pat"]["analysis-tool"]["analytics"] \
                                      [spectrum_section]["path"]
         spectrum_config_path = self.json_data["pat"]["analysis-tool"]["analytics"] \
                                              [spectrum_section]["config-file"]
 
-        # get halo finder run specifications from configuration file
-        spectrum_config = self.configuration_from_json_data(spectrum_section)
-
-        # create job to run halo finder on each output file from CBench
-        # create job to run 
+        # create jobs to run analysis jobs on each output file from CBench
         for path in self.json_data["pat"]["input-files"]:
             print("Creating analysis jobs for", path)
             prefix = path["output-prefix"]
             cbench_path = path["path"]
-            timestep = 499
+            timestep = cbench_path.split(".")[-1]
 
             # write halo finder parameters file
             # specify location of parsed configuration file inside
             new_parameters_path = halo_section + "/" + prefix + "_halo_params.txt"
             new_config_path = halo_section + "/" + prefix + "_halo_config.txt"
-            os.system("sed \"s/^COSMOTOOLS_CONFIG.*/COSMOTOOLS_CONFIG .\/{}/\" {} > {}".format(os.path.basename(new_config_path),
-                                                                                               parameters_path,
-                                                                                               self.workflow_dir + "/" + new_parameters_path))
+            os.system("sed \"s/^COSMOTOOLS_CONFIG.*/COSMOTOOLS_CONFIG .\/{}/\" {} > {}".format(
+                                    os.path.basename(new_config_path),
+                                    parameters_path,
+                                    self.workflow_dir + "/" + new_parameters_path))
 
             # write halo finder configuration file
             # specify output prefix inside
             tmp_path = "tmp.out"
-            os.system("sed \"s/^BASE_OUTPUT_FILE_NAME.*/BASE_OUTPUT_FILE_NAME .\/{}/\" {} > {}".format(prefix,
-                                                                                                       config_path,
-                                                                                                       tmp_path))
-            os.system("sed \"s/^ACCUMULATE_CORE_NAME.*/ACCUMULATE_CORE_NAME .\/{}/\" {} > {}".format(prefix,
-                                                                                                     tmp_path,
-                                                                                                     self.workflow_dir + "/" + new_config_path))
+            os.system("sed \"s/^BASE_OUTPUT_FILE_NAME.*/BASE_OUTPUT_FILE_NAME .\/{}/\" {} > {}".format(
+                                    prefix, config_path, tmp_path))
+            os.system("sed \"s/^ACCUMULATE_CORE_NAME.*/ACCUMULATE_CORE_NAME .\/{}/\" {} > {}".format(
+                                    prefix, tmp_path, self.workflow_dir + "/" + new_config_path))
             os.remove(tmp_path)
 
             # create job for halo finder
             halo_job = j.Job(name="{}_{}".format(prefix, halo_section),
-                           execute_dir=halo_section,
-                           executable=halo_exe,
-                           arguments=["--config", os.path.basename(new_config_path),
-                                      "--timesteps", timesteps_path,
-                                      "--prefix", cbench_path[:-len(str(timestep)) - 1],
-                                      os.path.basename(new_parameters_path)],
-                           configurations=halo_config,
-                           environment=environment)
+                             execute_dir=halo_section,
+                             executable=halo_exe,
+                             arguments=["--config", os.path.basename(new_config_path),
+                                        "--timesteps", timesteps_path,
+                                        "--prefix", cbench_path[:-len(str(timestep)) - 1],
+                                        os.path.basename(new_parameters_path)],
+                             configurations=halo_config,
+                             environment=environment)
 
             # make dependent on CBench job and add to workflow
             halo_job.add_parents(cbench_job)
             self.add_job(halo_job)
+
+            # create job for getting halo finder distribution
+            halo_dist_job = j.Job(name="{}_{}".format(prefix, halo_dist_section),
+                                  execute_dir=halo_dist_section,
+                                  executable=halo_dist_exe,
+                                  arguments=["--input-file", halo_file,
+                                             "--output-file", halo_dist_file],
+                                  configurations=halo_dist_config,
+                                  environment=environment)
+
+            # make dependent on halo finder job
+            halo_dist_job.add_parent(halo_job)
+            self.add_job(halo_dist_job)
 
             # create job for power spectrum
             spectrum_job = j.Job(name="{}_{}".format(prefix, spectrum_section),
@@ -96,13 +109,36 @@ class HACCWorkflow(workflow.Workflow):
             spectrum_job.add_parents(cbench_job)
             self.add_job(spectrum_job)
 
-    def add_plotting_jobs(self):
-        print("PLOTTING JOBS")
+        def add_cinema_plotting_jobs(self):
 
-        halo_images = []
-        spectrum_images = []
+            # get environment for Cinema job
+            if "evn_path" in self.json_data["cinema-plots"]:
+                    environment = self.json_data["foresight-home"] + self.json_data["cinema-plots"]["evn_path"]
+            else:
+                    environment = None
 
-        #create_CinemaDB()
+            # get configuration for Cinema job
+            if "configuration" in self.json_data["cinema-plots"]:
+                    configurations = list( sum( self.json_data["cinema-plots"]["configuration"].items(), () ) )
+            else:
+                    configurations = None
+
+            # set paths
+            input_file = self.json_data["project-home"] +  self.json_data['wflow-path'] + "/cbench/wflow.json"
+            plot_path = self.json_data['project-home'] + self.json_data['wflow-path'] + "/cinema"
+
+            # create job for Cinema
+            cinema_job = j.Job(name="cinema",
+                    execute_dir="cinema",
+                    executable="python " + os.getcwd() + "/" + "pat_hacc_cinema.py",
+                    arguments=[ "--input-file", input_file],
+                    configurations=configurations,
+                    environment=environment)
+            cinema_job.add_command("mkdir " + plot_path)
+
+            # make dependent on all previous workflow jobs and add to workflow
+            cinema_job.add_parents(*self.jobs)
+            self.add_job(cinema_job)
 
 # parse command line
 parser = argparse.ArgumentParser()
@@ -121,6 +157,7 @@ wflow = HACCWorkflow("wflow", wflow_data, workflow_dir=wflow_dir)
 os.makedirs(wflow_dir + "/cbench")
 os.makedirs(wflow_dir + "/halo")
 os.makedirs(wflow_dir + "/spectrum")
+os.makedirs(wflow_dir + "/cinema")
 
 # add jobs to workflow
 wflow.add_cbench_job()
