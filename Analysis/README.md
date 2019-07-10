@@ -13,4 +13,4 @@ This will run the full analysis workflow and generate a cinema database. For exa
 ```
 $ python Analysis/pat_nyx.py --input-file inputs/nyx/nyx_darwin_test.json --submit
 ```
-will run CBench, PAT, and a plot generator for cinema. The output will be a cinema database
+will run CBench, PAT, and a plot generator for Cinema HTML viewers. The output will be a Cinema database.
