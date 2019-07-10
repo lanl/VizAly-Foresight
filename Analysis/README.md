@@ -1,14 +1,12 @@
 # PAT: Python Analysis Toolkit
-This folder contains PAT, the P that is used to run the foresight workflow. The Analysis toolkit will generate a cinema database from the input file specified.
+
+This folder contains PAT, the Python package that is used to run the Foresight workflows. The Analysis toolkit will generate a Cinema database from the input file specified.
 
 ## Prerequisites:
-* Python 2
-* numpy
-* pandas
-* matplotlib
 
-All of these packages can be installed as python pip install <package name>
+* Python 2.7
 
+There is a `requirements.txt` file in the top-level of this repository. All of these packages can be installed as: `pip install -r requirements.txt`
 
 ## Running Foresight
 This will run the full analysis workflow and generate a cinema database. For example
