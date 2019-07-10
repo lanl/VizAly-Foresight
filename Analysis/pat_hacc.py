@@ -94,9 +94,11 @@ class HACCWorkflow(workflow.Workflow):
                         "--query", sec["query"][i],
                         "--xlabel", sec["xlabel"][i],
                         "--ylabel", sec["ylabel"][i],
-                        "--xlim", " ".join(sec["xlim"][i])]
-                if sec["log-bins"][i]:
-                    args += ["--log-bins"]
+                if "xlim" in sec.keys():
+                    args += ["--xlim", " ".join(sec["xlim"][i])]
+                if "log-bins" in sec.keys():
+                    if sec["log-bins"][i]:
+                        args += ["--log-bins"]
                 halo_query_job = j.Job(name="{}_{}_{}".format(prefix, halo_query_section, i),
                                       execute_dir=halo_query_section,
                                       executable=halo_query_exe,
