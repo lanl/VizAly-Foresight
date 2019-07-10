@@ -59,8 +59,8 @@
             "run-path" : "/projects/exasky/cmbiwer-projects/foresight/Analysis/hacc_wflow",
             "output-decompressed": true,
             "output-decompressed-location" : "decompressed_files",
-            "log-file" : "runlog_hacc_test_",
-            "metrics-file" : "metrics_hacc_test_"
+            "log-file" : "runlog",
+            "metrics-file" : "metrics"
         },
         "metrics":
         [
