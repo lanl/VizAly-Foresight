@@ -91,10 +91,10 @@ class HACCWorkflow(workflow.Workflow):
                 halo_query_file = halo_query_section + "/halo_query_{}_{}.csv".format(prefix, i)
                 args = ["--input-file", halo_file,
                         "--output-file", halo_query_file,
-                        "--query", sec["query"][i]],
-                        "--xlabel", sec["xlabel"][i]],
-                        "--ylabel", sec["ylabel"][i]],
-                        "--xlim", " ".join(sec["xlim"][i]])]
+                        "--query", sec["query"][i],
+                        "--xlabel", sec["xlabel"][i],
+                        "--ylabel", sec["ylabel"][i],
+                        "--xlim", " ".join(sec["xlim"][i])]
                 if sec["log-bins"][i]:
                     args += ["--log-bins"]
                 halo_query_job = j.Job(name="{}_{}_{}".format(prefix, halo_query_section, i),
