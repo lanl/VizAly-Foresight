@@ -41,7 +41,6 @@ parser.add_argument("--query", default="select fof_halo_mass from __TABLE__ ORDE
 parser.add_argument("--xlabel", default="Halo Mass")
 parser.add_argument("--ylabel", default="Counts")
 parser.add_argument("--xlim", nargs="+", type=float, default=[])
-parser.add_argument("--ylim", nargs="+", type=float, default=[])
 parser.add_argument("--log-bins", action="store_true")
 opts = parser.parse_args()
 
