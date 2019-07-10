@@ -121,8 +121,12 @@ class HACCWorkflow(workflow.Workflow):
             # make dependent on CBench job and add to workflow
             spectrum_job.add_parents(cbench_job)
             self.add_job(spectrum_job)
-            self.json_data["pat"]["analysis"].append({"output-column" : "FILE_Spectrum",
-                                                      "output-prefix" : prefix, "path" : spectrum_file})
+
+            # predict output file
+            for ext in ["", ".rsd.0", ".rsd.1", ".rsd.2"]:
+                spectrum_file = spectrum_section + "/{}_spectrum.pk{}".format(prefix, ext)
+                self.json_data["pat"]["analysis"].append({"output-column" : "FILE_Spectrum{}".format(ext),
+                                                          "output-prefix" : prefix, "path" : spectrum_file})
 
     def add_cinema_plotting_jobs(self):
 
