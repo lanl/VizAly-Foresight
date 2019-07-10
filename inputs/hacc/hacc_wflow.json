@@ -140,7 +140,7 @@
 
     "cinema-plots" :
     {
-        "cinema-db-name" : "results",
+        "path" : "python /projects/exasky/cmbiwer-projects/foresight/Analysis/pat_hacc_cinema.py",
         "plotting" :
         {
             "x-range" : [0, 11]
