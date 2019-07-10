@@ -43,7 +43,7 @@ class Workflow(object):
         """ Adds a CBench job to the workflow.
         """
 
-        base_path = self.json_data['project-home'] +  self.json_data['wflow-path']
+        base_path = self.json_data['project-home'] + self.json_data['wflow-path']
 
         # Create input settings
         orig_path_filename = futils.splitString(self.json_data['input']['filename'],'/')
@@ -74,7 +74,7 @@ class Workflow(object):
         else:
             environment = None
 
-        # Find exewcutable command
+        # Find executable command
         exec_command = self.json_data["cbench"]["path"]
         foresight_home = self.json_data["foresight-home"]
         exec_command = exec_command.replace("$foresight-home$", foresight_home)
