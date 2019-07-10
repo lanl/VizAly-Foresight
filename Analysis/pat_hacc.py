@@ -122,7 +122,7 @@ class HACCWorkflow(workflow.Workflow):
             spectrum_job.add_parents(cbench_job)
             self.add_job(spectrum_job)
 
-            # predict output file
+            # predict and track output files
             for ext in ["", ".rsd.0", ".rsd.1", ".rsd.2"]:
                 spectrum_file = spectrum_section + "/{}_spectrum.pk{}".format(prefix, ext)
                 self.json_data["pat"]["analysis"].append({"output-column" : "FILE_Spectrum{}".format(ext),
