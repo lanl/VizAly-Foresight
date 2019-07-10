@@ -6,7 +6,7 @@ This folder contains PAT, the Python package that is used to run the Foresight w
 
 * Python 2.7
 
-There is a `requirements.txt` file in the top-level of this repository. All of these packages can be installed as: `pip install -r requirements.txt`
+There is a `requirements.txt` file in the top-level of this repository. All of the required Python packages can be installed as: `pip install -r requirements.txt`
 
 ## Running Foresight
 This will run the full analysis workflow and generate a cinema database. For example
