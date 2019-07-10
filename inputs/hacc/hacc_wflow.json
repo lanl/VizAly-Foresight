@@ -118,7 +118,7 @@
                     "sqlite-file" : "/home/cmbiwer/src/VizAly-Vis_IO/genericio/frontend/GenericIOSQLite.so",
                     "query" :
                     [
-                        "select fof_halo_mass from __TABLE__ ORDER BY fof_halo_mass"
+                        "select fof_halo_mass from __TABLE__"
                     ],
                     "xlabel" :
                     [
