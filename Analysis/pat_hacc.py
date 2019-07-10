@@ -128,11 +128,11 @@ class HACCWorkflow(workflow.Workflow):
 
         # create job for Cinema
         cinema_job = j.Job(name="cinema",
-                execute_dir="cinema",
-                executable=cinema_exe,
-                arguments=[ "--input-file", self.json_file],
-                configurations=configurations,
-                environment=environment)
+                           execute_dir="cinema",
+                           executable=cinema_exe,
+                           arguments=[ "--input-file", self.json_file],
+                           configurations=configurations,
+                           environment=environment)
 
         # make dependent on all previous workflow jobs and add to workflow
         cinema_job.add_parents(*self.jobs)
