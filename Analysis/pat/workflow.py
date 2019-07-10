@@ -158,7 +158,6 @@ class Workflow(object):
                 if job.command != "":
                     fp.write(job.command + "\n")
 
-
                 if job.environment != None:
                     fp.write("source {}\n".format(job.environment))
                 fp.write(job.executable + " " + " ".join(map(str, job.arguments)) + "\n")
@@ -169,7 +168,6 @@ class Workflow(object):
                 fp.write("\n# {}\n".format(job.name))
                 fp.write("jid{}=$(sbatch {} --output {} {})\n".format(job._idx, depends_str, slurm_out_path, path))
                 fp.write("jid{}=$(echo $jid{} | rev | cut -f 1 -d ' ' | rev)".format(job._idx, job._idx))
-    
     
 
     def submit(self):
