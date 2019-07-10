@@ -33,5 +33,5 @@ pip install -r requirements.txt
 
 # test HACC workflow generator and executables
 cd Analysis
-python pat_hacc.py --input-file ../inputs/hacc/hacc_wflow.json 
+python pat_hacc.py --input-file ../../inputs/hacc/hacc_wflow.json 
 python pat_hacc_query.py --help
