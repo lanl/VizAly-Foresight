@@ -109,36 +109,36 @@ class HACCWorkflow(workflow.Workflow):
             spectrum_job.add_parents(cbench_job)
             self.add_job(spectrum_job)
 
-        def add_cinema_plotting_jobs(self):
+    def add_cinema_plotting_jobs(self):
 
-            # get environment for Cinema job
-            if "evn_path" in self.json_data["cinema-plots"]:
-                    environment = self.json_data["foresight-home"] + self.json_data["cinema-plots"]["evn_path"]
-            else:
-                    environment = None
+        # get environment for Cinema job
+        if "evn_path" in self.json_data["cinema-plots"]:
+                environment = self.json_data["foresight-home"] + self.json_data["cinema-plots"]["evn_path"]
+        else:
+                environment = None
 
-            # get configuration for Cinema job
-            if "configuration" in self.json_data["cinema-plots"]:
-                    configurations = list( sum( self.json_data["cinema-plots"]["configuration"].items(), () ) )
-            else:
-                    configurations = None
+        # get configuration for Cinema job
+        if "configuration" in self.json_data["cinema-plots"]:
+                configurations = list( sum( self.json_data["cinema-plots"]["configuration"].items(), () ) )
+        else:
+                configurations = None
 
-            # set paths
-            input_file = self.json_data["project-home"] +  self.json_data['wflow-path'] + "/cbench/wflow.json"
-            plot_path = self.json_data['project-home'] + self.json_data['wflow-path'] + "/cinema"
+        # set paths
+        input_file = self.json_data["project-home"] +  self.json_data['wflow-path'] + "/cbench/wflow.json"
+        plot_path = self.json_data['project-home'] + self.json_data['wflow-path'] + "/cinema"
 
-            # create job for Cinema
-            cinema_job = j.Job(name="cinema",
-                    execute_dir="cinema",
-                    executable="python " + os.getcwd() + "/" + "pat_hacc_cinema.py",
-                    arguments=[ "--input-file", input_file],
-                    configurations=configurations,
-                    environment=environment)
-            cinema_job.add_command("mkdir " + plot_path)
+        # create job for Cinema
+        cinema_job = j.Job(name="cinema",
+                execute_dir="cinema",
+                executable="python " + os.getcwd() + "/" + "pat_hacc_cinema.py",
+                arguments=[ "--input-file", input_file],
+                configurations=configurations,
+                environment=environment)
+        cinema_job.add_command("mkdir " + plot_path)
 
-            # make dependent on all previous workflow jobs and add to workflow
-            cinema_job.add_parents(*self.jobs)
-            self.add_job(cinema_job)
+        # make dependent on all previous workflow jobs and add to workflow
+        cinema_job.add_parents(*self.jobs)
+        self.add_job(cinema_job)
 
 # parse command line
 parser = argparse.ArgumentParser()
