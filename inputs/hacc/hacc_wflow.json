@@ -112,7 +112,7 @@
                         "constraint" : "gpu1_model:Tesla_K40m"
                     }
                 },
-                "halo_dist" :
+                "halo_query" :
                 {
                     "path": "python /projects/exasky/cmbiwer-projects/foresight/Analysis/pat_hacc_query.py",
                     "sqlite-file" : "/home/cmbiwer/src/VizAly-Vis_IO/genericio/frontend/GenericIOSQLite.so",

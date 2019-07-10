@@ -31,10 +31,10 @@ class HACCWorkflow(workflow.Workflow):
                                         [halo_section]["parameters-file"]
 
         # get halo distribution information from configuraiton file
-        halo_dist_section = "halo_dist"
-        halo_dist_config = self.configuration_from_json_data(halo_dist_section)
-        halo_dist_exe = self.json_data["pat"]["analysis-tool"]["analytics"] \
-                                 [halo_dist_section]["path"]
+        halo_query_section = "halo_query"
+        halo_query_config = self.configuration_from_json_data(halo_query_section)
+        halo_query_exe = self.json_data["pat"]["analysis-tool"]["analytics"] \
+                                 [halo_query_section]["path"]
 
         # get spectrum information from configuration file
         spectrum_section = "spectrum"
@@ -85,28 +85,28 @@ class HACCWorkflow(workflow.Workflow):
             self.add_job(halo_job)
 
             # loop over different halo SQL queries
-            # create job for getting halo finder distribution
-            sec = self.json_data["pat"]["analysis-tool"]["analytics"][halo_dist_section]
+            # create job for getting halo distribution
+            sec = self.json_data["pat"]["analysis-tool"]["analytics"][halo_query_section]
             for i, _ in enumerate(sec["query"]):
-                halo_dist_file = halo_dist_section + "/halo_dist_{}_{}.csv".format(prefix, i)
+                halo_query_file = halo_query_section + "/halo_query_{}_{}.csv".format(prefix, i)
                 args = ["--input-file", halo_file,
-                        "--output-file", halo_dist_file,
+                        "--output-file", halo_query_file,
                         "--query", sec["query"][i]],
                         "--xlabel", sec["xlabel"][i]],
                         "--ylabel", sec["ylabel"][i]],
                         "--xlim", " ".join(sec["xlim"][i]])]
                 if sec["log-bins"][i]:
                     args += ["--log-bins"]
-                halo_dist_job = j.Job(name="{}_{}_{}".format(prefix, halo_dist_section, i),
-                                      execute_dir=halo_dist_section,
-                                      executable=halo_dist_exe,
+                halo_query_job = j.Job(name="{}_{}_{}".format(prefix, halo_query_section, i),
+                                      execute_dir=halo_query_section,
+                                      executable=halo_query_exe,
                                       arguments=args,
-                                      configurations=halo_dist_config,
+                                      configurations=halo_query_config,
                                       environment=environment)
     
                 # make dependent on halo finder job
-                halo_dist_job.add_parent(halo_job)
-                self.add_job(halo_dist_job)
+                halo_query_job.add_parent(halo_job)
+                self.add_job(halo_query_job)
 
             # create job for power spectrum
             spectrum_job = j.Job(name="{}_{}".format(prefix, spectrum_section),
