@@ -119,22 +119,20 @@ class HACCWorkflow(workflow.Workflow):
 
         # get configuration for Cinema job
         if "configuration" in self.json_data["cinema-plots"]:
-                configurations = list( sum( self.json_data["cinema-plots"]["configuration"].items(), () ) )
+                configurations = list(sum(self.json_data["cinema-plots"]["configuration"].items(), ()))
         else:
                 configurations = None
 
-        # set paths
-        input_file = self.json_data["project-home"] +  self.json_data['wflow-path'] + "/cbench/wflow.json"
-        plot_path = self.json_data['project-home'] + self.json_data['wflow-path'] + "/cinema"
+        # get executable for Cinema job
+        cinema_exe = self.json_data["cinema-plots"]["path"]
 
         # create job for Cinema
         cinema_job = j.Job(name="cinema",
                 execute_dir="cinema",
-                executable="python " + os.getcwd() + "/" + "pat_hacc_cinema.py",
-                arguments=[ "--input-file", input_file],
+                executable=cinema_exe,
+                arguments=[ "--input-file", self.json_file],
                 configurations=configurations,
                 environment=environment)
-        cinema_job.add_command("mkdir " + plot_path)
 
         # make dependent on all previous workflow jobs and add to workflow
         cinema_job.add_parents(*self.jobs)

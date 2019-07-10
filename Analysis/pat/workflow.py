@@ -20,6 +20,7 @@ class Workflow(object):
         # store meta-data about the workflow
         self.name = name
         self.json_data = json_data
+        self.json_path = None
 
         # store a list of jobs in workflow
         self.jobs = []
@@ -31,12 +32,10 @@ class Workflow(object):
         self.submit_file = None
 
 
-
     def add_job(self, job, dependencies=None):
         """ Adds a job to the workflow.
         """
         self.jobs.append(job)
-
 
 
     def add_cbench_job(self):
