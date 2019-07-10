@@ -103,7 +103,9 @@ class HACCWorkflow(workflow.Workflow):
                                       arguments=args,
                                       configurations=halo_query_config,
                                       environment=environment)
-    
+                self.json_data["pat"]["analysis"].append({"output-column" : "FILE_Halo_Distribution_{}".format(i),
+                                                          "output-prefix" : prefix, "path" : halo_query_file})   
+ 
                 # make dependent on halo finder job
                 halo_query_job.add_parent(halo_job)
                 self.add_job(halo_query_job)
@@ -119,6 +121,8 @@ class HACCWorkflow(workflow.Workflow):
             # make dependent on CBench job and add to workflow
             spectrum_job.add_parents(cbench_job)
             self.add_job(spectrum_job)
+            self.json_data["pat"]["analysis"].append({"output-column" : "FILE_Spectrum",
+                                                      "output-prefix" : prefix, "path" : spectrum_file})
 
     def add_cinema_plotting_jobs(self):
 
