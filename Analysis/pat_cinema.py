@@ -1,7 +1,11 @@
 #! /usr/bin/env python
+""" This executable reads a JSON file and appends the metrics file with paths to images.
+The images are plotted in this executable.
+"""
 
 import argparse
 import csv
+import matplotlib as mpl; mpl.use("Agg")
 import matplotlib.pyplot as plt
 import numpy
 import os
