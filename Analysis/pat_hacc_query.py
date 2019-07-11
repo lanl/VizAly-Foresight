@@ -3,9 +3,7 @@
 """
 
 import argparse
-import matplotlib.pyplot as plt
 import numpy
-import os
 from pat import gioSqlite as gio_sqlite
 
 def load_sqlite_data(path, query, sqlite_file):
