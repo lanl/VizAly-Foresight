@@ -3,8 +3,8 @@
 import sys, os, json, csv
 from collections import OrderedDict
 
-import file_utilities as futils
-import plot_utilities as putils
+from pat import file_utilities as futils
+from pat import plot_utilities as putils
 
 
 
@@ -12,7 +12,7 @@ class CinemaWorkflow():
 
 	def __init__(self, json_file):
 		self.json_file = json_file
-		print self.json_file
+		print(self.json_file)
 		self.json_data = futils.read_json(self.json_file)
 
 
@@ -29,7 +29,7 @@ class CinemaWorkflow():
 		cmd = "cp " + csv_file + " " + cinema_database + "/data.csv"
 		os.system(cmd)
 
-		print "Create cinema database " + cinema_database
+		print("Create cinema database " + cinema_database)
 
 
 
