@@ -84,18 +84,21 @@ class HACCWorkflow(workflow.Workflow):
             halo_job.add_parents(cbench_job)
             self.add_job(halo_job)
 
+            # predict halo finder file
+            halo_file = self.workflow_dir + "/" + halo_section + "/" + prefix + "-" + timestep + ".fofproperties"
+
             # loop over different halo SQL queries
             # create job for getting halo distribution
             sec = self.json_data["pat"]["analysis-tool"]["analytics"][halo_query_section]
             for i, _ in enumerate(sec["query"]):
-                halo_query_file = halo_query_section + "/halo_query_{}_{}.csv".format(prefix, i)
+                halo_query_file = self.workflow_dir + "/" + halo_query_section + "/halo_query_{}_{}.csv".format(prefix, i)
                 args = ["--input-file", halo_file,
                         "--output-file", halo_query_file,
                         "--query", sec["query"][i],
                         "--xlabel", sec["xlabel"][i],
                         "--ylabel", sec["ylabel"][i]]
                 if "xlim" in sec.keys():
-                    args += ["--xlim", " ".join(sec["xlim"][i])]
+                    args += ["--xlim", " ".join(map(str, sec["xlim"][i]))]
                 if "log-bins" in sec.keys():
                     if sec["log-bins"][i]:
                         args += ["--log-bins"]
@@ -109,7 +112,7 @@ class HACCWorkflow(workflow.Workflow):
                                                           "output-prefix" : prefix, "path" : halo_query_file})   
  
                 # make dependent on halo finder job
-                halo_query_job.add_parent(halo_job)
+                halo_query_job.add_parents(halo_job)
                 self.add_job(halo_query_job)
 
             # create job for power spectrum
@@ -126,7 +129,7 @@ class HACCWorkflow(workflow.Workflow):
 
             # predict and track output files
             for ext in ["", ".rsd.0", ".rsd.1", ".rsd.2"]:
-                spectrum_file = spectrum_section + "/{}_spectrum.pk{}".format(prefix, ext)
+                spectrum_file = self.workflow_dir + "/" + spectrum_section + "/{}_spectrum.pk{}".format(prefix, ext)
                 self.json_data["pat"]["analysis"].append({"output-column" : "FILE_Spectrum{}".format(ext),
                                                           "output-prefix" : prefix, "path" : spectrum_file})
 
@@ -182,7 +185,6 @@ os.makedirs(wflow_dir + "/cinema")
 # add jobs to workflow
 wflow.add_cbench_job()
 wflow.add_analysis_jobs()
-wflow.add_plotting_jobs()
 
 # write submission script
 wflow.write_submit()

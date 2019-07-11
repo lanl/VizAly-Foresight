@@ -41,7 +41,7 @@
         {
             "name" : "fpzip",
             "output-prefix" : "fpzip",
-            "bits": 27
+            "bits" : 27
         },
         {
             "name" : "zfp",
@@ -139,7 +139,7 @@
                     "configuration" :
                     {
                         "partition" : "general",
-                        "nodes" : 1,
+                        "nodes" : 1
                     }
                 },
                 "spectrum" :
@@ -169,7 +169,7 @@
         "evn_path" : "scripts/VizAly-CBench.bash.darwin",
         "configuration" :
         {
-            "nodes" : 1,
+            "nodes" : 1
         }
     }
 }
