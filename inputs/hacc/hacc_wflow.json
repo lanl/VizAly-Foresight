@@ -162,7 +162,6 @@
     "cinema-plots" :
     {
         "path" : "python /projects/exasky/cmbiwer-projects/foresight/Analysis/pat_cinema.py",
-        "evn_path" : "scripts/VizAly-CBench.bash.darwin",
         "configuration" :
         {
             "nodes" : 1

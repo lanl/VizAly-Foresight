@@ -154,7 +154,7 @@ class HACCWorkflow(workflow.Workflow):
         cinema_job = j.Job(name="cinema",
                            execute_dir="cinema",
                            executable=cinema_exe,
-                           arguments=["--input-file", self.json_path],
+                           arguments=["--input-file", self.workflow_dir + "/" + self.json_path],
                            configurations=configurations,
                            environment=environment)
 
@@ -165,7 +165,7 @@ class HACCWorkflow(workflow.Workflow):
 # parse command line
 parser = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawTextHelpFormatter)
-parser.add_argument("--input-file")
+parser.add_argument("--input-file", required=True)
 parser.add_argument("--submit", action="store_true")
 opts = parser.parse_args()
 

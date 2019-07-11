@@ -85,7 +85,8 @@ class PATCinema(cinema.CinemaWorkflow):
             futils.write_csv("data.csv", all_runs)
 
 # parse Input
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument("--input-file", required=True)
 parser.add_argument("--output-file", default="results.cdb")
 opts = parser.parse_args()
