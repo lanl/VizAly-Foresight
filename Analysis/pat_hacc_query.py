@@ -3,10 +3,10 @@
 """
 
 import argparse
-import gioSqlite as gio_sqlite
 import matplotlib.pyplot as plt
 import numpy
 import os
+from pat import gioSqlite as gio_sqlite
 
 def load_sqlite_data(path, query, sqlite_file):
     """ Loads data using SQLite query.
@@ -41,6 +41,7 @@ parser.add_argument("--query", default="select fof_halo_mass from __TABLE__ ORDE
 parser.add_argument("--xlabel", default="Halo Mass")
 parser.add_argument("--ylabel", default="Counts")
 parser.add_argument("--xlim", nargs="+", type=float, default=[])
+parser.add_argument("--bins", type=float, default=20)
 parser.add_argument("--log-bins", action="store_true")
 opts = parser.parse_args()
 
@@ -56,7 +57,7 @@ x_max = max(x_max, data.max()) if not len(opts.xlim) > 1 else opts.xlim[1]
 if opts.log_bins:
     bins = numpy.logspace(numpy.log10(x_min), numpy.log10(x_max), num=opts.bins)
     bins_range = None
-elif i == 0:
+else:
     bins = opts.bins
     bins_range = (x_min, x_max)
 
@@ -68,6 +69,8 @@ bin_edges = numpy.hstack([(bin_edges[0], bin_edges[0]),
                           (bin_edges[-1], bin_edges[-1])])
 
 # save results
-results = numpy.hstack([bin_edges, hist])
-numpy.savetxt(opts.output_file, results, header=[opts.xlabel, opts.ylabel])
+delimiter = ","
+results = numpy.column_stack([bin_edges, hist])
+header = delimiter.join(map(str, [opts.xlabel, opts.ylabel]))
+numpy.savetxt(opts.output_file, results, header=header, delimiter=delimiter)
 
