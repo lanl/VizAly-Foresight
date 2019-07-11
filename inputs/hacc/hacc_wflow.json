@@ -91,7 +91,7 @@
     },
 
     "pat" : {
-        "evn_path" : "/projects/exasky/HACC_GPU.darwin_setup",
+        "evn_path" : "/projects/exasky/cmbiwer-projects/env.sh",
         "analysis-folder" : "HACC_Test_",
         "analysis-tool" :
         {
