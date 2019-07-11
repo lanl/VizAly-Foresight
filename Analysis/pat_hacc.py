@@ -154,7 +154,7 @@ class HACCWorkflow(workflow.Workflow):
         cinema_job = j.Job(name="cinema",
                            execute_dir="cinema",
                            executable=cinema_exe,
-                           arguments=["--input-file", self.json_file],
+                           arguments=["--input-file", self.json_path],
                            configurations=configurations,
                            environment=environment)
 
@@ -185,6 +185,7 @@ os.makedirs(wflow_dir + "/cinema")
 # add jobs to workflow
 wflow.add_cbench_job()
 wflow.add_analysis_jobs()
+wflow.add_cinema_plotting_jobs()
 
 # write submission script
 wflow.write_submit()
