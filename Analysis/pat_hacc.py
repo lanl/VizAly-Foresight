@@ -94,9 +94,9 @@ class HACCWorkflow(workflow.Workflow):
                 halo_query_file = self.workflow_dir + "/" + halo_query_section + "/halo_query_{}_{}.csv".format(prefix, i)
                 args = ["--input-file", halo_file,
                         "--output-file", halo_query_file,
-                        "--query", sec["query"][i],
-                        "--xlabel", sec["xlabel"][i],
-                        "--ylabel", sec["ylabel"][i]]
+                        "--query", "\"{}\"".format(sec["query"][i]),
+                        "--xlabel", "\"{}\"".format(sec["xlabel"][i]),
+                        "--ylabel", "\"{}\"".format(sec["ylabel"][i])]
                 if "xlim" in sec.keys():
                     args += ["--xlim", " ".join(map(str, sec["xlim"][i]))]
                 if "log-bins" in sec.keys():
