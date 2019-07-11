@@ -333,7 +333,7 @@ int main(int argc, char *argv[])
 
 			metricsInfo << compressorMgr->getParamsInfo() << std::endl;
 			csvOutput << compressorMgr->getCompressorName() << "_" << scalars[i] << "__" << compressorMgr->getParamsInfo()
-					  << ", " << compressors[c] << ", ";
+					  << ", " << jsonInput["compressors"][c]["output-prefix"] << ", ";
 
 			MPI_Barrier(MPI_COMM_WORLD);
 
