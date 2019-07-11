@@ -103,11 +103,11 @@ class HACCWorkflow(workflow.Workflow):
                     if sec["log-bins"][i]:
                         args += ["--log-bins"]
                 halo_query_job = j.Job(name="{}_{}_{}".format(prefix, halo_query_section, i),
-                                      execute_dir=halo_query_section,
-                                      executable=halo_query_exe,
-                                      arguments=args,
-                                      configurations=halo_query_config,
-                                      environment=environment)
+                                       execute_dir=halo_query_section,
+                                       executable=halo_query_exe,
+                                       arguments=args,
+                                       configurations=halo_query_config,
+                                       environment=environment)
                 self.json_data["pat"]["analysis"].append({"output-column" : "FILE_Halo_Distribution_{}".format(i),
                                                           "output-prefix" : prefix, "path" : halo_query_file})   
  
