@@ -154,7 +154,7 @@ class HACCWorkflow(workflow.Workflow):
         cinema_job = j.Job(name="cinema",
                            execute_dir="cinema",
                            executable=cinema_exe,
-                           arguments=[ "--input-file", self.json_file],
+                           arguments=["--input-file", self.json_file],
                            configurations=configurations,
                            environment=environment)
 
