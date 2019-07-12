@@ -80,13 +80,12 @@ inline HaloEntropy::~HaloEntropy() {
 /* -------------------------------------------------------------------------- */
 inline HaloEntropy::init(int argc, char* argv[]) {
 
-  // initialize MPI environment
-  MPI_Init_thread(NULL, NULL, MPI_THREAD_MULTIPLE, &thread_support);
-  MPI_Comm_size(MPI_COMM_WORLD, &nb_ranks);
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 }
 /* -------------------------------------------------------------------------- */
 inline bool HaloEntropy::loadData(std::string path) {
+  // basic checks 
+  assert(nb_ranks > 0); 
+  assert(ioMgr != nullptr);
 
   nlohmann::json json;
   std::ifstream file(path);
@@ -126,8 +125,6 @@ inline bool HaloEntropy::loadData(std::string path) {
   }
 
   // set the IO manager
-  assert(ioMgr != nullptr);
-
   if (json["input"].find("datainfo") != json["input"].end()) {
     auto const& datainfo = json["input"]["datainfo"];
     for (auto it = datainfo.begin(); it != datainfo.end(); ++it) {
@@ -161,5 +158,86 @@ inline bool HaloEntropy::loadData(std::string path) {
   // everything was fine at this point  
   return true;
 }
+
+};
+
+
+/* -------------------------------------------------------------------------- */
+void printUsage() {
+  if (my_rank == 0) {
+    std::fprintf(stderr, "Usage: mpirun -n <int> analyzer [options]\n");
+    std::fprintf(stderr, "options:\n");
+    std::fprintf(stderr, "-h, --help   show this help message and exit\n");
+    std::fprintf(stderr, "-i, --input  input json parameter file\n");
+    std::fflush(stderr);
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+bool isValidInput(int argc, char* argv[], int my_rank, int nb_ranks) {
+
+  if(not isPowerOfTwo(nb_ranks)) {
+    std::cerr << "Please run with power of 2 ranks" << std::endl;
+    return false;
+  }
+  else if (argc < 2) {
+    printUsage();
+    return false;
+  }
+  
+  // check input json file
+  std::ifstream file(argv[1]);
+  nlohmann::json json;
+
+  if (file.good()) {
+    try {
+      // pass file to json parser
+      file >> json;
+      file.close();
+    } catch(nlohmann::json::parse_error& e) {
+      if (my_rank == 0) 
+        std::cerr << "Invalid JSON file " << path << "\n" << e.what() << std::endl;
+      file.close();
+      return false;
+    }
+  } else {
+    if (my_rank == 0)
+      std::cerr << "Error while opening parameter file" << std::endl;
+    file.close();
+    return false;
+  }
+
+  // everything is fine at this point
+  return true;
+}
+
+
+/* -------------------------------------------------------------------------- */
+// todo: 
+// - split into different files
+// - create a specific target in 'CMakeLists.txt' and manage dependencies
+// - move into the right location
+int main(int argc, char* argv[]){
+  
+  // init MPI
+  MPI_Init_thread(NULL, NULL, MPI_THREAD_MULTIPLE, &thread_support);
+  MPI_Comm_size(MPI_COMM_WORLD, &nb_ranks);
+  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+  
+  // basic input checks
+  if (not isValidInput(argc, argv, my_rank, nb_ranks)) {
+    MPI_Finalize();
+    return EXIT_FAILURE;
+  }
+
+  // everything is OK at this point
+  loadData(json_input);
+  
+  // put other calls here
+  
+  MPI_Finalize();
+  return EXIT_SUCCESS;
+}
+/* -------------------------------------------------------------------------- */
 
 #endif
