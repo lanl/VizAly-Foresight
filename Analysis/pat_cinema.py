@@ -50,7 +50,6 @@ class PATCinema(cinema.CinemaWorkflow):
 
                 # loop over image types
                 for col_name in image_columns:
-                    print(prefix)
 
                     # get data file
                     # if no data file recorded then continue

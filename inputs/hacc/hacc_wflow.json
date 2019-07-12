@@ -91,7 +91,7 @@
     },
 
     "pat" : {
-        "evn_path" : "/projects/exasky/cmbiwer-projects/env.sh",
+        "evn_path" : "/projects/exasky/HACC_GPU.darwin_setup",
         "analysis-folder" : "HACC_Test_",
         "analysis-tool" :
         {
@@ -114,7 +114,7 @@
                 },
                 "halo_query" :
                 {
-                    "path": "python /projects/exasky/cmbiwer-projects/foresight/Analysis/pat_hacc_query.py",
+                    "path": "source /projects/exasky/cmbiwer-projects/env.sh; python /projects/exasky/cmbiwer-projects/foresight/Analysis/pat_hacc_query.py",
                     "sqlite-file" : "/home/cmbiwer/src/VizAly-Vis_IO/genericio/frontend/GenericIOSQLite.so",
                     "query" :
                     [
