@@ -121,6 +121,12 @@
 	{
 		"name" : "Nyx_ZFP_output_extended_.cdb",
 		"directory" : "data/Nyx_ZFP_output_extended_.cdb"
+	},
+
+	{
+		"name" : "NYX_512_fpzip_sweep.cdb",
+		"directory" : "data/NYX_512_fpzip_sweep_.cdb"
+
 	}
 
 
