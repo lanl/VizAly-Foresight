@@ -20,6 +20,7 @@ class Workflow(object):
         # store meta-data about the workflow
         self.name = name
         self.json_data = json_data
+        self.json_path = None
 
         # store a list of jobs in workflow
         self.jobs = []
@@ -31,19 +32,17 @@ class Workflow(object):
         self.submit_file = None
 
 
-
     def add_job(self, job, dependencies=None):
         """ Adds a job to the workflow.
         """
         self.jobs.append(job)
 
 
-
     def add_cbench_job(self):
         """ Adds a CBench job to the workflow.
         """
 
-        base_path = self.json_data['project-home'] +  self.json_data['wflow-path']
+        base_path = self.json_data['project-home'] + self.json_data['wflow-path']
 
         # Create input settings
         orig_path_filename = futils.splitString(self.json_data['input']['filename'],'/')
@@ -74,7 +73,7 @@ class Workflow(object):
         else:
             environment = None
 
-        # Find exewcutable command
+        # Find executable command
         exec_command = self.json_data["cbench"]["path"]
         foresight_home = self.json_data["foresight-home"]
         exec_command = exec_command.replace("$foresight-home$", foresight_home)
@@ -158,7 +157,6 @@ class Workflow(object):
                 if job.command != "":
                     fp.write(job.command + "\n")
 
-
                 if job.environment != None:
                     fp.write("source {}\n".format(job.environment))
                 fp.write(job.executable + " " + " ".join(map(str, job.arguments)) + "\n")
@@ -169,7 +167,6 @@ class Workflow(object):
                 fp.write("\n# {}\n".format(job.name))
                 fp.write("jid{}=$(sbatch {} --output {} {})\n".format(job._idx, depends_str, slurm_out_path, path))
                 fp.write("jid{}=$(echo $jid{} | rev | cut -f 1 -d ' ' | rev)".format(job._idx, job._idx))
-    
     
 
     def submit(self):
