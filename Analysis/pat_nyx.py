@@ -102,7 +102,7 @@ class NYXWorkflow(workflow.Workflow):
 
 		cinema_job = j.Job(name="cinema_",
 			execute_dir="cinema",
-			executable="python " + os.getcwd() + "/" + "pat_nyx_cinema.py", 
+			executable="python " + self.json_data["foresight-home"] + "/Analysis/" + "pat_nyx_cinema.py", 
 			arguments=[ "--input-file", arg1 ],
 			configurations=configurations,
 			environment=environment )
@@ -113,7 +113,6 @@ class NYXWorkflow(workflow.Workflow):
 		for job in self.jobs:
 			cinema_job.add_parents(job)
 		self.add_job(cinema_job)
-
 
 
 
