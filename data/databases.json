@@ -126,7 +126,16 @@
 	{
 		"name" : "NYX_512_fpzip_sweep.cdb",
 		"directory" : "data/NYX_512_fpzip_sweep_.cdb"
+	},
 
+	{
+		"name" : "NYX_512_zfp_sweep.cdb",
+		"directory" : "data/NYX_512_zfp_sweep_.cdb"
+	},
+
+	{
+		"name" : "NYX_512_sz_sweep_.cdb",
+		"directory" : "data/NYX_512_sz_sweep_.cdb"
 	}
 
 
