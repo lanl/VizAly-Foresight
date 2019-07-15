@@ -25,21 +25,19 @@ bool isValidInput(int argc, char* argv[], int my_rank, int nb_ranks) {
     if (my_rank == 0)
       printUsage();
     return false;
-  }
-  else if(not isPowerOfTwo(nb_ranks)) {
+  } else if(not isPowerOfTwo(nb_ranks)) {
     std::cerr << "Please run with power of 2 ranks" << std::endl;
     return false;
   }
 
   // check input json file
-  
   std::string path(argv[1]);
   std::ifstream file(path);
   nlohmann::json json;
 
   if (not file.good()) {
     if (my_rank == 0)
-      std::cerr << "Error while opening parameter file" << std::endl;
+      std::cerr << "Error while opening parameter file: "<< argv[1] << std::endl;
     file.close();
     return false;
   }
@@ -63,6 +61,7 @@ int main(int argc, char* argv[]){
   int my_rank = 0;
   int nb_ranks = 0;
   int thread_support = 0;
+  
 
   // init MPI
   MPI_Init_thread(NULL, NULL, MPI_THREAD_MULTIPLE, &thread_support);
@@ -76,7 +75,7 @@ int main(int argc, char* argv[]){
   }
 
   // everything is OK at this point
-  HaloEntropy analyzer(argv[2], my_rank, nb_ranks, MPI_COMM_WORLD);
+  HaloEntropy analyzer(argv[1], my_rank, nb_ranks, MPI_COMM_WORLD);
  
   // run the analyzer 
   analyzer.run();

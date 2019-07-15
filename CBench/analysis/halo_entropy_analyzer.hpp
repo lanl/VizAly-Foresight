@@ -50,7 +50,7 @@ public:
   HaloEntropy() = default; 
   HaloEntropy(HaloEntropy const&) = delete; 
   HaloEntropy(HaloEntropy&&) noexcept = delete; 
-  HaloEntropy(std::string in_path, int in_rank, int in_nb_ranks, MPI_Comm in_comm);
+  HaloEntropy(const char* in_path, int in_rank, int in_nb_ranks, MPI_Comm in_comm);
   ~HaloEntropy() = default;
  
   bool run();  // ok
@@ -63,7 +63,7 @@ public:
 
 /* -------------------------------------------------------------------------- */
 inline HaloEntropy::HaloEntropy(
-  std::string in_path, int in_rank, int in_nb_ranks, MPI_Comm in_comm
+  const char* in_path, int in_rank, int in_nb_ranks, MPI_Comm in_comm
 ) : json_path(in_path),
     my_rank  (in_rank),
     nb_ranks (in_nb_ranks),
@@ -107,14 +107,14 @@ inline bool HaloEntropy::run() {
   }
 
   // setup logs
-  std::string log_file = json["cbench"]["output"]["log-file"]; 
-  std::string output_log = "logs/"+ log_file +"_"+ std::to_string(my_rank);
-  writeLog(output_log, debuglog.str());
+  std::string basename = json["cbench"]["output"]["log-file"]; 
+  std::string output = basename +"_rank_"+ std::to_string(my_rank) +".log";
 
   for (auto&& scalar : json["input"]["scalars"]) {
     attributes.push_back(scalar);
     // todo: retrieve metadata here
   }
+
 
   // set the IO manager
   if (json["input"].find("datainfo") != json["input"].end()) {
@@ -128,6 +128,9 @@ inline bool HaloEntropy::run() {
   ioMgr->setSave(false); 
   MPI_Barrier(comm);
 
+  if (my_rank == 0)
+    printf("Found %d attributes\n", attributes.size());
+
   // loop over all scalars and load each of them
   for (auto&& scalar: attributes) {
     debuglog << "\nLoading and running " << scalar << std::endl;
@@ -135,7 +138,6 @@ inline bool HaloEntropy::run() {
       // save infos for debug
       debuglog << ioMgr->getDataInfo();
       debuglog << ioMgr->getLog();
-
       // TODO: compute Shannon entropy distribution for this attribute
 
     } else {
@@ -143,13 +145,21 @@ inline bool HaloEntropy::run() {
         std::cerr << "Error while loading " << scalar << ", exiting now" << std::endl;
       return false;
     }
-    appendLog(output_log, debuglog.str());
+    //appendLog(output_log, debuglog.str());
     // wait for other ranks to complete
     MPI_Barrier(comm);
   }
 
   // print some metadata on loaded HACC file
 
+  // output logs
+  std::ofstream logfile(output, std::ios::out);
+  logfile << debuglog.str();
+  debuglog.str("");
+  logfile.close();
+
+  std::cout << "Logs generated in "<< output << std::endl;  
+  MPI_Barrier(comm);
 
   // everything was fine at this point  
   return true;

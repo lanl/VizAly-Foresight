@@ -1,21 +1,27 @@
 {
   "project-home":"",
   "foresight-home":"",
-  "input": {
-    "filetype": "HACC",
-    "filename": "/projects/exasky/data/Argonne_L360_HACC001/analysis/Halos/b0168/STEP499/m000-499.haloparticles",
-    "scalars": ["x","y","z","vx","vy","vz"]
+  "input":{
+    "filetype":"HACC",
+    "filename":"/projects/exasky/data/Argonne_L360_HACC001/analysis/Halos/b0168/STEP499/m000-499.haloparticles",
+    "scalars":[
+      "x",
+      "y",
+      "z",
+      "vx",
+      "vy",
+      "vz"
+    ]
   },
-  "cbench": {
+  "cbench":{
     "path":"",
-    "output": {
+    "output":{
       "run-path":"build-new/",
       "output-decompressed":true,
       "output-decompressed-location":"decompressed_files",
-      "log-file":"log_hacc_analysis_",
-      "metrics-file":"metrics_hacc_analysis_"
+      "log-file":"log_hacc_analysis"
     },
-    "configuration": {
+    "configuration":{
       "partition":"scaling",
       "nodes":8,
       "ntasks-per-node":8
