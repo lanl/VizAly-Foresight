@@ -76,7 +76,7 @@ int main(int argc, char* argv[]){
   }
 
   // everything is OK at this point
-  HaloEntropy analyzer(argv[2], my_rank, nb_ranks);
+  HaloEntropy analyzer(argv[2], my_rank, nb_ranks, MPI_COMM_WORLD);
  
   // run the analyzer 
   analyzer.run();

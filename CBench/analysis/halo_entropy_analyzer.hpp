@@ -31,17 +31,12 @@
 /* -------------------------------------------------------------------------- */
 class HaloEntropy {
 
-  // Workflow
-  // - load JSON param file
-  // - load HACC data and store attributes
-  // - test: show attributes
-  // - compute Shannon entropy distribution
-  // - generate gnuplot histogram script 
-  // (!) make it self-contained
-
 private:
   std::string json_path = "";                                        // JSON parameter file path
-  DataLoaderInterface *ioMgr = nullptr;                              // HACC data loader
+  int my_rank = 0;                                                   // current MPI rank
+  int nb_ranks = 0;                                                  // total number of ranks
+  MPI_Comm comm = MPI_COMM_WORLD;                                    // MPI communicator
+  std::unique_ptr<DataLoaderInterface> ioMgr;                        // HACC data loader
   
   // per halo attribute data
   std::vector<std::string> attributes;                               // [x,y,x,vx,vy,vx]
@@ -51,16 +46,12 @@ private:
   std::unordered_map<std::string, std::vector<int>> frequencies;     // dataset elems frequency distribution
   std::unordered_map<std::string, double> entropy;                   // computed shannon entropy for each attribute
  
-  // MPI
-  int my_rank = 0;
-  int nb_ranks = 0;
-
 public: 
-  HaloEntropy() = delete; 
+  HaloEntropy() = default; 
   HaloEntropy(HaloEntropy const&) = delete; 
   HaloEntropy(HaloEntropy&&) noexcept = delete; 
-  HaloEntropy(std::string in_path, int in_rank, int in_nb_ranks);
-  ~HaloEntropy();
+  HaloEntropy(std::string in_path, int in_rank, int in_nb_ranks, MPI_Comm in_comm);
+  ~HaloEntropy() = default;
  
   bool run();  // ok
   bool showAttributeData() const;
@@ -71,23 +62,18 @@ public:
 };
 
 /* -------------------------------------------------------------------------- */
-inline HaloEntropy::HaloEntropy(std::string in_path, int in_rank, int in_nb_ranks) 
-  : json_path(in_path),
-    my_rank(in_rank),
-    nb_ranks(in_nb_ranks)
+inline HaloEntropy::HaloEntropy(
+  std::string in_path, int in_rank, int in_nb_ranks, MPI_Comm in_comm
+) : json_path(in_path),
+    my_rank  (in_rank),
+    nb_ranks (in_nb_ranks),
+    comm     (in_comm)
 {
-  ioMgr = new HACCDataLoader();
-  entropy.clear();
+  ioMgr = std::make_unique<HACCDataLoader>();
 }
 
 /* -------------------------------------------------------------------------- */
-inline HaloEntropy::~HaloEntropy() {
-  if (ioMgr != nullptr)
-    delete ioMgr;
-}
-
-/* -------------------------------------------------------------------------- */
-inline bool HaloEntropy::computeShannonEntropy(std::string attrib) {
+inline bool HaloEntropy::computeFrequencies(std::string attrib) {
 
 
   // TODO
@@ -102,12 +88,6 @@ inline bool HaloEntropy::run() {
   std::ifstream file(json_path);
   std::stringstream debuglog;
   
-  std::string filetype;
-  std::string log_file;
-  std::string input_hacc;
-  std::string output_log;
-  std::vector<std::string> attributes;
-
   try {
     // pass file to json parser
     file >> json;
@@ -118,8 +98,8 @@ inline bool HaloEntropy::run() {
   }
 
   // retrieve input file
-  filetype = json["input"]["filetype"];
-  input_hacc = json["input"]["filename"];
+  std::string filetype = json["input"]["filetype"];
+  std::string input_hacc = json["input"]["filename"];
   if (filetype != "HACC") {
     if (my_rank == 0) 
       std::cerr << "Only HACC data is supported" << std::endl;
@@ -127,12 +107,13 @@ inline bool HaloEntropy::run() {
   }
 
   // setup logs
-  log_file = json["cbench"]["output"]["log-file"]; 
-  output_log = "logs/"+ log_file +"_"+ std::to_string(my_rank);
+  std::string log_file = json["cbench"]["output"]["log-file"]; 
+  std::string output_log = "logs/"+ log_file +"_"+ std::to_string(my_rank);
   writeLog(output_log, debuglog.str());
 
   for (auto&& scalar : json["input"]["scalars"]) {
     attributes.push_back(scalar);
+    // todo: retrieve metadata here
   }
 
   // set the IO manager
@@ -143,9 +124,9 @@ inline bool HaloEntropy::run() {
     }    
   }
 
-  ioMgr->init(input_hacc, MPI_COMM_WORLD); 
+  ioMgr->init(input_hacc, comm); 
   ioMgr->setSave(false); 
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(comm);
 
   // loop over all scalars and load each of them
   for (auto&& scalar: attributes) {
@@ -164,7 +145,7 @@ inline bool HaloEntropy::run() {
     }
     appendLog(output_log, debuglog.str());
     // wait for other ranks to complete
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(comm);
   }
 
   // print some metadata on loaded HACC file
