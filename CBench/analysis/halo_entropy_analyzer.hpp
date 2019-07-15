@@ -21,16 +21,13 @@
 #include "timer.hpp"
 #include "log.hpp"
 #include "utils.hpp"
+#include "strConvert.hpp"
 
 // data loader
 #include "dataLoaderInterface.hpp"
 #include "HACCDataLoader.hpp"
-/* -------------------------------------------------------------------------- */
-class HaloData {
 
-  // mimic 'uncompressed data' from NYX
-}
-
+// EDIT: process one parameter each time
 /* -------------------------------------------------------------------------- */
 class HaloEntropy {
 
@@ -43,66 +40,80 @@ class HaloEntropy {
   // (!) make it self-contained
 
 private:
-  // hacc data loader
-  DataLoaderInterface *ioMgr;
-  // a map to store shannon entropy for each hacc attribute
-  // fixme: not sure about those attributes, to be updated
-  std::unordered_map<std::string, double> entropy;
+  std::string json_path = "";                                        // JSON parameter file path
+  DataLoaderInterface *ioMgr = nullptr;                              // HACC data loader
   
+  // per halo attribute data
+  std::vector<std::string> attributes;                               // [x,y,x,vx,vy,vx]
+  std::unordered_map<std::string, std::string> type;                 // datatype of each attribute [float|double]
+  std::unordered_map<std::string, int> size;                         // size of each attribute dataset (in bytes)
+  std::unordered_map<std::string, int> nb_elems;                     // number of dataset elements for each attribute
+  std::unordered_map<std::string, std::vector<int>> frequencies;     // dataset elems frequency distribution
+  std::unordered_map<std::string, double> entropy;                   // computed shannon entropy for each attribute
+ 
   // MPI
-  int my_rank;
-  int nb_ranks;
-  int thread_support;
+  int my_rank = 0;
+  int nb_ranks = 0;
 
-public:  
-  HaloEntropy();
+public: 
+  HaloEntropy() = delete; 
+  HaloEntropy(HaloEntropy const&) = delete; 
+  HaloEntropy(HaloEntropy&&) noexcept = delete; 
+  HaloEntropy(std::string in_path, int in_rank, int in_nb_ranks);
   ~HaloEntropy();
  
-  bool init(int argc, char* argv[]); 
-  bool loadData(std::string jsonParamFile);
+  bool run();  // ok
   bool showAttributeData() const;
-  bool computeShannonEntropyDistribution(std::string attribName);
-  bool generateGnuplot(std::string scriptFile) const;
+  bool computeFrequencies(std::string attrib); 
+  bool computeShannonEntropy(std::string attrib);
+  bool generateHistogram(std::string path) const;
 
 };
+
 /* -------------------------------------------------------------------------- */
-inline HaloEntropy::HaloEntropy() {
-  my_rank = 0;
-  nb_ranks = 0;
+inline HaloEntropy::HaloEntropy(std::string in_path, int in_rank, int in_nb_ranks) 
+  : json_path(in_path),
+    my_rank(in_rank),
+    nb_ranks(in_nb_ranks)
+{
   ioMgr = new HACCDataLoader();
   entropy.clear();
 }
+
 /* -------------------------------------------------------------------------- */
 inline HaloEntropy::~HaloEntropy() {
   if (ioMgr != nullptr)
     delete ioMgr;
 }
-/* -------------------------------------------------------------------------- */
-inline HaloEntropy::init(int argc, char* argv[]) {
 
+/* -------------------------------------------------------------------------- */
+inline bool HaloEntropy::computeShannonEntropy(std::string attrib) {
+
+
+  // TODO
 }
 /* -------------------------------------------------------------------------- */
-inline bool HaloEntropy::loadData(std::string path) {
+inline bool HaloEntropy::run() {
   // basic checks 
   assert(nb_ranks > 0); 
   assert(ioMgr != nullptr);
 
   nlohmann::json json;
-  std::ifstream file(path);
+  std::ifstream file(json_path);
   std::stringstream debuglog;
   
   std::string filetype;
+  std::string log_file;
   std::string input_hacc;
   std::string output_log;
   std::vector<std::string> attributes;
-
 
   try {
     // pass file to json parser
     file >> json;
   } catch(nlohmann::json::parse_error& e) {
     if (my_rank == 0) 
-      std::cerr << "Invalid JSON file " << path << "\n" << e.what() << std::endl;
+      std::cerr << "Invalid JSON file " << json_path << "\n" << e.what() << std::endl;
     return false;
   }
 
@@ -121,7 +132,7 @@ inline bool HaloEntropy::loadData(std::string path) {
   writeLog(output_log, debuglog.str());
 
   for (auto&& scalar : json["input"]["scalars"]) {
-    attributes.emplace_back(scalar);
+    attributes.push_back(scalar);
   }
 
   // set the IO manager
@@ -137,20 +148,24 @@ inline bool HaloEntropy::loadData(std::string path) {
   MPI_Barrier(MPI_COMM_WORLD);
 
   // loop over all scalars and load each of them
-  for (auto&& scalar: scalars) {
-    debuglog << "\nLoading " << scalar << std::endl;
+  for (auto&& scalar: attributes) {
+    debuglog << "\nLoading and running " << scalar << std::endl;
     if (ioMgr->loadData(scalar)) {
       // save infos for debug
       debuglog << ioMgr->getDataInfo();
       debuglog << ioMgr->getLog();
+
+      // TODO: compute Shannon entropy distribution for this attribute
+
     } else {
       if (my_rank == 0)
         std::cerr << "Error while loading " << scalar << ", exiting now" << std::endl;
       return false;
     }
     appendLog(output_log, debuglog.str());
+    // wait for other ranks to complete
+    MPI_Barrier(MPI_COMM_WORLD);
   }
-  MPI_Barrier(MPI_COMM_WORLD);
 
   // print some metadata on loaded HACC file
 
@@ -159,85 +174,7 @@ inline bool HaloEntropy::loadData(std::string path) {
   return true;
 }
 
-};
-
-
 /* -------------------------------------------------------------------------- */
-void printUsage() {
-  if (my_rank == 0) {
-    std::fprintf(stderr, "Usage: mpirun -n <int> analyzer [options]\n");
-    std::fprintf(stderr, "options:\n");
-    std::fprintf(stderr, "-h, --help   show this help message and exit\n");
-    std::fprintf(stderr, "-i, --input  input json parameter file\n");
-    std::fflush(stderr);
-  }
-}
 
-/* -------------------------------------------------------------------------- */
-bool isValidInput(int argc, char* argv[], int my_rank, int nb_ranks) {
-
-  if(not isPowerOfTwo(nb_ranks)) {
-    std::cerr << "Please run with power of 2 ranks" << std::endl;
-    return false;
-  }
-  else if (argc < 2) {
-    printUsage();
-    return false;
-  }
-  
-  // check input json file
-  std::ifstream file(argv[1]);
-  nlohmann::json json;
-
-  if (file.good()) {
-    try {
-      // pass file to json parser
-      file >> json;
-      file.close();
-    } catch(nlohmann::json::parse_error& e) {
-      if (my_rank == 0) 
-        std::cerr << "Invalid JSON file " << path << "\n" << e.what() << std::endl;
-      file.close();
-      return false;
-    }
-  } else {
-    if (my_rank == 0)
-      std::cerr << "Error while opening parameter file" << std::endl;
-    file.close();
-    return false;
-  }
-
-  // everything is fine at this point
-  return true;
-}
-
-
-/* -------------------------------------------------------------------------- */
-// todo: 
-// - split into different files
-// - create a specific target in 'CMakeLists.txt' and manage dependencies
-// - move into the right location
-int main(int argc, char* argv[]){
-  
-  // init MPI
-  MPI_Init_thread(NULL, NULL, MPI_THREAD_MULTIPLE, &thread_support);
-  MPI_Comm_size(MPI_COMM_WORLD, &nb_ranks);
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-  
-  // basic input checks
-  if (not isValidInput(argc, argv, my_rank, nb_ranks)) {
-    MPI_Finalize();
-    return EXIT_FAILURE;
-  }
-
-  // everything is OK at this point
-  loadData(json_input);
-  
-  // put other calls here
-  
-  MPI_Finalize();
-  return EXIT_SUCCESS;
-}
-/* -------------------------------------------------------------------------- */
 
 #endif
