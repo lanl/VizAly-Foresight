@@ -78,6 +78,20 @@ class PATCinema(cinema.CinemaWorkflow):
 
                     # plot
                     plt.plot(data[:, 0], data[:, 1] / orig[:, 1])
+
+                    # format plot
+                    if col_name in self.json_data["cinema-plots"]["analysis"].keys():
+                        sec = self.json_data["cinema-plots"]["analysis"][col_name]
+                        if "xscale" in sec.keys():
+                            plt.xscale(self.json_data["cinema-plots"]["analysis"][col_name]["xscale"])
+                        if "xlim" in sec.keys():
+                            plt.xlim(self.json_data["cinema-plots"]["analysis"][col_name]["xlim"])
+                        if "yscale" in sec.keys():
+                            plt.yscale(self.json_data["cinema-plots"]["analysis"][col_name]["yscale"])
+                        if "ylim" in sec.keys():
+                            plt.ylim(self.json_data["cinema-plots"]["analysis"][col_name]["ylim"])
+
+                    # write plot
                     output_file = col_name + "_" + prefix + ".png"
                     plt.savefig(output_file)
                     plt.close()
