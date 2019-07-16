@@ -82,10 +82,14 @@ class PATCinema(cinema.CinemaWorkflow):
                     # format plot
                     if col_name in self.json_data["cinema-plots"]["analysis"].keys():
                         sec = self.json_data["cinema-plots"]["analysis"][col_name]
+                        if "xlabel" in sec.keys():
+                            plt.xlabel(self.json_data["cinema-plots"]["analysis"][col_name]["xlabel"])
                         if "xscale" in sec.keys():
                             plt.xscale(self.json_data["cinema-plots"]["analysis"][col_name]["xscale"])
                         if "xlim" in sec.keys():
                             plt.xlim(self.json_data["cinema-plots"]["analysis"][col_name]["xlim"])
+                        if "ylabel" in sec.keys():
+                            plt.ylabel(self.json_data["cinema-plots"]["analysis"][col_name]["ylabel"])
                         if "yscale" in sec.keys():
                             plt.yscale(self.json_data["cinema-plots"]["analysis"][col_name]["yscale"])
                         if "ylim" in sec.keys():
