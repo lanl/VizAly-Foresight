@@ -46,7 +46,7 @@ class PATCinema(cinema.CinemaWorkflow):
 
             # loop over rows
             for row in reader:
-                prefix = row[1].strip()
+                prefix = row[1][2:-1]
 
                 # loop over image types
                 for col_name in image_columns:
@@ -65,10 +65,18 @@ class PATCinema(cinema.CinemaWorkflow):
                         continue
 
                     # get original data
-                    orig = numpy.loadtxt(data_file.replace(prefix, "orig"))
+                    try:
+                        orig = numpy.loadtxt(data_file.replace(prefix, "orig"), delimiter=",")
+                    except ValueError:
+                        orig = numpy.loadtxt(data_file.replace(prefix, "orig"))
+
+                    # get data
+                    try:
+                        data = numpy.loadtxt(data_file, delimiter=",")
+                    except ValueError:
+                        data = numpy.loadtxt(data_file)
 
                     # plot
-                    data = numpy.loadtxt(data_file)
                     plt.plot(data[:, 0], data[:, 1] / orig[:, 1])
                     output_file = col_name + "_" + prefix + ".png"
                     plt.savefig(output_file)
