@@ -197,7 +197,7 @@
                 "ylim" : [0.98, 1.01],
                 "xlabel" : "k",
                 "ylabel" : "Ratio [Compressed/Uncompressed]"
-            },
+            }
         },
         "configuration" :
         {
