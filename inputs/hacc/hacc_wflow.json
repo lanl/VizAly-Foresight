@@ -1,7 +1,7 @@
 {
-    "project-home" : "/projects/exasky/cmbiwer-projects/foresight/Analysis/hacc_wflow",
-    "foresight-home" : "",
-    "wflow-path" : "",
+    "project-home" : "/projects/exasky/VizAly-Foresight/",
+    "foresight-home" : "/projects/exasky/VizAly-Foresight/",
+    "wflow-path" : "scaling_test_wflow_1",
 
     "input" : 
     {
