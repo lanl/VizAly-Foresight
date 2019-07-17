@@ -4,3 +4,5 @@ Scripts to load modules on supercomputers:
 3. Cori @ NERSC: VizAly-CBench.bash.cori
 
 It also has scripts to run CBench on supercomputers, e.g  runJob_cori_NYX_test.sh is an example batch script for darwin
+
+A working [SPACK](https://github.com/spack/spack) script is included, to automatically compile on local environments, supercomputers, e.g.
