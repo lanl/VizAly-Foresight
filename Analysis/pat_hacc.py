@@ -176,11 +176,15 @@ wflow_data = futils.read_json(opts.input_file)
 wflow_dir = wflow_data["project-home"]
 wflow = HACCWorkflow("wflow", wflow_data, workflow_dir=wflow_dir)
 
-# make directories
-os.makedirs(wflow_dir + "/cbench")
-os.makedirs(wflow_dir + "/halo")
-os.makedirs(wflow_dir + "/spectrum")
-os.makedirs(wflow_dir + "/cinema")
+# make directorie
+if not os.path.exists(wflow_dir + "/cbench"):
+    os.makedirs(wflow_dir + "/cbench")
+if not os.path.exists(wflow_dir + "/halo"):
+    os.makedirs(wflow_dir + "/halo")
+if not os.path.exists(wflow_dir + "/spectrum"):
+    os.makedirs(wflow_dir + "/spectrum")
+if not os.path.exists(wflow_dir + "/cinema"):
+    os.makedirs(wflow_dir + "/cinema")
 
 # add jobs to workflow
 wflow.add_cbench_job()
