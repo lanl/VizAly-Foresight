@@ -30,8 +30,8 @@ class VizalyForesight(Package):
     url      = "https://github.com/lanl/VizAly-Foresight/archive/master.tar.gz"
     git      = "https://github.com/lanl/VizAly-Foresight.git"
 
-    #version('ldav', branch='master')
-    version('latest',branch='cmake_install')
+    version('latest', branch='master')
+    #version('latest',branch='cmake_install')
 
     # CBench Depends
     depends_on('mpi')
@@ -58,7 +58,7 @@ class VizalyForesight(Package):
         #working_dir('build-linux', create=True) #this does nothing
 
         args = []
-        args.append('-DWORKING_DIRECTORY=CBench')
+        #args.append('-DWORKING_DIRECTORY=CBench') #this does nothing
         #args.append('-DCMAKE_BUILD_TYPE=DEBUG')
 
         if 'c-blosc' in spec:
