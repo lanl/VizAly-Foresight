@@ -144,6 +144,9 @@ endif()
 add_executable(CBench main.cpp)
 target_link_libraries(CBench ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO)
 
+# Install instructions
+install(TARGETS CBench DESTINATION .)
+install(TARGETS GenericIO DESTINATION .)
 
 # Prevent in source builds since they are evil
 if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
