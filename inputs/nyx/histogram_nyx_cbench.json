@@ -5,11 +5,11 @@
 	"input": 
 	{
 		"filetype": "NYX",
-		"filename-42-512": "/datastore/NYX/highz/512/NVB_C009_l20n512_S12345T632_z42.hdf5",
-		"filename-42-1024": "/datastore/NYX/highz/1024/NVB_C009_l20n1024_S12345T632_z42.hdf5",
-		"filename": "/datastore/NYX/highz/2048/NVB_C009_l40n2048_S12345T692_z42.hdf5",
-		"filename-54-512": "/datastore/NYX/highz/512/NVB_C009_l10n512_S12345T692_z54.hdf",
-		"filename-54-1024": "/datastore/NYX/highz/1024/NVB_C009_l20n1024_S12345T632_z54.hdf5",
+		"filename-42-512": "/projects/exasky/data/NYX/highz/512/NVB_C009_l20n512_S12345T632_z42.hdf5",
+		"filename-42-1024": "/projects/exasky/data/NYX/highz/1024/NVB_C009_l20n1024_S12345T632_z42.hdf5",
+		"filename": "/projects/exasky/data/NYX/highz/2048/NVB_C009_l40n2048_S12345T692_z42.hdf5",
+		"filename-54-512": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z54.hdf",
+		"filename-54-1024": "/projects/exasky/data/NYX/highz/1024/NVB_C009_l20n1024_S12345T632_z54.hdf5",
 
 		"group" : "native_fields",
 		"scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ],

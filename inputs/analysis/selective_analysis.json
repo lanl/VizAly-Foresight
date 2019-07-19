@@ -1,0 +1,81 @@
+{
+	"project-home": "/projects/exasky/VizAly-Foresight/",
+	"wflow-path": "test_512",
+	"foresight-home": "/projects/exasky/VizAly-Foresight/",
+
+
+	"inputs": {
+		"filetype": "NYX",
+		"filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l20n1024_S12345T632_z42.hdf5"
+	},
+
+
+	"pat": {
+		"types": ["sim-stats", "lya-x", "lya-y", "lya-z"],
+
+		"metrics-header": "Compressor_field__params,analysis,absolute_error,relative_error,mse,psnr,minmax,Compression Throughput(MB/s),DeCompression Throughput(MB/s),Compression Ratio",
+
+		"analysis": 
+		[
+			{
+				"files": 
+				[
+					{
+						"name": "orig",
+						"pwr-spectrum": "/projects/exasky/VizAly-Foresight/epyc-sz-rel-wflow-1/sim_stats/origrhob_ps3d.txt"
+					},
+
+					{
+						"name": "sz_pw_rel0.01_",
+						"csv-file": "/projects/exasky/VizAly-Foresight/epyc-sz-rel-wflow-1/cbench/metrics_.csv",
+						"compressor_field_param": ["SZ_baryon_density__pw_rel0.01"],
+						"pwr-spectrum": "/projects/exasky/VizAly-Foresight/epyc-sz-rel-wflow-1/sim_stats/SZ_pwrel_0.01_rhob_ps3d.txt"
+					},
+
+					{
+						"name": "zfp_rel_14_",
+						"csv-file": "/projects/exasky/VizAly-Foresight/epyc-zfp-rel-wflow-1/cbench/metrics_.csv",
+						"compressor_field_param": ["zfp_baryon_density__rel14"],
+						"pwr-spectrum": "/projects/exasky/VizAly-Foresight/epyc-zfp-rel-wflow-1/sim_stats/zfp_14_rhob_ps3d.txt"
+					}
+				],
+
+				"title": "sim_stats_rhob"
+			},
+
+			{
+				"files": 
+				[
+					{
+						"name": "orig",
+						"pwr-spectrum": "/projects/exasky/VizAly-Foresight/epyc-sz-rel-wflow-1/sim_stats/origrhodm_ps3d.txt"
+					},
+
+					{
+						"name": "SZ_dark_matter_density__pw_rel0.02_",
+						"csv-file": "/projects/exasky/VizAly-Foresight/epyc-sz-rel-wflow-1/cbench/metrics_.csv",
+						"compressor_field_param": ["SZ_dark_matter_density__pw_rel0.02"],
+						"pwr-spectrum": "/projects/exasky/VizAly-Foresight/epyc-sz-rel-wflow-1/sim_stats/SZ_pwrel_0.02_rhodm_ps3d.txt"
+					},
+
+					{
+						"name": "zfp_rel_14_",
+						"csv-file": "/projects/exasky/VizAly-Foresight/epyc-zfp-rel-wflow-1/cbench/metrics_.csv",
+						"compressor_field_param": ["zfp_dark_matter_density__rel14"],
+						"pwr-spectrum": "/projects/exasky/VizAly-Foresight/epyc-zfp-rel-wflow-1/sim_stats/zfp_14_rhodm_ps3d.txt"
+					}
+				],
+
+				"title": "sim_stats_rhodm"
+			}
+		]
+	},
+
+
+	"cinema-plots": {
+		"cinema-db-name": "cinemaDB",
+		"plotting": {
+			"x-range": [0, 10]
+		}
+	}
+}

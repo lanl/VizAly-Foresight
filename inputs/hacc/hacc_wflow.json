@@ -161,6 +161,43 @@
     "cinema-plots" :
     {
         "path" : "python $foresight-home$/Analysis/pat_cinema.py",
+        "analysis" : {
+            "FILE_Halo_Distribution_0" :
+            {
+                "xscale" : "log",
+                "ylim" : [0.95, 1.05],
+                "xlabel" : "Halo Mass",
+                "ylabel" : "Ratio [Compressed/Uncompressed]"
+            },
+            "FILE_Spectrum" :
+            {
+                "xlim" : [0, 10],
+                "ylim" : [0.98, 1.01],
+                "xlabel" : "k",
+                "ylabel" : "Ratio [Compressed/Uncompressed]"
+            },
+            "FILE_Spectrum.rsd.0" :
+            {
+                "xlim" : [0, 10],
+                "ylim" : [0.98, 1.01],
+                "xlabel" : "k",
+                "ylabel" : "Ratio [Compressed/Uncompressed]"
+            },
+            "FILE_Spectrum.rsd.1" :
+            {
+                "xlim" : [0, 10],
+                "ylim" : [0.98, 1.01],
+                "xlabel" : "k",
+                "ylabel" : "Ratio [Compressed/Uncompressed]"
+            },
+            "FILE_Spectrum.rsd.2" :
+            {
+                "xlim" : [0, 10],
+                "ylim" : [0.98, 1.01],
+                "xlabel" : "k",
+                "ylabel" : "Ratio [Compressed/Uncompressed]"
+            }
+        },
         "configuration" :
         {
             "nodes" : 1

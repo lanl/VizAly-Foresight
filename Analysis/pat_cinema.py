@@ -46,7 +46,7 @@ class PATCinema(cinema.CinemaWorkflow):
 
             # loop over rows
             for row in reader:
-                prefix = row[1].strip()
+                prefix = row[1][2:-1]
 
                 # loop over image types
                 for col_name in image_columns:
@@ -65,11 +65,37 @@ class PATCinema(cinema.CinemaWorkflow):
                         continue
 
                     # get original data
-                    orig = numpy.loadtxt(data_file.replace(prefix, "orig"))
+                    try:
+                        orig = numpy.loadtxt(data_file.replace(prefix, "orig"), delimiter=",")
+                    except ValueError:
+                        orig = numpy.loadtxt(data_file.replace(prefix, "orig"))
+
+                    # get data
+                    try:
+                        data = numpy.loadtxt(data_file, delimiter=",")
+                    except ValueError:
+                        data = numpy.loadtxt(data_file)
 
                     # plot
-                    data = numpy.loadtxt(data_file)
                     plt.plot(data[:, 0], data[:, 1] / orig[:, 1])
+
+                    # format plot
+                    if col_name in self.json_data["cinema-plots"]["analysis"].keys():
+                        sec = self.json_data["cinema-plots"]["analysis"][col_name]
+                        if "xlabel" in sec.keys():
+                            plt.xlabel(self.json_data["cinema-plots"]["analysis"][col_name]["xlabel"])
+                        if "xscale" in sec.keys():
+                            plt.xscale(self.json_data["cinema-plots"]["analysis"][col_name]["xscale"])
+                        if "xlim" in sec.keys():
+                            plt.xlim(self.json_data["cinema-plots"]["analysis"][col_name]["xlim"])
+                        if "ylabel" in sec.keys():
+                            plt.ylabel(self.json_data["cinema-plots"]["analysis"][col_name]["ylabel"])
+                        if "yscale" in sec.keys():
+                            plt.yscale(self.json_data["cinema-plots"]["analysis"][col_name]["yscale"])
+                        if "ylim" in sec.keys():
+                            plt.ylim(self.json_data["cinema-plots"]["analysis"][col_name]["ylim"])
+
+                    # write plot
                     output_file = col_name + "_" + prefix + ".png"
                     plt.savefig(output_file)
                     plt.close()
