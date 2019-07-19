@@ -92,7 +92,6 @@
 
     "pat" : {
         "evn_path" : "/projects/exasky/HACC_GPU.darwin_setup",
-        "analysis-folder" : "HACC_Test_",
         "analysis-tool" :
         {
             "HACC-home" : "/projects/exasky/HACC_GPU",
