@@ -117,7 +117,10 @@
 			"run-path" : "build/",
 
 			"output-decompressed": true,
-			"output-decompressed-location" : "decompressed_files",
+      "output-decompressed-location": "decompressed_files",
+
+      "output-compressed": true,
+			"output-compressed-location" : "compressed_files",
 			
 			"log-file" : "runlog_nyx_test_",
 			"metrics-file" : "metrics_nyx_test_"

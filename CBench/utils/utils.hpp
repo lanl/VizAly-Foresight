@@ -10,6 +10,7 @@ Authors:
 ================================================================================*/
 #pragma once
 
+#include <dataLoaderInterface.hpp>
 #include <stdio.h> 
 #include <stdbool.h> 
 #include <string>
@@ -52,7 +53,7 @@ inline int createFolder(std::string folderName)
 }
 
 
-inline bool fileExisits(char *filename) 
+inline bool fileExists(char *filename) 
 {
     std::ifstream ifs(filename);
     return ifs.good();
@@ -142,4 +143,58 @@ inline int deAllocateMem(std::string dataType, void *& data)
     data = NULL;
 
     return 1;
+}
+
+inline int writeCompressedStream(void* input, size_t cbytes, std::string outfile, std::string compressorName, std::string dataType, size_t dataTypeSize, size_t* n, std::stringstream &log)
+{
+	// Header:
+	// compressor-name,ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim() (5 dims)
+	// Data:
+	// raw-bytes
+
+	return 1;
+}
+
+inline int writeCompressedStream(void* input, size_t cbytes, std::string outfile, std::string compressorName, DataLoaderInterface *ioMgr, std::stringstream&log)
+{
+	// Header:
+	// compressor-name, cbytes, ioMgr->getTypeSize(), ioMgr->getSizePerDim() (5 dims)
+	// [c][c][c],[size_t],[size_t],([size_t][size_t][size_t][size_t][size_t]),[bytes]
+	// Data:
+	// raw-bytes
+	size_t dataTypeSize = ioMgr->getTypeSize();
+	size_t* n = ioMgr->getSizePerDim();
+
+	std::ofstream out;
+
+	log << "Creating file " << outfile << std::endl;
+	out.open(outfile, std::ifstream::binary);
+
+	char* tmp_c = new char[1];
+	//tmp_c[0] = ' '; tmp_c[1] = ' '; tmp_c[2] = ' ';
+	for (size_t i = 0; i < 3; i++)
+	{
+		if (i >= compressorName.size())
+			tmp_c[0] = ' ';
+		else
+			tmp_c[0] = compressorName.c_str()[i];
+		out.write(reinterpret_cast<char*>(tmp_c), sizeof(char));
+	}
+	// Write header information
+	out.write(reinterpret_cast<char*>(&cbytes), sizeof(size_t));
+	out.write(reinterpret_cast<char*>(&dataTypeSize), sizeof(size_t));
+	out.write(reinterpret_cast<char*>(&n[0]), sizeof(size_t));
+	out.write(reinterpret_cast<char*>(&n[1]), sizeof(size_t));
+	out.write(reinterpret_cast<char*>(&n[2]), sizeof(size_t));
+	out.write(reinterpret_cast<char*>(&n[3]), sizeof(size_t));
+	out.write(reinterpret_cast<char*>(&n[4]), sizeof(size_t));
+	
+	log << "Wrote: " << 3 + 8 + 8 + (8 * 5) << " byte header";
+	// Write Data
+	out.write(reinterpret_cast<char*>(input), cbytes);
+	out.close();
+
+	log << " and " << cbytes << " bytes of data" << std::endl;
+
+	return 1;
 }
