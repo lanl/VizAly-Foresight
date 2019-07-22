@@ -59,7 +59,7 @@ int validateInput(int argc, char *argv[], int myRank, int numRanks)
 	}
 
 	// Check if input file provided exists
-	if (!fileExisits(argv[1]))
+	if (!fileExists(argv[1]))
 	{
 		if (myRank == 0)
 			std::cerr << "Could not find input JSON file " << argv[1] << "." << std::endl;
@@ -152,6 +152,8 @@ int main(int argc, char *argv[])
 	for (int i = 0; i < jsonInput["cbench"]["metrics"].size(); i++)
 		metrics.push_back(jsonInput["cbench"]["metrics"][i]["name"]);
 
+	//
+	// Decompressed data properties
 	bool writeData = false;
 	std::string outputFile = "";
 	if (jsonInput["cbench"]["output"].find("output-decompressed") != jsonInput["cbench"]["output"].end())
@@ -172,6 +174,26 @@ int main(int argc, char *argv[])
 			createFolder(outputPath);
 	}
 
+	//
+	// Compressed data properties
+	bool writeCompData = false;
+	std::string outputCFile = "";
+	if (jsonInput["cbench"]["output"].find("output-compressed") != jsonInput["cbench"]["output"].end())
+	{
+		writeCompData = jsonInput["cbench"]["output"]["output-compressed"];
+		if (writeData)
+			outputCFile = extractFileName(inputFile);
+
+		// Initial a random number in case output name is not provided
+		srand(time(NULL));
+	}
+	std::string outputCPath = ".";
+	if (jsonInput["cbench"]["output"].find("output-compressed-location") != jsonInput["cbench"]["output"].end())
+	{
+		outputCPath = jsonInput["cbench"]["output"]["output-compressed-location"];
+		if (myRank == 0)
+			createFolder(outputCPath);
+	}
 
 	//
 	// For humans; all seems valid, let's start ...
@@ -289,7 +311,7 @@ int main(int argc, char *argv[])
 		// Cycle through scalars
 		for (int i = 0; i < scalars.size(); i++)
 		{
-			Timer compressClock, decompressClock;
+			Timer compressClock, decompressClock, compressWriteClock;
 			Memory memLoad;
 
 			memLoad.start();
@@ -346,6 +368,32 @@ int main(int argc, char *argv[])
 			compressorMgr->compress(ioMgr->data, cdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim());
 			compressClock.stop();
 
+			//
+			// Write/read compress stream
+			if (writeCompData)
+			{
+				std::string compressedOutputName;
+				if (jsonInput["compressors"][c].find("output-prefix") != jsonInput["compressors"][c].end())
+					compressedOutputName = jsonInput["compressors"][c]["output-prefix"];
+				else
+					compressedOutputName = "__" + compressorMgr->getCompressorName() + "_" + std::to_string(rand());
+				if (outputPath != ".")
+					compressedOutputName = outputCPath + "/" + compressedOutputName + "__" + outputCFile;
+				else
+					compressedOutputName = compressedOutputName + "__" + outputCFile;
+				compressedOutputName = compressedOutputName + ".ccd";
+				std::stringstream clog;
+
+				compressWriteClock.start();
+				writeCompressedStream(cdata, compressorMgr->getCompressedSize(), compressedOutputName, compressorMgr->getCompressorName(), ioMgr, clog);
+				compressWriteClock.stop();
+				//writeCompressedStream(cdata, "outfile.bin", ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim(), clog);
+				//debuglog << "Debug Statistics";
+
+				debuglog << compressorMgr->getCompressorName() << " ~ CompressWriteTime: " << compressWriteClock.getDuration() << " s\n";
+
+				appendLog(outputLogFile, clog);
+			}
 
 			//
 			// decompress
@@ -433,6 +481,7 @@ int main(int argc, char *argv[])
 			// Metrics Computation
 			double compress_time = compressClock.getDuration();
 			double decompress_time = decompressClock.getDuration();
+			double compress_write_time = compressWriteClock.getDuration();
 
 			double compress_throughput =
 				((double) (ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0 * 1024.0)) / compress_time;
@@ -475,6 +524,8 @@ int main(int argc, char *argv[])
 			//
 			// log stuff
 			debuglog << "\nCompress time: " << compress_time << std::endl;
+			if (writeCompData)
+				debuglog << "Compress write time: " << compress_write_time << std::endl;
 			debuglog << "Decompress time: " << decompress_time << std::endl;
 			debuglog << "\nMemory leaked: " << memLoad.getMemorySizeInMB() << " MB" << std::endl;
 			debuglog << "........................................." << std::endl << std::endl;
@@ -486,6 +537,8 @@ int main(int argc, char *argv[])
 				metricsInfo << "Max Compression Throughput: " << max_compress_throughput << " Mbytes/s" << std::endl;
 				metricsInfo << "Max DeCompression Throughput: " << max_decompress_throughput << " Mbytes/s" << std::endl;
 				metricsInfo << "Max Compress Time: " << max_compress_time << " s" << std::endl;
+				if (writeCompData)
+					metricsInfo << "Max Compress Write Time: " << compress_write_time << " s" << std::endl;
 
 				metricsInfo << "Min Compression Throughput: " << min_compress_throughput << " Mbytes/s" << std::endl;
 				metricsInfo << "Min DeCompression Throughput: " << min_decompress_throughput << " Mbytes/s" << std::endl;
