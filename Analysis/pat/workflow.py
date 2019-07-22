@@ -160,7 +160,7 @@ class Workflow(object):
                 if job.environment != None:
                     fp.write("source {}\n".format(job.environment))
                 cmd = job.executable + " " + " ".join(map(str, job.arguments)) + "\n"
-                cmd.replace("$foresight-home$", foresight_home)
+                cmd = cmd.replace("$foresight-home$", foresight_home)
                 fp.write(cmd)
 
             # append job to controller file
