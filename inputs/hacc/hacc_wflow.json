@@ -94,7 +94,6 @@
         "evn_path" : "/projects/exasky/HACC_GPU.darwin_setup",
         "analysis-tool" :
         {
-            "HACC-home" : "/projects/exasky/HACC_GPU",
             "analytics" :
             {
                 "halo" :
