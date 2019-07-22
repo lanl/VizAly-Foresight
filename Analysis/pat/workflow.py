@@ -75,9 +75,6 @@ class Workflow(object):
 
         # Find executable command
         exec_command = self.json_data["cbench"]["path"]
-        foresight_home = self.json_data["foresight-home"]
-        exec_command = exec_command.replace("$foresight-home$", foresight_home)
-
 
         # add a single CBench job to workflow for entire sweep
         cbench_job = j.Job(name="cbench",
@@ -108,6 +105,9 @@ class Workflow(object):
     def write_submit(self):
         """ Writes Slurm workflow files.
         """
+
+        # get foresight dir
+        foresight_home = self.json_data["foresight-home"]
 
         # create workflow output dir
         # change to workflow output dir
@@ -159,8 +159,10 @@ class Workflow(object):
 
                 if job.environment != None:
                     fp.write("source {}\n".format(job.environment))
-                fp.write(job.executable + " " + " ".join(map(str, job.arguments)) + "\n")
-    
+                cmd = job.executable + " " + " ".join(map(str, job.arguments)) + "\n"
+                cmd.replace("$foresight-home$", foresight_home)
+                fp.write(cmd)
+
             # append job to controller file
             slurm_out_path = job.execute_dir + "/" + job.name + ".slurm.out"
             with open(self.submit_path, "a") as fp:
