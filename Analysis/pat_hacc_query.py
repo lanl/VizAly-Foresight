@@ -72,3 +72,4 @@ results = numpy.column_stack([bin_edges, hist])
 header = delimiter.join(map(str, [opts.xlabel, opts.ylabel]))
 numpy.savetxt(opts.output_file, results, header=header, delimiter=delimiter)
 
+print("Done!")
