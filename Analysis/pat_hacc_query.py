@@ -34,7 +34,7 @@ def load_sqlite_data(path, query, sqlite_file):
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--input-file", required=True)
 parser.add_argument("--output-file", required=True)
-parser.add_argument("--sqlite-file", default="/home/cmbiwer/src/VizAly-Vis_IO/genericio/frontend/GenericIOSQLite.so")
+parser.add_argument("--sqlite-file", default="/projects/exasky/visio/genericio/frontend/GenericIOSQLite.so")
 parser.add_argument("--query", default="select fof_halo_mass from __TABLE__ ORDER BY fof_halo_mass")
 parser.add_argument("--xlabel", default="Halo Mass")
 parser.add_argument("--ylabel", default="Counts")
