@@ -64,7 +64,7 @@ Foresight takes as input a json file (examples of input json files are in the **
 ### Currently Supported compressors:
 * [Lossless BLOSC](http://blosc.org/) - version 1.10.2
 * [Lossy BigCrunch](https://github.com/lanl/VizAly-BigCrunch) - version 1.1
-* [Lossy LossyWave](https://github.com/lanl/VizAly-LossyWave) - version 0.1
+* [Lossy SNWPAC](https://github.com/lanl/VizAly-SNWPAC) - version 0.1
 * [SZ](https://collab.cels.anl.gov/display/ESR/SZ) - version 2.0.2.2
 * [zfp](https://computation.llnl.gov/projects/floating-point-compression) - version 0.5.4
 * [fpzip](https://computation.llnl.gov/projects/floating-point-compression) - version 1.2.0
@@ -75,6 +75,7 @@ Foresight takes as input a json file (examples of input json files are in the **
 * Relative Error
 * Mean Square Error (MSE)
 * Peak Signal-to-Noise Ratio (PSNR)
+* Data Ranges (Data distribution)
 * Memory Usage
 * Compute times
 
