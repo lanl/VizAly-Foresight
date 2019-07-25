@@ -40,6 +40,10 @@ class CompressorFactory
 		if (compressorName == "LossyWave")
 		  return new LossyWaveCompressor();
 	  #endif
+	  #ifdef CBENCH_HAS_SNWPAC
+		if (compressorName == "snwpac")
+		  return new SnwPacCompressor();
+	  #endif
 	  #ifdef CBENCH_HAS_MGARD
 		if (compressorName == "MGARD")
 		  return new MGARDCompressor();
