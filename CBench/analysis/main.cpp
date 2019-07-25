@@ -45,6 +45,15 @@ bool isValidInput(int argc, char* argv[], int my_rank, int nb_ranks) {
   try {
     // pass file to json parser
     file >> json;
+
+    // retrieve input file
+    if (json["input"]["filetype"] != "HACC") {
+      if (my_rank == 0)
+        std::cerr << "Only HACC data is supported" << std::endl;
+      file.close();
+      return false;
+    }
+
     file.close();
     return true;
   } catch(nlohmann::json::parse_error& e) {

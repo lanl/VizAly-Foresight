@@ -11,20 +11,14 @@
       "vx",
       "vy",
       "vz"
-    ]
+    ],
+    "num_bins": 1024
   },
-  "cbench":{
+  "analysis":{
     "path":"",
     "output":{
-      "run-path":"build/",
-      "output-decompressed":true,
-      "output-decompressed-location":"decompressed_files",
-      "log-file":"log_hacc_analysis"
-    },
-    "configuration":{
-      "partition":"scaling",
-      "nodes":8,
-      "ntasks-per-node":8
+      "logs":"log_hacc_analysis",
+      "gnuplot":"distrib"
     }
   }
 }

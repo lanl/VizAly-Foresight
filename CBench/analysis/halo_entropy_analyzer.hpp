@@ -53,7 +53,7 @@ private:
   std::stringstream debug_log;
 
   // bins partition
-  size_t const num_bins = 1024;
+  size_t num_bins = 1024;
   // per halo attribute data
   std::vector<std::string> attributes;                               // [x,y,x,vx,vy,vx]
   std::unordered_map<std::string, std::vector<double>> frequency;
@@ -179,15 +179,17 @@ inline void HaloEntropy::exportResults(std::string root_path) {
   if (my_rank != 0)
     return;
 
+  std::string const num_bins_str = std::to_string(num_bins);
+
   // dump data first
   for (auto&& scalar : attributes) {
-    std::string path = root_path + "/distrib_" + scalar + ".dat";
+    std::string path = root_path + "_" + scalar + "_" + num_bins_str +".dat";
     std::ofstream file(path, std::ios::out|std::ios::trunc);
     assert(file.is_open());
     assert(file.good());
 
     file << "# scalar: " << scalar << std::endl;
-    file << "# num_bins: " << num_bins << std::endl;
+    file << "# num_bins: " << num_bins_str << std::endl;
     for (auto&& value : frequency[scalar]) {
       file << value << std::endl;
     }
@@ -196,8 +198,11 @@ inline void HaloEntropy::exportResults(std::string root_path) {
   }
 
   // generate gnuplot script then
-  std::string path = root_path + "/distribution.gnu";
-  std::string output_eps = "distribution.eps";
+  std::string path = root_path + "_" + num_bins_str +".gnu";
+  std::string output_eps = root_path +"_"+ num_bins_str +".eps";
+
+  std::cout << path << std::endl;
+  std::cout << output_eps << std::endl;
 
   std::ofstream file(path, std::ios::out);
   assert(file.is_open());
@@ -223,6 +228,8 @@ inline void HaloEntropy::exportResults(std::string root_path) {
 
     double const entropy = computeShannonEntropy(scalar);
 
+    std::string data_file = root_path + "_" + scalar + "_" + num_bins_str +".dat";
+
     file << std::endl;
     file << "# ----------------------------------------------------" << std::endl;
     file << "set title '"<< scalar << ", entropy=" << entropy <<"'"<< std::endl;
@@ -242,14 +249,14 @@ inline void HaloEntropy::exportResults(std::string root_path) {
     file << "set boxwidth 0.5*width" << std::endl;
     file << "set style fill transparent solid 0.4" << std::endl;
     file << "set grid, xtics, ytics" << std::endl;
-    file << "plot 'distrib_"<< scalar <<".dat' using (hist($1,width)):(1.0)";
+    file << "plot '"<< data_file << "' using (hist($1,width)):(1.0)";
     file << " lc rgb '#800080' smooth freq with boxes notitle" << std::endl;
   }
   file << std::endl;
   file << "unset multiplot" << std::endl;
   file.close();
 
-  std::string cmd = "gnuplot " + extractBase(path);
+  std::string cmd = "gnuplot " + path;
   int exit_code = std::system(cmd.data());
   assert(exit_code == 0);
   std::cout << "Data distribution plots generated in " << output_eps << std::endl;
@@ -267,33 +274,17 @@ inline bool HaloEntropy::run() {
   debug_log.clear();
   debug_log.str("");
 
-  try {
-    // pass file to json parser
-    file >> json;
-  } catch(nlohmann::json::parse_error& e) {
-    if (my_rank == 0) 
-      std::cerr << "Invalid JSON file " << json_path << "\n" << e.what() << std::endl;
-    return false;
-  }
+  // parse params
+  file >> json;
 
-  // retrieve input file
-  std::string filetype = json["input"]["filetype"];
   input_hacc = json["input"]["filename"];
-  if (filetype != "HACC") {
-    if (my_rank == 0) 
-      std::cerr << "Only HACC data is supported" << std::endl;
-    return false;
-  }
-
-  // setup logs
-  std::string basename = json["cbench"]["output"]["log-file"]; 
-  std::string output = basename +"_rank_"+ std::to_string(my_rank) +".log";
 
   for (auto&& scalar : json["input"]["scalars"]) {
     attributes.push_back(scalar);
-    // todo: retrieve metadata here
   }
 
+  num_bins = json["input"]["num_bins"];
+  assert(num_bins > 0);
 
   // set the IO manager
   if (json["input"].find("datainfo") != json["input"].end()) {
@@ -329,21 +320,23 @@ inline bool HaloEntropy::run() {
         std::cerr << "Error while loading " << scalar << ", exiting now" << std::endl;
       return false;
     }
-
     MPI_Barrier(comm);
   }
 
   // output logs
+  std::string prefix = json["analysis"]["output"]["logs"];
+  std::string output = prefix + "_rank_" + std::to_string(my_rank) +".log";
+
   std::ofstream logfile(output, std::ios::out);
   logfile << debug_log.str();
   debug_log.str("");
   logfile.close();
-
   std::cout << "Logs generated in "<< output << std::endl;
   MPI_Barrier(comm);
 
   // dump data and generate plot
-  exportResults();
+  prefix = json["analysis"]["output"]["gnuplot"];
+  exportResults(prefix);
 
   // everything was fine at this point  
   return true;

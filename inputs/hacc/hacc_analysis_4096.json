@@ -1,0 +1,24 @@
+{
+  "project-home":"",
+  "foresight-home":"",
+  "input":{
+    "filetype":"HACC",
+    "filename":"/projects/exasky/data/Argonne_L360_HACC001/analysis/Halos/b0168/STEP499/m000-499.haloparticles",
+    "scalars":[
+      "x",
+      "y",
+      "z",
+      "vx",
+      "vy",
+      "vz"
+    ],
+    "num_bins": 4096
+  },
+  "analysis":{
+    "path":"",
+    "output":{
+      "logs":"log_hacc_analysis",
+      "gnuplot":"distrib"
+    }
+  }
+}
