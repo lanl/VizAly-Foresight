@@ -8,10 +8,10 @@ python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow_darwin.json --submit
 
 import argparse
 import os
-from pat import file_utilities as futils
-from pat import plot_utilities as putils
-from pat import workflow
-from pat import Job as j
+from ../pat import file_utilities as futils
+from ../pat import plot_utilities as putils
+from ../pat import workflow
+from ../pat import Job as j
 
 
 class NYXWorkflow(workflow.Workflow):

@@ -4,9 +4,9 @@
 
 import argparse
 import os
-from pat import file_utilities as futils
-from pat import Job as j
-from pat import workflow
+from ../pat import file_utilities as futils
+from ../pat import Job as j
+from ../pat import workflow
 
 class HACCWorkflow(workflow.Workflow):
 
