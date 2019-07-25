@@ -19,7 +19,7 @@ The default master branch should always point to the latest working version. How
 * CMake 3.8.1 or higher
 * GCC 6.4 or higher (C++14 minimum)
 * OpenMPI 2 or higher
-* Python 3.X (+matplotlib, +apsw, +numpy)
+* Python 3.X (+matplotlib=2.0.0, +apsw=3.9.2, +pysqlite=2.8.3)
 * SLURM (for job launching)
 
 ## Building:
