@@ -6,7 +6,7 @@ VizAly is a general framework for **A**na**ly**sis and **Vi**suali**z**ation of 
 Foresight has three components:
 * CBench: the compression benchmark arm of Foresight desighned to run at scale on supercomputers
 * PAT: Python Analysis Toolkit, which contains a bunch of untilities to speed up analysis and plotting of results
-* Cinema: The tool used to visualize the results of this project
+* [Cinema](https://cinemascience.github.io/): The tool used to visualize the results of this project 
 
 ## Current Visualization results
 * Link to the live cinema database with results : [https://lanl.github.io/VizAly-Foresight/](https://lanl.github.io/VizAly-Foresight/)
@@ -19,6 +19,8 @@ The default master branch should always point to the latest working version. How
 * CMake 3.8.1 or higher
 * GCC 6.4 or higher (C++11 minimum)
 * OpenMPI 2 or higher
+* Python 3.X (+matplotlib, +apsw, +numpy)
+* SLURM (for job launching)
 
 ## Building:
 The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @ ANL, Cori @ NERSC, and Darwin @ LANL . These build a base version of Foresight:
@@ -31,7 +33,7 @@ $ source build.sh
 ```
 
 ## Running Foresight
-This will run the full analysis workflow and generate a cinema database
+This will set up and run the full analysis workflow on SLURM and generate a cinema database
 ```
 $ python Analysis/pat_nyx.py --input-files inputs/nyx/nyx_darwin_test.json --submit
 ```
@@ -45,16 +47,7 @@ $ cat metrics_hacc_test_.csv
 
 
 # Usage
-Foresight takes as input a json file (examples of input json files are in the **_[inputs](inputs)_** folder) that specifies the input parameters. The list of parameters to specify are:
-* Filetype (HACC or NYX)
-* Filename
-* Scalars to analyze
-* Compressor parameters
-* Filename (For optional output)
-* Log-filename
-* Metric-filename
-* Compressors to use
-* Metrics
+Foresight takes as input a json file (examples of input json files are in the **_[inputs](inputs)_** folder) that specifies the input parameters. 
 
 ### Currently Supported file formats:
 * GenericIO
@@ -63,10 +56,8 @@ Foresight takes as input a json file (examples of input json files are in the **
 
 ### Currently Supported compressors:
 * [Lossless BLOSC](http://blosc.org/) - version 1.10.2
-* [Lossy BigCrunch](https://github.com/lanl/VizAly-BigCrunch) - version 1.1
-* [Lossy SNWPAC](https://github.com/lanl/VizAly-SNWPAC) - version 0.1
-* [SZ](https://collab.cels.anl.gov/display/ESR/SZ) - version 2.0.2.2
-* [zfp](https://computation.llnl.gov/projects/floating-point-compression) - version 0.5.4
+* [SZ](https://collab.cels.anl.gov/display/ESR/SZ) - version 2.1.4.2
+* [zfp](https://computation.llnl.gov/projects/floating-point-compression) - version 0.5.5
 * [fpzip](https://computation.llnl.gov/projects/floating-point-compression) - version 1.2.0
 * [ISABELA](http://freescience.org/cs/ISABELA/ISABELA.html) - version 0.2.1
 
@@ -81,6 +72,8 @@ Foresight takes as input a json file (examples of input json files are in the **
 
 # Development
 For information on how to add new compressors and/or metrics, look at the [readme in CBench/compressors](CBench/compressors/readme.md) and [CBench/metrics](CBench/metrics) respectively.
+
+To add new analysis routines, look at the [readme in Analysis/ folder](Analysis/README.md).
 
 For information on Travis CI and Docker image, look at the [travis folder](testing/travis) 
 
