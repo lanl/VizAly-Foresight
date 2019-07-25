@@ -29,7 +29,7 @@ cat metrics_NYX_Travis_.csv
 
 # install Python dependencies
 cd ..
-pip install -r requirements.txt
+pip install -r testing/travis/requirements.txt
 
 # test HACC workflow generator and executables
 cd Analysis
