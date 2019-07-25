@@ -5,7 +5,8 @@ python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow.json
 python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow.json --submit
 python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow_darwin.json --submit
 """
-
+import sys
+sys.path.append(sys.path[0]+"/..")
 import argparse
 import os
 from pat import file_utilities as futils

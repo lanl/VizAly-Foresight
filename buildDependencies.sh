@@ -40,7 +40,7 @@ pushd $externalDependenciesPath
 
 
 # copy the scripts into that folder and run 
-cp $projectPath/tools/externalDependencies/*.sh .
+cp $projectPath/scripts/thirdparty/*.sh .
 if [ $buildType = "all" ]; then
 	echo "building all dependencies ..."
 	source buildAllExternal.sh

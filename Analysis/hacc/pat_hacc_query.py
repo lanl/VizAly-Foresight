@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 """ Writes the distribution of halos from an SQL query.
 """
-
+import sys
+sys.path.append(sys.path[0]+"/..")
 import argparse
 import numpy
 from pat import gioSqlite as gio_sqlite

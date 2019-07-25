@@ -11,7 +11,7 @@ We expect that developers who contribute to this project will add new compressor
 
 ## Adding a new compressor
 ### Steps:
-1. You first need to download, build and install the compressor you want to add. Look at tools/externalDependencies/build_SZ.sh for an example script that does that. Add your script for your new compressor to that folder. 
+1. You first need to download, build and install the compressor you want to add. Look at scripts/thirdparty/build_SZ.sh for an example script that does that. Add your script for your new compressor to that folder. 
 2. Compressors should implement the CompressorInterface class located at CBench/compressors/compressorInterface.hpp and have a CMakeLists.txt file. Look at the BLOSC example located at CBench/compressors/SZ.
 3. Modify CBench/compressors/compressorFactory.hpp to add your new compressor. 
 ```
@@ -22,7 +22,7 @@ else if (compressorName == "NewCompressor")
 
 ```
 4. Rerun cmake as follows ccamke ../CBench, turn USE_NEW_COMPRESSOR ON, a run configure. This should ask you to specify the locaton of your new compressor's library and include path, e.g.:
-    1. NEW_COMPRESSOR_LIBRARY     : ../<path here>/libName.so 
-    2. NEW_COMPRESSOR_INCLUDE_PATH: ../<path here>/include
+    1. NEW_COMPRESSOR_LIBRARY     : ../\<path here\>/libName.so 
+    2. NEW_COMPRESSOR_INCLUDE_PATH: ../\<path here\>/include
     3. Configure, Generate, and rerun make
 5. Add your compressor to the input json file and run the benchmark

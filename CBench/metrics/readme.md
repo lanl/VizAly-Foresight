@@ -23,8 +23,19 @@ The following error metrics being used are defined as:
 	absolute error ^ 2
 	```
 
-Static Metric computed for all compressors:
-  - Compression Ration
+  - minmax
+  	```
+	min_val = min(approx_value)
+	max_val = max(approx_value)
+	```
+	
+### Histogram
+The following error metrics support a histogram output as a python script: absolute_error, relative_error, minmax. 
+This allows for visualization of data distributions. Usage examples can be found in inputs/nyx/nyx_cbench_test.json
+
+### Default Metrics
+These metrics are always computed for all compressors:
+  - Compression Ratio
     - compressed size / uncompressed size
   - Throughput
     - Size of data processed in MB / time take

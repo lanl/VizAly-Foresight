@@ -1,4 +1,6 @@
 #! /usr/bin/env python
+import sys
+sys.path.append(sys.path[0]+"/..")
 
 import argparse, os, csv
 
