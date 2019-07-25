@@ -22,7 +22,7 @@ else if (compressorName == "NewCompressor")
 
 ```
 4. Rerun cmake as follows ccamke ../CBench, turn USE_NEW_COMPRESSOR ON, a run configure. This should ask you to specify the locaton of your new compressor's library and include path, e.g.:
-    1. NEW_COMPRESSOR_LIBRARY     : ../<path here>/libName.so 
-    2. NEW_COMPRESSOR_INCLUDE_PATH: ../<path here>/include
+    1. NEW_COMPRESSOR_LIBRARY     : ../\<path here\>/libName.so 
+    2. NEW_COMPRESSOR_INCLUDE_PATH: ../\<path here\>/include
     3. Configure, Generate, and rerun make
 5. Add your compressor to the input json file and run the benchmark
