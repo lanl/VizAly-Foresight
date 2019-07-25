@@ -24,6 +24,6 @@ python3 <analysis_name> --input-file <absolute path of input file> --submit
 
 For example
 ```
-$ python Analysis/pat_nyx.py --input-file /projects/exasky/VizAly-Foresight/inputs/nyx/darwin_nyx_galton_wflow_test.jso --submit
+$ python Analysis/pat_nyx.py --input-file /projects/exasky/VizAly-Foresight/inputs/nyx/darwin_nyx_galton_wflow_test.json --submit
 ```
 will run CBench, PAT, and a plot generator for Cinema HTML viewers. The output will be a Cinema database.
