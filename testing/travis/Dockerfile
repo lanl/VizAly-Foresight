@@ -6,7 +6,7 @@ RUN yum install -y epel-release && \
     yum install -y doxygen git gsl-devel hdf5 hdf5-static \
                    hdf5-openmpi-devel hdf5-openmpi-static \
                    help2man make perl-CPAN perl-Thread-Queue \
-                   perl-devel python-devel python-pip openmpi \
+                   perl-devel python36-devel python36-pip openmpi \
                    openmpi-devel openssl-devel selinux-policy \
                    sqlite-devel sudo wget
 

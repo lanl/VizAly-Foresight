@@ -29,10 +29,10 @@ cat metrics_NYX_Travis_.csv
 
 # install Python dependencies
 cd ..
-pip install -r testing/travis/requirements.txt
+pip3 install -r testing/travis/requirements.txt
 
 # test HACC workflow generator and executables
 cd Analysis
-python hacc/pat_hacc.py --input-file ../inputs/hacc/hacc_wflow.json 
-python hacc/pat_hacc_query.py --help
-python hacc/pat_cinema.py --help
+python3 hacc/pat_hacc.py --input-file ../inputs/hacc/hacc_wflow.json 
+python3 hacc/pat_hacc_query.py --help
+python3 hacc/pat_cinema.py --help
