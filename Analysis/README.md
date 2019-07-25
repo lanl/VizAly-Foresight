@@ -5,7 +5,7 @@ This folder contains PAT, the Python package that is used to run the Foresight w
 ## Prerequisites:
 
 Minimum Requirements
-* Python 3.X (+matplotlib=2.0.0, +apsw=3.9.2.post1, +pysqlite=2.8.3)
+* Python 3.6 or higher with (+matplotlib=3.0.2, +apsw=3.9.2, +numpy=1.15.4)
 * SLURM (for job launching)
 
 ## Running Foresight
