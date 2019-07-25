@@ -9,10 +9,10 @@ import matplotlib as mpl; mpl.use("Agg")
 import matplotlib.pyplot as plt
 import numpy
 import os
-from pat import cinema
-from pat import file_utilities as futils
-from pat import plot_utilities as putils
-from pat import Job as j
+from ../pat import cinema
+from ../pat import file_utilities as futils
+from ../pat import plot_utilities as putils
+from ../pat import Job as j
 
 class PATCinema(cinema.CinemaWorkflow):
 
