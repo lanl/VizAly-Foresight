@@ -14,11 +14,14 @@ We expect that developers who contribute to this project will add new compressor
 
 ## Adding a new data loader
 ### Steps:
-1. You first need to download, build and install the reader you want to add. Look at tools/externalDependencies/build_SZ.sh for an example script that does that. Add your script for your new compressor to that folder. 
+1. You first need to download, build and install the reader you want to add. Look at scripts/thirdparty/build_SZ.sh for an example script that does that. Add your script for your new compressor to that folder. 
 2. Loaders should implement the dataLoaderInterface class located at CBench/dataLoader/dataLoaderInterface.hpp and have a CMakeLists.txt file. Look at the BLOSC example located at CBench/compressors/SZ.
-
+3. Rerun cmake as follows 
 
 ```
-4. Rerun cmake as follows ccamke ../CBench, turn USE_NEW_LOADER ON, a run configure. This should ask you to specify the locaton of your new reader's library and include path, e.g.:
+ccmake ../CBench
+```
+
+4. turn 'USE_NEW_LOADER' 'ON', and re-configure. This should ask you to specify the locaton of your new reader's library and include path, e.g.:
 
 5. Add your loader to the input json file and run the benchmark

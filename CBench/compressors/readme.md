@@ -11,7 +11,7 @@ We expect that developers who contribute to this project will add new compressor
 
 ## Adding a new compressor
 ### Steps:
-1. You first need to download, build and install the compressor you want to add. Look at tools/externalDependencies/build_SZ.sh for an example script that does that. Add your script for your new compressor to that folder. 
+1. You first need to download, build and install the compressor you want to add. Look at scripts/thirdparty/build_SZ.sh for an example script that does that. Add your script for your new compressor to that folder. 
 2. Compressors should implement the CompressorInterface class located at CBench/compressors/compressorInterface.hpp and have a CMakeLists.txt file. Look at the BLOSC example located at CBench/compressors/SZ.
 3. Modify CBench/compressors/compressorFactory.hpp to add your new compressor. 
 ```
