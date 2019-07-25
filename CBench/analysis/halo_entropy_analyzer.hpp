@@ -31,21 +31,6 @@
 /* -------------------------------------------------------------------------- */
 class HaloEntropy {
 
-private:
-  std::string json_path = "";                                        // JSON parameter file path
-  int my_rank = 0;                                                   // current MPI rank
-  int nb_ranks = 0;                                                  // total number of ranks
-  MPI_Comm comm = MPI_COMM_WORLD;                                    // MPI communicator
-  std::unique_ptr<DataLoaderInterface> ioMgr;                        // HACC data loader
-  
-  // per halo attribute data
-  std::vector<std::string> attributes;                               // [x,y,x,vx,vy,vx]
-  std::unordered_map<std::string, std::string> type;                 // datatype of each attribute [float|double]
-  std::unordered_map<std::string, int> size;                         // size of each attribute dataset (in bytes)
-  std::unordered_map<std::string, int> nb_elems;                     // number of dataset elements for each attribute
-  std::unordered_map<std::string, std::vector<int>> frequencies;     // dataset elems frequency distribution
-  std::unordered_map<std::string, double> entropy;                   // computed shannon entropy for each attribute
- 
 public: 
   HaloEntropy() = default; 
   HaloEntropy(HaloEntropy const&) = delete; 
@@ -54,30 +39,116 @@ public:
   ~HaloEntropy() = default;
  
   bool run();  // ok
-  bool showAttributeData() const;
-  bool computeFrequencies(std::string attrib); 
-  bool computeShannonEntropy(std::string attrib);
+  bool computeFrequencies(std::string scalar, void* original, void* approx, size_t n);
+  bool computeShannonEntropy(std::string scalar);
   bool generateHistogram(std::string path) const;
 
+private:
+  // IO
+  std::string json_path = "";                                        // JSON parameter file path
+  std::unique_ptr<DataLoaderInterface> ioMgr;                        // HACC data loader
+  std::stringstream debug_log;
+
+  // bins partition
+  size_t const num_bins = 1024;
+  // per halo attribute data
+  std::vector<std::string> attributes;                               // [x,y,x,vx,vy,vx]
+  std::unordered_map<std::string, std::vector<double>> frequency;
+  std::unordered_map<std::string, std::string> type;                 // datatype of each attribute [float|double]
+  std::unordered_map<std::string, int> size;                         // size of each attribute dataset (in bytes)
+  std::unordered_map<std::string, int> nb_elems;                     // number of dataset elements for each attribute
+
+  // MPI
+  int my_rank  = 0;                                                   // current MPI rank
+  int nb_ranks = 0;                                                  // total number of ranks
+  MPI_Comm comm = MPI_COMM_WORLD;                                    // MPI communicator
 };
 
 /* -------------------------------------------------------------------------- */
-inline HaloEntropy::HaloEntropy(
-  const char* in_path, int in_rank, int in_nb_ranks, MPI_Comm in_comm
-) : json_path(in_path),
-    my_rank  (in_rank),
-    nb_ranks (in_nb_ranks),
-    comm     (in_comm)
-{
-  ioMgr = std::make_unique<HACCDataLoader>();
-}
+inline HaloEntropy::HaloEntropy(const char* in_path, int in_rank,
+                                int in_nb_ranks, MPI_Comm in_comm)
+  : json_path(in_path), my_rank(in_rank),
+    nb_ranks(in_nb_ranks), comm(in_comm),
+    ioMgr(std::make_unique<HACCDataLoader>())
+{}
 
 /* -------------------------------------------------------------------------- */
-inline bool HaloEntropy::computeFrequencies(std::string attrib) {
+inline bool HaloEntropy::computeFrequencies(std::string scalar, void* original, void* approx, size_t n) {
 
 
-  // TODO
+
+  // step 1. determine lower and upper bounds on data
+  double global_max = 0;
+  double global_min = 0;
+  double local_max = std::numeric_limits<float>::min();
+  double local_min = std::numeric_limits<float>::max();
+
+  for (size_t i = 0; i < n; ++i) {
+    if (static_cast<float*>(original)[i] > local_max)
+      local_max = static_cast<float*>(original)[i];
+
+    if (static_cast<float*>(original)[i] < local_min)
+      local_min = static_cast<float*>(original)[i];
+  }
+
+  MPI_Allreduce(&local_max, &global_max, 1, MPI_DOUBLE, MPI_MAX, comm);
+  MPI_Allreduce(&local_min, &global_min, 1, MPI_DOUBLE, MPI_MIN, comm);
+
+  debug_log << " local_minmax: " << local_min << " " << local_max << std::endl;
+  debug_log << " global_minmax: " << global_min << " " << global_max << std::endl;
+  MPI_Barrier(comm);
+
+  // Compute histogram of values
+  if (global_max != 0) {
+
+    debug_log << "num_bins: " << num_bins << std::endl;
+
+    size_t local_histogram[num_bins];
+    size_t global_histogram[num_bins];
+
+    std::fill(local_histogram, local_histogram + num_bins, 0);
+    std::fill(global_histogram, global_histogram + num_bins, 0);
+
+    double range = global_max - global_min;
+    double capacity = range / num_bins;
+
+    for (size_t i = 0; i < n; ++i) {
+
+      double value = static_cast<float*>(approx)[i];
+      double relative_value = (value - global_min) / range;
+      int index = (range * relative_value) / capacity;
+
+      /*
+      debug_log << "value: " << value
+                << ", relative_value: " << relative_value
+                << ", global_max: " << global_max << std::endl;*/
+      if (index >= num_bins) {
+        index--;
+      }
+
+      local_histogram[index]++;
+    }
+
+    MPI_Allreduce(local_histogram, global_histogram, num_bins, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
+
+    // fill frequency eventually
+    frequency[scalar].clear();
+    frequency[scalar].resize(num_bins);
+
+    for (size_t i = 0; i < num_bins; ++i) {
+      frequency[scalar][i] = static_cast<double>(global_histogram[i]) / n;
+      debug_log << "frequency[" << i <<"]: " << frequency[scalar][i] << std::endl;
+    }
+    return true;
+
+    // Output histogram as a python script file
+    /*if (myRank == 0)
+      additionalOutput = python_histogram(num_bins, global_min, global_max, histogram);*/
+  }
+  return false;
 }
+
+
 /* -------------------------------------------------------------------------- */
 inline bool HaloEntropy::run() {
   // basic checks 
@@ -86,8 +157,10 @@ inline bool HaloEntropy::run() {
 
   nlohmann::json json;
   std::ifstream file(json_path);
-  std::stringstream debuglog;
-  
+
+  debug_log.clear();
+  debug_log.str("");
+
   try {
     // pass file to json parser
     file >> json;
@@ -133,19 +206,25 @@ inline bool HaloEntropy::run() {
 
   // loop over all scalars and load each of them
   for (auto&& scalar: attributes) {
-    debuglog << "\nLoading and running " << scalar << std::endl;
+
+    // for debug:
+    if (scalar != "x") continue;
+
+    debug_log << "\nLoading and running " << scalar << std::endl;
     if (ioMgr->loadData(scalar)) {
       // save infos for debug
-      debuglog << ioMgr->getDataInfo();
-      debuglog << ioMgr->getLog();
+      debug_log << ioMgr->getDataInfo();
+      debug_log << ioMgr->getLog();
       // TODO: compute Shannon entropy distribution for this attribute
+      if (scalar == "x")
+        computeFrequencies(scalar, ioMgr->data, ioMgr->data, ioMgr->getNumElements());
 
     } else {
       if (my_rank == 0)
         std::cerr << "Error while loading " << scalar << ", exiting now" << std::endl;
       return false;
     }
-    //appendLog(output_log, debuglog.str());
+    //appendLog(output_log, log.str());
     // wait for other ranks to complete
     MPI_Barrier(comm);
   }
@@ -154,8 +233,8 @@ inline bool HaloEntropy::run() {
 
   // output logs
   std::ofstream logfile(output, std::ios::out);
-  logfile << debuglog.str();
-  debuglog.str("");
+  logfile << debug_log.str();
+  debug_log.str("");
   logfile.close();
 
   std::cout << "Logs generated in "<< output << std::endl;  
