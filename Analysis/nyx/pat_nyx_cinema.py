@@ -1,11 +1,13 @@
 #! /usr/bin/env python
+import sys
+sys.path.append(sys.path[0]+"/..")
 
 import argparse, os, csv
 
-from ..pat import file_utilities as futils
-from ..pat import plot_utilities as putils
-from ..pat import cinema
-from ..pat import Job as j
+from pat import file_utilities as futils
+from pat import plot_utilities as putils
+from pat import cinema
+from pat import Job as j
 
 
 

@@ -5,13 +5,14 @@ python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow.json
 python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow.json --submit
 python pat_nyx.py --input-file ../inputs/nyx/NYX_wflow_darwin.json --submit
 """
-
+import sys
+sys.path.append(sys.path[0]+"/..")
 import argparse
 import os
-from ..pat import file_utilities as futils
-from ..pat import plot_utilities as putils
-from ..pat import workflow
-from ..pat import Job as j
+from pat import file_utilities as futils
+from pat import plot_utilities as putils
+from pat import workflow
+from pat import Job as j
 
 
 class NYXWorkflow(workflow.Workflow):

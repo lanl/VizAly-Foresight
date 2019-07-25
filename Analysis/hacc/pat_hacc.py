@@ -1,12 +1,13 @@
 #! /usr/bin/env python
 """ This script generates a workflow that runs CBench and HACC data analysis executables.
 """
-
+import sys
+sys.path.append(sys.path[0]+"/..")
 import argparse
 import os
-from ../pat import file_utilities as futils
-from ../pat import Job as j
-from ../pat import workflow
+from pat import file_utilities as futils
+from pat import Job as j
+from pat import workflow
 
 class HACCWorkflow(workflow.Workflow):
 

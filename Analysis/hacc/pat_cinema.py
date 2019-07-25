@@ -2,17 +2,18 @@
 """ This executable reads a JSON file and appends the metrics file with paths to images.
 The images are plotted in this executable.
 """
-
+import sys
+sys.path.append(sys.path[0]+"/..")
 import argparse
 import csv
 import matplotlib as mpl; mpl.use("Agg")
 import matplotlib.pyplot as plt
 import numpy
 import os
-from ../pat import cinema
-from ../pat import file_utilities as futils
-from ../pat import plot_utilities as putils
-from ../pat import Job as j
+from pat import cinema
+from pat import file_utilities as futils
+from pat import plot_utilities as putils
+from pat import Job as j
 
 class PATCinema(cinema.CinemaWorkflow):
 
