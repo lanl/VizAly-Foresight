@@ -33,10 +33,15 @@ $ source build.sh
 ```
 
 ## Running Foresight
-This will set up and run the full analysis workflow on SLURM and generate a cinema database
+This will set up and run the full analysis workflow on SLURM and generate a cinema database, the command is as follows:
 ```
-$ python Analysis/pat_nyx.py --input-files inputs/nyx/nyx_darwin_test.json --submit
+$ python3 Analysis/<name_of_analysis> --input-file <path to input JSON file> --submit
 ```
+For example, to run the NYX analysis, the command is:
+```
+$ python3 Analysis/pat_nyx.py --input-files inputs/nyx/nyx_darwin_test.json --submit
+```
+
 ## Running CBench as stand-alone:
 ```
 $ mpirun -np 2 build/CBench ../inputs/hacc/hacc_cbench_test.json
@@ -71,9 +76,7 @@ Foresight takes as input a json file (examples of input json files are in the **
 * Compute times
 
 # Development
-For information on how to add new compressors and/or metrics, look at the [readme in CBench/compressors](CBench/compressors/readme.md) and [CBench/metrics](CBench/metrics) respectively.
-
-To add new analysis routines, look at the [readme in Analysis/ folder](Analysis/README.md).
+For information on how to add new compressors and/or metrics, look at the [readme in CBench/compressors](CBench/compressors/readme.md) and [CBench/metrics](CBench/metrics) respectively. To add new analysis routines, look at the [readme in Analysis/ folder](Analysis/README.md).
 
 For information on Travis CI and Docker image, look at the [travis folder](testing/travis) 
 
