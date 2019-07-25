@@ -16,7 +16,7 @@
   "cbench":{
     "path":"",
     "output":{
-      "run-path":"build-new/",
+      "run-path":"build/",
       "output-decompressed":true,
       "output-decompressed-location":"decompressed_files",
       "log-file":"log_hacc_analysis"

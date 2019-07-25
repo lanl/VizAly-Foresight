@@ -196,7 +196,9 @@ inline void HaloEntropy::exportResults(std::string root_path) {
   }
 
   // generate gnuplot script then
-  std::string path = root_path + "/distrib.gnu";
+  std::string path = root_path + "/distribution.gnu";
+  std::string output_eps = "distribution.eps";
+
   std::ofstream file(path, std::ios::out);
   assert(file.is_open());
   assert(file.good());
@@ -207,7 +209,7 @@ inline void HaloEntropy::exportResults(std::string root_path) {
 
   file << "reset" << std::endl;
   file << "set terminal postscript eps enhanced color 14 size 21cm,14cm" << std::endl;
-  file << "set output 'distribution.eps'" << std::endl;
+  file << "set output '"<< output_eps <<"'" << std::endl;
   file << std::endl;
   file << "set multiplot layout 2,3 title 'HACC particle data - ";
   file << num_bins << " bins - file: " << extractBase(input_hacc) << "'" << std::endl;
@@ -246,6 +248,11 @@ inline void HaloEntropy::exportResults(std::string root_path) {
   file << std::endl;
   file << "unset multiplot" << std::endl;
   file.close();
+
+  std::string cmd = "gnuplot " + extractBase(path);
+  int exit_code = std::system(cmd.data());
+  assert(exit_code == 0);
+  std::cout << "Data distribution plots generated in " << output_eps << std::endl;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -326,16 +333,17 @@ inline bool HaloEntropy::run() {
     MPI_Barrier(comm);
   }
 
-  exportResults();
-
   // output logs
   std::ofstream logfile(output, std::ios::out);
   logfile << debug_log.str();
   debug_log.str("");
   logfile.close();
 
-  std::cout << "Logs generated in "<< output << std::endl;  
+  std::cout << "Logs generated in "<< output << std::endl;
   MPI_Barrier(comm);
+
+  // dump data and generate plot
+  exportResults();
 
   // everything was fine at this point  
   return true;
