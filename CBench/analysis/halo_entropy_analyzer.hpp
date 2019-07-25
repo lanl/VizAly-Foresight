@@ -40,7 +40,7 @@ public:
  
   bool run();  // ok
   bool computeFrequencies(std::string scalar, void* original, void* approx, size_t n);
-  bool computeShannonEntropy(std::string scalar);
+  double computeShannonEntropy(std::string scalar, size_t n);
   bool generateHistogram(std::string path) const;
 
 private:
@@ -74,8 +74,6 @@ inline HaloEntropy::HaloEntropy(const char* in_path, int in_rank,
 
 /* -------------------------------------------------------------------------- */
 inline bool HaloEntropy::computeFrequencies(std::string scalar, void* original, void* approx, size_t n) {
-
-
 
   // step 1. determine lower and upper bounds on data
   double global_max = 0;
@@ -140,14 +138,29 @@ inline bool HaloEntropy::computeFrequencies(std::string scalar, void* original, 
       debug_log << "frequency[" << i <<"]: " << frequency[scalar][i] << std::endl;
     }
     return true;
-
-    // Output histogram as a python script file
-    /*if (myRank == 0)
-      additionalOutput = python_histogram(num_bins, global_min, global_max, histogram);*/
   }
+
   return false;
 }
 
+/* -------------------------------------------------------------------------- */
+inline double HaloEntropy::computeShannonEntropy(std::string scalar, size_t n) {
+
+  auto const& distribution = frequency[scalar];
+
+  double entropy = 0.;
+  for (auto&& p_i : distribution) {
+    entropy += (p_i * std::log2(p_i));
+  }
+  entropy *= -1;
+
+  debug_log << "Shannon entropy for "<< scalar << ", using "
+            << num_bins << " bins is " << entropy
+            << ", accuracy: " << num_bins / static_cast<double>(n)
+            << std::endl;
+
+  return entropy;
+}
 
 /* -------------------------------------------------------------------------- */
 inline bool HaloEntropy::run() {
@@ -216,8 +229,11 @@ inline bool HaloEntropy::run() {
       debug_log << ioMgr->getDataInfo();
       debug_log << ioMgr->getLog();
       // TODO: compute Shannon entropy distribution for this attribute
-      if (scalar == "x")
-        computeFrequencies(scalar, ioMgr->data, ioMgr->data, ioMgr->getNumElements());
+      if (scalar == "x") {
+        auto const n = ioMgr->getNumElements();
+        computeFrequencies(scalar, ioMgr->data, ioMgr->data, n);
+        computeShannonEntropy(scalar, n);
+      }
 
     } else {
       if (my_rank == 0)
