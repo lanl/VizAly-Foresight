@@ -5,4 +5,5 @@
 #include "MGARD/MGARDcompressor.hpp"
 #include "SZ/SZcompressor.hpp"
 #include "fpzip/fpzipcompressor.hpp"
+#include "snwpac/snwpacCompressor.hpp"
 #include "zfp/zfpCompressor.hpp"

@@ -198,3 +198,13 @@ inline int writeCompressedStream(void* input, size_t cbytes, std::string outfile
 
 	return 1;
 }
+
+inline int readCompressedStream(std::string infile, void* &output, size_t cbytes, DataLoaderInterface* ioMgr, std::stringstream& log)
+{
+	log << "Read: " << 3 + 8 + 8 + (8 * 5) << " byte header";
+	// Write Data
+
+	log << " and " << cbytes << " bytes of data" << std::endl;
+
+	return 1;
+}

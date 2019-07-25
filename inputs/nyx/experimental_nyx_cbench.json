@@ -100,6 +100,14 @@
 
     {
       "name": "LossyWave",
+      "output-prefix": "lossywave_abs_.01_",
+      "pcnt": 50,
+      "quant": 1.0,
+      "tolerance":  1e-03
+    },
+
+    {
+      "name": "snwpac",
       "output-prefix": "snwpac_abs_.01_",
       "pcnt": 50,
       "quant": 1.0,
