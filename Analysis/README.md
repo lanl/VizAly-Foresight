@@ -4,19 +4,23 @@ This folder contains PAT, the Python package that is used to run the Foresight w
 
 ## Prerequisites:
 
-* Python 2.7
-
-There is a `requirements.txt` file in the top-level of this repository. All of the required Python packages can be installed as: `pip install -r requirements.txt`
+Minimum Requirements
+* Python 3.X (+matplotlib=2.0.0, +apsw=3.9.2.post1, +pysqlite=2.8.3)
+* SLURM (for job launching)
 
 ## Running Foresight
 This will run the full analysis workflow and generate a cinema database. 
 
-To run the anlysis for nyx, the command is as follows:
+For example, to generate the anlysis for nyx, use the command as follows:
 ```
-python <analysis_name> --input-file <absolute path of input file> --submit
+python3 <analysis_name> --input-file <absolute path of input file>
 ```
-withouth --submit, the jobs wont be submitted. This allows you to look at the input files.
+This will generate the scripts required to launch the full analysis.
 
+To launch the analysis (submit the jobs to SLURM), append the '--submit' command:
+```
+python3 <analysis_name> --input-file <absolute path of input file> --submit
+```
 
 For example
 ```
