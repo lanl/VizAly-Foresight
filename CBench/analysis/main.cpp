@@ -8,15 +8,10 @@
  * - Hoby Rakotoarivelo
  */
 /* -------------------------------------------------------------------------- */
-#include "halo_entropy_analyzer.hpp"
-
+#include "analyzer.hpp"
 /* -------------------------------------------------------------------------- */
 void printUsage() {
-  std::fprintf(stderr, "Usage: mpirun -n <int> analyzer [options]\n");
-  std::fprintf(stderr, "options:\n");
-  std::fprintf(stderr, "-h, --help   show this help message and exit\n");
-  std::fprintf(stderr, "-i, --input  input json parameter file\n");
-  std::fflush(stderr);
+  std::fprintf(stderr, "Usage: mpirun -n <int> ./analyzer [input-json]\n");
 }
 /* -------------------------------------------------------------------------- */
 bool isValidInput(int argc, char* argv[], int my_rank, int nb_ranks) {
@@ -71,7 +66,6 @@ int main(int argc, char* argv[]){
   int nb_ranks = 0;
   int thread_support = 0;
   
-
   // init MPI
   MPI_Init_thread(NULL, NULL, MPI_THREAD_MULTIPLE, &thread_support);
   MPI_Comm_size(MPI_COMM_WORLD, &nb_ranks);
@@ -84,7 +78,7 @@ int main(int argc, char* argv[]){
   }
 
   // everything is OK at this point
-  HaloEntropy analyzer(argv[1], my_rank, nb_ranks, MPI_COMM_WORLD);
+  Analyzer analyzer(argv[1], my_rank, nb_ranks, MPI_COMM_WORLD);
  
   // run the analyzer 
   analyzer.run();

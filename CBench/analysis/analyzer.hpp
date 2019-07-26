@@ -8,8 +8,7 @@
  * - Hoby Rakotoarivelo
  */   
 /* -------------------------------------------------------------------------- */
-#ifndef _HALO_ENTROPY_ANALYZER_H_
-#define _HALO_ENTROPY_ANALYZER_H_
+#pragma once
 /* -------------------------------------------------------------------------- */
 #include <iostream>
 #include <sstream>
@@ -27,46 +26,44 @@
 #include "dataLoaderInterface.hpp"
 #include "HACCDataLoader.hpp"
 
-// EDIT: process one parameter each time
 /* -------------------------------------------------------------------------- */
-class HaloEntropy {
+class Analyzer {
 
 public: 
-  HaloEntropy() = default; 
-  HaloEntropy(HaloEntropy const&) = delete; 
-  HaloEntropy(HaloEntropy&&) noexcept = delete; 
-  HaloEntropy(const char* in_path, int in_rank, int in_nb_ranks, MPI_Comm in_comm);
-  ~HaloEntropy() = default;
+  Analyzer() = default; 
+  Analyzer(Analyzer const&) = delete; 
+  Analyzer(Analyzer&&) noexcept = delete; 
+  Analyzer(const char* in_path, int in_rank, int in_nb_ranks, MPI_Comm in_comm);
+  ~Analyzer() = default;
  
   bool run();  // ok
-  bool computeFrequencies(std::string scalar, void* original, void* approx);
-  double computeShannonEntropy(std::string scalar);
-  bool generateHistogram(std::string path) const;
-  void exportResults(std::string path = ".");
-  std::string extractBase(std::string path);
 
 private:
+  bool computeFrequencies(std::string scalar, void* original, void* approx);
+  double computeShannonEntropy(std::string scalar);
+  void generateHistogram(std::string path = ".");
+  std::string extractBase(std::string path);
+
   // IO
-  std::string json_path = "";
-  std::string input_hacc = "";
+  std::string json_path;
+  std::string input_hacc;
   std::unique_ptr<DataLoaderInterface> ioMgr;
   std::stringstream debug_log;
 
-  // bins partition
-  size_t num_bins = 1024;
   // per halo attribute data
-  std::vector<std::string> attributes;                               // [x,y,x,vx,vy,vx]
+  size_t num_bins = 0;
+  std::vector<std::string> attributes;
   std::unordered_map<std::string, std::vector<double>> frequency;
-  std::unordered_map<std::string, size_t> size;                         // size of each attribute dataset (in bytes)
+  std::unordered_map<std::string, size_t> size;
 
   // MPI
-  int my_rank  = 0;                                                   // current MPI rank
-  int nb_ranks = 0;                                                  // total number of ranks
-  MPI_Comm comm = MPI_COMM_WORLD;                                    // MPI communicator
+  int my_rank  = 0;
+  int nb_ranks = 0;
+  MPI_Comm comm = MPI_COMM_NULL;
 };
 
 /* -------------------------------------------------------------------------- */
-inline HaloEntropy::HaloEntropy(const char* in_path, int in_rank,
+inline Analyzer::Analyzer(const char* in_path, int in_rank,
                                 int in_nb_ranks, MPI_Comm in_comm)
   : json_path(in_path), my_rank(in_rank),
     nb_ranks(in_nb_ranks), comm(in_comm),
@@ -74,7 +71,7 @@ inline HaloEntropy::HaloEntropy(const char* in_path, int in_rank,
 {}
 
 /* -------------------------------------------------------------------------- */
-inline bool HaloEntropy::computeFrequencies(std::string scalar, void* original, void* approx) {
+inline bool Analyzer::computeFrequencies(std::string scalar, void* original, void* approx) {
 
   double const& n = size[scalar];
   assert(n > 0.);
@@ -142,7 +139,7 @@ inline bool HaloEntropy::computeFrequencies(std::string scalar, void* original, 
 }
 
 /* -------------------------------------------------------------------------- */
-inline double HaloEntropy::computeShannonEntropy(std::string scalar) {
+inline double Analyzer::computeShannonEntropy(std::string scalar) {
 
   double entropy = 0.;
   double const epsilon = std::numeric_limits<double>::epsilon();
@@ -160,7 +157,7 @@ inline double HaloEntropy::computeShannonEntropy(std::string scalar) {
 }
 
 /* -------------------------------------------------------------------------- */
-inline std::string HaloEntropy::extractBase(std::string path) {
+inline std::string Analyzer::extractBase(std::string path) {
   char sep = '/';
 #ifdef _WIN32
   sep = '\\';
@@ -174,7 +171,7 @@ inline std::string HaloEntropy::extractBase(std::string path) {
 }
 
 /* -------------------------------------------------------------------------- */
-inline void HaloEntropy::exportResults(std::string root_path) {
+inline void Analyzer::generateHistogram(std::string root_path) {
 
   if (my_rank != 0)
     return;
@@ -263,7 +260,7 @@ inline void HaloEntropy::exportResults(std::string root_path) {
 }
 
 /* -------------------------------------------------------------------------- */
-inline bool HaloEntropy::run() {
+inline bool Analyzer::run() {
   // basic checks 
   assert(nb_ranks > 0); 
   assert(ioMgr != nullptr);
@@ -336,13 +333,10 @@ inline bool HaloEntropy::run() {
 
   // dump data and generate plot
   prefix = json["analysis"]["output"]["gnuplot"];
-  exportResults(prefix);
+  generateHistogram(prefix);
 
   // everything was fine at this point  
   return true;
 }
 
 /* -------------------------------------------------------------------------- */
-
-
-#endif
