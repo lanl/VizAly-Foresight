@@ -3,7 +3,8 @@
   "foresight-home":"",
   "input":{
     "filetype":"HACC",
-    "filename":"/projects/exasky/data/Argonne_L360_HACC001/analysis/Halos/b0168/STEP499/m000-499.haloparticles#9",
+    "full": "/projects/exasky/data/Argonne_L360_HACC001/STEP499/m000.full.mpicosmo.499",
+    "halo":"/projects/exasky/data/Argonne_L360_HACC001/analysis/Halos/b0168/STEP499/m000-499.haloparticles#9",
     "scalars":[
       "x",
       "y",

@@ -10,18 +10,7 @@
 /* -------------------------------------------------------------------------- */
 #pragma once
 /* -------------------------------------------------------------------------- */
-#include <iostream>
-#include <sstream>
-#include <stdlib.h>
-#include <mpi.h>
-
-// helper functions
-#include "json.hpp"
-#include "timer.hpp"
-#include "log.hpp"
-#include "utils.hpp"
-#include "strConvert.hpp"
-
+#include "tools.h"
 // data loader
 #include "dataLoaderInterface.hpp"
 #include "HACCDataLoader.hpp"
@@ -35,18 +24,21 @@ public:
   Analyzer(Analyzer&&) noexcept = delete; 
   Analyzer(const char* in_path, int in_rank, int in_nb_ranks, MPI_Comm in_comm);
   ~Analyzer() = default;
- 
+
+  bool extractNonHalos(std::string output);
   bool run();  // ok
 
 private:
   bool computeFrequencies(std::string scalar, void* original, void* approx);
   double computeShannonEntropy(std::string scalar);
   void generateHistogram(std::string path = ".");
-  std::string extractBase(std::string path);
 
   // IO
   std::string json_path;
-  std::string input_hacc;
+  std::string input_full;
+  std::string input_halo;
+  std::string output_log;
+  std::string output_gnu;
   std::unique_ptr<DataLoaderInterface> ioMgr;
   std::stringstream debug_log;
 
@@ -66,9 +58,48 @@ private:
 inline Analyzer::Analyzer(const char* in_path, int in_rank,
                                 int in_nb_ranks, MPI_Comm in_comm)
   : json_path(in_path), my_rank(in_rank),
-    nb_ranks(in_nb_ranks), comm(in_comm),
-    ioMgr(std::make_unique<HACCDataLoader>())
-{}
+    nb_ranks(in_nb_ranks), comm(in_comm)
+{
+  assert(nb_ranks > 0);
+  // parse parameters
+  nlohmann::json json;
+
+  std::ifstream file(json_path);
+  assert(file.is_open());
+  assert(file.good());
+
+  // parse params
+  file >> json;
+
+  if (json["input"].find("halo") != json["input"].end())
+    input_halo = json["input"]["halo"];
+
+  if (json["input"].find("full") != json["input"].end())
+    input_full = json["input"]["full"];
+
+  for (auto&& scalar : json["input"]["scalars"])
+    attributes.push_back(scalar);
+
+  if (json["input"].find("num_bins") != json["input"].end())
+    num_bins = json["input"]["num_bins"];
+  assert(num_bins > 0);
+
+  // set the IO manager
+  ioMgr = std::make_unique<HACCDataLoader>();
+
+  if (json["input"].find("datainfo") != json["input"].end()) {
+    auto const& datainfo = json["input"]["datainfo"];
+    for (auto it = datainfo.begin(); it != datainfo.end(); ++it) {
+      ioMgr->loaderParams[it.key()] = strConvert::toStr(it.value());
+    }
+  }
+
+  // set outputs paths
+  std::string prefix = json["analysis"]["output"]["logs"];
+  output_log = prefix + "_rank_" + std::to_string(my_rank) +".log";
+  output_gnu = json["analysis"]["output"]["gnuplot"];
+
+}
 
 /* -------------------------------------------------------------------------- */
 inline bool Analyzer::computeFrequencies(std::string scalar, void* original, void* approx) {
@@ -157,20 +188,6 @@ inline double Analyzer::computeShannonEntropy(std::string scalar) {
 }
 
 /* -------------------------------------------------------------------------- */
-inline std::string Analyzer::extractBase(std::string path) {
-  char sep = '/';
-#ifdef _WIN32
-  sep = '\\';
-#endif
-
-  size_t i = path.rfind(sep, path.length());
-  if (i != std::string::npos) {
-    return std::string(path.substr(i+1, path.length() - i));
-  }
-  return std::string("");
-}
-
-/* -------------------------------------------------------------------------- */
 inline void Analyzer::generateHistogram(std::string root_path) {
 
   if (my_rank != 0)
@@ -214,7 +231,7 @@ inline void Analyzer::generateHistogram(std::string root_path) {
   file << "set output '"<< output_eps <<"'" << std::endl;
   file << std::endl;
   file << "set multiplot layout 2,3 title 'HACC particle data - ";
-  file << num_bins << " bins - file: " << extractBase(input_hacc) << "'" << std::endl;
+  file << num_bins << " bins - file: " << tools::base(input_halo) << "'" << std::endl;
 
   for (auto&& scalar : attributes) {
     // get bounds
@@ -261,82 +278,42 @@ inline void Analyzer::generateHistogram(std::string root_path) {
 
 /* -------------------------------------------------------------------------- */
 inline bool Analyzer::run() {
-  // basic checks 
-  assert(nb_ranks > 0); 
-  assert(ioMgr != nullptr);
-
-  nlohmann::json json;
-  std::ifstream file(json_path);
 
   debug_log.clear();
   debug_log.str("");
+  debug_log << "Found "<< attributes.size() <<" attributes" << std::endl;
 
-  // parse params
-  file >> json;
-
-  input_hacc = json["input"]["filename"];
-
-  for (auto&& scalar : json["input"]["scalars"]) {
-    attributes.push_back(scalar);
-  }
-
-  num_bins = json["input"]["num_bins"];
-  assert(num_bins > 0);
-
-  // set the IO manager
-  if (json["input"].find("datainfo") != json["input"].end()) {
-    auto const& datainfo = json["input"]["datainfo"];
-    for (auto it = datainfo.begin(); it != datainfo.end(); ++it) {
-      ioMgr->loaderParams[it.key()] = strConvert::toStr(it.value());
-    }    
-  }
-
-  ioMgr->init(input_hacc, comm); 
+  ioMgr->init(input_halo, comm); 
   ioMgr->setSave(false); 
   MPI_Barrier(comm);
 
-  if (my_rank == 0)
-    printf("Found %d attributes\n", attributes.size());
-
-  // loop over all scalars and load each of them
   for (auto&& scalar: attributes) {
 
     debug_log << "\nLoading and running " << scalar << std::endl;
+    // load current data
+    assert(ioMgr->loadData(scalar));
 
-    if (ioMgr->loadData(scalar)) {
-      // save infos for debug
-      debug_log << ioMgr->getDataInfo();
-      debug_log << ioMgr->getLog();
+    // save infos for debug
+    debug_log << ioMgr->getDataInfo();
+    debug_log << ioMgr->getLog();
 
-      size[scalar] = ioMgr->getNumElements();
-      computeFrequencies(scalar, ioMgr->data, ioMgr->data);
-      computeShannonEntropy(scalar);
+    size[scalar] = ioMgr->getNumElements();
+    computeFrequencies(scalar, ioMgr->data, ioMgr->data);
+    computeShannonEntropy(scalar);
 
-    } else {
-      if (my_rank == 0)
-        std::cerr << "Error while loading " << scalar << ", exiting now" << std::endl;
-      return false;
-    }
     MPI_Barrier(comm);
   }
 
   // output logs
-  std::string prefix = json["analysis"]["output"]["logs"];
-  std::string output = prefix + "_rank_" + std::to_string(my_rank) +".log";
-
-  std::ofstream logfile(output, std::ios::out);
+  std::ofstream logfile(output_log, std::ios::out);
   logfile << debug_log.str();
-  debug_log.str("");
   logfile.close();
-  std::cout << "Logs generated in "<< output << std::endl;
+  std::cout << "Logs generated in "<< output_log << std::endl;
   MPI_Barrier(comm);
 
   // dump data and generate plot
-  prefix = json["analysis"]["output"]["gnuplot"];
-  generateHistogram(prefix);
+  generateHistogram(output_gnu);
 
   // everything was fine at this point  
   return true;
 }
-
-/* -------------------------------------------------------------------------- */
