@@ -10,8 +10,8 @@
 /* -------------------------------------------------------------------------- */
 #pragma once
 /* -------------------------------------------------------------------------- */
+#include <set>
 #include "tools.h"
-// data loader
 #include "dataLoaderInterface.hpp"
 #include "HACCDataLoader.hpp"
 
@@ -31,7 +31,8 @@ public:
 private:
   bool computeFrequencies(std::string scalar, void* original, void* approx);
   double computeShannonEntropy(std::string scalar);
-  void generateHistogram(std::string path = ".");
+  void dumpLogs();
+  void generateHistogram();
 
   // IO
   std::string json_path;
@@ -39,8 +40,8 @@ private:
   std::string input_halo;
   std::string output_log;
   std::string output_gnu;
-  std::unique_ptr<DataLoaderInterface> ioMgr;
   std::stringstream debug_log;
+  std::unique_ptr<DataLoaderInterface> ioMgr;
 
   // per halo attribute data
   size_t num_bins = 0;
@@ -188,7 +189,9 @@ inline double Analyzer::computeShannonEntropy(std::string scalar) {
 }
 
 /* -------------------------------------------------------------------------- */
-inline void Analyzer::generateHistogram(std::string root_path) {
+inline void Analyzer::generateHistogram() {
+
+  auto root_path = output_gnu;
 
   if (my_rank != 0)
     return;
@@ -304,16 +307,125 @@ inline bool Analyzer::run() {
     MPI_Barrier(comm);
   }
 
-  // output logs
+
+  dumpLogs();
+
+  // dump data and generate plot
+  generateHistogram();
+
+  // everything was fine at this point  
+  return true;
+}
+
+/* -------------------------------------------------------------------------- */
+inline void Analyzer::dumpLogs() {
+
   std::ofstream logfile(output_log, std::ios::out);
   logfile << debug_log.str();
   logfile.close();
   std::cout << "Logs generated in "<< output_log << std::endl;
+
+  debug_log.clear();
+  debug_log.str("");
+  MPI_Barrier(comm);
+}
+
+/* -------------------------------------------------------------------------- */
+// WARNING: very memory-consuming routine (may segfault on small nodes)
+inline bool Analyzer::extractNonHalos(std::string scalar) {
+
+  debug_log.clear();
+  debug_log.str("");
+
+  std::vector<float> all;
+  std::vector<float> halo;
+  std::vector<float> non_halo;
+
+  // load all particles data
+  debug_log << "Handling full particles data ... " << std::endl;
+  ioMgr->init(input_full, comm);
+
+  if (ioMgr->loadData(scalar)) {
+    debug_log << ioMgr->getDataInfo();
+    size_t const n = ioMgr->getNumElements();
+    float* data = static_cast<float*>(ioMgr->data);
+
+    all.resize(n);
+    std::copy(data, data + n, all.begin());
+    std::sort(all.begin(), all.end());
+    ioMgr->close();
+
+    if (my_rank == 0)
+      std::cout << "scalar " << scalar << " copied and sorted" << std::endl;
+  }
+
   MPI_Barrier(comm);
 
-  // dump data and generate plot
-  generateHistogram(output_gnu);
+  // then load halo only data
+  debug_log << "Handling halo particles data ... " << std::endl;
 
-  // everything was fine at this point  
-  return true;
+  ioMgr->inOutData.clear();
+  ioMgr->init(input_halo, comm);
+  ioMgr->saveInputFileParameters();
+  MPI_Barrier(comm);
+
+  if (ioMgr->loadData(scalar)) {
+    debug_log << ioMgr->getDataInfo();
+    size_t const n = ioMgr->getNumElements();
+    float* data = static_cast<float*>(ioMgr->data);
+
+    halo.resize(n);
+    std::copy(data, data+n, halo.begin());
+    std::sort(halo.begin(), halo.end());
+    ioMgr->close();
+
+    if (my_rank == 0)
+      std::cout << "scalar "<< scalar << " copied and sorted" << std::endl;
+  }
+
+  MPI_Barrier(comm);
+
+  // FIXME may need redistribution here
+  // there maybe a mismatch between full and halo data partitions.
+  // plus, values must remain ordered for set_difference.
+  // accumulate and run with a single rank ? Huh :(
+
+  if (not all.empty() and not halo.empty()) {
+    // finally take the difference
+    non_halo.resize(all.size());
+
+    if (my_rank == 0)
+      std::cout << "compute set difference for scalar '"<< scalar << "'"
+                << "all particles: " << all.size() << ", "
+                << "halo particles: "<< halo.size() << "." << std::endl;
+
+    auto first = non_halo.begin();
+    auto last = std::set_difference(all.begin(), all.end(),
+                                    halo.begin(), halo.end(), first);
+
+    unsigned long local_count = last - first;
+    non_halo.resize(local_count);
+    std::cout << local_count << " non halos particles extracted" << std::endl;
+
+    // retrieve number of non halos particles
+    unsigned long global_count = 0;
+    MPI_Allreduce(&local_count, &global_count, 1, MPI_UNSIGNED_LONG, MPI_SUM, comm);
+
+    debug_log << " == " << global_count << " non halo particles found." << std::endl;
+    if (my_rank == 0)
+      std::cout << debug_log.str();
+  }
+
+  // save data for dumping
+  dumpLogs();
+
+  // no need to dump into file (unless for debug purposes),
+  // just pass the data to the analyzer directly.
+/*
+  void* void_data = static_cast<void*>(non_halo_data[index].data());
+  ioMgr->numElements = global_num_elems;
+  ioMgr->saveCompData(scalar, void_data);
+
+  ioMgr->writeData(output);
+  MPI_Barrier(comm);*/
 }

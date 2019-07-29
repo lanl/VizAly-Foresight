@@ -32,7 +32,8 @@ int main(int argc, char* argv[]){
   Analyzer analyzer(argv[1], my_rank, nb_ranks, comm);
  
   // run the analyzer 
-  analyzer.run();
+  //analyzer.run();
+  analyzer.extractNonHalos("x");
 
   MPI_Finalize();
   return EXIT_SUCCESS;
