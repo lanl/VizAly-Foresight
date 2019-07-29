@@ -16,11 +16,17 @@ Foresight has three components:
 The default master branch should always point to the latest working version. However, for more stable releases, you should checkout the latest tag release.
 
 ## Prerequisites:
+CBench
 * CMake 3.8.1 or higher
 * GCC 6.4 or higher (C++14 minimum)
 * OpenMPI 2 or higher
+
+PAT
 * Python 3.6 or higher with (+matplotlib=3.0.2, +apsw=3.9.2, +numpy=1.15.4)
 * SLURM (for job launching)
+
+Cinema
+* Mozilla Firefox Recommended
 
 ## Building:
 The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @ ANL, Cori @ NERSC, and Darwin @ LANL . These build a base version of Foresight:
