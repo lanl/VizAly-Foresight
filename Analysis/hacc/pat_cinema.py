@@ -47,7 +47,7 @@ class PATCinema(cinema.CinemaWorkflow):
 
             # loop over rows
             for row in reader:
-                prefix = row[1][2:-1]
+                prefix = row[1][1:]
 
                 # loop over image types
                 for col_name in image_columns:
@@ -57,11 +57,13 @@ class PATCinema(cinema.CinemaWorkflow):
                     if prefix in image_data[col_name].keys():
                         data_file = image_data[col_name][prefix]
                     else:
+                        print("Warning: Unable to match compressor name")
                         row.append("")
                         continue
 
                     # see if data file exists
                     if not os.path.exists(data_file):
+                        print("Error: File does not exist")
                         row.append("")
                         continue
 
@@ -69,12 +71,14 @@ class PATCinema(cinema.CinemaWorkflow):
                     try:
                         orig = numpy.loadtxt(data_file.replace(prefix, "orig"), delimiter=",")
                     except ValueError:
+                        print("Warning: Unable to find original data: ", data_file.replace(prefix, "orig"))
                         orig = numpy.loadtxt(data_file.replace(prefix, "orig"))
 
                     # get data
                     try:
                         data = numpy.loadtxt(data_file, delimiter=",")
                     except ValueError:
+                        print("Warning: Unable to compressed data: ", data_file)
                         data = numpy.loadtxt(data_file)
 
                     # plot
