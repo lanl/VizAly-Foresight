@@ -112,7 +112,7 @@
                 },
                 "halo_query" :
                 {
-                    "path": "source /projects/exasky/cmbiwer-projects/env.sh && python $foresight-home$/Analysis/pat_hacc_query.py",
+                    "path": "source /projects/exasky/cmbiwer-projects/env.sh && python $foresight-home$/Analysis/hacc/pat_hacc_query.py",
                     "sqlite-file" : "/projects/exasky/VizAly-Vis_IO/genericio/frontend/GenericIOSQLite.so",
                     "query" :
                     [
@@ -159,7 +159,7 @@
 
     "cinema-plots" :
     {
-        "path" : "python $foresight-home$/Analysis/pat_cinema.py",
+        "path" : "python $foresight-home$/Analysis/hacc/pat_cinema.py",
         "analysis" : {
             "FILE_Halo_Distribution_0" :
             {
