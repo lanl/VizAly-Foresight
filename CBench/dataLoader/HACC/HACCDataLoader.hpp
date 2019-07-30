@@ -27,12 +27,12 @@ class HACCDataLoader: public DataLoaderInterface
 	int numRanks;
 	int myRank;
 
+public:
 	// For output
 	double physOrigin[3];
 	double physScale[3];
 	int mpiCartPartitions[3];
 
-  public:
 	HACCDataLoader();
 	~HACCDataLoader();
 

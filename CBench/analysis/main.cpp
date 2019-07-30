@@ -33,7 +33,7 @@ int main(int argc, char* argv[]){
  
   // run the analyzer 
   //analyzer.run();
-  analyzer.extractNonHalos("x");
+  analyzer.extractNonHalos("x", true);
 
   MPI_Finalize();
   return EXIT_SUCCESS;

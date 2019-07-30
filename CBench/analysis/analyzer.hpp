@@ -25,7 +25,7 @@ public:
   Analyzer(const char* in_path, int in_rank, int in_nb_ranks, MPI_Comm in_comm);
   ~Analyzer() = default;
 
-  bool extractNonHalos(std::string output);
+  size_t extractNonHalos(std::string scalar, bool debug_dump = false);
   bool run();  // ok
 
 private:
@@ -33,15 +33,16 @@ private:
   double computeShannonEntropy(std::string scalar);
   void dumpLogs();
   void generateHistogram();
+  void saveDumpInfos(std::string input, int id);
 
-  // IO
+  // IOssh
   std::string json_path;
   std::string input_full;
   std::string input_halo;
   std::string output_log;
   std::string output_gnu;
   std::stringstream debug_log;
-  std::unique_ptr<DataLoaderInterface> ioMgr;
+  std::unique_ptr<HACCDataLoader> ioMgr;
 
   // per halo attribute data
   size_t num_bins = 0;
@@ -286,8 +287,8 @@ inline bool Analyzer::run() {
   debug_log.str("");
   debug_log << "Found "<< attributes.size() <<" attributes" << std::endl;
 
-  ioMgr->init(input_halo, comm); 
-  ioMgr->setSave(false); 
+  ioMgr->init(input_halo, comm);
+  ioMgr->setSave(false);
   MPI_Barrier(comm);
 
   for (auto&& scalar: attributes) {
@@ -307,13 +308,9 @@ inline bool Analyzer::run() {
     MPI_Barrier(comm);
   }
 
-
-  dumpLogs();
-
   // dump data and generate plot
   generateHistogram();
 
-  // everything was fine at this point  
   return true;
 }
 
@@ -329,10 +326,36 @@ inline void Analyzer::dumpLogs() {
   debug_log.str("");
   MPI_Barrier(comm);
 }
-
 /* -------------------------------------------------------------------------- */
-// WARNING: very memory-consuming routine (may segfault on small nodes)
-inline bool Analyzer::extractNonHalos(std::string scalar) {
+inline void Analyzer::saveDumpInfos(std::string input, int id) {
+
+  gio::GenericIO gioReader(comm, input);
+  std::vector<gio::GenericIO::VariableInfo> scalar_info;
+
+  gioReader.openAndReadHeader(gio::GenericIO::MismatchRedistribute);
+  assert(gioReader.readNRanks() >= nb_ranks);
+
+  gioReader.readPhysOrigin(ioMgr->physOrigin);
+  gioReader.readPhysScale(ioMgr->physScale);
+  gioReader.getVariableInfo(scalar_info);
+
+  ioMgr->inOutData.emplace_back(id,
+    scalar_info[id].Name,
+    static_cast<int>(scalar_info[id].Size),
+    scalar_info[id].IsFloat,
+    scalar_info[id].IsSigned,
+    scalar_info[id].IsPhysCoordX,
+    scalar_info[id].IsPhysCoordY,
+    scalar_info[id].IsPhysCoordZ
+  );
+
+  ioMgr->inOutData.back().determineDataType();
+
+}
+/* -------------------------------------------------------------------------- */
+// Warning: very memory-consuming routine (may segfault on small nodes).
+// It may need redistribution due to a possible data partitions mismatch.
+inline size_t Analyzer::extractNonHalos(std::string scalar, bool debug_dump) {
 
   debug_log.clear();
   debug_log.str("");
@@ -341,33 +364,10 @@ inline bool Analyzer::extractNonHalos(std::string scalar) {
   std::vector<float> halo;
   std::vector<float> non_halo;
 
-  // load all particles data
-  debug_log << "Handling full particles data ... " << std::endl;
-  ioMgr->init(input_full, comm);
-
-  if (ioMgr->loadData(scalar)) {
-    debug_log << ioMgr->getDataInfo();
-    size_t const n = ioMgr->getNumElements();
-    float* data = static_cast<float*>(ioMgr->data);
-
-    all.resize(n);
-    std::copy(data, data + n, all.begin());
-    std::sort(all.begin(), all.end());
-    ioMgr->close();
-
-    if (my_rank == 0)
-      std::cout << "scalar " << scalar << " copied and sorted" << std::endl;
-  }
-
-  MPI_Barrier(comm);
-
-  // then load halo only data
+  // load halo only particles data
   debug_log << "Handling halo particles data ... " << std::endl;
 
-  ioMgr->inOutData.clear();
   ioMgr->init(input_halo, comm);
-  ioMgr->saveInputFileParameters();
-  MPI_Barrier(comm);
 
   if (ioMgr->loadData(scalar)) {
     debug_log << ioMgr->getDataInfo();
@@ -385,47 +385,77 @@ inline bool Analyzer::extractNonHalos(std::string scalar) {
 
   MPI_Barrier(comm);
 
-  // FIXME may need redistribution here
-  // there maybe a mismatch between full and halo data partitions.
-  // plus, values must remain ordered for set_difference.
-  // accumulate and run with a single rank ? Huh :(
+  // load all particles data
+  debug_log << "Handling full particles data ... " << std::endl;
 
-  if (not all.empty() and not halo.empty()) {
-    // finally take the difference
-    non_halo.resize(all.size());
-
-    if (my_rank == 0)
-      std::cout << "compute set difference for scalar '"<< scalar << "'"
-                << "all particles: " << all.size() << ", "
-                << "halo particles: "<< halo.size() << "." << std::endl;
-
-    auto first = non_halo.begin();
-    auto last = std::set_difference(all.begin(), all.end(),
-                                    halo.begin(), halo.end(), first);
-
-    unsigned long local_count = last - first;
-    non_halo.resize(local_count);
-    std::cout << local_count << " non halos particles extracted" << std::endl;
-
-    // retrieve number of non halos particles
-    unsigned long global_count = 0;
-    MPI_Allreduce(&local_count, &global_count, 1, MPI_UNSIGNED_LONG, MPI_SUM, comm);
-
-    debug_log << " == " << global_count << " non halo particles found." << std::endl;
-    if (my_rank == 0)
-      std::cout << debug_log.str();
+  ioMgr->init(input_full, comm);
+  if (debug_dump) {
+    ioMgr->setSave(true);
+    saveDumpInfos(input_full, 0);
   }
 
-  // save data for dumping
+  if (ioMgr->loadData(scalar)) {
+    debug_log << ioMgr->getDataInfo();
+    size_t const n = ioMgr->getNumElements();
+    float* data = static_cast<float*>(ioMgr->data);
+
+    all.resize(n);
+    std::copy(data, data + n, all.begin());
+    std::sort(all.begin(), all.end());
+    ioMgr->close();
+
+    if (my_rank == 0)
+      std::cout << "scalar " << scalar << " copied and sorted" << std::endl;
+  }
+
+  MPI_Barrier(comm);
+
+  // then take the difference
+  non_halo.resize(all.size());
+  int const ratio = 100. * (double) halo.size() / all.size();
+
+  debug_log << "compute set difference for scalar '" << scalar << "': "
+            << "total particles: " << all.size() << ", "
+            << "halo particles: " << halo.size() << " ["<< ratio <<" %]."
+            << std::endl;
+
+  auto first = non_halo.begin();
+  auto last = std::set_difference(all.begin(), all.end(),
+                                  halo.begin(), halo.end(), first);
+
+  unsigned long global_count = 0;
+  unsigned long local_count = last - first;
+  non_halo.resize(local_count);
+
+  // retrieve number of non halos particles
+  MPI_Allreduce(&local_count, &global_count, 1, MPI_UNSIGNED_LONG, MPI_SUM, comm);
+
+  debug_log << "= local non halo particles extracted: "<< local_count << std::endl;
+  debug_log << "= total non halo particles extracted: "<< global_count << std::endl;
+
+  if (my_rank == 0)
+    std::cout << debug_log.str();
+
+  if (debug_dump) {
+
+    all.clear();
+    all.shrink_to_fit();
+    halo.clear();
+    halo.shrink_to_fit();
+
+    // dump data
+    debug_log << "Dumping non halo particles data ... " << std::endl;
+    if (my_rank == 0)
+      std::cout << "Dumping non halo particles data" << std::endl;
+
+    ioMgr->numElements = local_count;
+    ioMgr->totalNumberOfElements = global_count;
+    ioMgr->saveCompData(scalar, static_cast<void*>(non_halo.data()));
+    ioMgr->writeData("non_halo");
+
+    debug_log << " done" << std::endl;
+  }
+
   dumpLogs();
-
-  // no need to dump into file (unless for debug purposes),
-  // just pass the data to the analyzer directly.
-/*
-  void* void_data = static_cast<void*>(non_halo_data[index].data());
-  ioMgr->numElements = global_num_elems;
-  ioMgr->saveCompData(scalar, void_data);
-
-  ioMgr->writeData(output);
-  MPI_Barrier(comm);*/
+  return global_count;
 }

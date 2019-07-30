@@ -21,7 +21,7 @@ Authors:
 
 class DataLoaderInterface {
 
-protected:
+public:
 	std::string loader;
 	std::string filename;
 	std::string dataType;
