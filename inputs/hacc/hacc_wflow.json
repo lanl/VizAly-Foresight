@@ -159,7 +159,7 @@
 
     "cinema-plots" :
     {
-        "path" : "python $foresight-home$/Analysis/hacc/pat_cinema.py",
+        "path" : "source /projects/exasky/cmbiwer-projects/env.sh && python $foresight-home$/Analysis/hacc/pat_cinema.py",
         "analysis" : {
             "FILE_Halo_Distribution_0" :
             {
