@@ -1,0 +1,205 @@
+{
+    "project-home" : "/projects/exasky/run/hacc_ADD_NAME",
+    "foresight-home" : "/projects/exasky/VizAly-Foresight",
+    "wflow-path" : "",
+
+    "input" : 
+    {
+        "filetype" : "HACC",
+        "filename" : "/projects/exasky/VizAly-Foresight/testing/data/m000.full.mpicosmo.50",
+        "scalars" : ["x", "y", "z", "vx", "vy", "vz"]    
+    },
+
+    "compressors" : 
+    [
+        {
+            "name" : "BLOSC",
+            "output-prefix" : "blosc"
+        },
+        {
+            "name" : "SZ",
+            "output-prefix" : "sz",
+            "compressor-params" :
+            [
+                {
+                    "scalar" : ["x", "y", "z"],
+                    "abs" : 2E-3
+                },
+                {
+                    "scalar" : ["vx", "vy", "vz"],
+                    "pw_rel" : 1E-2
+                }
+            ]
+        },
+        {
+            "name" : "Isabela",
+            "output-prefix" : "isabela",
+            "tolerance" : 27,
+            "nCoeff" : 30,
+            "window-size" : 2048
+        },
+        {
+            "name" : "fpzip",
+            "output-prefix" : "fpzip",
+            "bits" : 27
+        },
+        {
+            "name" : "zfp",
+            "output-prefix" : "zfp",
+            "abs" : 1E-3
+        }
+    ],
+
+    
+    "cbench" : 
+    {
+        "path" : "mpirun $foresight-home$/build/CBench",
+        "output" :
+        {
+            "run-path" : "/projects/exasky/run/hacc_ADD_NAME",
+            "output-decompressed" : true,
+            "output-decompressed-location" : "decompressed_files",
+            "log-file" : "runlog",
+            "metrics-file" : "metrics"
+        },
+        "metrics" :
+        [
+            {
+                "name" : "absolute_error",
+                "histogram" : ["x", "y", "z"]
+            },
+            {
+                "name" : "relative_error"
+            },
+            {
+                "name" : "mse"
+            },
+            {
+                "name" : "psnr"
+            },
+            {
+                "name" : "minmax",
+                "histogram" : ["vx", "vy", "vz"]
+            }
+        ],
+        "configuration" :
+        {
+            "partition" : "scaling",
+            "nodes" : 1,
+            "ntasks-per-node" : 8
+        }
+    },
+
+    "pat" : {
+        "evn_path" : "/projects/exasky/HACC_GPU.darwin_setup",
+        "analysis-tool" :
+        {
+            "analytics" :
+            {
+                "halo" :
+                {
+                    "path" : "mpirun /projects/exasky/HACC_GPU/trunk/Darwin_GPU/mpi/bin/cosmotools-driver",
+                    "config-file" : "/projects/exasky/HACC_GPU/run/haloInputs/cosmotools-config.dat",
+                    "timesteps-file" : "/projects/exasky/HACC_GPU/run/haloInputs/timesteps.dat",
+                    "parameters-file" : "/projects/exasky/HACC_GPU/run/haloInputs/indat.params",
+                    "configuration" :
+                    {
+                        "partition" : "shared-gpu",
+                        "nodes" : 1,
+                        "ntasks-per-node" : 1
+                    }
+                },
+                "halo_query" :
+                {
+                    "path": "source /projects/exasky/cmbiwer-projects/env.sh && python $foresight-home$/Analysis/hacc/pat_hacc_query.py",
+                    "sqlite-file" : "/projects/exasky/VizAly-Vis_IO/genericio/frontend/GenericIOSQLite.so",
+                    "query" :
+                    [
+                        "select fof_halo_mass from __TABLE__"
+                    ],
+                    "xlabel" :
+                    [
+                        "Halo Mass"
+                    ],
+                    "ylabel" :
+                    [
+                        "Counts"
+                    ],
+                    "xlim" :
+                    [
+                        [1e10, 1e15]
+                    ],
+                    "log-bins" :
+                    [
+                        true
+                    ],
+                    "configuration" :
+                    {
+                        "partition" : "scaling",
+                        "nodes" : 1
+                    }
+                },
+                "spectrum" :
+                {
+                    "path" : "mpirun /projects/exasky/HACC/trunk/Darwin/mpi/bin/hacc_pk_gio_auto_rsd",
+                    "config-file" : "/projects/exasky/HACC/run/inputs/indat.params",
+                    "configuration" :
+                    {
+                        "partition" : "scaling",
+                        "nodes" : 4,
+                        "ntasks-per-node" : 16
+                    }
+                }
+            }
+        },
+        "input-files" : [],
+        "analysis" : []
+    },
+
+    "cinema-plots" :
+    {
+        "path" : "source /projects/exasky/cmbiwer-projects/env.sh && python $foresight-home$/Analysis/hacc/pat_cinema.py",
+        "analysis" : {
+            "FILE_Halo_Distribution_0" :
+            {
+                "xscale" : "log",
+                "ylim" : [0.95, 1.05],
+                "xlabel" : "Halo Mass",
+                "ylabel" : "Ratio [Compressed/Uncompressed]"
+            },
+            "FILE_Spectrum" :
+            {
+                "xlim" : [0, 10],
+                "ylim" : [0.98, 1.01],
+                "xlabel" : "k",
+                "ylabel" : "Ratio [Compressed/Uncompressed]"
+            },
+            "FILE_Spectrum.rsd.0" :
+            {
+                "xlim" : [0, 10],
+                "ylim" : [0.98, 1.01],
+                "xlabel" : "k",
+                "ylabel" : "Ratio [Compressed/Uncompressed]"
+            },
+            "FILE_Spectrum.rsd.1" :
+            {
+                "xlim" : [0, 10],
+                "ylim" : [0.98, 1.01],
+                "xlabel" : "k",
+                "ylabel" : "Ratio [Compressed/Uncompressed]"
+            },
+            "FILE_Spectrum.rsd.2" :
+            {
+                "xlim" : [0, 10],
+                "ylim" : [0.98, 1.01],
+                "xlabel" : "k",
+                "ylabel" : "Ratio [Compressed/Uncompressed]"
+            }
+        },
+        "configuration" :
+        {
+            "partition" : "scaling",
+            "nodes" : 1
+        }
+    }
+}
