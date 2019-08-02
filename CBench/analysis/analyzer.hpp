@@ -406,8 +406,6 @@ inline void Analyzer::saveDumpInfos(std::string input, int id) {
 
 /* -------------------------------------------------------------------------- */
 // warning: very memory-consuming routine (may segfault on small nodes).
-// may need redistribution due to a slight partitions mismatch.
-// particle count error (relative deviation) is 0.000006 for 'm000.full.mpicosmo.499'
 inline std::vector<float> Analyzer::extractNonHalos(std::string scalar, bool debug_dump) {
 
   debug_log.clear();
@@ -416,6 +414,10 @@ inline std::vector<float> Analyzer::extractNonHalos(std::string scalar, bool deb
   std::vector<float> all;
   std::vector<float> halo;
   std::vector<float> non_halo;
+  std::vector<float> unmatched;
+
+  size_t total_halo_count = 0;
+  size_t total_full_count = 0;
 
   // load halo only particles data
   debug_log << "Handling halo particles data ... " << std::endl;
@@ -424,6 +426,7 @@ inline std::vector<float> Analyzer::extractNonHalos(std::string scalar, bool deb
 
   if (ioMgr->loadData(scalar)) {
     debug_log << ioMgr->getDataInfo();
+    total_halo_count = ioMgr->totalNumberOfElements;
     size_t const n = ioMgr->getNumElements();
     float* data = static_cast<float*>(ioMgr->data);
 
@@ -449,6 +452,7 @@ inline std::vector<float> Analyzer::extractNonHalos(std::string scalar, bool deb
 
   if (ioMgr->loadData(scalar)) {
     debug_log << ioMgr->getDataInfo();
+    total_full_count = ioMgr->totalNumberOfElements;
     size_t const n = ioMgr->getNumElements();
     float* data = static_cast<float*>(ioMgr->data);
 
@@ -465,30 +469,49 @@ inline std::vector<float> Analyzer::extractNonHalos(std::string scalar, bool deb
 
   // then take the difference
   non_halo.resize(all.size());
-  int const ratio = 100. * (double) halo.size() / all.size();
+  double const ratio = 100. * double(total_halo_count) / total_full_count;
 
   debug_log << "compute set difference for scalar '" << scalar << "': "
-            << "total particles: " << all.size() << ", "
-            << "halo particles: " << halo.size() << " ["<< ratio <<" %]."
-            << std::endl;
+            << "all: " << total_full_count << ", "
+            << "halo: "<< total_halo_count << " ["<< ratio <<" %]." << std::endl;
 
   auto first = non_halo.begin();
   auto last = std::set_difference(all.begin(), all.end(),
                                   halo.begin(), halo.end(), first);
 
-  unsigned long global_count = 0;
-  unsigned long local_count = last - first;
-  non_halo.resize(local_count);
+  unsigned long total_non_halo_count = 0;
+  unsigned long local_non_halo_count = last - first;
+  non_halo.resize(local_non_halo_count);
 
   // retrieve number of non halos particles
-  MPI_Allreduce(&local_count, &global_count, 1, MPI_UNSIGNED_LONG, MPI_SUM, comm);
+  MPI_Allreduce(&local_non_halo_count, &total_non_halo_count, 1, MPI_UNSIGNED_LONG, MPI_SUM, comm);
 
-  debug_log << "= local non halo particles extracted: "<< local_count << std::endl;
-  debug_log << "= total non halo particles extracted: "<< global_count << std::endl;
+  // now compute the error
+  debug_log << "compute unmatched halo particles "<< std::endl;
 
-  ioMgr->numElements = local_count;
-  ioMgr->totalNumberOfElements = global_count;
-  count_non_halos += global_count;
+  unmatched.resize(halo.size());
+  auto first_pos = unmatched.begin();
+  auto last_pos  = std::set_difference(halo.begin(), halo.end(),
+                                       all.begin(), all.end(), first_pos);
+
+  unsigned long total_unmatched_halo_count = 0;
+  unsigned long local_unmatched_halo_count = last_pos - first_pos;
+
+  // retrieve number of non halos particles
+  MPI_Allreduce(&local_unmatched_halo_count, &total_unmatched_halo_count, 1, MPI_UNSIGNED_LONG, MPI_SUM, comm);
+  // deduce error
+  double const total_error_ratio = 100. * double(total_unmatched_halo_count) / total_halo_count;
+  // ---------------
+
+  ioMgr->numElements = local_non_halo_count;
+  ioMgr->totalNumberOfElements = total_non_halo_count;
+
+  debug_log << "= local unmatched halo particles: "<< local_unmatched_halo_count << std::endl;
+  debug_log << "= local non halo particles extracted: "<< local_non_halo_count << std::endl;
+  debug_log << std::endl;
+  debug_log << "= total unmatched halo particles: "<< total_unmatched_halo_count << std::endl;
+  debug_log << "= total non halo particles extracted: "<< total_non_halo_count << std::endl;
+  debug_log << "= total extraction error ratio: "<< total_error_ratio << " %"<< std::endl;
 
   if (my_rank == 0)
     std::cout << debug_log.str();
@@ -496,8 +519,11 @@ inline std::vector<float> Analyzer::extractNonHalos(std::string scalar, bool deb
   if (debug_dump) {
 
     all.clear();
-    all.shrink_to_fit();
     halo.clear();
+    unmatched.clear();
+
+    all.shrink_to_fit();
+    halo.shrink_to_fit();
     halo.shrink_to_fit();
 
     // dump data
