@@ -20,17 +20,18 @@ class Analyzer {
 
 public: 
   Analyzer() = default; 
-  Analyzer(Analyzer const&) = delete; 
-  Analyzer(Analyzer&&) noexcept = delete; 
   Analyzer(const char* in_path, int in_rank, int in_nb_ranks, MPI_Comm in_comm);
+  Analyzer(Analyzer const&) = delete;
+  Analyzer(Analyzer&&) noexcept = delete;
   ~Analyzer() = default;
 
-  std::vector<float> extractNonHalos(std::string scalar, bool debug_dump = false);
-  bool run();  // ok
+  bool run();
 
 private:
-  bool computeFrequencies(std::string scalar, float* original, float* approx);
-  double computeShannonEntropy(std::string scalar);
+  bool computeFrequencies(int id, float* original, float* approx);
+  void computeShannonEntropy(int id);
+  std::vector<float> extractNonHalos(std::string scalar, bool debug_dump = false);
+  size_t updateParticlesCount();
   void generateHistogram();
   void saveDumpInfos(std::string input, int id);
   void dumpLogs();
@@ -44,15 +45,18 @@ private:
   std::stringstream debug_log;
   std::unique_ptr<HACCDataLoader> ioMgr;
 
-  // per halo attribute data
+
   bool extract_non_halos = false;
+  int num_scalars = 0;
+  size_t num_bins = 0;
   size_t count_halos = 0;
   size_t count_non_halos = 0;
 
-  size_t num_bins = 0;
+  // per scalar data
   std::vector<std::string> attributes;
-  std::unordered_map<std::string, std::vector<double>> frequency;
-  std::unordered_map<std::string, size_t> size;
+  std::vector<size_t> count;
+  std::vector<std::vector<double>> frequency;
+  std::vector<double> entropy;
 
   // MPI
   int my_rank  = 0;
@@ -100,6 +104,12 @@ inline Analyzer::Analyzer(const char* in_path, int in_rank,
     }
   }
 
+  // init data structures
+  num_scalars = attributes.size();
+  entropy.resize(num_scalars);
+  count.resize(num_scalars);
+  frequency.resize(num_scalars);
+
   // check if non halo particles should be extracted
   if (json["analysis"].find("extract_non_halos") != json["analysis"].end()) {
     assert(input_full != "");
@@ -114,9 +124,24 @@ inline Analyzer::Analyzer(const char* in_path, int in_rank,
 }
 
 /* -------------------------------------------------------------------------- */
-inline bool Analyzer::computeFrequencies(std::string scalar, float* original, float* approx) {
+inline size_t Analyzer::updateParticlesCount() {
 
-  double const& n = size[scalar];
+  if (extract_non_halos) {
+    // may slightly differ due to partition mismatch, so take the average
+    size_t nb_particles = 0;
+    for (auto&& current : count) {
+      nb_particles += current;
+    }
+    count_non_halos = nb_particles / num_scalars;
+  } else {
+    count_halos = count[0];
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+inline bool Analyzer::computeFrequencies(int id, float* original, float* approx) {
+
+  double const& n = count[id];
   assert(n > 0.);
 
   // step 1. determine lower and upper bounds on data
@@ -165,11 +190,11 @@ inline bool Analyzer::computeFrequencies(std::string scalar, float* original, fl
     MPI_Allreduce(local_histogram, global_histogram, num_bins, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
 
     // fill frequency eventually
-    frequency[scalar].clear();
-    frequency[scalar].resize(num_bins);
+    frequency[id].clear();
+    frequency[id].resize(num_bins);
 
     for (size_t i = 0; i < num_bins; ++i)
-      frequency[scalar][i] = static_cast<double>(global_histogram[i]) / n;
+      frequency[id][i] = static_cast<double>(global_histogram[i]) / n;
 
     return true;
   }
@@ -178,21 +203,19 @@ inline bool Analyzer::computeFrequencies(std::string scalar, float* original, fl
 }
 
 /* -------------------------------------------------------------------------- */
-inline double Analyzer::computeShannonEntropy(std::string scalar) {
+inline void Analyzer::computeShannonEntropy(int i) {
 
-  double entropy = 0.;
   double const epsilon = std::numeric_limits<double>::epsilon();
 
-  for (auto&& value : frequency[scalar]) {
-    auto const& p_i = std::max(value, epsilon);
-    entropy += (p_i * std::log2(p_i));
+  entropy[i] = 0.;
+  for (auto&& value : frequency[i]) {
+    auto const& p_j = std::max(value, epsilon);
+    entropy[i] += (p_j * std::log2(p_j));
   }
-  entropy *= -1;
+  entropy[i] *= -1;
 
-  debug_log << "shannon entropy for '"<< scalar << "' = "<< entropy
-           << " using " << num_bins << " bins." << std::endl;
-
-  return entropy;
+  debug_log << "shannon entropy for '"<< attributes[i] << "' = "
+            << entropy[i] << " using " << num_bins << " bins." << std::endl;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -201,11 +224,14 @@ inline void Analyzer::generateHistogram() {
   if (my_rank != 0)
     return;
 
+  updateParticlesCount();
+
   auto const& root_path = output_gnu;
   auto const num_bins_str = std::to_string(num_bins);
 
   // dump data first
-  for (auto&& scalar : attributes) {
+  for (int i = 0; i < num_scalars; ++i) {
+    auto const& scalar = attributes[i];
     std::string path = root_path + "_" + scalar + "_" + num_bins_str +".dat";
     std::ofstream file(path, std::ios::out|std::ios::trunc);
     assert(file.is_open());
@@ -213,7 +239,7 @@ inline void Analyzer::generateHistogram() {
 
     file << "# scalar: " << scalar << std::endl;
     file << "# num_bins: " << num_bins_str << std::endl;
-    for (auto&& value : frequency[scalar]) {
+    for (auto&& value : frequency[i]) {
       file << value << std::endl;
     }
 
@@ -252,20 +278,18 @@ inline void Analyzer::generateHistogram() {
   file << std::endl;
   file << "set multiplot layout 2,3 title '"<< title <<"'" << std::endl;
 
-  for (auto&& scalar : attributes) {
+  for (int i = 0; i < num_scalars; ++i) {
     // get bounds
     double v_max = 0.;
-    for (auto&& value : frequency[scalar]) {
+    for (auto&& value : frequency[i]) {
       if (value > v_max) { v_max = value; }
     }
 
-    double const entropy = computeShannonEntropy(scalar);
-
-    std::string data_file = root_path + "_" + scalar + "_" + num_bins_str +".dat";
+    std::string data_file = root_path + "_" + attributes[i] + "_" + num_bins_str +".dat";
 
     file << std::endl;
     file << "# ----------------------------------------------------" << std::endl;
-    file << "set title '"<< scalar << ", entropy=" << entropy <<"'"<< std::endl;
+    file << "set title '"<< attributes[i] << ", entropy=" << entropy[i] <<"'"<< std::endl;
     file << "set size ratio 1" << std::endl;
     file << "set xlabel 'particle values'" << std::endl;
     file << "set ylabel 'frequency'" << std::endl;
@@ -300,7 +324,7 @@ inline bool Analyzer::run() {
 
   debug_log.clear();
   debug_log.str("");
-  debug_log << "Found "<< attributes.size() <<" attributes" << std::endl;
+  debug_log << "Found "<< num_scalars <<" attributes" << std::endl;
 
   if (not extract_non_halos) {
 
@@ -308,35 +332,32 @@ inline bool Analyzer::run() {
     ioMgr->setSave(false);
     MPI_Barrier(comm);
 
-    for (auto&& scalar: attributes) {
+    for (int i = 0; i < num_scalars; ++i) {
+      auto const& scalar = attributes[i];
       debug_log << "\nLoading and running " << scalar << std::endl;
       // load current data
       if (ioMgr->loadData(scalar)) {
         // save infos for debug
         debug_log << ioMgr->getDataInfo();
         debug_log << ioMgr->getLog();
-
-        size[scalar] = ioMgr->getNumElements();
+        count[i] = ioMgr->getNumElements();
         float* data = static_cast<float*>(ioMgr->data);
-        computeFrequencies(scalar, data, data);
-        computeShannonEntropy(scalar);
-        count_halos = size[scalar];
+        computeFrequencies(i, data, data);
+        computeShannonEntropy(i);
         MPI_Barrier(comm);
       }
     }
   } else {
-    count_non_halos = 0;
-
-    for (auto&& scalar: attributes) {
+    for (int i = 0; i < num_scalars; ++i) {
+      auto const& scalar = attributes[i];
       // first extract non halos data
       auto non_halos = extractNonHalos(scalar);
-      size[scalar] = ioMgr->getNumElements();
-      computeFrequencies(scalar, non_halos.data(), non_halos.data());
-      computeShannonEntropy(scalar);
+      count[i] = ioMgr->getNumElements();
+      computeFrequencies(i, non_halos.data(), non_halos.data());
+      computeShannonEntropy(i);
       non_halos.clear();
       MPI_Barrier(comm);
     }
-    count_non_halos /= attributes.size();
   }
 
   // dump data and generate plot
@@ -381,11 +402,12 @@ inline void Analyzer::saveDumpInfos(std::string input, int id) {
   );
 
   ioMgr->inOutData.back().determineDataType();
-
 }
+
 /* -------------------------------------------------------------------------- */
-// Warning: very memory-consuming routine (may segfault on small nodes).
-// It may need redistribution due to a possible data partitions mismatch.
+// warning: very memory-consuming routine (may segfault on small nodes).
+// may need redistribution due to a slight partitions mismatch.
+// particle count error (relative deviation) is 0.000006 for 'm000.full.mpicosmo.499'
 inline std::vector<float> Analyzer::extractNonHalos(std::string scalar, bool debug_dump) {
 
   debug_log.clear();
