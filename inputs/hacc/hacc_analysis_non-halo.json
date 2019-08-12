@@ -12,14 +12,17 @@
       "vx",
       "vy",
       "vz"
-    ],
-    "num_bins": 2048
+    ]
   },
   "analysis":{
-    "path":"",
-    "output":{
-      "logs":"log_hacc_analysis",
-      "gnuplot":"distrib"
+    "non-halos":{
+      "extract": "yes",
+      "output": "non-halo"
+    },
+    "entropy":{
+      "num_bins": 4096,
+      "logs": "log_non-halo_analysis",
+      "plots": "distrib"
     }
   }
 }

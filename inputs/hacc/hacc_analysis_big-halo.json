@@ -1,0 +1,29 @@
+{
+  "project-home":"",
+  "foresight-home":"",
+  "input":{
+    "filetype":"HACC",
+    "full": "/projects/exasky/data/Argonne_L360_HACC001/STEP499/m000.full.mpicosmo.499",
+    "halo":"/projects/exasky/data/Argonne_L360_HACC001/analysis/Halos/b0168/STEP499/m000-499.bighaloparticles",
+    "scalars":[
+      "x",
+      "y",
+      "z",
+      "vx",
+      "vy",
+      "vz"
+    ],
+    "num_bins": 4096
+  },
+  "analysis":{
+    "non-halos":{
+      "extract": "no",
+      "output": ""
+    },
+    "entropy":{
+      "num_bins": 4096,
+      "logs": "log_big-halo_analysis",
+      "plots": "big-halo/distrib"
+    }
+  }
+}
