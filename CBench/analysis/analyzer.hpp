@@ -23,17 +23,18 @@ public:
   Analyzer(const char* in_path, int in_rank, int in_nb_ranks, MPI_Comm in_comm);
   Analyzer(Analyzer const&) = delete;
   Analyzer(Analyzer&&) noexcept = delete;
-  ~Analyzer() = default;
+  ~Analyzer();
 
   bool run();
 
 private:
   bool computeFrequencies(int id, float* original, float* approx);
-  void computeShannonEntropy(int id);
-  std::vector<float> extractNonHalos(std::string scalar, bool debug_dump = false);
-  size_t updateParticlesCount();
+  void computeShannonEntropy(int i);
+  void updateParticlesCount();
+  // non-halo particles
+  void extractNonHalos(int i);
+  void dumpNonHalosData();
   void generateHistogram();
-  void saveDumpInfos(std::string input, int id);
   void dumpLogs();
 
   // IO
@@ -42,21 +43,25 @@ private:
   std::string input_halo;
   std::string output_log;
   std::string output_gnu;
+  std::string output_non_halos;
   std::stringstream debug_log;
   std::unique_ptr<HACCDataLoader> ioMgr;
 
-
-  bool extract_non_halos = false;
   int num_scalars = 0;
   size_t num_bins = 0;
+  double phys_origin[3];
+  double phys_scale[3];
+
   size_t count_halos = 0;
   size_t count_non_halos = 0;
+  bool extract_non_halos = false;
 
   // per scalar data
   std::vector<std::string> attributes;
   std::vector<size_t> count;
   std::vector<std::vector<double>> frequency;
   std::vector<double> entropy;
+  std::vector<float*> non_halos;
 
   // MPI
   int my_rank  = 0;
@@ -65,74 +70,76 @@ private:
 };
 
 /* -------------------------------------------------------------------------- */
-inline Analyzer::Analyzer(const char* in_path, int in_rank,
-                                int in_nb_ranks, MPI_Comm in_comm)
-  : json_path(in_path), my_rank(in_rank),
-    nb_ranks(in_nb_ranks), comm(in_comm)
+inline Analyzer::Analyzer(const char* in_path, int in_rank, int in_nb_ranks, MPI_Comm in_comm)
+  : json_path(in_path),
+    my_rank(in_rank),
+    nb_ranks(in_nb_ranks),
+    comm(in_comm)
 {
   assert(nb_ranks > 0);
-  // parse parameters
   nlohmann::json json;
+  std::string buffer;
 
   std::ifstream file(json_path);
   assert(file.is_open());
   assert(file.good());
 
-  // parse params
+  // parse params and do basic checks
   file >> json;
 
-  if (json["input"].find("halo") != json["input"].end())
-    input_halo = json["input"]["halo"];
+  assert(json["input"].find("halo") != json["input"].end());
+  assert(json["input"].find("full") != json["input"].end());
+  assert(json["input"].find("scalars") != json["input"].end());
+  assert(json["analysis"].find("entropy") != json["analysis"].end());
+  assert(json["analysis"].find("non-halos") != json["analysis"].end());
 
-  if (json["input"].find("full") != json["input"].end())
-    input_full = json["input"]["full"];
+  // set the IO manager
+  ioMgr = std::make_unique<HACCDataLoader>();
+  input_halo = json["input"]["halo"];
+  input_full = json["input"]["full"];
 
   for (auto&& scalar : json["input"]["scalars"])
     attributes.push_back(scalar);
 
-  if (json["input"].find("num_bins") != json["input"].end())
-    num_bins = json["input"]["num_bins"];
-  assert(num_bins > 0);
-
-  // set the IO manager
-  ioMgr = std::make_unique<HACCDataLoader>();
-
-  if (json["input"].find("datainfo") != json["input"].end()) {
-    auto const& datainfo = json["input"]["datainfo"];
-    for (auto it = datainfo.begin(); it != datainfo.end(); ++it) {
-      ioMgr->loaderParams[it.key()] = strConvert::toStr(it.value());
-    }
-  }
-
   // init data structures
+  num_bins = json["analysis"]["entropy"]["num_bins"];
   num_scalars = attributes.size();
   entropy.resize(num_scalars);
   count.resize(num_scalars);
   frequency.resize(num_scalars);
 
-  // check if non halo particles should be extracted
-  if (json["analysis"].find("extract_non_halos") != json["analysis"].end()) {
-    assert(input_full != "");
-    extract_non_halos = (json["analysis"]["extract_non_halos"] == "yes");
-  }
-
   // set outputs paths
-  std::string prefix = json["analysis"]["output"]["logs"];
+  std::string prefix = json["analysis"]["entropy"]["logs"];
   output_log = prefix + "_rank_" + std::to_string(my_rank) +".log";
-  output_gnu = json["analysis"]["output"]["gnuplot"];
+  output_gnu = json["analysis"]["entropy"]["plots"];
 
+  // non-halos particles
+  // check if non halo particles should be extracted
+  std::string option = json["analysis"]["non-halos"]["extract"];
+
+  if (option == "yes") {
+    extract_non_halos = true;
+    output_non_halos = json["analysis"]["non-halos"]["output"];
+    non_halos.resize(num_scalars);
+    for (auto&& data : non_halos)
+      data = nullptr;
+  }
 }
 
 /* -------------------------------------------------------------------------- */
-inline size_t Analyzer::updateParticlesCount() {
+inline Analyzer::~Analyzer() {
+  for (auto&& data : non_halos)
+    delete [] data;
+}
 
+/* -------------------------------------------------------------------------- */
+inline void Analyzer::updateParticlesCount() {
+
+  // non-halo particles count may slightly differ due to partition mismatch
+  // need to take the minimum to avoid issues when dumping them.
   if (extract_non_halos) {
-    // may slightly differ due to partition mismatch, so take the average
-    size_t nb_particles = 0;
-    for (auto&& current : count) {
-      nb_particles += current;
-    }
-    count_non_halos = nb_particles / num_scalars;
+    std::accumulate(count.begin(), count.end(), count_non_halos,
+                    [](auto& a, auto& b) { return std::min(a,b); });
   } else {
     count_halos = count[0];
   }
@@ -330,7 +337,6 @@ inline bool Analyzer::run() {
 
     ioMgr->init(input_halo, comm);
     ioMgr->setSave(false);
-    MPI_Barrier(comm);
 
     for (int i = 0; i < num_scalars; ++i) {
       auto const& scalar = attributes[i];
@@ -341,6 +347,7 @@ inline bool Analyzer::run() {
         debug_log << ioMgr->getDataInfo();
         debug_log << ioMgr->getLog();
         count[i] = ioMgr->getNumElements();
+
         float* data = static_cast<float*>(ioMgr->data);
         computeFrequencies(i, data, data);
         computeShannonEntropy(i);
@@ -349,15 +356,15 @@ inline bool Analyzer::run() {
     }
   } else {
     for (int i = 0; i < num_scalars; ++i) {
-      auto const& scalar = attributes[i];
       // first extract non halos data
-      auto non_halos = extractNonHalos(scalar);
+      extractNonHalos(i);
       count[i] = ioMgr->getNumElements();
-      computeFrequencies(i, non_halos.data(), non_halos.data());
+      computeFrequencies(i, non_halos[i], non_halos[i]);
       computeShannonEntropy(i);
-      non_halos.clear();
       MPI_Barrier(comm);
     }
+
+    dumpNonHalosData();
   }
 
   // dump data and generate plot
@@ -378,51 +385,28 @@ inline void Analyzer::dumpLogs() {
   debug_log.str("");
   MPI_Barrier(comm);
 }
-/* -------------------------------------------------------------------------- */
-inline void Analyzer::saveDumpInfos(std::string input, int id) {
 
-  gio::GenericIO gioReader(comm, input);
-  std::vector<gio::GenericIO::VariableInfo> scalar_info;
-
-  gioReader.openAndReadHeader(gio::GenericIO::MismatchRedistribute);
-  assert(gioReader.readNRanks() >= nb_ranks);
-
-  gioReader.readPhysOrigin(ioMgr->physOrigin);
-  gioReader.readPhysScale(ioMgr->physScale);
-  gioReader.getVariableInfo(scalar_info);
-
-  ioMgr->inOutData.emplace_back(id,
-    scalar_info[id].Name,
-    static_cast<int>(scalar_info[id].Size),
-    scalar_info[id].IsFloat,
-    scalar_info[id].IsSigned,
-    scalar_info[id].IsPhysCoordX,
-    scalar_info[id].IsPhysCoordY,
-    scalar_info[id].IsPhysCoordZ
-  );
-
-  ioMgr->inOutData.back().determineDataType();
-}
 
 /* -------------------------------------------------------------------------- */
 // warning: very memory-consuming routine (may segfault on small nodes).
-inline std::vector<float> Analyzer::extractNonHalos(std::string scalar, bool debug_dump) {
+inline void Analyzer::extractNonHalos(int i) {
 
-  debug_log.clear();
-  debug_log.str("");
+  assert(i < num_scalars);
 
   std::vector<float> all;
   std::vector<float> halo;
-  std::vector<float> non_halo;
   std::vector<float> unmatched;
 
   size_t total_halo_count = 0;
   size_t total_full_count = 0;
 
   // load halo only particles data
+  debug_log.clear();
+  debug_log.str("");
   debug_log << "Handling halo particles data ... " << std::endl;
 
   ioMgr->init(input_halo, comm);
+  auto scalar = attributes[i];
 
   if (ioMgr->loadData(scalar)) {
     debug_log << ioMgr->getDataInfo();
@@ -445,12 +429,16 @@ inline std::vector<float> Analyzer::extractNonHalos(std::string scalar, bool deb
   debug_log << "Handling full particles data ... " << std::endl;
 
   ioMgr->init(input_full, comm);
-  if (debug_dump) {
-    ioMgr->setSave(true);
-    saveDumpInfos(input_full, 0);
-  }
+  ioMgr->saveInputFileParameters();
+  ioMgr->setSave(true);
 
   if (ioMgr->loadData(scalar)) {
+
+    if (my_rank == 0) {
+      std::cout << ioMgr->getLog() << std::endl;
+      std::cout << "===================================" << std::endl;
+    }
+
     debug_log << ioMgr->getDataInfo();
     total_full_count = ioMgr->totalNumberOfElements;
     size_t const n = ioMgr->getNumElements();
@@ -468,20 +456,21 @@ inline std::vector<float> Analyzer::extractNonHalos(std::string scalar, bool deb
   MPI_Barrier(comm);
 
   // then take the difference
-  non_halo.resize(all.size());
+  //non_halo.resize(all.size());
+  non_halos[i] = new float[all.size()];
   double const ratio = 100. * double(total_halo_count) / total_full_count;
 
   debug_log << "compute set difference for scalar '" << scalar << "': "
             << "all: " << total_full_count << ", "
             << "halo: "<< total_halo_count << " ["<< ratio <<" %]." << std::endl;
 
-  auto first = non_halo.begin();
+  auto first = non_halos[i];//non_halo.begin();
   auto last = std::set_difference(all.begin(), all.end(),
                                   halo.begin(), halo.end(), first);
 
   unsigned long total_non_halo_count = 0;
   unsigned long local_non_halo_count = last - first;
-  non_halo.resize(local_non_halo_count);
+  //non_halo.resize(local_non_halo_count);
 
   // retrieve number of non halos particles
   MPI_Allreduce(&local_non_halo_count, &total_non_halo_count, 1, MPI_UNSIGNED_LONG, MPI_SUM, comm);
@@ -516,26 +505,61 @@ inline std::vector<float> Analyzer::extractNonHalos(std::string scalar, bool deb
   if (my_rank == 0)
     std::cout << debug_log.str();
 
-  if (debug_dump) {
+  dumpLogs();
+  //non_halos[i] = std::move(non_halo.d);
+}
 
-    all.clear();
-    halo.clear();
-    unmatched.clear();
+/* --------------------------------------------------------------------------
+void Analyzer::cacheNonHalosData(int i) {
 
-    all.shrink_to_fit();
-    halo.shrink_to_fit();
-    halo.shrink_to_fit();
+  assert(i < num_scalars);
+  assert(data != nullptr);
+  assert(count[i]);
 
-    // dump data
-    debug_log << "Dumping non halo particles data ... " << std::endl;
-    if (my_rank == 0)
-      std::cout << "Dumping non halo particles data" << std::endl;
+  debug_log << "Caching non halos data for scalar "<< attributes[i] <<" ... ";
+  // nb: local to the current rank
+  non_halos[i] = new float[count[i]];
+  std::copy(data, data + count[i], non_halos[i]);
 
-    ioMgr->saveCompData(scalar, static_cast<void*>(non_halo.data()));
-    ioMgr->writeData("non_halo");
-    debug_log << " done" << std::endl;
+  debug_log << count[i] << " particle data stored." << std::endl;
+}*/
+/* -------------------------------------------------------------------------- */
+void Analyzer::dumpNonHalosData() {
+
+  debug_log << "Dumping non halos data into '"<< output_non_halos <<"' ... ";
+
+  int periods[3] = {0,0,0};
+  int const* dim_size = ioMgr->mpiCartPartitions;
+  MPI_Cart_create(comm, 3, dim_size, periods, 0, &comm);
+
+  // init writer and open file
+  gio::GenericIO gioWriter(comm, output_non_halos);
+  gioWriter.setNumElems(count_non_halos);
+
+  // init physical params
+  for (int d=0; d < 3; ++d) {
+    gioWriter.setPhysOrigin(ioMgr->physOrigin[d], d);
+    gioWriter.setPhysScale(ioMgr->physScale[d], d);
   }
 
-  dumpLogs();
-  return std::move(non_halo);
+  MPI_Barrier(comm);
+
+  auto flag = [](int i) {
+    unsigned f = gio::GenericIO::VarHasExtraSpace;
+         if (i == 0) { f |= gio::GenericIO::VarIsPhysCoordX; }
+    else if (i == 1) { f |= gio::GenericIO::VarIsPhysCoordY; }
+    else if (i == 2) { f |= gio::GenericIO::VarIsPhysCoordZ; }
+    return f;
+  };
+
+  // populate params now
+  for (int i=0; i < num_scalars; ++i) {
+    auto scalar = attributes[i].data();
+    gioWriter.addVariable(scalar, non_halos[i], flag(i));
+  }
+
+  gioWriter.write();
+
+  debug_log << " done." << std::endl;
 }
+/* -------------------------------------------------------------------------- */
