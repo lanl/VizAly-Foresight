@@ -23,7 +23,7 @@ public:
   Analyzer(const char* in_path, int in_rank, int in_nb_ranks, MPI_Comm in_comm);
   Analyzer(Analyzer const&) = delete;
   Analyzer(Analyzer&&) noexcept = delete;
-  ~Analyzer();
+  ~Analyzer() = default;
 
   bool run();
 
@@ -55,12 +55,12 @@ private:
   size_t count_non_halos = 0;
   bool extract_non_halos = false;
 
-  // per scalar data
+  // per-scalar data
   std::vector<std::string> scalars;
   std::vector<size_t> count;
   std::vector<double> entropy;
   std::vector<std::vector<double>> frequency;
-  std::vector<float*> non_halos;
+  std::vector<std::vector<float>> non_halos;
 
   // MPI
   int my_rank  = 0;
@@ -120,15 +120,7 @@ inline Analyzer::Analyzer(const char* in_path, int in_rank, int in_nb_ranks, MPI
     extract_non_halos = true;
     output_non_halos = json["analysis"]["non-halos"]["output"];
     non_halos.resize(num_scalars);
-    for (auto&& data : non_halos)
-      data = nullptr;
   }
-}
-
-/* -------------------------------------------------------------------------- */
-inline Analyzer::~Analyzer() {
-  for (auto&& data : non_halos)
-    delete [] data;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -233,6 +225,7 @@ inline void Analyzer::extractNonHalos(int i) {
 
   std::vector<float> all;
   std::vector<float> halo;
+  std::vector<float> non_halo;
   std::vector<float> unmatched;
 
   size_t total_halo_count = 0;
@@ -286,15 +279,15 @@ inline void Analyzer::extractNonHalos(int i) {
   }
 
   // then take the difference
-  //non_halo.resize(all.size());
-  non_halos[i] = new float[all.size()];
+  non_halo.resize(all.size());
   debug_log << "step 3/4: compute non-halo particles ... " << std::endl;
-  auto first = non_halos[i];
+  auto first = non_halo.begin();
   auto last = std::set_difference(all.begin(), all.end(),
                                   halo.begin(), halo.end(), first);
 
   unsigned long total_non_halo_count = 0;
   unsigned long local_non_halo_count = last - first;
+  non_halo.resize(local_non_halo_count);
 
   // retrieve number of non halos particles
   MPI_Allreduce(&local_non_halo_count, &total_non_halo_count, 1, MPI_UNSIGNED_LONG, MPI_SUM, comm);
@@ -333,6 +326,8 @@ inline void Analyzer::extractNonHalos(int i) {
   debug_log << "= total extraction error ratio: "<< error_ratio << " %"<< std::endl;
   debug_log << std::endl;
 
+  non_halos[i] = std::move(non_halo);
+
   if (my_rank == 0)
     std::cout << debug_log.str();
 
@@ -341,6 +336,8 @@ inline void Analyzer::extractNonHalos(int i) {
 
 /* -------------------------------------------------------------------------- */
 void Analyzer::dumpNonHalosData() {
+
+  updateParticlesCount();
 
   debug_log << "Dumping non halos data into '"<< output_non_halos <<"' ... ";
 
@@ -371,7 +368,7 @@ void Analyzer::dumpNonHalosData() {
   // populate params now
   for (int i=0; i < num_scalars; ++i) {
     auto scalar = scalars[i].data();
-    gioWriter.addVariable(scalar, non_halos[i], flag(i));
+    gioWriter.addVariable(scalar, non_halos[i].data(), flag(i));
   }
 
   gioWriter.write();
@@ -524,7 +521,8 @@ inline bool Analyzer::run() {
       // first extract non halos data
       extractNonHalos(i);
       count[i] = ioMgr->getNumElements();
-      computeFrequencies(i, non_halos[i]);
+      float* data = non_halos[i].data();
+      computeFrequencies(i, data);
       computeShannonEntropy(i);
       MPI_Barrier(comm);
     }
