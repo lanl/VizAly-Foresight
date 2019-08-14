@@ -122,6 +122,10 @@ for ((i=1; i<=$#; i++ )); do
 		buildOpt="osx"
 	fi
 
+	if [ $arg = "-gpu" ]; then
+		buildOpt="gpu"
+	fi
+
 	index=$((index+1))
 done
  
@@ -324,6 +328,26 @@ elif [ $buildOpt = "osx" ]; then
 		-DCBENCH_ENABLE_ISABELA=ON \
 		-DISABELA_INCLUDE_PATH=$externalDependencies/ISABELA-compress-0.2.1/include \
 		-DISABELA_LIBRARY=$externalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a
+
+elif [ $buildOpt = "gpu" ]; then
+	echo "Building with gpu dependencies ..."
+
+	cmake ../CBench $opt\
+	    -DCBENCH_ENABLE_NYX_LOADER=ON \
+		-DHDF5_DIR=$projectPath/ExternalDependencies/hdf5/install/share/cmake/hdf5 \
+		-DCBENCH_ENABLE_SZ_GPU=ON \
+		-DSZ_GPU_INCLUDE_PATH=$projectPath/ExternalDependencies/SZ-generic/sz/include \
+		-DSZ_GPU_LIBRARY=$projectPath/ExternalDependencies/SZ-generic/install/lib/libSZ.so \
+		-DZLIB_GPU_LIBRARY=$projectPath/ExternalDependencies/SZ-generic/install/lib/libzlib.so \
+		-DZSTD_GPU_LIBRARY=$projectPath/ExternalDependencies/SZ-generic/install/lib/libzstd.so \
+		-DCBENCH_ENABLE_ZFP_GPU=ON \
+		-DZFP_GPU_INCLUDE_PATH=$projectPath/ExternalDependencies/gpu_zfp/install/include \
+		-DZFP_GPU_LIBRARY=$projectPath/ExternalDependencies/gpu_zfp/install/lib64/libzfp.so \
+		-DCBENCH_ENABLE_FPZIP=ON \
+		-DFPZIP_INCLUDE_PATH=$projectPath/ExternalDependencies/fpzip-1.2.0/inc/ \
+		-DFPZIP_LIBRARY=$projectPath/ExternalDependencies/fpzip-1.2.0/lib/libfpzip.a \
+		-DCMAKE_BUILD_TYPE=$buildType
+
 else
 	echo "Build type " $buildOpt " not supported yet!"
 fi
@@ -342,6 +366,7 @@ make -j
 # -all : build with all options on
 # -min : build with minimal options on
 # -hacc : build for HACC only; no HDF5
+# -gpu : build for gpu only
 
 # -release: use release mode instead of debug
 
