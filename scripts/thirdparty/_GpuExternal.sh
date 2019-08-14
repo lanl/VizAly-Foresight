@@ -3,7 +3,7 @@
 # Builds dependencies
 currentDir=$(pwd)
 
-for file in build_gpu_*.sh;
+for file in _gpu_*.sh;
 do
     pushd "$currentDir"  # to guard against build failure
     	source $file;

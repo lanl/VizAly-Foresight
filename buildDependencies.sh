@@ -50,7 +50,7 @@ if [ $buildType = "all" ]; then
 	source buildAllExternal.sh
 elif [ $buildType = "gpu" ]; then
 	echo "building gpu dependencies ..."
-	source buildGpuExternal.sh
+	source _GpuExternal.sh
 else
 	source buildExternal.sh
 fi
