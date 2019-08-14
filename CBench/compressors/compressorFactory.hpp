@@ -32,9 +32,17 @@ class CompressorFactory
 		if (compressorName == "zfp")
 		 return new ZFPCompressor();
 	  #endif
+	  #ifdef CBENCH_HAS_ZFP_GPU
+		if (compressorName == "zfp_gpu")
+		 return new ZFPCompressorGpu();
+	  #endif
 	  #ifdef CBENCH_HAS_SZ
 		if (compressorName == "SZ")
 		  return new SZCompressor();
+	  #endif
+	  #ifdef CBENCH_HAS_SZ_GPU
+		if (compressorName == "SZ_gpu")
+		  return new SZCompressorGpu();
 	  #endif
 	  #ifdef CBENCH_HAS_LOSSY_WAVE
 		if (compressorName == "LossyWave")
