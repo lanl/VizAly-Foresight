@@ -17,5 +17,11 @@
       "logs": "logs/log_non-halo_analysis",
       "plots": "entropy/distrib"
     }
+  },
+  "post-process": {
+    "halos": "data/halo_decompressed_sz_m000-499.haloparticles",
+    "non-halos":"data/non-halo_decompressed_fpzip_m000-499_non-halos",
+    "output": "data/all_combined_m000-499.particles",
+    "logs": "logs/log_analysis_post-process"
   }
 }

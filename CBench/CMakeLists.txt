@@ -148,6 +148,10 @@ target_link_libraries(CBench ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO)
 add_executable(analyzer analysis/main.cpp)
 target_link_libraries(analyzer ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO)
 
+# Build merger executable
+add_executable(merger analysis/merge.cpp)
+target_link_libraries(merger ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO)
+
 # Install instructions
 install(TARGETS CBench DESTINATION .)
 install(TARGETS GenericIO DESTINATION .)
