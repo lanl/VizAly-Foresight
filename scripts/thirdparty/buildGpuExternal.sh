@@ -10,5 +10,5 @@ do
     popd
 done
 
-source build_HDF5.sh;
+source _HDF5.sh;
 source build_fpzip.sh;
