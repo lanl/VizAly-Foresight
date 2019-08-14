@@ -3,9 +3,8 @@
 # SZ
 echo "Building GPU version of SZ ... "
 
-wget https://github.com/lanl/VizAly-Foresight/blob/gh-pages/compressors/SZ-GPU-generic.zip
-unzip ./SZ-GPU-generic.zip
-rm -f ./SZ-GPU-generic.zip
+wget https://lanl.github.io/VizAly-Foresight/compressors/SZ-GPU-generic.tar.gz
+tar -zxvf SZ-GPU-generic.tar.gz
 cd SZ-generic
 mkdir install
 mkdir build
