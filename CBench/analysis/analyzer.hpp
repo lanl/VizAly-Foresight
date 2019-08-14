@@ -476,13 +476,13 @@ inline void Analyzer::generateHistogram() {
 
   std::string title;
   if (not extract_non_halos) {
-    title = "halo data - "+ num_bins_str +" bins - file: "
+    title = "halos - "+ num_bins_str +" bins - file: '"
             + tools::base(input_halo)
-            + "("+ std::to_string(local_halos) +" particles)";
+            + "' - "+ std::to_string(total_halos) +" particles.";
   } else {
-    title = "non halo data - "+ num_bins_str +" bins - file: "
-            + tools::base(input_full)
-            + "("+ std::to_string(local_non_halos) +" particles)";
+    title = "non halos - "+ num_bins_str +" bins - file: '"
+            + output_non_halos
+            + "' - "+ std::to_string(total_non_halos) +" particles.";
   }
 
   file << "#" << std::endl;

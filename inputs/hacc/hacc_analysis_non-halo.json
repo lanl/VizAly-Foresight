@@ -10,12 +10,12 @@
   "analysis":{
     "non-halos":{
       "extract": "yes",
-      "output": "m000-499_non-halos"
+      "output": "data/m000-499_non-halos"
     },
     "entropy":{
       "num_bins": 4096,
-      "logs": "log_non-halo_analysis",
-      "plots": "distrib"
+      "logs": "logs/log_non-halo_analysis",
+      "plots": "entropy/distrib"
     }
   }
 }
