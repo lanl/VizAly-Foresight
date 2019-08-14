@@ -14,7 +14,8 @@
 #include "tools.h"
 #include "dataLoaderInterface.hpp"
 #include "HACCDataLoader.hpp"
-
+/* -------------------------------------------------------------------------- */
+#define STORE_PARTICLE_MASK 0
 /* -------------------------------------------------------------------------- */
 class Analyzer {
 
@@ -30,7 +31,7 @@ public:
 private:
   bool computeFrequencies(int i, float* data);
   void computeShannonEntropy(int i);
-  void updateParticlesCount();
+  void filterParticles();
   void extractNonHalos(int i);
   void dumpNonHalosData();
   void dumpLogs();
@@ -47,13 +48,17 @@ private:
   std::unique_ptr<HACCDataLoader> ioMgr;
 
   int num_scalars = 0;
-  size_t num_bins = 0;
-  double phys_origin[3];
-  double phys_scale[3];
-
-  size_t count_halos = 0;
-  size_t count_non_halos = 0;
+  int num_bins = 0;
   bool extract_non_halos = false;
+
+  long local_parts = 0;
+  long total_parts = 0;
+  long local_halos = 0;
+  long total_halos = 0;
+  long local_non_halos = 0;
+  long total_non_halos = 0;
+  long local_unmatched = 0;
+  long total_unmatched = 0;
 
   // per-scalar data
   std::vector<std::string> scalars;
@@ -61,6 +66,11 @@ private:
   std::vector<double> entropy;
   std::vector<std::vector<double>> frequency;
   std::vector<std::vector<float>> non_halos;
+
+  // per-particle data
+  std::vector<bool> is_halo;
+  std::vector<long> non_halos_id;
+  std::vector<short> non_halos_mask;
 
   // MPI
   int my_rank  = 0;
@@ -124,75 +134,63 @@ inline Analyzer::Analyzer(const char* in_path, int in_rank, int in_nb_ranks, MPI
 }
 
 /* -------------------------------------------------------------------------- */
-inline void Analyzer::updateParticlesCount() {
-
-  // non-halo particles count may slightly differ due to partition mismatch
-  // need to take the minimum to avoid issues when dumping them.
-  if (extract_non_halos) {
-    std::accumulate(count.begin(), count.end(), count_non_halos,
-                    [](auto& a, auto& b) { return std::min(a,b); });
-  } else {
-    count_halos = count[0];
-  }
-}
-
-/* -------------------------------------------------------------------------- */
 inline bool Analyzer::computeFrequencies(int i, float* data) {
 
-  size_t const& n = count[i];
+  auto const n = (extract_non_halos ? local_non_halos : local_halos);
   assert(n > 0);
 
+  debug_log << "computing frequencies for scalar '"<< scalars[i] <<"'"<< std::endl;
+
   // step 1. determine lower and upper bounds on data
-  double global_max = 0;
-  double global_min = 0;
   double local_max = std::numeric_limits<float>::min();
   double local_min = std::numeric_limits<float>::max();
+  double total_max = 0;
+  double total_min = 0;
 
-  for (size_t j = 0; j < n; ++j) {
+  for (auto j=0; j < n; ++j) {
     if (data[j] > local_max) { local_max = data[j]; }
     if (data[j] < local_min) { local_min = data[j]; }
   }
 
-  MPI_Allreduce(&local_max, &global_max, 1, MPI_DOUBLE, MPI_MAX, comm);
-  MPI_Allreduce(&local_min, &global_min, 1, MPI_DOUBLE, MPI_MIN, comm);
+  MPI_Allreduce(&local_max, &total_max, 1, MPI_DOUBLE, MPI_MAX, comm);
+  MPI_Allreduce(&local_min, &total_min, 1, MPI_DOUBLE, MPI_MIN, comm);
 
   debug_log << "= local_extents: [" << local_min << ", " << local_max << "]"<< std::endl;
-  debug_log << "= global_extents: [" << global_min << ", " << global_max << "]"<< std::endl;
+  debug_log << "= total_extents: [" << total_min << ", " << total_max << "]"<< std::endl;
   MPI_Barrier(comm);
 
   // Compute histogram of values
-  if (global_max > 0) {
+  if (total_max > 0) {
 
     debug_log << "num_bins: " << num_bins << std::endl;
 
-    size_t local_histogram[num_bins];
-    size_t global_histogram[num_bins];
+    long local_histogram[num_bins];
+    long total_histogram[num_bins];
 
     std::fill(local_histogram, local_histogram + num_bins, 0);
-    std::fill(global_histogram, global_histogram + num_bins, 0);
+    std::fill(total_histogram, total_histogram + num_bins, 0);
 
-    double range = global_max - global_min;
+    double range = total_max - total_min;
     double capacity = range / num_bins;
 
-    for (size_t j = 0; j < n; ++j) {
-
-      double const& value = data[j];
-      double relative_value = (value - global_min) / range;
+    for (auto k=0; k < n; ++k) {
+      double relative_value = (data[k] - total_min) / range;
       int index = (range * relative_value) / capacity;
 
-      if (index >= num_bins) { index--; }
+      if (index >= num_bins)
+        index--;
 
       local_histogram[index]++;
     }
 
-    MPI_Allreduce(local_histogram, global_histogram, num_bins, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
+    MPI_Allreduce(local_histogram, total_histogram, num_bins, MPI_LONG, MPI_SUM, comm);
 
     // fill frequency eventually
     frequency[i].clear();
     frequency[i].resize(num_bins);
 
-    for (int j = 0; j < num_bins; ++j)
-      frequency[i][j] = double(global_histogram[j]) / n;
+    for (int j=0; j < num_bins; ++j)
+      frequency[i][j] = double(total_histogram[j]) / n;
 
     return true;
   }
@@ -216,138 +214,179 @@ inline void Analyzer::computeShannonEntropy(int i) {
             << entropy[i] << " using " << num_bins << " bins." << std::endl;
 }
 
-
 /* -------------------------------------------------------------------------- */
-// warning: very memory-consuming routine (may segfault on small nodes).
-inline void Analyzer::extractNonHalos(int i) {
+inline void Analyzer::filterParticles() {
 
-  assert(i < num_scalars);
+  local_non_halos = 0;
+  local_unmatched = 0;
+  total_non_halos = 0;
+  total_unmatched = 0;
 
-  std::vector<float> all;
-  std::vector<float> halo;
-  std::vector<float> non_halo;
-  std::vector<float> unmatched;
+  // map from particle id to dataset index
+  std::unordered_map<long, long> index;
 
-  size_t total_halo_count = 0;
-  size_t total_full_count = 0;
-
-  // load halo only particles data
   debug_log.clear();
   debug_log.str("");
-  debug_log << "step 1/4: copy and sort halo particles data ... " << std::endl;
-
-  ioMgr->init(input_halo, comm);
-  auto scalar = scalars[i];
-
-  if (ioMgr->loadData(scalar)) {
-    debug_log << ioMgr->getDataInfo();
-    total_halo_count = ioMgr->totalNumberOfElements;
-    size_t const n = ioMgr->getNumElements();
-    float* data = static_cast<float*>(ioMgr->data);
-
-    halo.resize(n);
-    std::copy(data, data+n, halo.begin());
-    std::sort(halo.begin(), halo.end());
-    ioMgr->close();
-
-    debug_log << "= local: "<< n << std::endl;
-    debug_log << "= total: "<< total_halo_count << std::endl << std::endl;
-    MPI_Barrier(comm);
-  }
-
-  // load all particles data
-  debug_log << "step 2/4: copy and sort full particles data ... " << std::endl;
+  debug_log << "step 1/4: set particles index mapping ... " << std::endl;
 
   ioMgr->init(input_full, comm);
-  ioMgr->saveInputFileParameters();
-  ioMgr->setSave(true);
 
-  if (ioMgr->loadData(scalar)) {
+  if (ioMgr->loadData("id")) {
     debug_log << ioMgr->getDataInfo();
-    total_full_count = ioMgr->totalNumberOfElements;
-    size_t const n = ioMgr->getNumElements();
-    float* data = static_cast<float*>(ioMgr->data);
+    // update particles count
+    total_parts = ioMgr->totalNumberOfElements;
+    local_parts = ioMgr->getNumElements();
+    auto data = static_cast<long*>(ioMgr->data);
+    // keep track of particles ID to dataset index such that
+    // we can easily identify non halo particles when we load
+    // another scalar data from the full particles dataset.
+    for (auto i=0; i < local_parts; ++i)
+      index[data[i]] = i;
 
-    all.resize(n);
-    std::copy(data, data + n, all.begin());
-    std::sort(all.begin(), all.end());
     ioMgr->close();
 
-    debug_log << "= local: "<< n << std::endl;
-    debug_log << "= total: "<< total_full_count << std::endl << std::endl;
+    // init lookup table
+    is_halo.resize(local_parts, false);
+
+    debug_log << "= local: "<< local_parts << std::endl;
+    debug_log << "= total: "<< total_parts << std::endl << std::endl;
     MPI_Barrier(comm);
   }
 
-  // then take the difference
-  non_halo.resize(all.size());
-  debug_log << "step 3/4: compute non-halo particles ... " << std::endl;
-  auto first = non_halo.begin();
-  auto last = std::set_difference(all.begin(), all.end(),
-                                  halo.begin(), halo.end(), first);
+  debug_log << "step 2/4: update lookup table ... " << std::endl;
 
-  unsigned long total_non_halo_count = 0;
-  unsigned long local_non_halo_count = last - first;
-  non_halo.resize(local_non_halo_count);
+  ioMgr->init(input_halo, comm);
 
-  // retrieve number of non halos particles
-  MPI_Allreduce(&local_non_halo_count, &total_non_halo_count, 1, MPI_UNSIGNED_LONG, MPI_SUM, comm);
+  if (ioMgr->loadData("id")) {
+    debug_log << ioMgr->getDataInfo();
+    // update particles count
+    total_halos = ioMgr->totalNumberOfElements;
+    local_halos = ioMgr->getNumElements();
+    auto data = static_cast<long*>(ioMgr->data);
 
-  double const ratio[] = {
-    100. * double(total_halo_count) / total_full_count,
-    100. * double(total_non_halo_count) / total_full_count,
-  };
+    // update halo particles lookup table
+    // while counting unmatched particles due to
+    // partition mismatch.
+    for (auto i=0; i < local_halos; ++i) {
+      if (not index.count(data[i])) {
+        ++local_unmatched;
+      } else {
+        auto const& k = index[data[i]];
+        is_halo[k] = true;
+      }
+    }
 
-  debug_log << "= full-part: "<< total_full_count << std::endl;
-  debug_log << "= halo-part: "<< total_halo_count << " ["<< ratio[0] <<" %]." << std::endl;
-  debug_log << "= non-halos: "<< total_non_halo_count << " ["<< ratio[1] <<" %]." << std::endl;
-  debug_log << std::endl;
+    ioMgr->close();
+    debug_log << "= local: "<< local_halos << std::endl;
+    debug_log << "= total: "<< total_halos << std::endl << std::endl;
+    MPI_Barrier(comm);
+  }
+
+  // early release to reduce memory pressure
+  index.clear();
+
+  debug_log << "step 3/4: store non-halos id and mask ... " << std::endl;
+
+  ioMgr->init(input_full, comm);
+  ioMgr->setSave(true);
+  ioMgr->saveInputFileParameters();
+
+  non_halos_id.reserve(local_non_halos);
+  non_halos_mask.reserve(local_non_halos);
+
+  if (ioMgr->loadData("id")) {
+    auto* data = static_cast<long*>(ioMgr->data);
+    for (auto i=0; i < local_parts; ++i) {
+      if (not is_halo[i]) {
+        non_halos_id.push_back(data[i]);
+        ++local_non_halos;
+      }
+    }
+    ioMgr->close();
+  }
+
+#if STORE_PARTICLE_MASK
   MPI_Barrier(comm);
 
-  // now compute the error
-  debug_log << "step 4/4: assess count error due to partition mismatch "<< std::endl;
+  if (ioMgr->loadData("mask")) {
+    auto* data = static_cast<short*>(ioMgr->data);
+    for (auto i=0; i < local_parts; ++i) {
+      if (not is_halo[i])
+        non_halos_mask.push_back(data[i]);
+    }
+    ioMgr->close();
+  }
+#endif
 
-  unmatched.resize(halo.size());
-  first = unmatched.begin();
-  last  = std::set_difference(halo.begin(), halo.end(), all.begin(), all.end(), first);
+  debug_log << "= copied: "<< non_halos_id.size() << std::endl << std::endl;
+  MPI_Barrier(comm);
 
-  unsigned long total_unmatched_halo_count = 0;
-  unsigned long local_unmatched_halo_count = last - first;
+  debug_log << "step 4/4: assess particles count ... " << std::endl;
 
   // retrieve number of non halos particles
-  MPI_Allreduce(&local_unmatched_halo_count, &total_unmatched_halo_count, 1, MPI_UNSIGNED_LONG, MPI_SUM, comm);
-  // deduce error
-  double const error_ratio = 100. * double(total_unmatched_halo_count) / total_halo_count;
-  // ---------------
+  MPI_Allreduce(&local_non_halos, &total_non_halos, 1, MPI_LONG, MPI_SUM, comm);
+  MPI_Allreduce(&local_unmatched, &total_unmatched, 1, MPI_LONG, MPI_SUM, comm);
 
-  debug_log << "= local unmatched halo particles: "<< local_unmatched_halo_count << std::endl;
-  debug_log << "= local non halo particles extracted: "<< local_non_halo_count << std::endl;
-  debug_log << "= total unmatched halo particles: "<< total_unmatched_halo_count << std::endl;
-  debug_log << "= total non halo particles extracted: "<< total_non_halo_count << std::endl;
-  debug_log << "= total extraction error ratio: "<< error_ratio << " %"<< std::endl;
+  double const ratio[] = {
+    100. * double(total_halos) / total_parts,
+    100. * double(total_non_halos) / total_parts,
+    100. * double(total_unmatched) / total_halos
+  };
+
+  debug_log << "= total particles: "<< total_parts     << std::endl;
+  debug_log << "= total halos:     "<< total_halos     << " ["<< ratio[0] <<" %]." << std::endl;
+  debug_log << "= total non-halos: "<< total_non_halos << " ["<< ratio[1] <<" %]." << std::endl;
+  debug_log << "= total unmatched: "<< total_unmatched << " ["<< ratio[2] <<" %]." << std::endl;
   debug_log << std::endl;
-
-  non_halos[i] = std::move(non_halo);
 
   if (my_rank == 0)
     std::cout << debug_log.str();
 
+  MPI_Barrier(comm);
   dumpLogs();
+}
+
+/* -------------------------------------------------------------------------- */
+inline void Analyzer::extractNonHalos(int i) {
+
+  assert(i < num_scalars);
+
+  debug_log << "Cache non-halos particles data '"<< scalars[i] <<"'"<< std::endl;
+
+  ioMgr->filename = input_full;
+
+  if (ioMgr->loadData(scalars[i])) {
+    size_t const n = ioMgr->getNumElements();
+    assert(n == local_parts);
+    non_halos[i].reserve(n);
+    auto data = static_cast<float*>(ioMgr->data);
+
+    for (auto k=0; k < local_parts; ++k) {
+      if (not is_halo[k]) {
+        non_halos[i].push_back(data[k]);
+      }
+    }
+
+    ioMgr->close();
+
+    debug_log << "= local: "<< n << std::endl;
+    debug_log << "= total: "<< total_parts << std::endl << std::endl;
+    MPI_Barrier(comm);
+  }
 }
 
 /* -------------------------------------------------------------------------- */
 void Analyzer::dumpNonHalosData() {
 
-  updateParticlesCount();
-
   debug_log << "Dumping non halos data into '"<< output_non_halos <<"' ... ";
 
   int periods[3] = {0,0,0};
-  int const* dim_size = ioMgr->mpiCartPartitions;
+  auto dim_size = ioMgr->mpiCartPartitions;
   MPI_Cart_create(comm, 3, dim_size, periods, 0, &comm);
 
   // init writer and open file
   gio::GenericIO gioWriter(comm, output_non_halos);
-  gioWriter.setNumElems(count_non_halos);
+  gioWriter.setNumElems(local_non_halos);
 
   // init physical params
   for (int d=0; d < 3; ++d) {
@@ -357,23 +396,34 @@ void Analyzer::dumpNonHalosData() {
 
   MPI_Barrier(comm);
 
-  auto flag = [](int i) {
-    unsigned f = gio::GenericIO::VarHasExtraSpace;
-    if (i == 0) { f |= gio::GenericIO::VarIsPhysCoordX; }
-    else if (i == 1) { f |= gio::GenericIO::VarIsPhysCoordY; }
-    else if (i == 2) { f |= gio::GenericIO::VarIsPhysCoordZ; }
-    return f;
-  };
+  unsigned default_flag = gio::GenericIO::VarHasExtraSpace;
 
   // populate params now
   for (int i=0; i < num_scalars; ++i) {
-    auto scalar = scalars[i].data();
-    gioWriter.addVariable(scalar, non_halos[i].data(), flag(i));
+    auto scalar = scalars[i].c_str();
+    unsigned flag = default_flag;
+    switch (i) {
+      case 0: flag |= gio::GenericIO::VarIsPhysCoordX; break;
+      case 1: flag |= gio::GenericIO::VarIsPhysCoordY; break;
+      case 2: flag |= gio::GenericIO::VarIsPhysCoordZ; break;
+      default: break;
+    }
+    gioWriter.addVariable(scalar, non_halos[i].data(), flag);
   }
 
+  gioWriter.addVariable("id", non_halos_id.data(), default_flag);
+#if STORE_PARTICLE_MASK
+  gioWriter.addVariable("mask", non_halos_mask.data(), default_flag);
+#endif
   gioWriter.write();
 
+  // release memory eventually
+  non_halos.clear();
+  non_halos_id.clear();
+  non_halos_mask.clear();
+
   debug_log << " done." << std::endl;
+  MPI_Barrier(comm);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -392,8 +442,6 @@ inline void Analyzer::dumpLogs() {
 
 /* -------------------------------------------------------------------------- */
 inline void Analyzer::generateHistogram() {
-
-  updateParticlesCount();
 
   auto const& root_path = output_gnu;
   auto const num_bins_str = std::to_string(num_bins);
@@ -430,11 +478,11 @@ inline void Analyzer::generateHistogram() {
   if (not extract_non_halos) {
     title = "halo data - "+ num_bins_str +" bins - file: "
             + tools::base(input_halo)
-            + "("+ std::to_string(count_halos) +" particles)";
+            + "("+ std::to_string(local_halos) +" particles)";
   } else {
     title = "non halo data - "+ num_bins_str +" bins - file: "
             + tools::base(input_full)
-            + "("+ std::to_string(count_non_halos) +" particles)";
+            + "("+ std::to_string(local_non_halos) +" particles)";
   }
 
   file << "#" << std::endl;
@@ -508,21 +556,25 @@ inline bool Analyzer::run() {
         // save infos for debug
         debug_log << ioMgr->getDataInfo();
         debug_log << ioMgr->getLog();
-        count[i] = ioMgr->getNumElements();
+        // set halo particles count
+        if (i == 0) {
+          local_halos = ioMgr->getNumElements();
+          MPI_Allreduce(&local_halos, &total_halos, 1, MPI_LONG, MPI_SUM, comm);
+        }
 
-        float* data = static_cast<float*>(ioMgr->data);
+        auto data = static_cast<float*>(ioMgr->data);
         computeFrequencies(i, data);
         computeShannonEntropy(i);
         MPI_Barrier(comm);
       }
     }
   } else {
+    // set non halos lookup table and store metadata
+    filterParticles();
     for (int i = 0; i < num_scalars; ++i) {
-      // first extract non halos data
+      // extract and store non-halo scalar data
       extractNonHalos(i);
-      count[i] = ioMgr->getNumElements();
-      float* data = non_halos[i].data();
-      computeFrequencies(i, data);
+      computeFrequencies(i, non_halos[i].data());
       computeShannonEntropy(i);
       MPI_Barrier(comm);
     }
