@@ -1,0 +1,31 @@
+{
+	"input":{
+		"filetype":"HACC",
+		"filename":"/projects/exasky/data/Argonne_L360_HACC001/analysis/Halos/b0168/STEP499/m000-499.haloparticles",
+		"scalars":["x", "y", "z", "vx", "vy", "vz"]
+	},
+	"compressors":[
+		{
+			"name": "SZ",
+			"output-prefix": "halo_decompressed_sz",
+			"abs":0.003
+		}
+	],
+	"cbench":{
+		"path":"",
+		"output":{
+			"run-path": "build/",
+			"output-decompressed": true,
+			"output-decompressed-location": "data",
+			"log-file": "halo_log",
+			"metrics-file": "halo_metrics"
+		},
+		"metrics":[
+			{ "name":"absolute_error" },
+			{ "name":"relative_error" },
+			{ "name":"mse" },
+			{ "name":"psnr" },
+			{ "name":"minmax" }
+		]
+	}
+}

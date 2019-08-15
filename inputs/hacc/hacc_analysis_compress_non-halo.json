@@ -1,0 +1,31 @@
+{
+	"input":{
+		"filetype":"HACC",
+		"filename":"/projects/exasky/hoby-projects/cbench/build/data/m000-499_non-halos",
+		"scalars":["x", "y", "z", "vx", "vy", "vz"]
+	},
+	"compressors":[
+		{
+			"name": "fpzip",
+			"output-prefix": "non-halo_compressed_fpzip_",
+			"bits":26
+		}
+	],
+	"cbench":{
+		"path":"",
+		"output":{
+			"run-path": "build/",
+			"output-decompressed": true,
+			"output-decompressed-location": "data",
+			"log-file": "non-halo_log",
+			"metrics-file": "non-halo_metrics"
+		},
+		"metrics":[
+			{ "name":"absolute_error" },
+			{ "name":"relative_error" },
+			{ "name":"mse" },
+			{ "name":"psnr" },
+			{ "name":"minmax" }
+		]
+	}
+}
