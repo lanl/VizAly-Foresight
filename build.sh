@@ -129,10 +129,12 @@ done
 
 # Platform
 if [ $buildPlatform = "cori" ]; then
-	export CPATH=/usr/common/software/hdf5-parallel/1.10.1/gnu/include:$CPATH
-	export LD_LIBRARY_PATH=/usr/common/software/hdf5-parallel/1.10.1/gnu/lib:$LD_LIBRARY_PATH
+	echo ""
+	export CPATH=/opt/cray/pe/hdf5-parallel/1.10.2.0/GNU/8.2/include:$CPATH
+	export LD_LIBRARY_PATH=/opt/cray/pe/hdf5-parallel/1.10.2.0/GNU/8.2/lib:$LD_LIBRARY_PATH
 
-	opt="-DCMAKE_C_FLAGS=-dynamic -DCMAKE_CXX_FLAGS=-dynamic -DCBENCH_PLATFORM=Cori "
+	#opt="-DCMAKE_C_FLAGS=-dynamic -DCMAKE_CXX_FLAGS=-dynamic -DCBENCH_PLATFORM=Cori "
+	opt="-DCBENCH_PLATFORM=Cori"
 else
     opt="-DCBENCH_PLATFORM=Default "
 fi
@@ -152,6 +154,7 @@ if [ $buildOpt = "min" ]; then
 elif [ $buildOpt = "Default" ]; then
 	echo "Default build on ..."
 	if [ $buildPlatform = "cori" ]; then
+		echo "..Building on Cori.."
 		cmake ../CBench $opt\
 			-DCBENCH_ENABLE_NYX_LOADER=ON \
 			-DHDF5_DIR=$externalDependencies/hdf5/install/share/cmake/hdf5 \

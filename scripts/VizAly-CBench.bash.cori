@@ -1,14 +1,15 @@
 module unload PrgEnv-intel
 module load PrgEnv-gnu
-module load cmake/3.11.4
-module load gsl/2.1
-module load cray-mpich/7.7.3
+module load cmake/3.14.4
+module load gsl/2.5
+module load cray-mpich/7.7.6
 module load fftw
 module load vim
 module load openmpi
 module load zlib/1.2.11
 module unload darshan
-module load hdf5-parallel/1.10.1
+#module load hdf5-parallel/1.10.1
+module load cray-hdf5-parallel/1.10.2.0
 
 export CC="cc -dynamic -fPIC"
 export CXX="CC -dynamic -fPIC"
@@ -16,9 +17,11 @@ export CXX="CC -dynamic -fPIC"
 
 export HDF5_USE_FILE_LOCKING=FALSE
 
-export CPLUS_INCLUDE_PATH=$CPLUS_INLUDE_PATH:/usr/common/software/gsl/2.1/gnu/include
-export C_INCLUDE_PATH=$C_INCLUDE_PATH:/usr/common/software/gsl/2.1/gnu/include
-export LD_LIBRARY_PATH=/usr/common/software/gsl/2.1/gnu/lib:$LD_LIBRARY_PATH
+# gsl 2.5
+# Cori has command ${GSL}
+export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/global/common/sw/cray/cnl7/haswell/gsl/2.5/gcc/8.2.0/sr445ay/include
+export C_INCLUDE_PATH=$C_INCLUDE_PATH:/global/common/sw/cray/cnl7/haswell/gsl/2.5/gcc/8.2.0/sr445ay/include
+export LD_LIBRARY_PATH=/global/common/sw/cray/cnl7/haswell/gsl/2.5/gcc/8.2.0/sr445ay/lib:$LD_LIBRARY_PATH
 
 # fftw3.3.8
 export LD_LIBRARY_PATH=/project/projectdirs/m2848/lanl/fftw-3.3.8/install/lib:$LD_LIBRARY_PATH
