@@ -1,9 +1,9 @@
 #!/bin/bash
 
-#SBATCH -N 2
+#SBATCH --nodes 2
 #SBATCH --ntasks-per-node 8
-#SBATCH -p scaling
-
+#SBATCH --partition scaling
+#SBATCH --job-name pk-full
 
 HACC="/projects/exasky/HACC"
 POWER_SPECTRUM="${HACC}/trunk/Darwin/mpi/bin/hacc_pk_gio_auto"
