@@ -143,13 +143,16 @@ inline size_t Merger::cache(long offset) {
   debug_log << " done." << std::endl;
   MPI_Barrier(comm);
 
-  return index.size();
+  size_t const copied_count = index.size() - offset;
+  return copied_count;
 };
 
 /* -------------------------------------------------------------------------- */
 inline void Merger::dump() {
 
   debug_log << "Dumping dataset ... ";
+  if (my_rank == 0)
+    std::cout << debug_log.str();
 
   assert(local_parts > 0);
 
@@ -186,11 +189,10 @@ inline void Merger::dump() {
   gioWriter.addVariable("id", index.data(), default_flag);
   gioWriter.write();
 
-  // release memory eventually
-  dataset.clear();
-  index.clear();
-
   debug_log << " done." << std::endl;
+  if (my_rank == 0)
+    std::cout << debug_log.str();
+
   MPI_Barrier(comm);
 }
 
@@ -215,6 +217,8 @@ inline void Merger::run() {
   local_parts = local_halos + local_non_halos;
   total_parts = total_halos + total_non_halos;
 
+  int const format = static_cast<int>(std::ceil(std::log10(total_parts)));
+
   debug_log << "\tlocal parts: "<< local_parts << " particles"<< std::endl;
   debug_log << "\tlocal halos: "<< local_halos << " particles"<< std::endl;
   debug_log << "\tlocal non-halos: "<< local_non_halos << " particles"<< std::endl;
@@ -223,10 +227,10 @@ inline void Merger::run() {
   debug_log << "\ttotal halos: "<< total_halos << " particles"<< std::endl;
   debug_log << "\ttotal non-halos: "<< total_non_halos << " particles"<< std::endl;
 
+  MPI_Barrier(comm);
+
   if (my_rank == 0)
     std::cout << debug_log.str();
-
-  MPI_Barrier(comm);
 
   // now dump everything
   dump();
