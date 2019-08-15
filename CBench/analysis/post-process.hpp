@@ -25,12 +25,13 @@ public:
   void run();
 
 private:
-
-  size_t cache(std::vector<float>* dataset, std::vector<long>& index);
+  template<bool save>
+  size_t cache(long offset);
   void dump();
   void dumpLogs();
 
   std::string json_path;
+  std::string input_full;
   std::string halo_file;
   std::string non_halo_file;
   std::string output_combined;
@@ -47,11 +48,8 @@ private:
   long total_non_halos = 0;
 
   std::vector<std::string> scalars;
-  std::vector<std::vector<float>> halos;
-  std::vector<std::vector<float>> non_halos;
-
-  std::vector<long> halos_id;
-  std::vector<long> non_halos_id;
+  std::vector<std::vector<float>> dataset;
+  std::vector<long> index;
 
   // MPI
   int my_rank  = 0;
@@ -77,11 +75,13 @@ inline Merger::Merger(const char* in_path, int in_rank, int in_nb_ranks, MPI_Com
   // parse params and do basic checks
   file >> json;
 
+  assert(json["input"].find("full") != json["input"].end());
   assert(json["input"].find("scalars") != json["input"].end());
   assert(json["post-process"].find("halos") != json["post-process"].end());
   assert(json["post-process"].find("non-halos") != json["post-process"].end());
   assert(json["post-process"].find("output") != json["post-process"].end());
 
+  input_full = json["input"]["full"];
   halo_file = json["post-process"]["halos"];
   non_halo_file = json["post-process"]["non-halos"];
   output_combined = json["post-process"]["output"];
@@ -91,8 +91,7 @@ inline Merger::Merger(const char* in_path, int in_rank, int in_nb_ranks, MPI_Com
     scalars.push_back(name);
 
   num_scalars = scalars.size();
-  halos.resize(num_scalars);
-  non_halos.resize(num_scalars);
+  dataset.resize(num_scalars);
 
   // set the IO manager
   ioMgr = std::make_unique<HACCDataLoader>();
@@ -100,17 +99,24 @@ inline Merger::Merger(const char* in_path, int in_rank, int in_nb_ranks, MPI_Com
 
 /* -------------------------------------------------------------------------- */
 // generic method for caching a given dataset
-inline size_t Merger::cache(std::vector<float>* dataset, std::vector<long>& index) {
+template <bool save>
+inline size_t Merger::cache(long offset) {
 
   debug_log << "Caching dataset ... ";
-  assert(dataset != nullptr);
+
+  if (save) {
+    // set 'physOrigin' and 'physScale'
+    // and update MPI cart partition while loading file.
+    ioMgr->saveInputFileParameters();
+    ioMgr->setSave(true);
+  }
 
   for (int i=0; i < num_scalars; ++i) {
     if (ioMgr->loadData(scalars[i])) {
       auto const n = ioMgr->getNumElements();
       auto const data = static_cast<float*>(ioMgr->data);
-      dataset[i].resize(n);
-      std::copy(data, data + n, dataset[i].data());
+      dataset[i].resize(n + offset);
+      std::copy(data, data + n, dataset[i].data() + offset);
     }
     MPI_Barrier(comm);
   }
@@ -118,8 +124,20 @@ inline size_t Merger::cache(std::vector<float>* dataset, std::vector<long>& inde
   if (ioMgr->loadData("id")) {
     auto const n = ioMgr->getNumElements();
     auto const data = static_cast<long*>(ioMgr->data);
-    index.resize(n);
-    std::copy(data, data + n, index.data());
+    index.resize(n + offset);
+    std::copy(data, data + n, index.data() + offset);
+  }
+
+  if (my_rank == 0 and save) {
+    std::cout << "mpiCartPartitions: " << ioMgr->mpiCartPartitions[0] << ", "
+                                       << ioMgr->mpiCartPartitions[1] << ", "
+                                       << ioMgr->mpiCartPartitions[2] << std::endl;
+    std::cout << "physOrig: " << ioMgr->physOrigin[0] << ", "
+                              << ioMgr->physOrigin[1] << ", "
+                              << ioMgr->physOrigin[2] << std::endl;
+    std::cout << "physScale: " << ioMgr->physScale[0] << ", "
+                               << ioMgr->physScale[1] << ", "
+                               << ioMgr->physScale[2] << std::endl;
   }
 
   debug_log << " done." << std::endl;
@@ -162,19 +180,15 @@ inline void Merger::dump() {
       case 2: flag |= gio::GenericIO::VarIsPhysCoordZ; break;
       default: break;
     }
-    gioWriter.addVariable(scalars[i].data(), halos[i].data(), flag);
-    gioWriter.addVariable(scalars[i].data(), non_halos[i].data(), flag);
+    gioWriter.addVariable(scalars[i].data(), dataset[i].data(), flag);
   }
 
-  gioWriter.addVariable("id", halos_id.data(), default_flag);
-  gioWriter.addVariable("id", non_halos_id.data(), default_flag);
+  gioWriter.addVariable("id", index.data(), default_flag);
   gioWriter.write();
 
   // release memory eventually
-  halos.clear();
-  halos_id.clear();
-  non_halos.clear();
-  non_halos_id.clear();
+  dataset.clear();
+  index.clear();
 
   debug_log << " done." << std::endl;
   MPI_Barrier(comm);
@@ -187,13 +201,10 @@ inline void Merger::run() {
   debug_log << "Reconstruct decompressed dataset:" << std::endl;
 
   ioMgr->init(halo_file, comm);
-  local_halos = cache(halos.data(), halos_id);
+  local_halos = cache<false>(0);
 
   ioMgr->init(non_halo_file, comm);
-  ioMgr->setSave(true);
-  ioMgr->saveInputFileParameters();
-
-  local_non_halos = cache(non_halos.data(), non_halos_id);
+  local_non_halos = cache<true>(local_halos);
 
   // get total number of particles
   total_halos = 0;
@@ -203,8 +214,17 @@ inline void Merger::run() {
 
   local_parts = local_halos + local_non_halos;
   total_parts = total_halos + total_non_halos;
-  debug_log << "\tlocal: "<< local_parts << " particles"<< std::endl;
-  debug_log << "\ttotal: "<< total_parts << " particles"<< std::endl;
+
+  debug_log << "\tlocal parts: "<< local_parts << " particles"<< std::endl;
+  debug_log << "\tlocal halos: "<< local_halos << " particles"<< std::endl;
+  debug_log << "\tlocal non-halos: "<< local_non_halos << " particles"<< std::endl;
+
+  debug_log << "\ttotal parts: "<< total_parts << " particles"<< std::endl;
+  debug_log << "\ttotal halos: "<< total_halos << " particles"<< std::endl;
+  debug_log << "\ttotal non-halos: "<< total_non_halos << " particles"<< std::endl;
+
+  if (my_rank == 0)
+    std::cout << debug_log.str();
 
   MPI_Barrier(comm);
 
