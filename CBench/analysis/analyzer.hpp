@@ -476,13 +476,13 @@ inline void Analyzer::generateHistogram() {
 
   std::string title;
   if (not extract_non_halos) {
-    title = "halos - "+ num_bins_str +" bins - file: '"
+    title = "halos - "+ num_bins_str +" bins - file: "
             + tools::base(input_halo)
-            + "' - "+ std::to_string(total_halos) +" particles.";
+            + " - "+ std::to_string(total_halos) +" particles.";
   } else {
-    title = "non halos - "+ num_bins_str +" bins - file: '"
+    title = "non halos - "+ num_bins_str +" bins - file: "
             + output_non_halos
-            + "' - "+ std::to_string(total_non_halos) +" particles.";
+            + " - "+ std::to_string(total_non_halos) +" particles.";
   }
 
   file << "#" << std::endl;
@@ -571,6 +571,7 @@ inline bool Analyzer::run() {
   } else {
     // set non halos lookup table and store metadata
     filterParticles();
+
     for (int i = 0; i < num_scalars; ++i) {
       // extract and store non-halo scalar data
       extractNonHalos(i);
@@ -578,7 +579,6 @@ inline bool Analyzer::run() {
       computeShannonEntropy(i);
       MPI_Barrier(comm);
     }
-
     dumpNonHalosData();
   }
 
