@@ -26,6 +26,10 @@ for ((i=1; i<=$#; i++ )); do
 		buildType="all"
 	fi
 
+	if [ $arg = "-gpu" ]; then
+		buildType="gpu"
+	fi 
+
 	if [ $arg = "--path" ]; then
 		index=i
 		index=$((index+1))
@@ -44,6 +48,9 @@ cp $projectPath/scripts/thirdparty/*.sh .
 if [ $buildType = "all" ]; then
 	echo "building all dependencies ..."
 	source buildAllExternal.sh
+elif [ $buildType = "gpu" ]; then
+	echo "building gpu dependencies ..."
+	source _GpuExternal.sh
 else
 	source buildExternal.sh
 fi
@@ -52,4 +59,5 @@ popd
 #
 # Build Arguments
 # -all   : build all dependencies
+# -gpu   : build gpu dependencies
 # --path : build dependency path
