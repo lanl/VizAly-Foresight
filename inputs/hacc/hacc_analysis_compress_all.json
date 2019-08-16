@@ -1,14 +1,19 @@
 {
 	"input":{
 		"filetype":"HACC",
-		"filename":"/projects/exasky/hoby-projects/cbench/build/data/m000-499_non-halos",
+		"filename":"/projects/exasky/data/Argonne_L360_HACC001/STEP499/m000.full.mpicosmo.499",
 		"scalars":["x", "y", "z", "vx", "vy", "vz"]
 	},
 	"compressors":[
 		{
+			"name": "SZ",
+			"output-prefix": "all_decompressed_sz",
+			"abs":0.003
+		},
+		{
 			"name": "fpzip",
-			"output-prefix": "non-halo_compressed_hyper",
-			"bits":10
+			"output-prefix": "all_decompressed_fpzip",
+			"bits":26
 		}
 	],
 	"cbench":{
@@ -17,8 +22,8 @@
 			"run-path": "build/",
 			"output-decompressed": true,
 			"output-decompressed-location": "data",
-			"log-file": "non-halo_log_hyper",
-			"metrics-file": "non-halo_metrics_hyper"
+			"log-file": "all_log",
+			"metrics-file": "all_metrics"
 		},
 		"metrics":[
 			{ "name":"absolute_error" },
