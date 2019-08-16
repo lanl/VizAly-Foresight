@@ -3,13 +3,13 @@ module load PrgEnv-gnu
 module load cmake/3.14.4
 module load gsl/2.5
 module load cray-mpich/7.7.6
-module load fftw
+module load cray-fftw
 module load vim
 module load openmpi
 module load zlib/1.2.11
 module unload darshan
-#module load hdf5-parallel/1.10.1
 module load cray-hdf5-parallel/1.10.2.0
+module load python/3.6-anaconda-4.4
 
 export CC="cc -dynamic -fPIC"
 export CXX="CC -dynamic -fPIC"
@@ -23,11 +23,3 @@ export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:/global/common/sw/cray/cnl7/haswel
 export C_INCLUDE_PATH=$C_INCLUDE_PATH:/global/common/sw/cray/cnl7/haswell/gsl/2.5/gcc/8.2.0/sr445ay/include
 export LD_LIBRARY_PATH=/global/common/sw/cray/cnl7/haswell/gsl/2.5/gcc/8.2.0/sr445ay/lib:$LD_LIBRARY_PATH
 
-# fftw3.3.8
-export LD_LIBRARY_PATH=/project/projectdirs/m2848/lanl/fftw-3.3.8/install/lib:$LD_LIBRARY_PATH
-export FFTW_MAJOR_VERSION=3
-
-# python
-export PATH=/project/projectdirs/m2848/lanl/Python-2.7.16/install/bin:$PATH
-export LD_LIBRARY_PATH=/project/projectdirs/m2848/lanl/Python-2.7.16/install/lib:$LD_LIBRARY_PATH
-export PYTHONPATH="/project/projectdirs/m2848/lanl/Python-2.7.16/install/lib":$PYTHONPATH

@@ -1,6 +1,16 @@
 module load cray-fftw gsl cray-hdf5-parallel
 
-# python
-export PATH=/project/projectdirs/m2848/lanl/Python-2.7.16/install/bin:$PATH
-export LD_LIBRARY_PATH=/project/projectdirs/m2848/lanl/Python-2.7.16/install/lib:$LD_LIBRARY_PATH
-export PYTHONPATH="/project/projectdirs/m2848/lanl/Python-2.7.16/install/lib":$PYTHONPATH
+# python3 must have conda env set
+module load python/3.6-anaconda-4.4
+source activate cbench
+
+####### How to set Conda env ######
+## load Python 3
+#module load python/3.6-anaconda-4.4
+#conda create --yes --name cbench python=3.6
+#source activate cbench
+#
+## install Python packages
+#conda install --yes numpy==1.15.4 matplotlib==3.0.2
+#python -m pip install apsw==3.9.2.post1
+
