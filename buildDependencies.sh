@@ -60,6 +60,7 @@ elif [ $buildType = "gpu" ]; then
 	echo "building all GPU dependencies ..."
 	source buildGpuExternal.sh
 else
+	echo "building default dependencies ..."
 	source buildExternal.sh
 fi
 popd
