@@ -74,7 +74,7 @@ Foresight takes as input a json file (examples of input json files are in the **
 
 The following experimental GPU compressors are also supported:
 * SZ - custom version
-* [ZFP](https://github.com/LLNL/zfp.git gpu_zfp) - version 0.5.4
+* [zfp](https://github.com/LLNL/zfp.git) - version 0.5.4
 
 ### Currently Supported metrics:
 * Absolute Error
