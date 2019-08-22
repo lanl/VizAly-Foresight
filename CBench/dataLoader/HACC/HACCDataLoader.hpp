@@ -207,7 +207,7 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	allocateMem(dataType, numElements, 0, data);
 
 	readInData.setNumElements(maxNumElementsPerRank);
-	readInData.allocateMem(1);
+	readInData.alloc(1);
 
 	sizePerDim[0] = numElements;	// For compression
 
@@ -315,7 +315,7 @@ inline int HACCDataLoader::loadData(std::string paramName)
 		log << "mpiCartPartitions: " << mpiCartPartitions[0] << ", " << mpiCartPartitions[1] << ", " << mpiCartPartitions[2] << std::endl;
 	}
 	
-	readInData.deAllocateMem();
+	deAllocateMem(readInData.data);
 
 	return 1; // All good
 }
@@ -330,7 +330,7 @@ inline int HACCDataLoader::saveCompData(std::string paramName, void * cData)
 		if (inOutData[i].name == paramName)
 		{
 			inOutData[i].setNumElements(numElements);
-			inOutData[i].allocateMem();
+			inOutData[i].alloc();
 			memcpy(inOutData[i].data, cData, inOutData[i].size*numElements);
 
 			inOutData[i].doWrite = true;

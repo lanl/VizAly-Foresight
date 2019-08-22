@@ -11,7 +11,7 @@ Pascal Grosset
 #define _GIO_PV_GIO_DATA_H_
 
 #include <string>
-
+#include "utils.hpp"
 //
 // Stores the genericIO data being read in
 class GioData
@@ -42,8 +42,8 @@ class GioData
 
     int determineDataType();
 
-  	int allocateMem(int offset = 1);
-  	int deAllocateMem();
+  	int alloc(int offset = 1); // allocates internal data structure
+
 };
 
 
@@ -128,69 +128,12 @@ inline int GioData::determineDataType()
 }
 
 
-inline int GioData::allocateMem(int offset)
+inline int GioData::alloc(int offset)
 {
     determineDataType();
 
-    if (dataType == "float")
-        data = new float[numElements + offset];
-    else if (dataType == "double")
-        data = new double[numElements + offset];
-    else if (dataType == "int8_t")
-        data = new int8_t[numElements + offset];
-    else if (dataType == "int16_t")
-        data = new int16_t[numElements + offset];
-    else if (dataType == "int32_t")
-        data = new int32_t[numElements + offset];
-    else if (dataType == "int64_t")
-        data = new int64_t[numElements + offset];
-    else if (dataType == "uint8_t")
-        data = new uint8_t[numElements + offset];
-    else if (dataType == "uint16_t")
-        data = new uint16_t[numElements + offset];
-    else if (dataType == "uint32_t")
-        data = new uint32_t[numElements + offset];
-    else if (dataType == "uint64_t")
-        data = new uint64_t[numElements + offset];
-    else
-        return 0;
+	return allocateMem(dataType, numElements, offset, data);
 
-    return 1;
 }
-
-
-inline int GioData::deAllocateMem()
-{
-    if (data == NULL) // already deallocated!
-        return 1;
-
-    if (dataType == "float")
-        delete[](float*) data;
-    else if (dataType == "double")
-        delete[](double*) data;
-    else if (dataType == "int8_t")
-        delete[](int8_t*) data;
-    else if (dataType == "int16_t")
-        delete[](int16_t*) data;
-    else if (dataType == "int32_t")
-        delete[](int32_t*) data;
-    else if (dataType == "int64_t")
-        delete[](int64_t*) data;
-    else if (dataType == "uint8_t")
-        delete[](uint8_t*) data;
-    else if (dataType == "uint16_t")
-        delete[](uint16_t*) data;
-    else if (dataType == "uint32_t")
-        delete[](uint32_t*) data;
-    else if (dataType == "uint64_t")
-        delete[](uint64_t*) data;
-    else
-        return 0;
-
-    data = NULL;
-
-    return 1;
-}
-
 
 #endif

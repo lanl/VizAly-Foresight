@@ -16,6 +16,7 @@ Authors:
 #include <mpi.h>
 #include <sstream>
 #include <unordered_map>
+#include <list>
 
 #include "gioData.hpp"
 
@@ -83,6 +84,114 @@ inline std::string DataLoaderInterface::getDataInfo()
            << sizePerDim[4] << std::endl;
 
 	return dataInfo.str();
+}
+
+
+class Partition
+{
+public:
+	int min_x = 0;
+	int min_y = 0;
+	int min_z = 0;
+	int max_x = 0;
+	int max_y = 0;
+	int max_z = 0;
+
+public:
+	Partition() = default;
+	Partition(
+		int in_min_x, int in_min_y, int in_min_z,
+		int in_max_x, int in_max_y, int in_max_z
+	) : min_x(in_min_x),
+		min_y(in_min_y),
+		min_z(in_min_z),
+		max_x(in_max_x),
+		max_y(in_max_y),
+		max_z(in_max_z)
+	{}
+
+	void print()
+	{
+		std::cout << min_x << ", " << min_y << ", " << min_z << " - "
+			<< max_x << ", " << max_y << ", " << max_z << std::endl;
+	}
+};
+
+Partition getPartition(int myRank, int numRanks, int extentsX, int extentsY, int extentsZ)
+{
+
+	std::list<Partition> partitions;
+	partitions.push_back(Partition{ 0, 0, 0, extentsX, extentsY, extentsZ });
+
+	Partition first_half, second_half;
+
+	int axis = 0;
+	while (partitions.size() < numRanks)
+	{
+		int numCurrentPartitions = partitions.size();
+		for (int i = 0; i < numCurrentPartitions; i++)
+		{
+			Partition parent = partitions.front();
+			partitions.pop_front();
+
+
+			if (axis == 0)
+			{
+				first_half.min_x = parent.min_x;
+				first_half.max_x = (parent.min_x + parent.max_x) / 2;
+				second_half.min_x = first_half.max_x;
+				second_half.max_x = parent.max_x;
+
+				first_half.min_y = second_half.min_y = parent.min_y;
+				first_half.max_y = second_half.max_y = parent.max_y;
+				first_half.min_z = second_half.min_z = parent.min_z;
+				first_half.max_z = second_half.max_z = parent.max_z;
+			}
+
+			if (axis == 1)
+			{
+				first_half.min_y = parent.min_y;
+				first_half.max_y = (parent.min_y + parent.max_y) / 2;
+				second_half.min_y = first_half.max_y;
+				second_half.max_y = parent.max_y;
+
+				first_half.min_x = second_half.min_x = parent.min_x;
+				first_half.max_x = second_half.max_x = parent.max_x;
+				first_half.min_z = second_half.min_z = parent.min_z;
+				first_half.max_z = second_half.max_z = parent.max_z;
+			}
+
+			if (axis == 2)
+			{
+				first_half.min_z = parent.min_z;
+				first_half.max_z = (parent.min_z + parent.max_z) / 2;
+				second_half.min_z = first_half.max_z;
+				second_half.max_z = parent.max_z;
+
+				first_half.min_x = second_half.min_x = parent.min_x;
+				first_half.max_x = second_half.max_x = parent.max_x;
+				first_half.min_y = second_half.min_y = parent.min_y;
+				first_half.max_y = second_half.max_y = parent.max_y;
+			}
+
+			partitions.push_back(first_half);
+			partitions.push_back(second_half);
+
+			if (partitions.size() >= numRanks)
+				break;
+		}
+
+		axis++;
+		if (axis == 3)
+			axis = 0;
+	}
+
+
+	auto it = partitions.begin();
+	std::advance(it, myRank);
+
+	return *it;
+
 }
 
 #endif
