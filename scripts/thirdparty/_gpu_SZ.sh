@@ -6,8 +6,9 @@ echo "Building GPU version of SZ ... "
 # git clone https://github.com/robertu94/SZ.git SZ-generic
 # git checkout generic
 wget https://lanl.github.io/VizAly-Foresight/compressors/SZ-GPU-generic.tar.gz
-tar -zxvf SZ-GPU-generic.tar.gz
-cd SZ-generic
+mkdir SZ-generic-GPU
+tar -zxvf SZ-GPU-generic.tar.gz --directory SZ-generic-GPU
+cd SZ-generic-GPU
 mkdir install
 mkdir build
 cd build

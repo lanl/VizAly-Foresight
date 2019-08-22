@@ -24,17 +24,17 @@ for ((i=1; i<=$#; i++ )); do
 		echo ""
 		echo " --externalDependencies <folder>: path where external dependencies was built"
 		echo ""
-		echo "  -all : build with all options on"
-		echo "  -min : build with minimal options on"
-		echo "  -hacc: build for HACC only; no HDF5"
+		echo "  --all : build with all options on"
+		echo "  --min : build with minimal options on"
+		echo "  --hacc: build for HACC only; no HDF5"
 		echo ""
-		echo "  -cori   : build for cori at nersc"
-		echo "  -cooley : build for cooley"
+		echo "  --cori   : build for cori at nersc"
+		echo "  --cooley : build for cooley"
 		echo ""
-		echo "  -release: use release mode instead of debug"
+		echo "  --release: use release mode instead of debug"
 		echo ""
-		echo "  --cleanAll <folder>: remove build folder and ExternalDependencies"
 		echo "  --clean <folder>: remove build folder"
+		echo "  --cleanAll <folder>: remove build folder and ExternalDependencies"
 		echo ""
 		echo "  No arguments: build path is build, and type is Debug"
 		return
@@ -89,12 +89,12 @@ for ((i=1; i<=$#; i++ )); do
 	fi
 
 	# platform
-	if [ $arg = "-cori" ]; then
+	if [ $arg = "--cori" ]; then
 		buildPlatform="cori"
 	fi
 
 	# type
-	if [ $arg = "-release" ]; then
+	if [ $arg = "--release" ]; then
 		buildType="Release"
 	fi
 
@@ -102,27 +102,27 @@ for ((i=1; i<=$#; i++ )); do
 
 
 	# options
-	if [ $arg = "-all" ]; then
+	if [ $arg = "--all" ]; then
 		buildOpt="all"
 	fi
 
-	if [ $arg = "-travis" ]; then
+	if [ $arg = "--travis" ]; then
 		buildOpt="travis"
 	fi
 
-	if [ $arg = "-hacc" ]; then
+	if [ $arg = "--hacc" ]; then
 		buildOpt="hacc"
 	fi
 
-	if [ $arg = "-min" ]; then
+	if [ $arg = "--min" ]; then
 		buildOpt="minimal"
 	fi
 
-	if [ $arg = "-osx" ]; then
+	if [ $arg = "--osx" ]; then
 		buildOpt="osx"
 	fi
 
-	if [ $arg = "-gpu" ]; then
+	if [ $arg = "--gpu" ]; then
 		buildOpt="gpu"
 	fi
 
@@ -363,15 +363,15 @@ make -j
 # --path <foder name> : build exec in that folder
 # --externalDependencies <foder name>: path where external dependencies was built"
 
-# -cooley : build for cooley
-# -cori : build for cori at nersc
+# --cooley : build for cooley
+# --cori : build for cori at nersc
 
-# -all : build with all options on
-# -min : build with minimal options on
-# -hacc : build for HACC only; no HDF5
-# -gpu : build for gpu only
+# --all : build with all options on
+# --min : build with minimal options on
+# --hacc : build for HACC only; no HDF5
+# --gpu : build for gpu only
 
-# -release: use release mode instead of debug
+# --release: use release mode instead of debug
 
 # --cleanAll <folder>: remove build folder and ExternalDependencies
 # --clean <folder>: remove build folder

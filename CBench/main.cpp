@@ -43,66 +43,6 @@ Authors:
 #endif
 
 
-// Function to validate whatever could be wrong with the input
-int validateInput(int argc, char *argv[], int myRank, int numRanks)
-{
-	// Check if we have the right number of arguments
-	if (argc < 2)
-	{
-		if (myRank == 0)
-		{
-			std::cerr << "Input argument needed. Run as: ../inputs/all.json" << std::endl;
-			std::cerr << "Read arguments: " << argc << std::endl;
-		}
-
-		return 0;
-	}
-
-	// Check if input file provided exists
-	if (!fileExisits(argv[1]))
-	{
-		if (myRank == 0)
-			std::cerr << "Could not find input JSON file " << argv[1] << "." << std::endl;
-
-		return 0;
-	}
-
-
-
-	// Validate JSON file
-	nlohmann::json jsonInput;
-	std::ifstream jsonFile(argv[1]);
-
-	try
-	{
-		jsonFile >> jsonInput;
-	}
-	catch (nlohmann::json::parse_error &e)
-	{
-		if (myRank == 0)
-			std::cerr << "Input JSON file " << argv[1] << " is invalid!\n"
-					  << e.what() << "\n"
-					  << "Validate your JSON file using e.g. https://jsonformatter.curiousconcept.com/ " << std::endl;
-		return 0;
-	}
-
-
-
-	// Check if powers of 2 number of ranks
-	if (jsonInput["cbench"]["output"].find("output-decompressed-location") != jsonInput["cbench"]["output"].end())
-		if (!isPowerOfTwo(numRanks))
-		{
-			if (myRank == 0)
-				std::cerr << "Please run with powers of 2 number of ranks. e.g. 4, 8, 16, 32, ... when writing out HACC files."
-						  << std::endl;
-
-			return 0;
-		}
-
-	return 1;
-}
-
-
 
 int main(int argc, char *argv[])
 {
@@ -114,6 +54,7 @@ int main(int argc, char *argv[])
 	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
 
+
 	//
 	// Validate input params
 	if (!validateInput(argc, argv, myRank, numRanks))
@@ -123,42 +64,29 @@ int main(int argc, char *argv[])
 	}
 
 
+
 	//
 	// Load input
 
+
+	//
 	// Pass JSON file to json parser and
 	nlohmann::json jsonInput;
 	std::ifstream jsonFile(argv[1]);
 	jsonFile >> jsonInput;
 
-	// Load in the parameters
-	std::string inputFileType = jsonInput["input"]["filetype"];
-	std::string inputFile = jsonInput["input"]["filename"];
 
-	std::string _outputLogFile =  jsonInput["cbench"]["output"]["log-file"];
-	std::string outputLogFile = "logs/" + _outputLogFile + "_" + std::to_string(myRank);
-
-	std::string metricsFile = jsonInput["cbench"]["output"]["metrics-file"];
-
-	std::vector<std::string> scalars;
-	for (int i = 0; i < jsonInput["input"]["scalars"].size(); i++)
-		scalars.push_back(jsonInput["input"]["scalars"][i]);
-
-	std::vector<std::string> compressors;
-	for (int i = 0; i < jsonInput["compressors"].size(); i++)
-		compressors.push_back(jsonInput["compressors"][i]["name"]);
-
-	std::vector<std::string> metrics;
-	for (int i = 0; i < jsonInput["cbench"]["metrics"].size(); i++)
-		metrics.push_back(jsonInput["cbench"]["metrics"][i]["name"]);
-
+	//
+	// Load in the global input parameters
+	std::string inputFilename = jsonInput["input"]["filename"];
+	
 	bool writeData = false;
-	std::string outputFile = "";
+	std::string outputFilename = "";
 	if (jsonInput["cbench"]["output"].find("output-decompressed") != jsonInput["cbench"]["output"].end())
 	{
 		writeData = jsonInput["cbench"]["output"]["output-decompressed"];
 		if (writeData)
-			outputFile = extractFileName(inputFile);
+			outputFilename = extractFileName(inputFilename);
 
 		// Initial a random number in case output name is not provided
 		srand(time(NULL));
@@ -172,6 +100,23 @@ int main(int argc, char *argv[])
 			createFolder(outputPath);
 	}
 
+	std::string outputLogFilename = "logs/" + jsonInput["cbench"]["output"]["log-file"].get<std::string>() + "_" + std::to_string(myRank);
+
+
+
+	std::vector<std::string> compressors;
+	for (int i = 0; i < jsonInput["compressors"].size(); i++)
+		compressors.push_back(jsonInput["compressors"][i]["name"]);
+
+	std::vector<std::string> scalars;
+	for (int i = 0; i < jsonInput["input"]["scalars"].size(); i++)
+		scalars.push_back(jsonInput["input"]["scalars"][i]);
+
+	std::vector<std::string> metrics;
+	for (int i = 0; i < jsonInput["cbench"]["metrics"].size(); i++)
+		metrics.push_back(jsonInput["cbench"]["metrics"][i]["name"]);
+
+
 
 	//
 	// For humans; all seems valid, let's start ...
@@ -179,18 +124,19 @@ int main(int argc, char *argv[])
 		std::cout << "Starting ... \nLook at the log for progress update ... \n" << std::endl;
 
 
+
 	//
 	// Create log and metrics files
 	Timer overallClock;
 	std::stringstream debuglog, metricsInfo, csvOutput;
-	writeLog(outputLogFile, debuglog.str());
+	writeLog(outputLogFilename, debuglog.str());
 
 	csvOutput << "Compressor_field" << "__" << "params" << ", " << "name, ";
 	for (int m = 0; m < metrics.size(); ++m)
 		csvOutput << metrics[m] << ", ";
 
 	csvOutput << "Compression Throughput(MB/s), DeCompression Throughput(MB/s), Compression Ratio" << std::endl;
-	metricsInfo << "Input file: " << inputFile << std::endl;
+	metricsInfo << "Input file: " << inputFilename << std::endl;
 
 	overallClock.start();
 
@@ -199,58 +145,60 @@ int main(int argc, char *argv[])
 	//
 	// Open data file
 	DataLoaderInterface *ioMgr;
-
-	if (inputFileType == "Binary")
-		ioMgr = new BinaryDataLoader();
-	else if (inputFileType == "HACC")
-		ioMgr = new HACCDataLoader();
-	#ifdef CBENCH_HAS_NYX
-	else if (inputFileType == "NYX")
 	{
-		ioMgr = new NYXDataLoader();
-		if (inputFileType == "NYX")
+		std::string inputFileType = jsonInput["input"]["filetype"];
+
+		if (inputFileType == "Binary")
+			ioMgr = new BinaryDataLoader();
+		else if (inputFileType == "HACC")
+			ioMgr = new HACCDataLoader();
+		#ifdef CBENCH_HAS_NYX
+		else if (inputFileType == "NYX")
 		{
-			if (jsonInput["input"].find("group") != jsonInput["input"].end())
+			ioMgr = new NYXDataLoader();
+			if (inputFileType == "NYX")
 			{
-				ioMgr->setParam("group", "string", jsonInput["input"]["group"]);
+				if (jsonInput["input"].find("group") != jsonInput["input"].end())
+				{
+					ioMgr->setParam("group", "string", jsonInput["input"]["group"]);
+				}
 			}
 		}
+		#endif
+		else
+		{
+			// Exit if no input file is provided
+			if (myRank == 0)
+				std::cout << "Unsupported format " << inputFileType << "!!!" << std::endl;
+
+			MPI_Finalize();
+			return 0;
+		}
+	
+
+		//
+		// Check if the datainfo field exist for a dataset
+		if (jsonInput["input"].find("datainfo") != jsonInput["input"].end())
+		{
+			// insert datainfo into loader parameter list
+			for (auto it = jsonInput["input"]["datainfo"].begin(); it != jsonInput["input"]["datainfo"].end(); it++)
+				ioMgr->loaderParams[it.key()] = strConvert::toStr(it.value());
+		}
+
+		ioMgr->init(inputFilename, MPI_COMM_WORLD);
+		ioMgr->setSave(writeData);
+
+
+		// Save parameters of input file to facilitate rewrite
+		if (writeData)
+			ioMgr->saveInputFileParameters();
 	}
-	#endif
-	else
-	{
-		// Exit if no input file is provided
-		if (myRank == 0)
-			std::cout << "Unsupported format " << inputFileType << "!!!" << std::endl;
 
-		MPI_Finalize();
-		return 0;
-	}
-
-
-	// Check if the datainfo field exist for a dataset
-	if (jsonInput["input"].find("datainfo") != jsonInput["input"].end())
-	{
-		// insert datainfo into loader parameter list
-		for (auto it = jsonInput["input"]["datainfo"].begin(); it != jsonInput["input"]["datainfo"].end(); it++)
-			ioMgr->loaderParams[it.key()] = strConvert::toStr(it.value());
-	}
-
-	ioMgr->init(inputFile, MPI_COMM_WORLD);
-	ioMgr->setSave(writeData);
-
-
-	// Save parameters of input file to facilitate rewrite
-	if (writeData)
-		ioMgr->saveInputFileParameters();
 
 
 	//
-	// Cycle through compressors and parameters
+	// Cycle through compressors
 	CompressorInterface *compressorMgr;
-	MetricInterface *metricsMgr;
-
-
 	for (int c = 0; c < compressors.size(); ++c)
 	{
 		// initialize compressor
@@ -258,9 +206,10 @@ int main(int argc, char *argv[])
 		if (compressorMgr == NULL)
 		{
 			if (myRank == 0)
-				std::cout << "Unsupported compressor: " << compressors[c] << " ... Skipping!" << std::endl;
+				std::cout << "Unsupported compressor: " << compressors[c] << " ... skipping!" << std::endl;
 			continue;
 		}
+
 
 		// initialize compressor
 		compressorMgr->init();
@@ -286,14 +235,12 @@ int main(int argc, char *argv[])
 		debuglog << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
 
 
+		//
 		// Cycle through scalars
 		for (int i = 0; i < scalars.size(); i++)
 		{
 			Timer compressClock, decompressClock;
-			Memory memLoad;
-
-			memLoad.start();
-
+			Memory memLoad(true);
 
 			// Check if parameter is valid before proceding
 			if (!ioMgr->loadData(scalars[i]))
@@ -329,7 +276,7 @@ int main(int argc, char *argv[])
 			// log stuff
 			debuglog << ioMgr->getDataInfo();
 			debuglog << ioMgr->getLog();
-			appendLog(outputLogFile, debuglog);
+			appendLog(outputLogFilename, debuglog);
 
 			metricsInfo << compressorMgr->getParamsInfo() << std::endl;
 			csvOutput << compressorMgr->getCompressorName() << "_" << scalars[i] << "__" << compressorMgr->getParamsInfo()
@@ -366,20 +313,20 @@ int main(int argc, char *argv[])
 			MPI_Allreduce(&unCompressedSize, &totalUnCompressedSize, 1, MPI_UNSIGNED_LONG, MPI_SUM, MPI_COMM_WORLD);
 
 
-			debuglog << "\n\ncompressedSize: " << compressedSize << ", totalCompressedSize: " << totalCompressedSize
-					 << std::endl;
-			debuglog << "unCompressedSize: " << unCompressedSize << ", totalUnCompressedSize: " << totalUnCompressedSize
-					 << std::endl;
+			debuglog << "\n\ncompressedSize: " << compressedSize << ", totalCompressedSize: " << totalCompressedSize << std::endl;
+			debuglog << "unCompressedSize: " << unCompressedSize << ", totalUnCompressedSize: " << totalUnCompressedSize << std::endl;
 			debuglog << "Compression ratio: " << totalUnCompressedSize / (float) totalCompressedSize << std::endl;
 
-			appendLog(outputLogFile, compressorMgr->getLog());
+			appendLog(outputLogFilename, compressorMgr->getLog());
 			compressorMgr->clearLog();
 
 
 			//
-			// metrics
+			// Cycle through metrics
 			debuglog << "\n----- " << scalars[i] << " error metrics ----- " << std::endl;
 			metricsInfo << "\nField: " << scalars[i] << std::endl;
+
+			MetricInterface *metricsMgr;
 			for (int m = 0; m < metrics.size(); ++m)
 			{
 				metricsMgr = MetricsFactory::createMetric(metrics[m]);
@@ -387,6 +334,7 @@ int main(int argc, char *argv[])
 				{
 					if (myRank == 0)
 						std::cout << "Unsupported metric: " << metrics[m] << " ... Skipping!" << std::endl;
+
 					continue;
 				}
 
@@ -406,6 +354,7 @@ int main(int argc, char *argv[])
 							}
 				}
 
+
 				// Launch
 				metricsMgr->init(MPI_COMM_WORLD);
 				metricsMgr->execute(ioMgr->data, decompdata, ioMgr->getNumElements());
@@ -418,7 +367,7 @@ int main(int argc, char *argv[])
 					{
 						createFolder("logs");
 						std::string outputHistogramName = "logs/";
-						outputHistogramName += extractFileName(inputFile) + "_" + compressors[c] + "_" + scalars[i];
+						outputHistogramName += extractFileName(inputFilename) + "_" + compressors[c] + "_" + scalars[i];
 						outputHistogramName += "_" + metrics[m] + "_" + compressorMgr->getParamsInfo() + "_hist.py";
 						writeFile(outputHistogramName, metricsMgr->additionalOutput);
 					}
@@ -434,10 +383,8 @@ int main(int argc, char *argv[])
 			double compress_time = compressClock.getDuration();
 			double decompress_time = decompressClock.getDuration();
 
-			double compress_throughput =
-				((double) (ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0 * 1024.0)) / compress_time;
-			double decompress_throughput =
-				((double) (ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0 * 1024.0)) / decompress_time;
+			double compress_throughput   = ((double) (ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0 * 1024.0)) / compress_time;     // MB/s
+			double decompress_throughput = ((double) (ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0 * 1024.0)) / decompress_time;	// MB/s
 
 
 			double max_compress_throughput = 0;
@@ -472,6 +419,7 @@ int main(int argc, char *argv[])
 			memLoad.stop();
 
 
+
 			//
 			// log stuff
 			debuglog << "\nCompress time: " << compress_time << std::endl;
@@ -479,7 +427,7 @@ int main(int argc, char *argv[])
 			debuglog << "\nMemory leaked: " << memLoad.getMemorySizeInMB() << " MB" << std::endl;
 			debuglog << "........................................." << std::endl << std::endl;
 
-			appendLog(outputLogFile, debuglog);
+			appendLog(outputLogFilename, debuglog);
 
 			if (myRank == 0)
 			{
@@ -494,8 +442,11 @@ int main(int argc, char *argv[])
 				csvOutput << min_compress_throughput << ", " << min_decompress_throughput << ", " 
 						  << totalUnCompressedSize / (float) totalCompressedSize << "\n";
 
-				writeFile(metricsFile, metricsInfo.str());
-				writeFile(metricsFile + ".csv", csvOutput.str());
+				{
+					std::string metricsFile = jsonInput["cbench"]["output"]["metrics-file"];
+					writeFile(metricsFile, metricsInfo.str());
+					writeFile(metricsFile + ".csv", csvOutput.str());
+				}
 			}
 
 			MPI_Barrier(MPI_COMM_WORLD);
@@ -537,9 +488,9 @@ int main(int argc, char *argv[])
 				decompressedOutputName = "__" + compressorMgr->getCompressorName() + "_" + std::to_string(rand());
 
 			if (outputPath != ".")
-				decompressedOutputName = outputPath + "/" + decompressedOutputName + "__" + outputFile;
+				decompressedOutputName = outputPath + "/" + decompressedOutputName + "__" + outputFilename;
 			else
-				decompressedOutputName = decompressedOutputName + "__" + outputFile;
+				decompressedOutputName = decompressedOutputName + "__" + outputFilename;
 
 
 			ioMgr->writeData(decompressedOutputName);
@@ -549,7 +500,7 @@ int main(int argc, char *argv[])
 
 			debuglog << ioMgr->getLog();
 			debuglog << "Write output took: " << clockWrite.getDuration() << " s " << std::endl;
-			appendLog(outputLogFile, debuglog);
+			appendLog(outputLogFilename, debuglog);
 		}
 
 		compressorMgr->close();
@@ -557,7 +508,9 @@ int main(int argc, char *argv[])
 
 	overallClock.stop();
 	debuglog << "\nTotal run time: " << overallClock.getDuration() << " s " << std::endl;
-	appendLog(outputLogFile, debuglog);
+	appendLog(outputLogFilename, debuglog);
+
+
 
 	// For humans
 	if (myRank == 0)
