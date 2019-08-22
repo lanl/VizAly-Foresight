@@ -50,6 +50,11 @@ CBench takes as input a json file (examples of input json files are in the **_[i
 * [fpzip](https://computation.llnl.gov/projects/floating-point-compression) - version 1.2.0
 * [ISABELA](http://freescience.org/cs/ISABELA/ISABELA.html) - version 0.2.1
 
+The following experimental **GPU** compressors are also supported:
+* SZ - custom version
+* [zfp](https://github.com/LLNL/zfp.git) - version 0.5.4
+
+
 ### Currently Supported metrics:
 * Absolute Error
 * Relative Error
