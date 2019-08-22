@@ -86,7 +86,7 @@ class MetricInterface
 
   public:
     std::unordered_map<std::string, std::string> parameters; // parameter inputs for metrics, i.e. enable histogram
-    std::string additionalOutput;   // if ever we need an additional output as for histograms
+    std::string additionalOutput;   // additional output stream, can be used for saving histogram (.py) file
                 
 
 	virtual void init(MPI_Comm _comm) = 0;
