@@ -43,7 +43,7 @@ class HACCDataLoader: public DataLoaderInterface
 	int saveCompData(std::string paramName, void * cData);
 	int writeData(std::string _filename);
 	int saveInputFileParameters();
-	int close() { return deAllocateMem(dataType, data); }
+	int close() { return deAllocateMem(data); }
 	void setParam(std::string paramName, std::string type, std::string value){};
   bool loadUncompressedFields(nlohmann::json const&) { return false; }
 };
@@ -62,7 +62,7 @@ inline HACCDataLoader::HACCDataLoader()
 
 inline HACCDataLoader::~HACCDataLoader()
 {
-	deAllocateMem(dataType, data);
+	deAllocateMem(data);
 }
 
 

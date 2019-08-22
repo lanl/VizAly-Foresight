@@ -68,7 +68,6 @@ inline void absoluteError::execute(void *original, void *approx, size_t n) {
     double sum_abs_err = 0;
 	for (std::size_t i = 0; i < n; ++i)
 	{
-		// Max set tolerence to 1
 		double err = absError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i]);
 		abs_err.push_back(err);
         sum_abs_err += err;

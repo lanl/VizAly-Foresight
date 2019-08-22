@@ -7,6 +7,10 @@ All rights reserved.
 Authors:
  - Pascal Grosset
  - Jesus Pulido
+
+ Utils.hpp is a collection of helper functions used throughout Cbench and its
+ classes. Any non-specific functions related to the various interfaces go here.
+
 ================================================================================*/
 #pragma once
 
@@ -25,10 +29,10 @@ Authors:
 #include "json.hpp"
 
 
+struct stat finfo; // utility for folder checking
 
-struct stat finfo;
-
-
+//
+// Creates a folder only if it doesnt exist
 inline int createFolder(std::string folderName)
 {
   #ifdef _WIN32
@@ -57,7 +61,8 @@ inline int createFolder(std::string folderName)
 }
 
 
-
+//
+// Checks if file exists
 inline bool fileExisits(char *filename) 
 {
 	std::ifstream ifs(filename);
@@ -65,7 +70,8 @@ inline bool fileExisits(char *filename)
 }
 
 
-
+//
+// Returns whether or not number is power of two
 inline bool isPowerOfTwo(int n) 
 { 
 	if (n == 0) 
@@ -81,7 +87,8 @@ inline bool isPowerOfTwo(int n)
 } 
 
 
-
+//
+// On an input string, extracts the filename at the end of the string
 inline std::string extractFileName(std::string inputString)
 {
 	std::size_t pos = inputString.find_last_of("/\\");
@@ -89,7 +96,8 @@ inline std::string extractFileName(std::string inputString)
 }
 
 
-
+//
+// Allocates memory based on the string size name, adds an offset
 inline int allocateMem(std::string dataType, size_t numElements, int offset, void *& data)
 {
 	if (dataType == "float")
@@ -119,35 +127,14 @@ inline int allocateMem(std::string dataType, size_t numElements, int offset, voi
 }
 
 
-
-inline int deAllocateMem(std::string dataType, void *& data)
+//
+// Generic memory deallocator
+inline int deAllocateMem(void *& data)
 {
 	if (data == NULL) // already deallocated!
 		return 1;
 
-	if (dataType == "float")
-		delete[](float*) data;
-	else if (dataType == "double")
-		delete[](double*) data;
-	else if (dataType == "int8_t")
-		delete[](int8_t*) data;
-	else if (dataType == "int16_t")
-		delete[](int16_t*) data;
-	else if (dataType == "int32_t")
-		delete[](int32_t*) data;
-	else if (dataType == "int64_t")
-		delete[](int64_t*) data;
-	else if (dataType == "uint8_t")
-		delete[](uint8_t*) data;
-	else if (dataType == "uint16_t")
-		delete[](uint16_t*) data;
-	else if (dataType == "uint32_t")
-		delete[](uint32_t*) data;
-	else if (dataType == "uint64_t")
-		delete[](uint64_t*) data;
-	else
-		return 0;
-
+	delete[] data;
 	data = NULL;
 
 	return 1;
@@ -155,7 +142,7 @@ inline int deAllocateMem(std::string dataType, void *& data)
 
 
 
-
+//
 // Function to validate whatever could be wrong with the input
 inline int validateInput(int argc, char *argv[], int myRank, int numRanks)
 {
@@ -214,3 +201,39 @@ inline int validateInput(int argc, char *argv[], int myRank, int numRanks)
 
 	return 1;
 }
+
+//
+// creates a .py file that will plot a histogram for a specific metric using matplotlib
+inline std::string python_histogram(size_t numBins, float min_val, float max_val, std::vector<float> histogram)
+{
+	std::stringstream outputFileSS;
+	outputFileSS << "import sys" << std::endl;
+	outputFileSS << "import numpy as np" << std::endl;
+	outputFileSS << "import matplotlib" << std::endl;
+	outputFileSS << "matplotlib.use(\'agg\')" << std::endl;
+	outputFileSS << "import matplotlib.pyplot as plt" << std::endl;
+
+	outputFileSS << "y=[";
+	std::size_t i;
+	for (i = 0; i < numBins - 1; ++i)
+		outputFileSS << std::to_string(histogram[i]) << ", ";
+	outputFileSS << std::to_string(histogram[i]) << "]" << std::endl;
+
+	outputFileSS << "minVal=" << std::to_string(min_val) << std::endl;
+	outputFileSS << "maxVal=" << std::to_string(max_val) << std::endl;
+	outputFileSS << "plotName=sys.argv[0]" << std::endl;
+	outputFileSS << "plotName = plotName.replace('.py','.png')" << std::endl;
+
+	outputFileSS << "numVals = len(y)" << std::endl;
+	outputFileSS << "x = np.linspace(minVal, maxVal, numVals+1)[1:]" << std::endl;
+	outputFileSS << "plt.plot(x,y, linewidth=0.5)" << std::endl;
+	outputFileSS << "plt.title(plotName)" << std::endl;
+	outputFileSS << "plt.yscale(\"linear\") #log,linear,symlog,logit" << std::endl;
+	outputFileSS << "plt.ylabel(\"Frequency\")" << std::endl;
+	outputFileSS << "plt.xticks(rotation=90)" << std::endl;
+	outputFileSS << "plt.tight_layout()" << std::endl;
+	outputFileSS << "plt.savefig(plotName, dpi=300)" << std::endl;
+
+	return outputFileSS.str();
+}
+

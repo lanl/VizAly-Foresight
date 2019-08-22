@@ -58,8 +58,8 @@ inline void minmaxMetric::init(MPI_Comm _comm)
 
 inline void minmaxMetric::execute(void *original, void *approx, size_t n) {
 
-	double local_max = -99999999999;
-	double local_min = 99999999999;
+	double local_max = -DBL_MAX;
+	double local_min = DBL_MAX;
 
 	for (std::size_t i = 0; i < n; ++i)
 	{

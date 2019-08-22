@@ -56,7 +56,12 @@ inline void relativeError::init(MPI_Comm _comm)
 	MPI_Comm_rank(comm, &myRank);
 }
 
-
+//
+// Helper function to compute relative error.
+// (tolerance) is used to avoid degenerative state where a near division-by-zero 
+// happens. It is also used to avoid the case where small values have very high
+// relative errors. This may be known as a bounded relative error. Any values
+// lower than this bound will default to absolute error instead.
 template <class T>
 inline T relError(T original, T approx, double tolerance)
 {
@@ -76,7 +81,7 @@ inline void relativeError::execute(void *original, void *approx, size_t n) {
 	double sum_rel_err = 0;
 	for (std::size_t i = 0; i < n; ++i)
 	{
-		// Max set tolerence to 1
+		// Tolerance set to a value of 1
 		double err = relError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i], 1);
 		rel_err.push_back(err);
 		sum_rel_err += err;

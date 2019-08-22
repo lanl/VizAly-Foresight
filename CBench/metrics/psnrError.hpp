@@ -53,20 +53,7 @@ inline void psnrError::init(MPI_Comm _comm)
 }
 
 
-/*template <class T>
-inline T relError(T original, T approx, double tolerance)
-{
-	double absolute_error = std::abs(original - approx);
-	if (std::abs(original) < tolerance)
-	{
-		return absolute_error;
-	}
-
-	return absolute_error / std::abs(original);
-}*/
-
 inline void psnrError::execute(void *original, void *approx, size_t n) {
-	//std::vector<double> rel_err(n);
 
 	double local_max = -999999999;
 	double local_mse = 0;
@@ -77,8 +64,6 @@ inline void psnrError::execute(void *original, void *approx, size_t n) {
 
 		local_mse += (pow(static_cast<float *>(original)[i] - static_cast<float *>(approx)[i], (double)2.0));
 
-		//double err;// = relError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i], 1);
-		//rel_err.push_back(err);
 	}
 
 	// Local Quantity
