@@ -17,6 +17,7 @@ Authors:
 #include <vector>
 #include "metricInterface.hpp"
 
+
 class minmaxMetric : public MetricInterface
 {
 	int numRanks;
@@ -32,6 +33,7 @@ public:
 
 };
 
+
 inline minmaxMetric::minmaxMetric()
 {
 	myRank = 0;
@@ -39,10 +41,12 @@ inline minmaxMetric::minmaxMetric()
 	metricName = "minmax";
 }
 
+
 inline minmaxMetric::~minmaxMetric()
 {
 
 }
+
 
 inline void minmaxMetric::init(MPI_Comm _comm)
 {
@@ -50,6 +54,7 @@ inline void minmaxMetric::init(MPI_Comm _comm)
 	MPI_Comm_size(comm, &numRanks);
 	MPI_Comm_rank(comm, &myRank);
 }
+
 
 inline void minmaxMetric::execute(void *original, void *approx, size_t n) {
 
@@ -73,7 +78,7 @@ inline void minmaxMetric::execute(void *original, void *approx, size_t n) {
 	// Global min value
 	double global_min = 0;
 	MPI_Allreduce(&local_min, &global_min, 1, MPI_DOUBLE, MPI_MIN, comm);
-    
+	
 	log << " local_minmax: " << local_min << " " << local_max << std::endl;
 	// Currently only report Global minmax
 	log << "-minmax: " << global_min << " " << global_max << std::endl;
@@ -125,7 +130,6 @@ inline void minmaxMetric::execute(void *original, void *approx, size_t n) {
 				
 		}
 	}
-
 
 	return;
 }

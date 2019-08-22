@@ -16,12 +16,9 @@ for ((i=1; i<=$#; i++ )); do
 		echo ""
 		echo "Build Arguments:"
 		echo " --all: build all possible dependencies"
-		echo ""
 		echo " --cpu: build dependencies for a CPU build"
-		echo ""
 		echo " --gpu: build dependencies for a GPU build"
-		echo ""
-		echo " --path <folder> : expernal dependencies path"
+		echo " --path <folder> : external dependencies path"
 		echo ""
 		return
 	fi

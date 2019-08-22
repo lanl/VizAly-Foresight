@@ -38,6 +38,6 @@ These metrics are always computed for all compressors:
   - Compression Ratio
     - compressed size / uncompressed size
   - Throughput
-    - Size of data processed in MB / time take
+    - Size of data processed in MB / time taken in seconds
 
 	

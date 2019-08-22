@@ -22,7 +22,7 @@ for ((i=1; i<=$#; i++ )); do
 		echo "Build Arguments:"
 		echo "  --path <folder> : build exec in that folder"
 		echo ""
-		echo " --externalDependencies <folder>: path where external dependencies was built"
+		echo "  --externalDependencies <folder>: path where external dependencies was built"
 		echo ""
 		echo "  --all : build with all options on"
 		echo "  --min : build with minimal options on"

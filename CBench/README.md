@@ -19,9 +19,12 @@ The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @
 git clone https://github.com/lanl/VizAly-Foresight.git
 
 cd VizAly-Foresight
-source buildDependencies.sh
+source buildDependencies.sh 
 source build.sh
 ```
+
+For more options, run buildDependencies.sh and build.sh with  "-h" 
+
 
 ## Running:
 ```
@@ -55,3 +58,4 @@ CBench takes as input a json file (examples of input json files are in the **_[i
 * Data Ranges (data distribution)
 * Memory Usage
 * Compute times
+* Histogram of values

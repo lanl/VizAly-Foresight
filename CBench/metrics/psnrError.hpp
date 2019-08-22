@@ -17,6 +17,7 @@ Authors:
 #include <vector>
 #include "metricInterface.hpp"
 
+
 class psnrError : public MetricInterface
 {
 	int numRanks;
@@ -100,7 +101,7 @@ inline void psnrError::execute(void *original, void *approx, size_t n) {
 	double global_psnr = 10 * log10(pow(global_max, 2.0) / (global_mse));
 
 	total_val = global_psnr;
-    
+	
 	log << " local_psnr: " << local_psnr << std::endl;
 	// Currently only report Global PSNR
 	log << "-psnr: " << global_psnr << std::endl;
