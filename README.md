@@ -31,27 +31,27 @@ Cinema
 ## Building:
 The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @ ANL, Cori @ NERSC, and Darwin @ LANL . These build a base version of Foresight:
 ```
-$ git clone https://github.com/lanl/VizAly-Foresight.git
+git clone https://github.com/lanl/VizAly-Foresight.git
 
-$ cd VizAly-Foresight
-$ source buildDependencies.sh
-$ source build.sh
+cd VizAly-Foresight
+source buildDependencies.sh
+source build.sh
 ```
 
 ## Running Foresight
 This will set up and run the full analysis workflow on SLURM and generate a cinema database, the command is as follows:
 ```
-$ python3 Analysis/<name_of_analysis> --input-file <path to input JSON file> --submit
+python3 Analysis/<name_of_analysis> --input-file <path to input JSON file> --submit
 ```
 For example, to run the NYX analysis, the command is:
 ```
-$ python3 Analysis/pat_nyx.py --input-files inputs/nyx/nyx_darwin_test.json --submit
+python3 Analysis/pat_nyx.py --input-files inputs/nyx/nyx_darwin_test.json --submit
 ```
 
 ## Running CBench as stand-alone:
 ```
-$ mpirun -np 2 build/CBench ../inputs/hacc/hacc_cbench_test.json
-$ cat metrics_hacc_test_.csv
+mpirun -np 2 build/CBench ../inputs/hacc/hacc_cbench_test.json
+cat metrics_hacc_test_.csv
 ```
 
 **Note:**  The above will only run a toy dataset meant for testing if the code runs. The results should **NOT** be used as an indicator for the performance of the compressors!
@@ -72,6 +72,10 @@ Foresight takes as input a json file (examples of input json files are in the **
 * [fpzip](https://computation.llnl.gov/projects/floating-point-compression) - version 1.2.0
 * [ISABELA](http://freescience.org/cs/ISABELA/ISABELA.html) - version 0.2.1
 
+The following experimental GPU compressors are also supported:
+* SZ - custom version
+* [ZFP](https://github.com/LLNL/zfp.git gpu_zfp) - version 0.5.4
+
 ### Currently Supported metrics:
 * Absolute Error
 * Relative Error
@@ -89,6 +93,7 @@ For information on Travis CI and Docker image, look at the [travis folder](testi
 # Developers
 * Chris Biwer
 * Pascal Grosset
+* Sian Jin
 * Jesus Pulido
 * Hoby Rakotoarivelo
 
