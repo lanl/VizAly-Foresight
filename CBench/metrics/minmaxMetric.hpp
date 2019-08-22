@@ -15,6 +15,7 @@ Authors:
 #include <string>
 #include <sstream>
 #include <vector>
+#include <limits>
 #include "metricInterface.hpp"
 
 
@@ -58,8 +59,8 @@ inline void minmaxMetric::init(MPI_Comm _comm)
 
 inline void minmaxMetric::execute(void *original, void *approx, size_t n) {
 
-	double local_max = -DBL_MAX;
-	double local_min = DBL_MAX;
+	double local_max = -std::numeric_limits<double>::max();
+	double local_min = std::numeric_limits<double>::max();
 
 	for (std::size_t i = 0; i < n; ++i)
 	{
