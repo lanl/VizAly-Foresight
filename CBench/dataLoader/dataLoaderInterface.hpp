@@ -6,6 +6,7 @@ All rights reserved.
 
 Authors:
  - Pascal Grosset
+ - Jesus Pulido
 ================================================================================*/
 
 #ifndef _DATA_LOADER_INTERFACE_H_

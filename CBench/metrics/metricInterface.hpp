@@ -18,7 +18,8 @@ Authors:
 #include <mpi.h>
 
 
-
+//
+// synchronizes local hist with global histogram when using MPI, and returns it
 inline std::vector<float> syncHistogram(int numBins, size_t numValues, std::vector<size_t> localHistogram, MPI_Comm comm)
 {
     // Synchronize
@@ -35,7 +36,8 @@ inline std::vector<float> syncHistogram(int numBins, size_t numValues, std::vect
     return histogram;
 }
 
-
+//
+// creates a .py file that will plot a histogram for a specific metric using matplotlib
 inline std::string python_histogram(size_t numBins, float min_val, float max_val, std::vector<float> histogram)
 {
     std::stringstream outputFileSS;
@@ -74,16 +76,16 @@ inline std::string python_histogram(size_t numBins, float min_val, float max_val
 class MetricInterface
 {
   protected:
-    double val;       // Local Quantity (MPI)
-    double total_val; // Global Quantity (MPI)
+    double val;				// Local Quantity (MPI)
+    double total_val;		// Global Quantity (MPI)
 
-    std::string metricName;
-    std::stringstream log;
+    std::string metricName;	// Internam metric name
+    std::stringstream log;	// log file stream
     
-	MPI_Comm comm;
+	MPI_Comm comm;			// Global mpi comm handle
 
   public:
-    std::unordered_map<std::string, std::string> parameters;
+    std::unordered_map<std::string, std::string> parameters; // parameter inputs for metrics, i.e. enable histogram
     std::string additionalOutput;   // if ever we need an additional output as for histograms
                 
 
