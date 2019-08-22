@@ -401,6 +401,8 @@ int main(int argc, char *argv[])
 			MPI_Reduce(&decompress_throughput, &min_decompress_throughput, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
 
 
+			//
+			// Store the uncompressed data pointer, does not actually write yet
 			if (writeData)
 			{
 				debuglog << "writing: " << scalars[i] << std::endl;
@@ -429,6 +431,8 @@ int main(int argc, char *argv[])
 
 			appendLog(outputLogFilename, debuglog);
 
+			//
+			// log to metrics file and output metrics csv
 			if (myRank == 0)
 			{
 				metricsInfo << "Max Compression Throughput: " << max_compress_throughput << " Mbytes/s" << std::endl;
@@ -453,12 +457,13 @@ int main(int argc, char *argv[])
 		}
 
 
+		//
+		// write data to disk if requested in the json file
 		if (writeData)
 		{
 			Timer clockWrite;
 			clockWrite.start();
 
-			// EDIT: load and write uncompressed fields here
 			#if CBENCH_HAS_NYX
 			debuglog << "\nLoading uncompressed fields" << std::endl;
 			ioMgr->loadUncompressedFields(jsonInput);
@@ -468,7 +473,7 @@ int main(int argc, char *argv[])
 
 			debuglog << "Write data .... \n";
 
-			// Pass data that was not compressed
+			// Pass through original data to preserve original file data structure
 			for (int i = 0; i < ioMgr->inOutData.size(); i++)
 			{
 				if (!ioMgr->inOutData[i].doWrite)
@@ -492,7 +497,7 @@ int main(int argc, char *argv[])
 			else
 				decompressedOutputName = decompressedOutputName + "__" + outputFilename;
 
-
+			// Write out uncompressed (lossy) data
 			ioMgr->writeData(decompressedOutputName);
 
 
