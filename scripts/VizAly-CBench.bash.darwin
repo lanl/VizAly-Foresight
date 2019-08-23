@@ -5,8 +5,9 @@ module load cmake
 module load anaconda/Anaconda3
 source activate cbench
 
+# Automatically set up conda environment if not found
 if [ $? == 1 ]; then
-    echo "Conda env not found, setting up.."
+    echo "Conda env not found, onetime setup.."
     conda create --yes --name cbench python=3.6
     source activate cbench
 
