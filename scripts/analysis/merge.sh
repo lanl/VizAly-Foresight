@@ -14,4 +14,4 @@ source "/home/hoby/.bashrc"
 cd "${BUILD_DIR}"
 
 # run
-mpirun -np 16 ./merger ../inputs/hacc/hacc_analysis_non-halo.json
+mpirun -np 16 ./merger ../inputs/hacc/hacc_analysis_merge.json
