@@ -18,7 +18,8 @@ Authors:
 #include <mpi.h>
 
 
-
+//
+// synchronizes local hist with global histogram when using MPI, and returns it
 inline std::vector<float> syncHistogram(int numBins, size_t numValues, std::vector<size_t> localHistogram, MPI_Comm comm)
 {
     // Synchronize
@@ -36,55 +37,20 @@ inline std::vector<float> syncHistogram(int numBins, size_t numValues, std::vect
 }
 
 
-inline std::string python_histogram(size_t numBins, float min_val, float max_val, std::vector<float> histogram)
-{
-    std::stringstream outputFileSS;
-    outputFileSS << "import sys" << std::endl;
-    outputFileSS << "import numpy as np" << std::endl;
-	outputFileSS << "import matplotlib" << std::endl;
-	outputFileSS << "matplotlib.use(\'agg\')" << std::endl;
-	outputFileSS << "import matplotlib.pyplot as plt" << std::endl;
-
-    outputFileSS << "y=[";
-    std::size_t i;
-    for (i=0; i<numBins-1; ++i) 
-        outputFileSS << std::to_string(histogram[i]) << ", ";
-    outputFileSS << std::to_string(histogram[i]) << "]" << std::endl;
-
-	outputFileSS << "minVal=" << std::to_string(min_val) << std::endl;
-    outputFileSS << "maxVal=" << std::to_string(max_val) << std::endl;
-    outputFileSS << "plotName=sys.argv[0]" << std::endl;
-    outputFileSS << "plotName = plotName.replace('.py','.png')" << std::endl;
-
-    outputFileSS << "numVals = len(y)" << std::endl;
-    outputFileSS << "x = np.linspace(minVal, maxVal, numVals+1)[1:]" << std::endl;
-    outputFileSS << "plt.plot(x,y, linewidth=0.5)" << std::endl;
-    outputFileSS << "plt.title(plotName)" << std::endl;
-	outputFileSS << "plt.yscale(\"linear\") #log,linear,symlog,logit" << std::endl;
-    outputFileSS << "plt.ylabel(\"Frequency\")" << std::endl;
-    outputFileSS << "plt.xticks(rotation=90)" << std::endl;
-    outputFileSS << "plt.tight_layout()" << std::endl;
-    outputFileSS << "plt.savefig(plotName, dpi=300)" << std::endl;
-
-    return outputFileSS.str();
-}
-
-
-
 class MetricInterface
 {
   protected:
-    double val;       // Local Quantity (MPI)
-    double total_val; // Global Quantity (MPI)
+    double val;				// Local Quantity (MPI)
+    double total_val;		// Global Quantity (MPI)
 
-    std::string metricName;
-    std::stringstream log;
+    std::string metricName;	// Internam metric name
+    std::stringstream log;	// log file stream
     
-	MPI_Comm comm;
+	MPI_Comm comm;			// Global mpi comm handle
 
   public:
-    std::unordered_map<std::string, std::string> parameters;
-    std::string additionalOutput;   // if ever we need an additional output as for histograms
+    std::unordered_map<std::string, std::string> parameters; // parameter inputs for metrics, i.e. enable histogram
+    std::string additionalOutput;   // additional output stream, can be used for saving histogram (.py) file
                 
 
 	virtual void init(MPI_Comm _comm) = 0;

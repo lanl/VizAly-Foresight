@@ -18,6 +18,7 @@ Authors:
 #include <vector>
 #include "metricInterface.hpp"
 
+
 class relativeError : public MetricInterface
 {
 	int numRanks;
@@ -33,6 +34,7 @@ public:
 
 };
 
+
 inline relativeError::relativeError()
 {
 	myRank = 0;
@@ -40,10 +42,12 @@ inline relativeError::relativeError()
 	metricName = "relative_error";
 }
 
+
 inline relativeError::~relativeError()
 {
 
 }
+
 
 inline void relativeError::init(MPI_Comm _comm)
 {
@@ -52,7 +56,12 @@ inline void relativeError::init(MPI_Comm _comm)
 	MPI_Comm_rank(comm, &myRank);
 }
 
-
+//
+// Helper function to compute relative error.
+// (tolerance) is used to avoid degenerative state where a near division-by-zero 
+// happens. It is also used to avoid the case where small values have very high
+// relative errors. This may be known as a bounded relative error. Any values
+// lower than this bound will default to absolute error instead.
 template <class T>
 inline T relError(T original, T approx, double tolerance)
 {
@@ -65,16 +74,17 @@ inline T relError(T original, T approx, double tolerance)
 	return absolute_error / std::abs(original);
 }
 
+
 inline void relativeError::execute(void *original, void *approx, size_t n) {
 	std::vector<double> rel_err(n);
 
-    double sum_rel_err = 0;
+	double sum_rel_err = 0;
 	for (std::size_t i = 0; i < n; ++i)
 	{
-		// Max set tolerence to 1
+		// Tolerance set to a value of 1
 		double err = relError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i], 1);
 		rel_err.push_back(err);
-        sum_rel_err += err;
+		sum_rel_err += err;
 	}
 	double max_rel_err = *std::max_element(rel_err.begin(), rel_err.end());
 	val = max_rel_err;
@@ -85,19 +95,19 @@ inline void relativeError::execute(void *original, void *approx, size_t n) {
 
 	log << "-Max Rel Error: " << total_max_rel_err << std::endl;
 
-    // Additional debug metrics, only in run_log
-    // Global total sum of error
-    double glob_sum_rel_err = 0;
-    MPI_Allreduce(&sum_rel_err, &glob_sum_rel_err, 1, MPI_DOUBLE, MPI_SUM, comm);
+	// Additional debug metrics, only in run_log
+	// Global total sum of error
+	double glob_sum_rel_err = 0;
+	MPI_Allreduce(&sum_rel_err, &glob_sum_rel_err, 1, MPI_DOUBLE, MPI_SUM, comm);
 
-    // Global number of values
-    size_t global_n = 0;
-    MPI_Allreduce(&n, &global_n, 1, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
+	// Global number of values
+	size_t global_n = 0;
+	MPI_Allreduce(&n, &global_n, 1, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
 
-    // Compute mean
-    double mean_rel_err = glob_sum_rel_err / global_n;
-    log << " Total Rel Error: " << glob_sum_rel_err << std::endl;
-    log << " Mean Rel Error: " << mean_rel_err << std::endl;
+	// Compute mean
+	double mean_rel_err = glob_sum_rel_err / global_n;
+	log << " Total Rel Error: " << glob_sum_rel_err << std::endl;
+	log << " Mean Rel Error: " << mean_rel_err << std::endl;
 
 	MPI_Barrier(comm);
 

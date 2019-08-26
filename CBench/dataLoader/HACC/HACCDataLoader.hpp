@@ -43,7 +43,7 @@ class HACCDataLoader: public DataLoaderInterface
 	int saveCompData(std::string paramName, void * cData);
 	int writeData(std::string _filename);
 	int saveInputFileParameters();
-	int close() { return deAllocateMem(dataType, data); }
+	int close() { return deAllocateMem(data); }
 	void setParam(std::string paramName, std::string type, std::string value){};
   bool loadUncompressedFields(nlohmann::json const&) { return false; }
 };
@@ -62,7 +62,7 @@ inline HACCDataLoader::HACCDataLoader()
 
 inline HACCDataLoader::~HACCDataLoader()
 {
-	deAllocateMem(dataType, data);
+	deAllocateMem(data);
 }
 
 
@@ -207,7 +207,7 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	allocateMem(dataType, numElements, 0, data);
 
 	readInData.setNumElements(maxNumElementsPerRank);
-	readInData.allocateMem(1);
+	readInData.alloc(1);
 
 	sizePerDim[0] = numElements;	// For compression
 
@@ -315,7 +315,7 @@ inline int HACCDataLoader::loadData(std::string paramName)
 		log << "mpiCartPartitions: " << mpiCartPartitions[0] << ", " << mpiCartPartitions[1] << ", " << mpiCartPartitions[2] << std::endl;
 	}
 	
-	readInData.deAllocateMem();
+	deAllocateMem(readInData.data);
 
 	return 1; // All good
 }
@@ -330,7 +330,7 @@ inline int HACCDataLoader::saveCompData(std::string paramName, void * cData)
 		if (inOutData[i].name == paramName)
 		{
 			inOutData[i].setNumElements(numElements);
-			inOutData[i].allocateMem();
+			inOutData[i].alloc();
 			memcpy(inOutData[i].data, cData, inOutData[i].size*numElements);
 
 			inOutData[i].doWrite = true;

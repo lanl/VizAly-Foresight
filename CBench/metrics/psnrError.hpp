@@ -17,6 +17,7 @@ Authors:
 #include <vector>
 #include "metricInterface.hpp"
 
+
 class psnrError : public MetricInterface
 {
 	int numRanks;
@@ -52,20 +53,7 @@ inline void psnrError::init(MPI_Comm _comm)
 }
 
 
-/*template <class T>
-inline T relError(T original, T approx, double tolerance)
-{
-	double absolute_error = std::abs(original - approx);
-	if (std::abs(original) < tolerance)
-	{
-		return absolute_error;
-	}
-
-	return absolute_error / std::abs(original);
-}*/
-
 inline void psnrError::execute(void *original, void *approx, size_t n) {
-	//std::vector<double> rel_err(n);
 
 	double local_max = -999999999;
 	double local_mse = 0;
@@ -76,8 +64,6 @@ inline void psnrError::execute(void *original, void *approx, size_t n) {
 
 		local_mse += (pow(static_cast<float *>(original)[i] - static_cast<float *>(approx)[i], (double)2.0));
 
-		//double err;// = relError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i], 1);
-		//rel_err.push_back(err);
 	}
 
 	// Local Quantity
@@ -100,7 +86,7 @@ inline void psnrError::execute(void *original, void *approx, size_t n) {
 	double global_psnr = 10 * log10(pow(global_max, 2.0) / (global_mse));
 
 	total_val = global_psnr;
-    
+	
 	log << " local_psnr: " << local_psnr << std::endl;
 	// Currently only report Global PSNR
 	log << "-psnr: " << global_psnr << std::endl;

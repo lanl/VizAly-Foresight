@@ -2,6 +2,19 @@ module purge
 module load gcc/6.4.0
 module load openmpi/2.1.3-gcc_6.4.0
 module load cmake
+module load anaconda/Anaconda3
+source activate cbench
+
+# Automatically set up conda environment if not found
+if [ $? == 1 ]; then
+    echo "Conda env not found, onetime setup.."
+    conda create --yes --name cbench python=3.6
+    source activate cbench
+
+    # install Python packages
+    conda install --yes numpy==1.15.4 matplotlib==3.0.2
+    python -m pip install apsw==3.9.2.post1
+fi
 
 # hdf5
 export LD_LIBRARY_PATH=/projects/exasky/hdf5/install/lib:$LD_LIBRARY_PATH
@@ -10,11 +23,6 @@ export PATH=/projects/exasky/hdf5/install/bin:$PATH
 # fftw 3.3.8
 export LD_LIBRARY_PATH=/projects/exasky/fftw-3.3.8/install/lib:$LD_LIBRARY_PATH
 export FFTW_MAJOR_VERSION=3
-
-# python
-export PATH=/projects/exasky/Python-3.7.3/install/bin:$PATH
-export LD_LIBRARY_PATH=/projects/exasky/Python-3.7.3/install/lib:$LD_LIBRARY_PATH
-export PYTHONPATH="/projects/exasky/Python-3.7.3/install/lib":$PYTHONPATH
 
 # HACC
 export HACC_PLATFORM="Darwin"

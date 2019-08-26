@@ -19,6 +19,7 @@ Authors:
 #include "json.hpp"
 #include "timer.hpp"
 #include <unordered_map>
+#include "utils.hpp"
 
 class BinaryDataLoader: public DataLoaderInterface
 {
@@ -32,8 +33,7 @@ class BinaryDataLoader: public DataLoaderInterface
   public:
 	BinaryDataLoader();
 	~BinaryDataLoader();
-	int allocateMem(std::string dataType, size_t numElements, int offset);
-	int deAllocateMem();
+	int alloc(std::string dataType, size_t numElements, int offset);
 	size_t findByteAddress(size_t x, size_t y, size_t z, size_t field);
 
 	void init(std::string _filename, MPI_Comm _comm);
@@ -41,7 +41,7 @@ class BinaryDataLoader: public DataLoaderInterface
 	int saveCompData(std::string paramName, void * cData);
 	int writeData(std::string _filename);
     int saveInputFileParameters() { return 1; };
-	int close() { return deAllocateMem(); }
+	int close() { return deAllocateMem(data); }
 	void setParam(std::string paramName, std::string type, std::string value){};
   bool loadUncompressedFields(nlohmann::json const&) { return false; } 
 };
@@ -57,7 +57,7 @@ inline BinaryDataLoader::BinaryDataLoader()
 
 inline BinaryDataLoader::~BinaryDataLoader()
 {
-	deAllocateMem();
+	deAllocateMem(data);
 }
 
 
@@ -122,31 +122,9 @@ inline void BinaryDataLoader::init(std::string _filename, MPI_Comm _comm)
 	std::cout << "sizePerDim: " << sizePerDim[0] << "," << sizePerDim[1] << "," << sizePerDim[2] << ", header: " << headerSize << ", type: " << dataType << std::endl;
 }
 
-inline int BinaryDataLoader::allocateMem(std::string dataType, size_t numElements, int offset)
+inline int BinaryDataLoader::alloc(std::string dataType, size_t numElements, int offset)
 {
-	// Allocate mem
-	if (dataType == "float")
-		data = new float[numElements + offset];
-	else if (dataType == "double")
-		data = new double[numElements + offset];
-	else if (dataType == "int8_t")
-		data = new int8_t[numElements + offset];
-	else if (dataType == "int16_t")
-		data = new int16_t[numElements + offset];
-	else if (dataType == "int32_t")
-		data = new int32_t[numElements + offset];
-	else if (dataType == "int64_t")
-		data = new int64_t[numElements + offset];
-	else if (dataType == "uint8_t")
-		data = new uint8_t[numElements + offset];
-	else if (dataType == "uint16_t")
-		data = new uint16_t[numElements + offset];
-	else if (dataType == "uint32_t")
-		data = new uint32_t[numElements + offset];
-	else if (dataType == "uint64_t")
-		data = new uint64_t[numElements + offset];
-	else
-		return 0;
+	allocateMem(dataType, numElements, offset, data);
 
 	// Get size
 	if (dataType == "float")
@@ -171,39 +149,6 @@ inline int BinaryDataLoader::allocateMem(std::string dataType, size_t numElement
 		elemSize = sizeof(uint64_t);
 	else
 		return 0;
-
-	return 1;
-}
-
-inline int BinaryDataLoader::deAllocateMem()
-{
-	if (data == NULL) // already deallocated!
-		return 1;
-
-	if (dataType == "float")
-		delete[](float*) data;
-	else if (dataType == "double")
-		delete[](double*) data;
-	else if (dataType == "int8_t")
-		delete[](int8_t*) data;
-	else if (dataType == "int16_t")
-		delete[](int16_t*) data;
-	else if (dataType == "int32_t")
-		delete[](int32_t*) data;
-	else if (dataType == "int64_t")
-		delete[](int64_t*) data;
-	else if (dataType == "uint8_t")
-		delete[](uint8_t*) data;
-	else if (dataType == "uint16_t")
-		delete[](uint16_t*) data;
-	else if (dataType == "uint32_t")
-		delete[](uint32_t*) data;
-	else if (dataType == "uint64_t")
-		delete[](uint64_t*) data;
-	else
-		return 0;
-
-	data = NULL;
 
 	return 1;
 }
@@ -245,7 +190,7 @@ inline int BinaryDataLoader::loadData(std::string paramName)
 	size_t xl = 0; size_t yl = 0; size_t zl = 0;
 	size_t xu = dimx - 1; size_t yu = dimy - 1; size_t zu = dimz - 1;
 
-	allocateMem(dataTarget, numElements, 0);
+	alloc(dataTarget, numElements, 0);
 
 	float * fdata; double * ddata;
 	

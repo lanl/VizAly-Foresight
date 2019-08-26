@@ -1,5 +1,5 @@
 # CBench
-This is the compression benchmark part of Foresight. It can be run on its own or part of the Foresight workflow.
+This is the compression benchmark arm of Foresight. It can be run on its own or part of the Foresight workflow.
 
 ## Prerequisites:
 * CMake 3.8.1 or higher
@@ -16,18 +16,21 @@ This is the compression benchmark part of Foresight. It can be run on its own or
 ## Building:
 The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @ ANL and Darwin @ LANL . These build a base version of CBench:
 ```
-$ git clone https://github.com/lanl/VizAly-Foresight.git
+git clone https://github.com/lanl/VizAly-Foresight.git
 
-$ cd VizAly-Foresight
-$ source buildDependencies.sh
-$ source build.sh
+cd VizAly-Foresight
+source buildDependencies.sh 
+source build.sh
 ```
+
+For more options, run buildDependencies.sh and build.sh with  "-h" 
+
 
 ## Running:
 ```
-$ cd build/
-$ mpirun -np 2 ./CBench ../inputs/hacc/hacc_cbench_test.json
-$ cat metrics_hacc_test_.csv
+cd build/
+mpirun -np 2 ./CBench ../inputs/hacc/hacc_cbench_test.json
+cat metrics_hacc_test_.csv
 ```
 **Note:**  The above will only run a toy dataset meant for testing if the code runs. The results should **NOT** be used as an indicator for the performance of the compressors!
 
@@ -36,7 +39,7 @@ $ cat metrics_hacc_test_.csv
 CBench takes as input a json file (examples of input json files are in the **_[inputs](inputs)_** folder) that specifies the input parameters.
 
 ### Currently Supported file formats:
-* GenericIO
+* [GenericIO](https://trac.alcf.anl.gov/projects/genericio)
 * NYX(HDF5 version hdf5-1_10_3) 
 * Binary
 
@@ -47,6 +50,11 @@ CBench takes as input a json file (examples of input json files are in the **_[i
 * [fpzip](https://computation.llnl.gov/projects/floating-point-compression) - version 1.2.0
 * [ISABELA](http://freescience.org/cs/ISABELA/ISABELA.html) - version 0.2.1
 
+The following experimental **GPU** compressors are also supported:
+* SZ - custom version
+* [zfp](https://github.com/LLNL/zfp.git) - version 0.5.4
+
+
 ### Currently Supported metrics:
 * Absolute Error
 * Relative Error
@@ -55,3 +63,4 @@ CBench takes as input a json file (examples of input json files are in the **_[i
 * Data Ranges (data distribution)
 * Memory Usage
 * Compute times
+* Histogram of values

@@ -12,21 +12,26 @@ index=0
 for ((i=1; i<=$#; i++ )); do
 	arg=${!i}
 
-	if [ $arg = "-h" ]; then
+	if [ $arg = "-h" ] || [ $arg = "--help" ]; then
 		echo ""
 		echo "Build Arguments:"
-		echo "  --path <folder> : expernal dependencies path"
-		echo ""
-		echo " --all: build all dependencies"
+		echo " --all: build all possible dependencies"
+		echo " --cpu: build dependencies for a CPU build"
+		echo " --gpu: build dependencies for a GPU build"
+		echo " --path <folder> : external dependencies path"
 		echo ""
 		return
 	fi
 
-	if [ $arg = "-all" ]; then
+	if [ $arg = "--all" ]; then
 		buildType="all"
 	fi
 
-	if [ $arg = "-gpu" ]; then
+	if [ $arg = "--cpu" ]; then
+		buildType="cpu"
+	fi
+
+	if [ $arg = "--gpu" ]; then
 		buildType="gpu"
 	fi 
 
@@ -46,18 +51,23 @@ pushd $externalDependenciesPath
 # copy the scripts into that folder and run 
 cp $projectPath/scripts/thirdparty/*.sh .
 if [ $buildType = "all" ]; then
-	echo "building all dependencies ..."
+	echo "building all possible dependencies ..."
 	source buildAllExternal.sh
+elif [ $buildType = "cpu" ]; then
+	echo "building all CPU dependencies ..."
+	source buildCpuExternal.sh
 elif [ $buildType = "gpu" ]; then
-	echo "building gpu dependencies ..."
-	source _GpuExternal.sh
+	echo "building all GPU dependencies ..."
+	source buildGpuExternal.sh
 else
+	echo "building default dependencies ..."
 	source buildExternal.sh
 fi
 popd
 
 #
-# Build Arguments
-# -all   : build all dependencies
-# -gpu   : build gpu dependencies
+# Build Arguments:
+# --all  : build all dependencies
+# --cpu  : build CPU dependencies
+# --gpu  : build GPU dependencies
 # --path : build dependency path
