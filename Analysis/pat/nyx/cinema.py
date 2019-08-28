@@ -56,6 +56,7 @@ class nyx_cinema(cinema.CinemaWorkflow):
 			futils.write_csv(output_file_name, all)
 
 
+
 	# Converts a string to an operator
 	def validate(self, operand, relate, result):
 		ops = { "<": operator.lt }

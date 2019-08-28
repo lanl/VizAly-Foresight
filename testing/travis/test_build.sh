@@ -33,6 +33,7 @@ pip3 install -r testing/travis/requirements.txt
 
 # test HACC workflow generator and executables
 cd Analysis
-python3 -m hacc/pat_hacc.py --input-file ../inputs/hacc/hacc_wflow.json --preview
-python3 -m hacc/pat_hacc_query.py --help
-python3 -m hacc/pat_cinema.py --help
+
+python3 -m pat.hacc.pat_hacc --input-file ../inputs/hacc/hacc_wflow.json --preview
+python3 -m pat.hacc.pat_hacc_query.py --help
+python3 -m pat.hacc.pat_cinema.py --help
