@@ -1,7 +1,10 @@
 #! /usr/bin/env python
 """
 To run executable do:
-python pat/pat_nyx.py --input-file ../inputs/nyx/NYX_wflow.json
+
+python3 -m pat.nyx.workflow --input-file ../inputs/nyx/test.json
+python3 -m pat.nyx.workflow --input-file ../inputs/nyx/test-analysis-cinema.json --analysis-cinema
+python3 -m pat.nyx.workflow --input-file ../inputs/nyx/test-cinema.json --cinema
 """
 import sys
 import os
@@ -47,8 +50,6 @@ class NYXWorkflow(workflow.Workflow):
 					json_item['files'].append(input_item)
 
 				self.json_data['pat']['analysis'].append(json_item)
-
-
 
 	
 
@@ -163,20 +164,16 @@ def main():
 	# add jobs to workflow
 	if opts.cinema:
 		print("Run cinema only")
-		wflow.set_analysis_type(2)
 		wflow.add_cinema_plotting_jobs()
-	elif opts.bench:
+	elif opts.cbench:
 		print("Run cbench only")
-		wflow.set_analysis_type(3)
 		wflow.add_cbench_job()
 	elif opts.analysis_cinema:
 		print("Run analysis + cinema")
-		wflow.set_analysis_type(1)
 		wflow.add_analysis_jobs()
 		wflow.add_cinema_plotting_jobs()
 	else:	
-		print("Run full")
-		wflow.set_analysis_type(0)
+		print("Run full: CBench, analysis, and Cinema")
 		wflow.add_cbench_job()
 		wflow.add_analysis_jobs()
 		wflow.add_cinema_plotting_jobs()

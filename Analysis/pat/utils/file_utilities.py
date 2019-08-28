@@ -23,15 +23,14 @@ def splitString(filename, char):
 	return filename[:k+1], filename[k+1:]
 
 
-def get_git_version(repo_path):
-	git_tag = subprocess.check_output(["mv " + repo_path + "; git describe --tags"])
-	print git_tag
-
-
-
 # Commands
 def run_command(cmd):
 	return subprocess.call(cmd, shell=True)
+
+
+def get_git_version(path):
+	git_tag = os.popen("cd " + path + "; git describe --tags").read()
+	return git_tag
 
 
 # Folders

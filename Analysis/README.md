@@ -30,7 +30,7 @@ python3 -m <analysis_name> --input-file <absolute path of input file>
 For example,
 ```
 cd Analysis
-$ python3 -m pat.nyx.nyx --input-file ../inputs/nyx/darwin_nyx_galton_wflow_test.json
+$ python3 -m pat.nyx.workflow --input-file ../inputs/nyx/darwin_nyx_galton_wflow_test.json
 ```
 
 

@@ -30,20 +30,15 @@ class Workflow(object):
 		# location to store workflow files
 		self.workflow_dir = workflow_dir
 
-
-		# analysis type
-		self.analysis_type = 0 	# 0:Cbench + Pat + Cinema,  1: Pat + Cinema,  2: Cinema
-
 		# attributes for workflow construction
 		self.submit_file = None
 
+		# Add git tag
+		git_tag = futils.get_git_version(self.json_data['foresight-home'])
+		git_tag = git_tag.strip('\n')
+		self.json_data["git-tag"] = git_tag
+		futils.write_json_file(self.json_path,self.json_data)
 
-	def set_analysis_type(self, ana_type):
-		self.analysis_type = ana_type
-
-
-	def get_analysis_type(self):
-		return self.analysis_type
 
 
 	def add_job(self, job, dependencies=None):
@@ -52,12 +47,13 @@ class Workflow(object):
 		self.jobs.append(job)
 
 
-	def add_cbench_job(self):
-		""" Adds a CBench job to the workflow.
+
+
+	def fill_input_files(self):
+		""" Fill in  ["pat"]["input-files"]
 		"""
 		base_path = self.json_data['project-home'] + self.json_data['wflow-path']
 
-		# Fill in  ["pat"]["input-files"]
 		orig_path_filename = futils.splitString(self.json_data['input']['filename'],'/')
 		orig_item = {
 			"output-prefix" : "orig",
@@ -73,6 +69,12 @@ class Workflow(object):
 
 			self.json_data['pat']['input-files'].append(json_item)
 
+
+
+	def add_cbench_job(self):
+		""" Adds a CBench job to the workflow.
+		"""
+	
 		# Set up environment
 		execute_dir = "cbench"
 
@@ -100,6 +102,10 @@ class Workflow(object):
 						 environment=environment)
 		cbench_job.add_command("mkdir -p logs")
 		self.add_job(cbench_job)
+
+
+		# Fill in  ["pat"]["input-files"]
+		self.fill_input_files()
 
 
 
