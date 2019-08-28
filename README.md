@@ -34,6 +34,7 @@ The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @
 git clone https://github.com/lanl/VizAly-Foresight.git
 
 cd VizAly-Foresight
+source scrits/<Name of the environment> # that sets up the environment
 source buildDependencies.sh
 source build.sh
 ```
@@ -41,11 +42,12 @@ source build.sh
 ## Running Foresight
 This will set up and run the full analysis workflow on SLURM and generate a cinema database, the command is as follows:
 ```
-python3 Analysis/<name_of_analysis> --input-file <path to input JSON file> --submit
+cd Analysis
+python3 -m <name_of_analysis> --input-file <path to input JSON file>
 ```
 For example, to run the NYX analysis, the command is:
 ```
-python3 Analysis/pat_nyx.py --input-files inputs/nyx/nyx_darwin_test.json --submit
+python3 -m pat.nyx.nyx --input-files inputs/nyx/nyx_darwin_test.json
 ```
 
 ## Running CBench as stand-alone:

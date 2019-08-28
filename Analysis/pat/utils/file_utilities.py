@@ -5,6 +5,7 @@ import json
 import csv
 import argparse
 import shutil
+import subprocess
 from collections import OrderedDict
 
 
@@ -20,6 +21,11 @@ def validate_num_args(num_arguments, min_count):
 def splitString(filename, char):
 	k = filename.rfind(char)
 	return filename[:k+1], filename[k+1:]
+
+
+def get_git_version(repo_path):
+	git_tag = subprocess.check_output(["mv " + repo_path + "; git describe --tags"])
+	print git_tag
 
 
 

@@ -145,6 +145,7 @@ def main():
 	parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
 	parser.add_argument("--input-file")
 	parser.add_argument("--analysis-cinema", action="store_true", help="run analysis and cinema job only")
+	parser.add_argument("--cbench",          action="store_true", help="run cbench only")
 	parser.add_argument("--cinema",          action="store_true", help="run cinema only")
 	parser.add_argument("--preview", 		 action="store_true", help="preview the job, create scripts, ... but won't run")
 	opts = parser.parse_args()
@@ -164,6 +165,10 @@ def main():
 		print("Run cinema only")
 		wflow.set_analysis_type(2)
 		wflow.add_cinema_plotting_jobs()
+	elif opts.bench:
+		print("Run cbench only")
+		wflow.set_analysis_type(3)
+		wflow.add_cbench_job()
 	elif opts.analysis_cinema:
 		print("Run analysis + cinema")
 		wflow.set_analysis_type(1)
