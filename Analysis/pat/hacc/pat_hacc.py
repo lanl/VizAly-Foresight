@@ -1,13 +1,11 @@
 #! /usr/bin/env python
 """ This script generates a workflow that runs CBench and HACC data analysis executables.
 """
-import sys
-sys.path.append(sys.path[0]+"/..")
-import argparse
-import os
-from pat import file_utilities as futils
-from pat import Job as j
-from pat import workflow
+import sys, os, argparse
+
+from pat.utils import file_utilities as futils
+from pat.utils import job as j
+from pat.utils import workflow
 
 class HACCWorkflow(workflow.Workflow):
 
@@ -60,23 +58,14 @@ class HACCWorkflow(workflow.Workflow):
                                     os.path.basename(new_config_path),
                                     parameters_path,
                                     self.workflow_dir + "/" + new_parameters_path))
-            # write halo finder timestep file
-            # specify from parsing the input file
-            new_timesteps_path = halo_section + "/" + prefix + "_halo_timesteps.txt"
-            tfile = open(self.workflow_dir + "/" + new_timesteps_path, 'w+')
-            tfile.write(timestep)
-            tfile.close()
 
             # write halo finder configuration file
             # specify output prefix inside
             tmp_path = "tmp.out"
-            tmp_path2 = "tmp2.out"
             os.system("sed \"s/^BASE_OUTPUT_FILE_NAME.*/BASE_OUTPUT_FILE_NAME .\/{}/\" {} > {}".format(
                                     prefix, config_path, tmp_path))
-            os.system("sed \"s/^EXPLICIT_TIMESTEPS.*/EXPLICIT_TIMESTEPS {}/\" {} > {}".format(
-                                    timestep, tmp_path, tmp_path2))
             os.system("sed \"s/^ACCUMULATE_CORE_NAME.*/ACCUMULATE_CORE_NAME .\/{}/\" {} > {}".format(
-                                    prefix, tmp_path2, self.workflow_dir + "/" + new_config_path))
+                                    prefix, tmp_path, self.workflow_dir + "/" + new_config_path))
             os.remove(tmp_path)
 
             # create job for halo finder
@@ -84,7 +73,7 @@ class HACCWorkflow(workflow.Workflow):
                              execute_dir=halo_section,
                              executable=halo_exe,
                              arguments=["--config", os.path.basename(new_config_path),
-                                        "--timesteps", os.path.basename(new_timesteps_path),
+                                        "--timesteps", timesteps_path,
                                         "--prefix", cbench_path[:-len(str(timestep)) - 1],
                                         os.path.basename(new_parameters_path)],
                              configurations=halo_config,
@@ -125,7 +114,6 @@ class HACCWorkflow(workflow.Workflow):
                 halo_query_job.add_parents(halo_job)
                 self.add_job(halo_query_job)
 
-            # TODO: Automate 'TOPOLOGY' in /projects/exasky/HACC/run/inputs/indat.params
             # create job for power spectrum
             spectrum_job = j.Job(name="{}_{}".format(prefix, spectrum_section),
                                  execute_dir=spectrum_section,

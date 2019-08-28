@@ -2,10 +2,9 @@
 """ Writes the distribution of halos from an SQL query.
 """
 import sys
-sys.path.append(sys.path[0]+"/..")
 import argparse
 import numpy
-from pat import gioSqlite as gio_sqlite
+from pat.utils import gioSqlite as gio_sqlite
 
 def load_sqlite_data(path, query, sqlite_file):
     """ Loads data using SQLite query.

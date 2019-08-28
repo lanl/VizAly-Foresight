@@ -1,10 +1,13 @@
 #!/usr/bin/python
 
-import sys, os, json, csv
+import sys
+import os
+import json
+import csv
 from collections import OrderedDict
 
-from pat import file_utilities as futils
-from pat import plot_utilities as putils
+from pat.utils import file_utilities as futils
+from pat.utils import plot_utilities as putils
 
 
 
@@ -40,7 +43,7 @@ class CinemaWorkflow():
 		output_path = self.json_data['project-home'] + self.json_data['wflow-path'] + "/"
 		cinema_database = output_path + self.json_data['cinema-plots']['cinema-db-name'] + ".cdb"
 		img_files = futils.list_files_in_folder( output_path + "plots/" , ".png")
-		cinema_csv = output_path + "cbench/" + "data.csv"
+		cinema_csv = output_path + "cinema/" + "data.csv"
 
 		self.create_cinema_database(cinema_database, cinema_csv, img_files)
 

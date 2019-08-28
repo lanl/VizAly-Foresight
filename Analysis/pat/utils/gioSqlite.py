@@ -3,7 +3,6 @@
 import sys
 import io
 
-
 dbConnLoaded = ""
 
 try:

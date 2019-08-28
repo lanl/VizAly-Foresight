@@ -3,17 +3,16 @@
 The images are plotted in this executable.
 """
 import sys
-sys.path.append(sys.path[0]+"/..")
 import argparse
 import csv
 import matplotlib as mpl; mpl.use("Agg")
 import matplotlib.pyplot as plt
 import numpy
 import os
-from pat import cinema
-from pat import file_utilities as futils
-from pat import plot_utilities as putils
-from pat import Job as j
+from pat.utils import cinema
+from pat.utils import file_utilities as futils
+from pat.utils import plot_utilities as putils
+from pat.utils import job as j
 
 class PATCinema(cinema.CinemaWorkflow):
 
@@ -48,7 +47,6 @@ class PATCinema(cinema.CinemaWorkflow):
             # loop over rows
             for row in reader:
                 prefix = row[1][1:]
-                #prefix = row[1][2:-1]
 
                 # loop over image types
                 for col_name in image_columns:
@@ -58,7 +56,7 @@ class PATCinema(cinema.CinemaWorkflow):
                     if prefix in image_data[col_name].keys():
                         data_file = image_data[col_name][prefix]
                     else:
-                        print("Warning: Unable to match compressor name: ",prefix)
+                        print("Warning: Unable to match compressor name")
                         row.append("")
                         continue
 
@@ -79,7 +77,7 @@ class PATCinema(cinema.CinemaWorkflow):
                     try:
                         data = numpy.loadtxt(data_file, delimiter=",")
                     except ValueError:
-                        print("Warning: Unable to find compressed data: ", data_file)
+                        print("Warning: Unable to compressed data: ", data_file)
                         data = numpy.loadtxt(data_file)
 
                     # plot
@@ -113,10 +111,7 @@ class PATCinema(cinema.CinemaWorkflow):
                 all_runs.append(row)
 
             # write data CSV file
-            #futils.write_csv("data.csv", all_runs)
-            with open("data.csv", 'w') as csvoutput:
-                writer = csv.writer(csvoutput, escapechar=' ', quoting=csv.QUOTE_NONE)
-                writer.writerows(all_runs)
+            futils.write_csv("data.csv", all_runs)
 
 # parse Input
 parser = argparse.ArgumentParser(description=__doc__,

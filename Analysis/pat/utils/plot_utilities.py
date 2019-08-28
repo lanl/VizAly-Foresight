@@ -76,7 +76,7 @@ def plotScatterGraph(x, x_label, y_label, title, path, x_range, list_of_tuples):
     plt.ylabel(y_label)
     plt.grid(True)
 
-    marker = itertools.cycle(('o', 's', '*', 'P', 'D', 'X', 'v', 'H'))
+    marker = itertools.cycle(('o', 's', '*', 'P', 'D', 'X', 'v', 'H', '2', '+'))
 
     for item in list_of_tuples:
         ax.semilogx(x, item[0], label=item[1], marker=next(marker))

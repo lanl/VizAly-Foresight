@@ -2,28 +2,98 @@
 
 This folder contains PAT, the Python package that is used to run the Foresight workflows. The Analysis toolkit will generate a Cinema database from the input file specified.
 
+
 ## Prerequisites:
 
 Minimum Requirements
 * Python 3.6 or higher with (+matplotlib=3.0.2, +apsw=3.9.2, +numpy=1.15.4)
 * SLURM (for job launching)
 
+
 ## Running Foresight
+
+Foresight can be run in 3 different modes:
+1. Full workflow (Run compression benchmark, analysis on decompressed data, and Visualize the results). This is the default behavior.
+2. Analysis (Analysis on decompressed data, and Visualize the results)
+3. Cinema (Visualize the results)
+
+
+### Running Full analysis
 This will run the full analysis workflow and generate a cinema database. 
 
-For example, to generate the anlysis for nyx, use the command as follows:
+To generate the analysis for nyx, use the command as follows:
 ```
-python3 <analysis_name> --input-file <absolute path of input file>
-```
-This will generate the scripts required to launch the full analysis.
-
-To launch the analysis (submit the jobs to SLURM), append the '--submit' command:
-```
-python3 <analysis_name> --input-file <absolute path of input file> --submit
+python3 -m <analysis_name> --input-file <absolute path of input file>
 ```
 
-For example
+
+For example,
 ```
-$ python3 Analysis/pat_nyx.py --input-file /projects/exasky/VizAly-Foresight/inputs/nyx/darwin_nyx_galton_wflow_test.json --submit
+cd Analysis
+$ python3 -m pat.nyx.nyx --input-file ../inputs/nyx/darwin_nyx_galton_wflow_test.json
 ```
-will run CBench, PAT, and a plot generator for Cinema HTML viewers. The output will be a Cinema database.
+
+
+
+### Options
+Append the following options for the behavior below
+* --preview: only create the scripts but do not launch them
+
+* --analysis_cinema: opmits CBench, existing output files must be provided
+	* metrics file must be proivided in ["inputs"] e.g.
+		"input": 
+		{
+			"metrics-csv" : "...."
+			.
+			.
+			.
+		}
+
+	* paths of files must be provided e.g.
+		"pat" :
+		{
+			.
+			.
+			.
+
+			"input-files": [
+	            {
+	                "output-prefix": "orig",
+	                "path": "/projects/exasky/pascal-projects/VizAly-Foresight/testing/data/z255_32.h5"
+	            },
+	            {
+	                "output-prefix": "SZ_",
+	                "path": "/projects/exasky/pascal-projects/VizAly-Foresight/testXXX/cbench/decompressed_files/SZ___z255_32.h5"
+	            }
+	        ]
+	    }
+
+* --cinema: only produces cinema output from existing CBench and analysis runs. 
+	* metrics file must be proivided in ["inputs"] and "analysis-results" location e.g.
+			"input": 
+			{
+				"metrics-csv" : "...."
+				"analysis-results" : "..."
+				.
+				.
+				.
+			}
+
+	* paths of files must be provided e.g.
+		"pat" :
+		{
+			.
+			.
+			.
+
+			"input-files": [
+	            {
+	                "output-prefix": "orig",
+	                "path": "/projects/exasky/pascal-projects/VizAly-Foresight/testing/data/z255_32.h5"
+	            },
+	            {
+	                "output-prefix": "SZ_",
+	                "path": "/projects/exasky/pascal-projects/VizAly-Foresight/testXXX/cbench/decompressed_files/SZ___z255_32.h5"
+	            }
+	        ]
+	    }
