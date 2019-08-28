@@ -37,7 +37,6 @@ class Workflow(object):
 		git_tag = futils.get_git_version(self.json_data['foresight-home'])
 		git_tag = git_tag.strip('\n')
 		self.json_data["git-tag"] = git_tag
-		futils.write_json_file(self.json_path,self.json_data)
 
 
 

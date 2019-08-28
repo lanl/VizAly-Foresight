@@ -50,13 +50,25 @@ For example, to run the NYX analysis, the command is:
 python3 -m pat.nyx.nyx --input-files inputs/nyx/nyx_darwin_test.json
 ```
 
+The output will be posted in a cinemaDB.cdb folder. 
+
+
 ## Running CBench as stand-alone:
 ```
 mpirun -np 2 build/CBench ../inputs/hacc/hacc_cbench_test.json
 cat metrics_hacc_test_.csv
 ```
+Alternatively, CBench can also be run throughj foresight as follows:
+```
+cd Analysis
+python3 -m <name_of_analysis> --input-file <path to input JSON file> --cbench
+```
 
 **Note:**  The above will only run a toy dataset meant for testing if the code runs. The results should **NOT** be used as an indicator for the performance of the compressors!
+
+
+### Provenance
+The folder in cinemaDB.cdb will also contain a wflow.json that will point to the git-hash tag that the code was ran on. To replicate the run, use git checkout <git-tag> to get the exact same code.
 
 
 # Usage

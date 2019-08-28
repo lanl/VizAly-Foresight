@@ -12,8 +12,6 @@ from pat.utils import cinema
 from pat.utils import job as j
 
 
-
-
 class nyx_cinema(cinema.CinemaWorkflow):
 
 	def prepare_cinema(self):

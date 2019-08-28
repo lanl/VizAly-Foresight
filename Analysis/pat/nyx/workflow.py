@@ -2,10 +2,11 @@
 """
 To run executable do:
 
-python3 -m pat.nyx.workflow --input-file ../inputs/nyx/test.json
-python3 -m pat.nyx.workflow --input-file ../inputs/nyx/test-analysis-cinema.json --analysis-cinema
-python3 -m pat.nyx.workflow --input-file ../inputs/nyx/test-cinema.json --cinema
+python3 -m pat.nyx.workflow --input-file ../inputs/tests/test-nyx-foresight.json
+python3 -m pat.nyx.workflow --input-file ../inputs/tests/test-nyx-analysis-cinema.json --analysis-cinema
+python3 -m pat.nyx.workflow --input-file ../inputs/tests/test-nyx-cinema.json --cinema
 """
+
 import sys
 import os
 import argparse
@@ -128,7 +129,7 @@ class NYXWorkflow(workflow.Workflow):
 			environment=environment )
 		cinema_job.add_command("mkdir " + plot_path)
 		cinema_job.add_command("cd " + self.json_data["foresight-home"] + "/Analysis/")
-		cinema_job.add_command("rm -rf " + self.json_data["foresight-home"] + "/cbench/" + self.json_data['cbench']['output']['output-decompressed-location'])
+		cinema_job.add_command("rm -rf " + self.json_data["project-home"] + "/" + self.json_data["wflow-path"] + "/" + "/cbench/" + self.json_data['cbench']['output']['output-decompressed-location'])
 
 		# make dependent on CBench job and add to workflow
 		if ( len(self.jobs) > 0):
