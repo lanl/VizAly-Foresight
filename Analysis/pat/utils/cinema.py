@@ -32,6 +32,12 @@ class CinemaWorkflow():
 		cmd = "cp " + csv_file + " " + cinema_database + "/data.csv"
 		os.system(cmd)
 
+
+		# Copy JSON to cinema for provenance
+		cmd = "cp " + self.json_file + " " + cinema_database + "/wflow.json"
+		os.system(cmd)
+
+
 		print("Create cinema database " + cinema_database)
 
 
