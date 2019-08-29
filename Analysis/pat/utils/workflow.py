@@ -53,6 +53,10 @@ class Workflow(object):
 		"""
 		base_path = self.json_data['project-home'] + self.json_data['wflow-path']
 
+		# Remove all entries if any
+		self.json_data['pat']['input-files'].clear()
+
+		# Add the original
 		orig_path_filename = futils.splitString(self.json_data['input']['filename'],'/')
 		orig_item = {
 			"output-prefix" : "orig",
@@ -60,6 +64,7 @@ class Workflow(object):
 		}
 		self.json_data['pat']['input-files'].append(orig_item)
 
+		# Add decompressed ones
 		for _file in self.json_data['compressors']:
 			json_item = {
 				"output-prefix" : _file["output-prefix"],

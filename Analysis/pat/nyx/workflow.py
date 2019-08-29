@@ -33,8 +33,11 @@ class NYXWorkflow(workflow.Workflow):
 		else:
 			analysis_path = self.json_data["project-home"] +  self.json_data['wflow-path']
 
-		
+		# Remove all entries if any
+		self.json_data['pat']['analysis'].clear()
 
+
+		# Add analysis entries
 		for ana in self.json_data['pat']['analysis-tool']['analytics']:
 			for item in ana['type']:
 				json_item = {
