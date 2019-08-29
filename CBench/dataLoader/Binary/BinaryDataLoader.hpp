@@ -41,7 +41,7 @@ class BinaryDataLoader: public DataLoaderInterface
 	int saveCompData(std::string paramName, void * cData);
 	int writeData(std::string _filename);
     int saveInputFileParameters() { return 1; };
-	int close() { return deAllocateMem(data); }
+	int close() { return deAllocateMem(dataType, data); }
 	void setParam(std::string paramName, std::string type, std::string value){};
   bool loadUncompressedFields(nlohmann::json const&) { return false; } 
 };
@@ -57,7 +57,7 @@ inline BinaryDataLoader::BinaryDataLoader()
 
 inline BinaryDataLoader::~BinaryDataLoader()
 {
-	deAllocateMem(data);
+	deAllocateMem(dataType, data);
 }
 
 
