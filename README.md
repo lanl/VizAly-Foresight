@@ -34,7 +34,7 @@ The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @
 git clone https://github.com/lanl/VizAly-Foresight.git
 
 cd VizAly-Foresight
-source scrits/<Name of the environment> # that sets up the environment
+source scripts/<Name of the environment> # that sets up the environment
 source buildDependencies.sh
 source build.sh
 ```
@@ -47,10 +47,11 @@ python3 -m <name_of_analysis> --input-file <path to input JSON file>
 ```
 For example, to run the NYX analysis, the command is:
 ```
-python3 -m pat.nyx.nyx --input-files inputs/nyx/nyx_darwin_test.json
+python3 -m pat.nyx.workflow --input-files inputs/nyx/nyx_darwin_test.json
 ```
 
-The output will be posted in a cinemaDB.cdb folder. 
+The outputs/logs will be generated in a folder using "project-home" and "wflow-path" in the input JSON file. The folder 
+cinemaDB.cdb will contain the graphed outputs.
 
 
 ## Running CBench as stand-alone:
@@ -68,7 +69,7 @@ python3 -m <name_of_analysis> --input-file <path to input JSON file> --cbench
 
 
 ### Provenance
-The folder in cinemaDB.cdb will also contain a wflow.json that will point to the git-hash tag that the code was ran on. To replicate the run, use git checkout <git-tag> to get the exact same code.
+The folder in cinemaDB.cdb will also contain a wflow.json that will point to a git-hash tag that the code was ran on. To replicate the run, git checkout <git-tag> to get the exact same code.
 
 
 # Usage
