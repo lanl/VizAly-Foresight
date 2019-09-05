@@ -42,6 +42,10 @@ Authors:
 	#include "NYXDataLoader.hpp"
 #endif
 
+#ifdef CBENCH_HAS_VTK
+	#include "VTKDataLoader.hpp"
+#endif
+
 
 
 int main(int argc, char *argv[])
@@ -100,6 +104,7 @@ int main(int argc, char *argv[])
 			createFolder(outputPath);
 	}
 
+	createFolder("logs");
 	std::string outputLogFilename = "logs/" + jsonInput["cbench"]["output"]["log-file"].get<std::string>() + "_" + std::to_string(myRank);
 
 
@@ -163,6 +168,12 @@ int main(int argc, char *argv[])
 					ioMgr->setParam("group", "string", jsonInput["input"]["group"]);
 				}
 			}
+		}
+		#endif
+		#ifdef CBENCH_HAS_VTK
+		else if (inputFileType == "VTI")
+		{
+			ioMgr = new VTKDataLoader();
 		}
 		#endif
 		else

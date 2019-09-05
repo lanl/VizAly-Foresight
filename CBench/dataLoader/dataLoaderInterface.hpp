@@ -35,7 +35,7 @@ protected:
 
 	size_t origDims[5]{ 0,0,0,0,0 };	// Global dataset size
 	size_t sizePerDim[5]{ 0,0,0,0,0 };	// For compression, size of this mpi rank
-	size_t rankOffset[3];				// Rank offset, for parallel operations
+	size_t rankOffset[3]{0, 0, 0};		// Rank offset, for parallel operations
 	size_t elemSize;					// sizeof() in bytes of that parameter
 	size_t totalNumberOfElements;		// total number of points/cells for input file
 	size_t numElements;					// number of points/cells for this mpi rank

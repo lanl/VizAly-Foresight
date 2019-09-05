@@ -17,6 +17,7 @@ include_directories(${CMAKE_SOURCE_DIR}/utils)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader/Binary)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader/HACC)
+include_directories(${CMAKE_SOURCE_DIR}/dataLoader/VTK)
 
 
 # HACC Loader
@@ -24,6 +25,22 @@ include_directories(${CMAKE_SOURCE_DIR}/thirdparty/genericio)
 add_definitions(-DGENERICIO_NO_COMPRESSION)
 add_library(GenericIO STATIC "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO.cxx")
 set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
+
+
+# VTK Loader
+option(CBENCH_ENABLE_VTK_LOADER "Enables the reading of VTK data" OFF)
+if (CBENCH_ENABLE_VTK_LOADER)
+	find_package(VTK REQUIRED)
+	if (VTK_FOUND)
+		add_definitions(-DCBENCH_HAS_VTK)
+
+		include(${VTK_USE_FILE})
+		set (EXTRA_LIBS ${EXTRA_LIBS} ${VTK_LIBRARIES})
+	else()
+		message(FATAL_ERROR "Could not find vtk!!!") 
+	endif()
+endif()
+
 
 # NYX Loader
 option(CBENCH_ENABLE_NYX_LOADER "Enables the reading of NyX HDF5 data" OFF)
