@@ -1,0 +1,705 @@
+{
+    "project-home": "",
+    "wflow-path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly",
+    "foresight-home": "/projects/exasky_data/testforesight_pat/",
+    "input": {
+        "filetype": "NYX",
+        "filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",
+        "filename-512": "/project/projectdirs/nyx/www/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",
+        "filename-1024": "/project/projectdirs/nyx/www/highz/1024/NVB_C009_l20n1024_S12345T632_z42.hdf5",
+        "filename-2048": "/project/projectdirs/nyx/www/highz/2048/NVB_C009_l40n2048_S12345T692_z42.hdf5",
+        "group": "native_fields",
+        "scalars": [
+            "baryon_density",
+            "dark_matter_density",
+            "temperature",
+            "velocity_x",
+            "velocity_y",
+            "velocity_z"
+        ],
+        "uncompressed": [
+            {
+                "group": "domain",
+                "attributes": [
+                    {
+                        "name": "shape",
+                        "type": "int",
+                        "size": 3
+                    },
+                    {
+                        "name": "size",
+                        "type": "double",
+                        "size": 3
+                    }
+                ]
+            },
+            {
+                "group": "universe",
+                "attributes": [
+                    {
+                        "name": "hubble",
+                        "type": "double",
+                        "size": 1
+                    },
+                    {
+                        "name": "omega_b",
+                        "type": "double",
+                        "size": 1
+                    },
+                    {
+                        "name": "omega_l",
+                        "type": "double",
+                        "size": 1
+                    },
+                    {
+                        "name": "omega_m",
+                        "type": "double",
+                        "size": 1
+                    },
+                    {
+                        "name": "redshift",
+                        "type": "double",
+                        "size": 1
+                    }
+                ]
+            }
+        ]
+    },
+    "compressors": [
+        {
+            "name": "BLOSC",
+            "output-prefix": "blosc_"
+        },
+        {
+            "name": "fpzip",
+            "output-prefix": "fpzip_",
+            "compressor-params": [
+                {
+                    "scalar": [
+                        "baryon_density",
+                        "dark_matter_density"
+                    ],
+                    "bits": 18
+                },
+                {
+                    "scalar": [
+                        "temperature"
+                    ],
+                    "bits": 12
+                },
+                {
+                    "scalar": [
+                        "velocity_x",
+                        "velocity_y",
+                        "velocity_z"
+                    ],
+                    "bits": 14
+                }
+            ]
+        },
+        {
+            "name": "SZ",
+            "output-prefix": "sz_pwrel_",
+            "compressor-params": [
+                {
+                    "scalar": [
+                        "baryon_density",
+                        "dark_matter_density"
+                    ],
+                    "pw_rel": 0.01
+                },
+                {
+                    "scalar": [
+                        "temperature"
+                    ],
+                    "pw_rel": 0.25
+                },
+                {
+                    "scalar": [
+                        "velocity_x",
+                        "velocity_y",
+                        "velocity_z"
+                    ],
+                    "pw_rel": 0.05
+                }
+            ]
+        },
+        {
+            "name": "SZ",
+            "output-prefix": "sz_abs_run1_",
+            "compressor-params": [
+                {
+                    "scalar": [
+                        "baryon_density",
+                        "dark_matter_density"
+                    ],
+                    "abs": 1
+                },
+                {
+                    "scalar": [
+                        "temperature"
+                    ],
+                    "abs": 1000
+                },
+                {
+                    "scalar": [
+                        "velocity_x",
+                        "velocity_y",
+                        "velocity_z"
+                    ],
+                    "abs": 1000000
+                }
+            ]
+        },
+        {
+            "name": "SZ",
+            "output-prefix": "sz_abs_run2_",
+            "compressor-params": [
+                {
+                    "scalar": [
+                        "baryon_density",
+                        "dark_matter_density"
+                    ],
+                    "abs": 2
+                },
+                {
+                    "scalar": [
+                        "temperature"
+                    ],
+                    "abs": 5000
+                },
+                {
+                    "scalar": [
+                        "velocity_x",
+                        "velocity_y",
+                        "velocity_z"
+                    ],
+                    "abs": 1000000
+                }
+            ]
+        },
+        {
+            "name": "zfp",
+            "output-prefix": "zfp_abs_run1_",
+            "compressor-params": [
+                {
+                    "scalar": [
+                        "baryon_density",
+                        "dark_matter_density"
+                    ],
+                    "abs": 2
+                },
+                {
+                    "scalar": [
+                        "temperature"
+                    ],
+                    "abs": 5000
+                },
+                {
+                    "scalar": [
+                        "velocity_x",
+                        "velocity_y",
+                        "velocity_z"
+                    ],
+                    "abs": 1000000
+                }
+            ]
+        },
+        {
+            "name": "zfp",
+            "output-prefix": "zfp_abs_run2_",
+            "compressor-params": [
+                {
+                    "scalar": [
+                        "baryon_density",
+                        "dark_matter_density"
+                    ],
+                    "abs": 5
+                },
+                {
+                    "scalar": [
+                        "temperature"
+                    ],
+                    "abs": 10000
+                },
+                {
+                    "scalar": [
+                        "velocity_x",
+                        "velocity_y",
+                        "velocity_z"
+                    ],
+                    "abs": 5000000
+                }
+            ]
+        }
+    ],
+    "cbench": {
+        "path": "mpirun -np 64 --oversubscribe $foresight-home$build/CBench",
+        "output": {
+            "output-decompressed": true,
+            "output-decompressed-location": "decompressed_files",
+            "log-file": "runlog_",
+            "metrics-file": "metrics_"
+        },
+        "metrics-comment": "which metrics to use",
+        "metrics": [
+            {
+                "name": "absolute_error",
+                "histogram": [
+                    "baryon_density",
+                    "temperature",
+                    "velocity_x"
+                ]
+            },
+            {
+                "name": "relative_error"
+            },
+            {
+                "name": "mse"
+            },
+            {
+                "name": "psnr"
+            },
+            {
+                "name": "minmax",
+                "histogram": [
+                    "baryon_density",
+                    "temperature",
+                    "velocity_x"
+                ]
+            }
+        ],
+        "evn_path": "scripts/VizAly-CBench.bash.darwin",
+        "configuration": {
+            "partition": "amd-epyc",
+            "nodes": 1,
+            "ntasks-per-node": "64"
+        }
+    },
+    "pat": {
+        "evn_path": "scripts/VizAly-CBench.bash.darwin",
+        "analysis-tool": {
+            "gimlet-home": "/projects/exasky/gimlet2",
+            "analytics": [
+                {
+                    "name": "sim_stats",
+                    "type": [
+                        "rhob",
+                        "rhom",
+                        "rhodm",
+                        "temp",
+                        "velmag",
+                        "vz"
+                    ],
+                    "postfix": "_ps3d.txt",
+                    "path": "mpirun /projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex",
+                    "configuration": {
+                        "partition": "scaling",
+                        "nodes": 4,
+                        "ntasks-per-node": 16
+                    }
+                },
+                {
+                    "name": "lya_all_axes",
+                    "type": [
+                        "x",
+                        "y",
+                        "z"
+                    ],
+                    "postfix": "_flux_ps1d.txt",
+                    "path": "mpirun /projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex",
+                    "command": "cp /projects/exasky/gimlet2/treecools/TREECOOL_middle .",
+                    "configuration": {
+                        "partition": "scaling",
+                        "nodes": 4,
+                        "ntasks-per-node": 16
+                    }
+                }
+            ]
+        },
+        "input-files": [
+            {
+                "output-prefix": "orig",
+                "path": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5"
+            },
+            {
+                "output-prefix": "blosc_",
+                "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/blosc___NVB_C009_l10n512_S12345T692_z42.hdf5"
+            },
+            {
+                "output-prefix": "fpzip_",
+                "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/fpzip___NVB_C009_l10n512_S12345T692_z42.hdf5"
+            },
+            {
+                "output-prefix": "sz_pwrel_",
+                "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/sz_pwrel___NVB_C009_l10n512_S12345T692_z42.hdf5"
+            },
+            {
+                "output-prefix": "sz_abs_run1_",
+                "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/sz_abs_run1___NVB_C009_l10n512_S12345T692_z42.hdf5"
+            },
+            {
+                "output-prefix": "sz_abs_run2_",
+                "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/sz_abs_run2___NVB_C009_l10n512_S12345T692_z42.hdf5"
+            },
+            {
+                "output-prefix": "zfp_abs_run1_",
+                "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/zfp_abs_run1___NVB_C009_l10n512_S12345T692_z42.hdf5"
+            },
+            {
+                "output-prefix": "zfp_abs_run2_",
+                "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/zfp_abs_run2___NVB_C009_l10n512_S12345T692_z42.hdf5"
+            }
+        ],
+        "analysis": [
+            {
+                "title": "sim_stats_rhob",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/origrhob_ps3d.txt"
+                    },
+                    {
+                        "name": "blosc_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/blosc_rhob_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/fpzip_rhob_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_pwrel_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_pwrel_rhob_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run1_rhob_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run2_rhob_ps3d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run1_rhob_ps3d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run2_rhob_ps3d.txt"
+                    }
+                ]
+            },
+            {
+                "title": "sim_stats_rhom",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/origrhom_ps3d.txt"
+                    },
+                    {
+                        "name": "blosc_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/blosc_rhom_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/fpzip_rhom_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_pwrel_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_pwrel_rhom_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run1_rhom_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run2_rhom_ps3d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run1_rhom_ps3d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run2_rhom_ps3d.txt"
+                    }
+                ]
+            },
+            {
+                "title": "sim_stats_rhodm",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/origrhodm_ps3d.txt"
+                    },
+                    {
+                        "name": "blosc_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/blosc_rhodm_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/fpzip_rhodm_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_pwrel_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_pwrel_rhodm_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run1_rhodm_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run2_rhodm_ps3d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run1_rhodm_ps3d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run2_rhodm_ps3d.txt"
+                    }
+                ]
+            },
+            {
+                "title": "sim_stats_temp",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/origtemp_ps3d.txt"
+                    },
+                    {
+                        "name": "blosc_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/blosc_temp_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/fpzip_temp_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_pwrel_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_pwrel_temp_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run1_temp_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run2_temp_ps3d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run1_temp_ps3d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run2_temp_ps3d.txt"
+                    }
+                ]
+            },
+            {
+                "title": "sim_stats_velmag",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/origvelmag_ps3d.txt"
+                    },
+                    {
+                        "name": "blosc_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/blosc_velmag_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/fpzip_velmag_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_pwrel_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_pwrel_velmag_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run1_velmag_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run2_velmag_ps3d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run1_velmag_ps3d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run2_velmag_ps3d.txt"
+                    }
+                ]
+            },
+            {
+                "title": "sim_stats_vz",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/origvz_ps3d.txt"
+                    },
+                    {
+                        "name": "blosc_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/blosc_vz_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/fpzip_vz_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_pwrel_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_pwrel_vz_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run1_vz_ps3d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run2_vz_ps3d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run1_vz_ps3d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run2_vz_ps3d.txt"
+                    }
+                ]
+            },
+            {
+                "title": "lya_all_axes_x",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/origx_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "blosc_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/blosc_x_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "fpzip_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/fpzip_x_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "sz_pwrel_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_pwrel_x_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_abs_run1_x_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_abs_run2_x_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/zfp_abs_run1_x_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/zfp_abs_run2_x_flux_ps1d.txt"
+                    }
+                ]
+            },
+            {
+                "title": "lya_all_axes_y",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/origy_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "blosc_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/blosc_y_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "fpzip_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/fpzip_y_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "sz_pwrel_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_pwrel_y_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_abs_run1_y_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_abs_run2_y_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/zfp_abs_run1_y_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/zfp_abs_run2_y_flux_ps1d.txt"
+                    }
+                ]
+            },
+            {
+                "title": "lya_all_axes_z",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/origz_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "blosc_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/blosc_z_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "fpzip_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/fpzip_z_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "sz_pwrel_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_pwrel_z_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_abs_run1_z_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "sz_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_abs_run2_z_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run1_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/zfp_abs_run1_z_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "zfp_abs_run2_",
+                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/zfp_abs_run2_z_flux_ps1d.txt"
+                    }
+                ]
+            }
+        ]
+    },
+    "cinema-plots": {
+        "cinema-db-name": "cinemaDB",
+        "plotting": {
+            "x-range": [
+                0,
+                11
+            ]
+        },
+        "evn_path": "scripts/VizAly-CBench.bash.darwin",
+        "configuration": {
+            "partition": "scaling",
+            "nodes": 1
+        }
+    },
+    "git-tag": "v1.3-11-gd4d277c"
+}

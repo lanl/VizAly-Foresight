@@ -136,6 +136,12 @@
 	{
 		"name" : "NYX_512_sz_sweep_.cdb",
 		"directory" : "data/NYX_512_sz_sweep_.cdb"
+	},
+
+	{
+		"name" : "NYX_512_Velocity.cdb.cdb",
+		"directory" : "data/NYX_Velocity.cdb"
+		
 	}
 
 
