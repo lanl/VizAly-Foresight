@@ -114,36 +114,33 @@
 	},
 
  {
-		"name" : "NYX_512_42_zfp_rel_.cdb",
+		"name" : "NYX_512_42_zfp_rel",
 		"directory" : "data/NYX_512_42_zfp_rel_.cdb"
 	},
 
 	{
-		"name" : "Nyx_ZFP_output_extended_.cdb",
+		"name" : "Nyx_ZFP_output_extended",
 		"directory" : "data/Nyx_ZFP_output_extended_.cdb"
 	},
 
 	{
-		"name" : "NYX_512_fpzip_sweep.cdb",
+		"name" : "NYX_512_fpzip_sweep",
 		"directory" : "data/NYX_512_fpzip_sweep_.cdb"
 	},
 
 	{
-		"name" : "NYX_512_zfp_sweep.cdb",
+		"name" : "NYX_512_zfp_sweep",
 		"directory" : "data/NYX_512_zfp_sweep_.cdb"
 	},
 
 	{
-		"name" : "NYX_512_sz_sweep_.cdb",
+		"name" : "NYX_512_sz_sweep_",
 		"directory" : "data/NYX_512_sz_sweep_.cdb"
 	},
 
 	{
-		"name" : "NYX_512_Velocity.cdb.cdb",
+		"name" : "NYX_512_Velocity",
 		"directory" : "data/NYX_Velocity.cdb"
 		
 	}
-
-
-
 ]
