@@ -15,15 +15,20 @@ Authors:
 #include <string>
 #include <unordered_map>
 
-#include <vtkXMLImageDataReader.h>
-#include <vtkXMLImageDataWriter.h>
-#include <vtkImageData.h>
-#include <vtkDataArray.h>
+#include <vtkMPIController.h>
+#include <vtkTrivialProducer.h>
 #include <vtkSmartPointer.h>
 #include <vtkCellData.h>
 #include <vtkPointData.h>
-#include <vtkProperty.h>
+
+#include <vtkXMLPImageDataWriter.h>
+#include <vtkXMLImageDataReader.h>
+#include <vtkImageData.h>
+
+#include <vtkDataArray.h>
 #include <vtkFloatArray.h>
+#include <vtkDoubleArray.h>
+#include <vtkIntArray.h>
 
 #include "dataLoaderInterface.hpp"
 
@@ -36,6 +41,8 @@ class VTKDataLoader: public DataLoaderInterface
 {
 	vtkSmartPointer<vtkImageData> imageData;
 	vtkSmartPointer<vtkImageData> imageWriteData;
+
+	vtkSmartPointer<vtkMPIController> contr;
 
 	int numRanks;
 	int myRank;	
@@ -61,6 +68,9 @@ class VTKDataLoader: public DataLoaderInterface
 inline VTKDataLoader::VTKDataLoader()
 {
 	imageData = nullptr;
+	
+	contr = vtkSmartPointer<vtkMPIController>::New();
+	contr->Initialize(NULL, NULL, 1);
 }
 
 
@@ -86,10 +96,6 @@ inline void VTKDataLoader::init(std::string _filename, MPI_Comm _comm)
 
   	imageData = reader->GetOutput();
 	
-
-
-	
-
   	log << "vtkXMLImageDataReader Number of point array: " << reader->GetNumberOfPointArrays() << std::endl;
   	log << "vtkXMLImageDataReader Number of cell array: " << reader->GetNumberOfCellArrays() << std::endl;
 }
@@ -110,9 +116,6 @@ inline int VTKDataLoader::loadData(std::string paramName)
 	// Get Dimensions
 	int *dims = imageData->GetDimensions();
 	
-
-	
-
 
 	// Read in array in myArray
 	vtkSmartPointer<vtkDataArray> myArray;
@@ -193,37 +196,78 @@ inline int VTKDataLoader::loadData(std::string paramName)
 	if (!found)
 	{
 		std::cout << "This field does not exist!!!" << std::endl;
-		exit(0);
+		return 0;
 	}
 
 
-	totalNumberOfElements = origDims[0]*origDims[1]*origDims[2];	
-	sizePerDim[0] = origDims[0];
-	sizePerDim[1] = origDims[1];
-	sizePerDim[2] = origDims[2];
 
+	totalNumberOfElements = origDims[0]*origDims[1]*origDims[2];	
 
 	//
 	// TODO: MPI split!!!
 	Partition current = getPartition(myRank, numRanks, origDims[0], origDims[1], origDims[2]);
-	numElements = totalNumberOfElements;
-	//
+	rankOffset[0] = current.min_x;
+	rankOffset[1] = current.min_y;
+	rankOffset[2] = current.min_z;
+
+	sizePerDim[0] = current.max_x - current.min_x;
+	sizePerDim[1] = current.max_y - current.min_y;
+	sizePerDim[2] = current.max_z - current.min_z;
+
+	numElements = sizePerDim[0]*sizePerDim[1]*sizePerDim[2];
+
 
 
 	// Create space for data and store data there
-	allocateMem("float", numElements, 0, data);
+	allocateMem(dataType, numElements, 0, data);
 
 	//data = myArray->GetVoidPointer(0);
-	for (int i=0; i<numElements; i++)
-		((float *)data)[i] =  myArray->GetComponent(i, 0);
+	// for (int i=0; i<numElements; i++)
+	// 	((float *)data)[i] = myArray->GetComponent(i, 0);
+
+	size_t indexLocal = 0;
+	for (size_t z=0; z<sizePerDim[2]; z++)
+		for (size_t y=0; y<sizePerDim[1]; y++)
+			for (size_t x=0; x<sizePerDim[0]; x++)
+			{
+				size_t indexGlobal = (rankOffset[2] + z) * (origDims[0] * origDims[1]) +
+									 (rankOffset[1] + y) *  origDims[0] +
+									 (rankOffset[0] + x);
+
+				// Choose based on datatype
+				if (dataType == "float")
+					((float *)data)[indexLocal] = myArray->GetComponent(indexGlobal, 0);
+				else if (dataType == "double")
+					((double *)data)[indexLocal] = myArray->GetComponent(indexGlobal, 0);
+				else if (dataType == "int")
+					((int *)data)[indexLocal] = myArray->GetComponent(indexGlobal, 0);
+				indexLocal++;
+			}
+
 	
 
+	// Sould we save the data
+	if (saveData)
+	{
+		imageWriteData = vtkSmartPointer<vtkImageData>::New();
 
-	imageWriteData = vtkSmartPointer<vtkImageData>::New();
-	imageWriteData->SetDimensions(origDims[0]+1, origDims[1]+1, origDims[2]+1);
+		double spacing[3];
+		imageData->GetSpacing (spacing);
+		imageWriteData->SetSpacing (spacing[0], spacing[1], spacing[2]);
 
+		double origin[3];
+		imageData->GetOrigin(origin);
+		imageWriteData->SetOrigin (origin[0], origin[1], origin[2]);
+	}
 	
+
 	clock.stop();
+	log << "origDims: "   << origDims[0]   << ", " << origDims[1]   << ", " << origDims[2]   << std::endl;
+	log << "sizePerDim: " << sizePerDim[0] << ", " << sizePerDim[1] << ", " << sizePerDim[2] << std::endl;
+	log << "rankOffset: " << rankOffset[0] << ", " << rankOffset[1] << ", " << rankOffset[2] << std::endl;
+	log << "numElements: " << numElements << std::endl;
+	log << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
+	
 	log << "Loading data took: " << clock.getDuration() << " s" << std::endl;
 }
 
@@ -234,28 +278,42 @@ inline int VTKDataLoader::saveCompData(std::string paramName, void * cData)
 	Timer clock;
 	clock.start();
 
-
-	// TODO: MPI Gather to a new array
-	void *allData;
-	if (myRank == 0)
-		allocateMem(dataType, totalNumberOfElements, 0, allData, );
 		
+	vtkSmartPointer<vtkFloatArray> temp = vtkFloatArray::New();
 
-	
-		vtkSmartPointer<vtkFloatArray> temp = vtkFloatArray::New();;
 
-		temp->SetNumberOfTuples(numElements);
-		temp->SetNumberOfComponents(numComponents);
-		temp->SetName(paramName.c_str());
+	// if (dataType == "float")
+	// 	temp = vtkSmartPointer<vtkFloatArray>::New();
+	// else if (dataType == "double")
+	// 	temp = vtkSmartPointer<vtkDoubleArray>::New();
+	// else if (dataType == "int")
+	// 	temp = vtkSmartPointer<vtkIntArray>::New();
 
-		temp->SetNumberOfValues(numElements);
-		for (size_t i=0; i<numElements; i++)
-			temp->SetValue( i, ((float *)cData)[i]);
+	temp->SetNumberOfTuples(numElements);
+	temp->SetNumberOfComponents(numComponents);
+	temp->SetName(paramName.c_str());
 
-		imageWriteData->GetCellData()->AddArray(temp);
-	
-	if (myRank == 0)
-		deAllocateMem(dataType, allData);
+
+	for (size_t index=0; index<numElements; index++)
+	{
+		// if (dataType == "float")
+		// 	(vtkSmartPointer<vtkFloatArray>temp)->SetValue( index, ((float *)cData)[index]);
+		// else if (dataType == "double")
+		// 	(vtkSmartPointer<vtkFloatArray>temp)->SetValue( index, ((double *)cData)[index]);
+		// else if (dataType == "int")
+		// 	(vtkSmartPointer<vtkFloatArray>temp)->SetValue( index, ((int *)cData)[index]);
+
+		temp->SetValue( index, ((float *)cData)[index]);
+	}
+
+
+	imageWriteData->GetCellData()->AddArray(temp);
+
+	imageWriteData->SetDimensions(sizePerDim[0], sizePerDim[1], sizePerDim[2]);
+	imageWriteData->SetExtent(rankOffset[0], rankOffset[0]+sizePerDim[0],
+							  rankOffset[1], rankOffset[1]+sizePerDim[1],
+							  rankOffset[2], rankOffset[2]+sizePerDim[2]);
+
 
 	clock.stop();
 	log << "saving data took: " << clock.getDuration() << " s" << std::endl;
@@ -268,17 +326,46 @@ inline int VTKDataLoader::writeData(std::string _filename)
 	Timer clock;
 	clock.start();
 
-	if (myRank == 0)
+
+	vtkSmartPointer<vtkXMLPImageDataWriter> writer = vtkSmartPointer<vtkXMLPImageDataWriter>::New();
+	std::string outputFilename;
+
+  	if (numRanks > 1)
 	{
-		vtkSmartPointer<vtkXMLImageDataWriter> writer = vtkSmartPointer<vtkXMLImageDataWriter>::New();
-	  	writer->SetFileName(_filename.c_str());
-		#if VTK_MAJOR_VERSION <= 5
-	  		writer->SetInputConnection(imageWriteData->GetProducerPort());
-		#else
-	  		writer->SetInputData(imageWriteData);
-		#endif
-	  	writer->Write();
-  	}
+		_filename.replace((_filename.length()-3),3,"pvti");  
+		outputFilename =   _filename;
+
+		vtkNew<vtkTrivialProducer> tp;
+		tp->SetOutput(imageWriteData);
+		tp->SetWholeExtent(0, origDims[0],
+		                   0, origDims[1],
+		                   0, origDims[2]);
+
+		writer->SetInputConnection(tp->GetOutputPort());
+		writer->SetController(contr);
+	}
+	else
+		outputFilename = _filename + ".vti";
+
+
+
+	writer->SetDataModeToBinary();
+    writer->SetCompressor(nullptr);
+    writer->SetWriteSummaryFile(1);
+	writer->SetFileName(outputFilename.c_str());
+	writer->SetNumberOfPieces(numRanks);
+	writer->SetStartPiece(myRank);
+    writer->SetEndPiece(myRank);
+
+
+	#if VTK_MAJOR_VERSION <= 5
+    	writer->SetInput(imageWriteData);
+	#else
+  		writer->SetInputData(imageWriteData);
+	#endif
+
+	writer->Write();
+  	
 
   	clock.stop();
 	log << "writing data took: " << clock.getDuration() << " s" << std::endl;
@@ -286,3 +373,4 @@ inline int VTKDataLoader::writeData(std::string _filename)
 
 
 #endif
+
