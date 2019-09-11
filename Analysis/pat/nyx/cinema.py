@@ -61,13 +61,21 @@ class nyx_cinema(cinema.CinemaWorkflow):
 		return ops[relate]( abs(operand-1.0), result)
 
 	# Process checks found in "cinema-plots" "plotting" "checks"
-	def is_valid(self, pk_ratio):
+	def is_valid(self, pk_ratio, range_count):
 		valid = True
 		for check in self.json_data['cinema-plots']['plotting']['checks']:
+
+			count = 0
 			for item in pk_ratio:
+
+				if count > range_count:	# we only care about the set range
+					break;
+
 				if not self.validate(item, check['operator'],  check['result']):
 					valid = False 
 					break
+
+				count = count + 1
 			
 		return valid
 
@@ -76,7 +84,13 @@ class nyx_cinema(cinema.CinemaWorkflow):
 	def create_plots(self):
 		output_path = self.json_data['project-home'] + self.json_data['wflow-path']
 		output_plot_path = output_path + "/plots"
-		x_range = self.json_data['cinema-plots']['plotting']['x-range']
+
+		has_range = False;
+		if "x-range" in self.json_data['cinema-plots']['plotting']:
+			x_range = self.json_data['cinema-plots']['plotting']['x-range']
+			has_range = True
+
+
 
 
 		for ana in self.json_data['pat']['analysis']:
@@ -93,6 +107,18 @@ class nyx_cinema(cinema.CinemaWorkflow):
 					k_list  = futils.extract_csv_col(file['path'], ' ', 2)
 					orig_pk = futils.extract_csv_col(file['path'], ' ', 3)
 
+
+			# Check range limit
+			range_count = 0
+			for x in k_list:
+				if has_range == True:
+					if (x > x_range[1]):
+						break
+				else:
+					has_range = 1000000
+
+				range_count =  range_count + 1
+
 			# Process the other files
 			for file in ana['files']:
 				if (file['name']!="orig"):
@@ -103,7 +129,7 @@ class nyx_cinema(cinema.CinemaWorkflow):
 
 						# Check if passes test
 						if "checks" in self.json_data["cinema-plots"]["plotting"]:
-							if self.is_valid(pk_ratio):
+							if self.is_valid(pk_ratio, range_count):
 								to_plot.append(this_tuple)
 						else:
 							to_plot.append(this_tuple)
