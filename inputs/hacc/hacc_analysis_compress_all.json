@@ -7,12 +7,12 @@
 	"compressors":[
 		{
 			"name": "SZ",
-			"output-prefix": "all_decompressed_sz",
+			"output-prefix": "data-all-sz",
 			"abs":0.003
 		},
 		{
 			"name": "fpzip",
-			"output-prefix": "all_decompressed_fpzip",
+			"output-prefix": "data-all-fpzip",
 			"bits":26
 		}
 	],

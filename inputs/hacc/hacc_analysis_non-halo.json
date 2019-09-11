@@ -10,7 +10,7 @@
   "analysis":{
     "non-halos":{
       "extract": "yes",
-      "output": "data/m000-499_non-halos"
+      "output": "data/data-non-halo-raw"
     },
     "entropy":{
       "num_bins": 4096,
@@ -19,9 +19,9 @@
     }
   },
   "post-process": {
-    "halos": "data/halo_decompressed_sz_m000-499.haloparticles",
-    "non-halos":"data/non-halo_decompressed_fpzip_m000-499_non-halos",
-    "output": "data/all_combined_m000-499.particles",
+    "halos": "data/data-halo-sz",
+    "non-halos":"data/data-non-halo-fpzip",
+    "output": "data/data-combined-sz-fpzip",
     "logs": "logs/log_analysis_post-process"
   }
 }

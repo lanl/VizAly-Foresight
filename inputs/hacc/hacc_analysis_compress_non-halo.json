@@ -1,13 +1,13 @@
 {
 	"input":{
 		"filetype":"HACC",
-		"filename":"/projects/exasky/hoby-projects/cbench/build/data/m000-499_non-halos",
+		"filename":"/projects/exasky/hoby-projects/cbench/build/data/data-non-halo-raw",
 		"scalars":["x", "y", "z", "vx", "vy", "vz"]
 	},
 	"compressors":[
 		{
 			"name": "fpzip",
-			"output-prefix": "non-halo_decompressed",
+			"output-prefix": "data-non-halo-fpzip",
 			"bits":26
 		}
 	],

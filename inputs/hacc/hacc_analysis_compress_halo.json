@@ -7,7 +7,7 @@
 	"compressors":[
 		{
 			"name": "SZ",
-			"output-prefix": "halo_decompressed_sz",
+			"output-prefix": "data-halo-sz",
 			"abs":0.003
 		}
 	],
