@@ -7,8 +7,8 @@
 	"compressors":[
 		{
 			"name": "fpzip",
-			"output-prefix": "non-halo_compressed_hyper",
-			"bits":10
+			"output-prefix": "non-halo_decompressed",
+			"bits":26
 		}
 	],
 	"cbench":{
@@ -17,8 +17,8 @@
 			"run-path": "build/",
 			"output-decompressed": true,
 			"output-decompressed-location": "data",
-			"log-file": "non-halo_log_hyper",
-			"metrics-file": "non-halo_metrics_hyper"
+			"log-file": "non-halo_log",
+			"metrics-file": "non-halo_metrics"
 		},
 		"metrics":[
 			{ "name":"absolute_error" },
