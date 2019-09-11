@@ -9,7 +9,7 @@
   "post-process": {
     "halos": "data/data-halo-sz",
     "non-halos":"data/data-non-halo-fpzip",
-    "output": "data/data-combined-sz-fpzip",
+    "output": "data/data-combined-zip",
     "logs": "logs/log_analysis_post-process"
   }
 }
