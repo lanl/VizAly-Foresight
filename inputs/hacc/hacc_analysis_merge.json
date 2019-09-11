@@ -19,9 +19,9 @@
     }
   },
   "post-process": {
-    "halos": "data/halo_blosc__m000-499.haloparticles",
-    "non-halos":"data/non-halo_blosc__m000-499_non-halos",
-    "output": "data/blosc_combined_m000-499.particles",
+    "halos": "/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/analysis/Halos/b0168/STEP499/m000-499.haloparticles",
+    "non-halos":"data/m000-499_non-halos",
+    "output": "data/all_combined_m000-499.particles",
     "logs": "logs/log_analysis_post-process"
   }
 }
