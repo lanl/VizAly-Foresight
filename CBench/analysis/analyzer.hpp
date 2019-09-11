@@ -59,6 +59,8 @@ private:
   long total_non_halos = 0;
   long local_unmatched = 0;
   long total_unmatched = 0;
+  long local_updated = 0;
+  long total_updated = 0;
 
   // per-scalar data
   std::vector<std::string> scalars;
@@ -219,15 +221,17 @@ inline void Analyzer::filterParticles() {
 
   local_non_halos = 0;
   local_unmatched = 0;
+  local_updated   = 0;
   total_non_halos = 0;
   total_unmatched = 0;
+  total_updated   = 0;
 
   // map from particle id to dataset index
   std::unordered_map<long, long> index;
 
   debug_log.clear();
   debug_log.str("");
-  debug_log << "step 1/4: set particles index mapping ... " << std::endl;
+  debug_log << "step 1/5: set particles index mapping ... " << std::endl;
 
   ioMgr->init(input_full, comm);
 
@@ -253,9 +257,12 @@ inline void Analyzer::filterParticles() {
     MPI_Barrier(comm);
   }
 
-  debug_log << "step 2/4: update lookup table ... " << std::endl;
+  debug_log << "step 2/5: update lookup table ... " << std::endl;
 
   ioMgr->init(input_halo, comm);
+
+  // keep track of mismatch
+  std::vector<long> redistribute;
 
   if (ioMgr->loadData("id")) {
     debug_log << ioMgr->getDataInfo();
@@ -264,17 +271,22 @@ inline void Analyzer::filterParticles() {
     local_halos = ioMgr->getNumElements();
     auto data = static_cast<long*>(ioMgr->data);
 
+    redistribute.reserve(local_halos);
+
     // update halo particles lookup table
     // while counting unmatched particles due to
     // partition mismatch.
     for (auto i=0; i < local_halos; ++i) {
       if (not index.count(data[i])) {
-        ++local_unmatched;
+        redistribute.push_back(data[i]);
       } else {
         auto const& k = index[data[i]];
         is_halo[k] = true;
       }
     }
+
+    redistribute.shrink_to_fit();
+    local_unmatched = (long) redistribute.size();
 
     ioMgr->close();
     debug_log << "= local: "<< local_halos << std::endl;
@@ -282,10 +294,61 @@ inline void Analyzer::filterParticles() {
     MPI_Barrier(comm);
   }
 
+  debug_log << "step 3/5: redistribute unmatched and update halos table ... " << std::endl;
+
+  // first reduce redistribute list sizes
+  // retrieve number of non halos particles
+  MPI_Allreduce(&local_unmatched, &total_unmatched, 1, MPI_LONG, MPI_SUM, comm);
+
+  int const local_size = static_cast<int>(local_unmatched);
+  int const total_size = static_cast<int>(total_unmatched);
+
+  int sizes[nb_ranks];
+  int offsets[nb_ranks];
+
+  // get local list sizes per rank
+  MPI_Allgather(&local_size, 1, MPI_INT, sizes, 1, MPI_INT, comm);
+
+  // compute offsets by a prefix sum then
+  offsets[0] = 0;
+  std::copy(sizes, sizes + nb_ranks - 1, offsets + 1);
+
+  for (int i = 1; i < nb_ranks; ++i)
+    offsets[i] += offsets[i-1];
+
+  MPI_Barrier(comm);
+
+  for (int i = 0; i < nb_ranks; ++i) {
+    debug_log << "rank[" << i <<"]: local_size: "<< sizes[i]
+              <<", offset: "<< offsets[i] << ", total_size: "
+              << total_size << std::endl;
+  }
+
+  long unmatched[total_size];
+
+  MPI_Allgatherv(redistribute.data(), local_size, MPI_LONG, unmatched, sizes, offsets, MPI_LONG, comm);
+
+  debug_log << "= redistribution done: " << total_unmatched << " particles." << std::endl;
+
+  // check particle is in local part
+  // and update halo flag if so.
+  for (int i = 0; i < total_size; ++i) {
+    auto const& id = unmatched[i];
+    if (index.count(id)) {
+      is_halo[index[id]] = true;  // index[id] < local_parts certainly.
+      local_updated++;
+    }
+  }
+
+  MPI_Allreduce(&local_updated, &total_updated, 1, MPI_LONG, MPI_SUM, comm);
+
+  debug_log << "= lookup table update: "<< total_updated << " particles." << std::endl << std::endl;
+
+  // at this point, we only need 'is_halo'.
   // early release to reduce memory pressure
   index.clear();
 
-  debug_log << "step 3/4: store non-halos id and mask ... " << std::endl;
+  debug_log << "step 4/5: store non-halos id and mask ... " << std::endl;
 
   ioMgr->init(input_full, comm);
   ioMgr->setSave(true);
@@ -318,27 +381,30 @@ inline void Analyzer::filterParticles() {
   }
 #endif
 
-  debug_log << "= copied: "<< non_halos_id.size() << std::endl << std::endl;
+  debug_log << " done." << std::endl << std::endl;
+
   MPI_Barrier(comm);
 
-  debug_log << "step 4/4: assess particles count ... " << std::endl;
+  debug_log << "step 5/5: assess particles count ... " << std::endl;
 
-  // retrieve number of non halos particles
   MPI_Allreduce(&local_non_halos, &total_non_halos, 1, MPI_LONG, MPI_SUM, comm);
-  MPI_Allreduce(&local_unmatched, &total_unmatched, 1, MPI_LONG, MPI_SUM, comm);
+
+  long const count_mismatch = std::abs(total_unmatched - total_updated);
 
   double const ratio[] = {
     100. * double(total_halos) / total_parts,
     100. * double(total_non_halos) / total_parts,
-    100. * double(total_unmatched) / total_halos
+    100. * double(count_mismatch) / total_halos
   };
 
   debug_log << "= total particles: "<< total_parts     << std::endl;
   debug_log << "= total halos:     "<< total_halos     << " ["<< ratio[0] <<" %]." << std::endl;
   debug_log << "= total non-halos: "<< total_non_halos << " ["<< ratio[1] <<" %]." << std::endl;
-  debug_log << "= total unmatched: "<< total_unmatched << " ["<< ratio[2] <<" %]." << std::endl;
+  debug_log << "= count mismatch: " << count_mismatch  << " ["<< ratio[2] <<" %]." << std::endl;
   debug_log << std::endl;
 
+
+finalize:
   if (my_rank == 0)
     std::cout << debug_log.str();
 
