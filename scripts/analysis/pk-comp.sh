@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#SBATCH --nodes 4
-#SBATCH --ntasks-per-node 2
+#SBATCH --nodes 8
+#SBATCH --ntasks-per-node 1
 #SBATCH --partition scaling
 #SBATCH --job-name spectrum
 

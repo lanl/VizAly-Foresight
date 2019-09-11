@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --nodes 16
+#SBATCH --nodes 8
 #SBATCH --ntasks-per-node 16
 #SBATCH --partition scaling
 #SBATCH --job-name extract
@@ -14,4 +14,4 @@ source "/home/hoby/.bashrc"
 cd "${BUILD_DIR}"
 
 # run
-mpirun -np 256 ./analyzer ../inputs/hacc/hacc_analysis_non-halo.json
+mpirun -np 128 ./analyzer ../inputs/hacc/hacc_analysis_non-halo.json
