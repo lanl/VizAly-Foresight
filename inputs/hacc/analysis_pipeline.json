@@ -41,9 +41,9 @@
       { "name":"minmax" }
     ]
   },
-  "post-process": {
+  "merge": {
     "halos": "data/data-halo-sz",
-    "non-halos":"data/data-non-halo-fpzip-20bits",
+    "non-halos":"data/data-non-halo-fpzip-20bits__data-non-halo-raw",
     "output": "data/data-combined-zip-20bits",
     "logs": "logs/log_analysis_post-process"
   }

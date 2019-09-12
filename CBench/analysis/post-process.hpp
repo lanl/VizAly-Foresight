@@ -77,15 +77,15 @@ inline Merger::Merger(const char* in_path, int in_rank, int in_nb_ranks, MPI_Com
 
   assert(json["input"].find("full") != json["input"].end());
   assert(json["input"].find("scalars") != json["input"].end());
-  assert(json["post-process"].find("halos") != json["post-process"].end());
-  assert(json["post-process"].find("non-halos") != json["post-process"].end());
-  assert(json["post-process"].find("output") != json["post-process"].end());
+  assert(json["merge"].find("halos") != json["merge"].end());
+  assert(json["merge"].find("non-halos") != json["merge"].end());
+  assert(json["merge"].find("output") != json["merge"].end());
 
   input_full = json["input"]["full"];
-  halo_file = json["post-process"]["halos"];
-  non_halo_file = json["post-process"]["non-halos"];
-  output_combined = json["post-process"]["output"];
-  output_log = json["post-process"]["logs"];
+  halo_file = json["merge"]["halos"];
+  non_halo_file = json["merge"]["non-halos"];
+  output_combined = json["merge"]["output"];
+  output_log = json["merge"]["logs"];
 
   for (auto&& name : json["input"]["scalars"])
     scalars.push_back(name);
