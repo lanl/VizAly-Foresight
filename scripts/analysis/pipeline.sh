@@ -5,23 +5,44 @@
 #SBATCH --partition skylake-gold
 #SBATCH --job-name analysis
 
+# enable or disable steps
+EXTRACT_NON_HALOS=false
+COMPRESS_NON_HALOS=true
+MERGE_DATASETS=true
+COMPUTE_POWER_SPECTRUM=true
+
+# parameters
+NRANKS=8
+TIMESTEP=499
+SUFFIX="-20bits"
 HACC="/projects/exasky/HACC"
 CBENCH="/projects/exasky/hoby-projects/cbench"
 BUILD="${CBENCH}/build"
+INPUT_JSON="../inputs/hacc/hacc_pipeline_analysis.json"
 POWER_SPECTRUM="${HACC}/trunk/Darwin/mpi/bin/hacc_pk_gio_auto"
-PARTICLES_DATA="${BUILD}/data/data-combined-zip"
-OUTPUT_DATA="${BUILD}/data/pk-combined-zip.dat"
-TIMESTEP=499
+PARTICLES_DATA="${BUILD}/data/data-combined-zip${SUFFIX}"
+OUTPUT_DATA="${BUILD}/data/pk-combined-zip${SUFFIX}.dat"
 
-# load modules
-source "${HACC}.darwin_setup" && cd ${BUILD} &&
+# extract non-halos and compute entropy if required
+if ${EXTRACT_NON_HALOS}; then
+  source "/home/hoby/.bashrc" && cd ${BUILD} &&
+  mpirun -np ${NRANKS} ./analyzer ${INPUT_JSON}
+fi
 
 # compress non-halo particles dataset
-mpirun -np 8 ./CBench ../inputs/hacc/hacc_analysis_compress_non-halo.json &&
+if ${COMPRESS_NON_HALOS}; then
+  source "${HACC}.darwin_setup" && cd ${BUILD} &&
+  mpirun -np ${NRANKS} ./CBench ${INPUT_JSON}
+fi
 
 # merge it with halo ones
-mpirun -np 8 ./merger ../inputs/hacc/hacc_analysis_merge.json &&
+if ${MERGE_DATASETS}; then
+  source "/home/hoby/.bashrc" && cd "${BUILD}" &&
+  mpirun -np ${NRANKS} ./merger ${INPUT_JSON}
+fi
 
 # compute power spectrum eventually
-cd "${HACC}/run" &&
-mpirun ${POWER_SPECTRUM} inputs/indat.params -n ${PARTICLES_DATA} ${OUTPUT_DATA} ${TIMESTEP}
+if ${COMPUTE_POWER_SPECTRUM}; then
+  source "${HACC}.darwin_setup" && cd "${HACC}/run" &&
+  mpirun ${POWER_SPECTRUM} inputs/indat.params -n ${PARTICLES_DATA} ${OUTPUT_DATA} ${TIMESTEP}
+fi
