@@ -234,7 +234,9 @@ inline void Merger::run() {
 
   // now dump everything
   dump();
-  dumpLogs();
+
+  if (my_rank == 0)
+    dumpLogs();
 }
 
 /* -------------------------------------------------------------------------- */
