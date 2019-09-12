@@ -7,8 +7,8 @@
 
 # enable or disable steps
 EXTRACT_NON_HALOS=false
-COMPRESS_NON_HALOS=true
-MERGE_DATASETS=true
+COMPRESS_NON_HALOS=false
+MERGE_DATASETS=false
 COMPUTE_POWER_SPECTRUM=true
 
 # parameters
@@ -16,12 +16,11 @@ NRANKS=8
 TIMESTEP=499
 SUFFIX="-20bits"
 HACC="/projects/exasky/HACC"
-CBENCH="/projects/exasky/hoby-projects/cbench"
-BUILD="${CBENCH}/build"
-INPUT_JSON="../inputs/hacc/hacc_pipeline_analysis.json"
+BUILD="/projects/exasky/hoby-projects/cbench/build"
+INPUT_JSON="../inputs/hacc/analysis_pipeline.json"
 POWER_SPECTRUM="${HACC}/trunk/Darwin/mpi/bin/hacc_pk_gio_auto"
-PARTICLES_DATA="${BUILD}/data/data-combined-zip${SUFFIX}"
-OUTPUT_DATA="${BUILD}/data/pk-combined-zip${SUFFIX}.dat"
+PARTICLES_DATA="/projects/exasky_data/hoby/analysis/data-combined-zip${SUFFIX}"
+OUTPUT_DATA="/projects/exasky_data/hoby/analysis/pk-combined-zip${SUFFIX}.dat"
 
 # extract non-halos and compute entropy if required
 if ${EXTRACT_NON_HALOS}; then
@@ -37,7 +36,7 @@ fi
 
 # merge it with halo ones
 if ${MERGE_DATASETS}; then
-  source "/home/hoby/.bashrc" && cd "${BUILD}" &&
+  source "/home/hoby/.bashrc" && cd ${BUILD} &&
   mpirun -np ${NRANKS} ./merger ${INPUT_JSON}
 fi
 

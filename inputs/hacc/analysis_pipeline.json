@@ -3,13 +3,13 @@
     "filetype":"HACC",
     "full":"/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP499/m000.full.mpicosmo.499",
     "halo":"/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/analysis/Halos/b0168/STEP499/m000-499.haloparticles",
-    "filename":"/projects/exasky/hoby-projects/cbench/build/data/data-non-halo-raw",
+    "filename":"/projects/exasky_data/hoby/analysis/data-non-halo-raw",
     "scalars":["x", "y", "z", "vx", "vy", "vz"]
   },
   "analysis":{
     "non-halos":{
       "extract": "yes",
-      "output": "data/data-non-halo-raw"
+      "output": "/projects/exasky_data/hoby/analysis/data-non-halo-raw"
     },
     "entropy":{
       "num_bins": 4096,
@@ -29,7 +29,7 @@
     "output":{
       "run-path": "build/",
       "output-decompressed": true,
-      "output-decompressed-location": "data",
+      "output-decompressed-location": "/projects/exasky_data/hoby/analysis",
       "log-file": "non-halo",
       "metrics-file": "non-halo_metrics"
     },
@@ -42,9 +42,9 @@
     ]
   },
   "merge": {
-    "halos": "data/data-halo-sz",
-    "non-halos":"data/data-non-halo-fpzip-20bits__data-non-halo-raw",
-    "output": "data/data-combined-zip-20bits",
+    "halos": "/projects/exasky_data/hoby/analysis/data-halo-sz",
+    "non-halos":"/projects/exasky_data/hoby/analysis/data-non-halo-fpzip-20bits__data-non-halo-raw",
+    "output": "/projects/exasky_data/hoby/analysis/data-combined-zip-20bits",
     "logs": "logs/log_analysis_post-process"
   }
 }
