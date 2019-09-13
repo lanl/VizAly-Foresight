@@ -20,8 +20,8 @@
   "compressors":[
     {
       "name": "fpzip",
-      "output-prefix": "data-non-halo-fpzip-20bits",
-      "bits":20
+      "output-prefix": "data-non-halo-fpzip-26bits",
+      "bits":26
     }
   ],
   "cbench":{
@@ -43,8 +43,8 @@
   },
   "merge": {
     "halos": "/projects/exasky_data/hoby/analysis/data-halo-sz",
-    "non-halos":"/projects/exasky_data/hoby/analysis/data-non-halo-fpzip-20bits__data-non-halo-raw",
-    "output": "/projects/exasky_data/hoby/analysis/data-combined-zip-20bits",
+    "non-halos":"/projects/exasky_data/hoby/analysis/data-non-halo-fpzip-26bits__data-non-halo-raw",
+    "output": "/projects/exasky_data/hoby/analysis/data-combined-zip-26bits",
     "logs": "logs/log_analysis_post-process"
   }
 }
