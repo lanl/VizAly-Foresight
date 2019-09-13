@@ -12,14 +12,18 @@ set xlabel "k (h/Mpc)"
 set ylabel "P_0(k) (Mpc/h)^3"
 set key Left reverse below maxcols 1
 set grid
-set logscale x 10 
+set logscale x 10
 set logscale y 10
-set xrange [0.01:10] 
+set xrange [0.01:10]
 
-plot 'pk-full-raw.dat'   using 1:2:3 title 'full-raw'   w errorbars lc rgb '#FF00FF',\
-     'pk-combined.dat'   using 1:2:3 title 'combined'   w errorbars lc rgb '#CB0707',\
-     'pk-full-sz.dat'    using 1:2:3 title 'full-sz'    w errorbars lc rgb '#800080',\
-     'pk-full-fpzip.dat' using 1:2 title   'full-fpzip' w lines lc rgb '#000080'
+plot 'pk-full-raw.dat'            using 1:2:3 title 'full-raw'      w errorbars lc rgb '#FF00FF',\
+     'pk-full-sz.dat'             using 1:2:3 title 'full-sz'       w errorbars lc rgb '#800080',\
+     'pk-full-fpzip.dat'          using 1:2 title   'full-fpzip'    w lines     lc rgb '#000080'.\
+     'pk-combined-zip-20bits.dat' using 1:2:3 title 'merged-20bits' w errorbars lc rgb '#000000',\
+     'pk-combined-zip-22bits.dat' using 1:2:3 title 'merged-22bits' w errorbars lc rgb '#000000',\
+     'pk-combined-zip-24bits.dat' using 1:2:3 title 'merged-24bits' w errorbars lc rgb '#000000',\
+     'pk-combined-zip.dat'        using 1:2:3 title 'merged-26bits' w errorbars lc rgb '#CB0707'
+
 # --------------
 #unset logscale
 #unset key
@@ -48,10 +52,14 @@ unset logscale
 
 set xrange [0:10]
 
-plot 'ratio.dat' using 1:($9/$2) title 'combined'    w lines lc rgb '#CB0707',\
-     'ratio.dat' using 1:($4/$2) title 'full-sz'     w lines lc rgb '#800080',\
-     'ratio.dat' using 1:($5/$2) title 'full-fpzip'  w lines lc rgb '#000080'
-#     'ratio.dat' using 1:($8/$2) title 'halo: blosc | non-halo: blosc' w lines lc rgb '#FF00FF'
+plot 'ratio.dat' using 1:($11/$2) title 'merged-20bits' w lines lc rgb '#000000',\
+     'ratio.dat' using 1:($10/$2) title 'merged-22bits'w lines lc rgb '#CB0707',\
+     'ratio.dat' using 1:($10/$2) title 'merged-24bits'w lines lc rgb '#CB0707',\
+     'ratio.dat' using 1:($10/$2) title 'merged-25bits'w lines lc rgb '#CB0707',\
+     'ratio.dat' using 1:($10/$2) title 'merged-26bits'w lines lc rgb '#CB0707',\
+     'ratio.dat' using 1:( $9/$2) title 'merged-raw' w lines lc rgb '#FF00FF',\
+     'ratio.dat' using 1:( $4/$2) title 'full-sz'      w lines lc rgb '#800080',\
+     'ratio.dat' using 1:( $5/$2) title 'full-fpzip'   w lines lc rgb '#000080'
 # ---------------
 
 #set title ''
@@ -87,4 +95,3 @@ plot 'ratio.dat' using 1:($9/$2) title 'combined'    w lines lc rgb '#CB0707',\
 #     'ratio.dat' using 1:($7/$2) title 'raw: non-halo'   w lines lc rgb '#000000'
 # ---------------
 unset multiplot
-
