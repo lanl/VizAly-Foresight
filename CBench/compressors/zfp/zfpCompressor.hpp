@@ -63,6 +63,8 @@ inline zfp_type ZFPCompressor::getZfpType(std::string dataType)
 		return zfp_type_int32;
 	else if (dataType == "int64_t")
 		return zfp_type_int64;
+
+    throw std::runtime_error("invalid type");
 }
 
 

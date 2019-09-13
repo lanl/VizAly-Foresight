@@ -229,9 +229,6 @@ inline void Merger::run() {
 
   MPI_Barrier(comm);
 
-  if (my_rank == 0)
-    std::cout << debug_log.str();
-
   // now dump everything
   dump();
 
