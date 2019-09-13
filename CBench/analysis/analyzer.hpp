@@ -11,6 +11,8 @@
 #pragma once
 /* -------------------------------------------------------------------------- */
 #include <set>
+#include <random>
+#include <unordered_set>
 #include "tools.h"
 #include "dataLoaderInterface.hpp"
 #include "HACCDataLoader.hpp"
@@ -50,6 +52,7 @@ private:
   int num_scalars = 0;
   int num_bins = 0;
   bool extract_non_halos = false;
+  float sampling_factor = 1.;
 
   long local_parts = 0;
   long total_parts = 0;
@@ -73,6 +76,9 @@ private:
   std::vector<bool> is_halo;
   std::vector<long> non_halos_id;
   std::vector<short> non_halos_mask;
+
+  // sampling
+  bool is_sampled = false;
 
   // MPI
   int my_rank  = 0;
@@ -133,6 +139,11 @@ inline Analyzer::Analyzer(const char* in_path, int in_rank, int in_nb_ranks, MPI
     output_non_halos = json["analysis"]["non-halos"]["output"];
     non_halos.resize(num_scalars);
   }
+
+  // sample non-halos?
+  if (json["analysis"]["non-halos"].count("sampling"))
+    sampling_factor = json["analysis"]["non-halos"]["sampling"];
+  is_sampled = sampling_factor > 0. and sampling_factor < 1.;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -226,12 +237,12 @@ inline void Analyzer::filterParticles() {
   total_unmatched = 0;
   total_updated   = 0;
 
-  // map from particle id to dataset index
+  // particle id to dataset index
   std::unordered_map<long, long> index;
 
   debug_log.clear();
   debug_log.str("");
-  debug_log << "step 1/5: set particles index mapping ... " << std::endl;
+  debug_log << "step 1/6: set particles index mapping ... " << std::endl;
 
   ioMgr->init(input_full, comm);
 
@@ -257,7 +268,7 @@ inline void Analyzer::filterParticles() {
     MPI_Barrier(comm);
   }
 
-  debug_log << "step 2/5: update lookup table ... " << std::endl;
+  debug_log << "step 2/6: update lookup table ... " << std::endl;
 
   ioMgr->init(input_halo, comm);
 
@@ -294,7 +305,7 @@ inline void Analyzer::filterParticles() {
     MPI_Barrier(comm);
   }
 
-  debug_log << "step 3/5: redistribute unmatched and update halos table ... " << std::endl;
+  debug_log << "step 3/6: redistribute unmatched and update halos table ... " << std::endl;
 
   // first reduce redistribute list sizes
   // retrieve number of non halos particles
@@ -346,9 +357,9 @@ inline void Analyzer::filterParticles() {
 
   // at this point, we only need 'is_halo'.
   // early release to reduce memory pressure
-  index.clear();
+  //index.clear();
 
-  debug_log << "step 4/5: store non-halos id and mask ... " << std::endl;
+  debug_log << "step 4/6: store non-halos id and mask ... " << std::endl;
 
   ioMgr->init(input_full, comm);
   ioMgr->setSave(true);
@@ -385,8 +396,51 @@ inline void Analyzer::filterParticles() {
 
   MPI_Barrier(comm);
 
-  debug_log << "step 5/5: assess particles count ... " << std::endl;
+    if (is_sampled) {
 
+    debug_log << "step 5/6: sampling non-halos to "<< 100 * sampling_factor
+              <<"% ... " << std::endl;
+
+    std::vector<long> sampled;
+    std::vector<long> removed;
+
+    sampled.reserve(local_non_halos);
+    removed.reserve(local_non_halos);
+
+    // sample particles ids first
+    std::random_device device;
+    std::mt19937 engine(device());
+    auto const new_size = static_cast<size_t>(local_non_halos * sampling_factor);
+
+    std::sample(non_halos_id.begin(), non_halos_id.end(),
+                std::back_inserter(sampled), new_size, engine);
+
+    // retrieve removed particles and set them as if they were halo ones.
+    std::set_difference(non_halos_id.begin(), non_halos_id.end(),
+                        sampled.begin(), sampled.end(), removed.begin());
+
+    for (auto&& id : removed)
+      is_halo[index[id]] = true;
+
+    removed.clear();
+
+    // finally update current non halo id list
+    non_halos_id.clear();
+    non_halos_id = std::move(sampled);
+    non_halos_id.shrink_to_fit();
+
+    // update counters
+    assert(non_halos_id.size() == new_size);
+    local_non_halos = new_size;
+
+    debug_log << " done." << std::endl << std::endl;
+  }
+
+  MPI_Barrier(comm);
+
+  debug_log << "step 6/6: assess particles count ... " << std::endl;
+
+  total_non_halos = 0;
   MPI_Allreduce(&local_non_halos, &total_non_halos, 1, MPI_LONG, MPI_SUM, comm);
 
   long const count_mismatch = std::abs(total_unmatched - total_updated);
@@ -404,7 +458,6 @@ inline void Analyzer::filterParticles() {
   debug_log << std::endl;
 
 
-finalize:
   if (my_rank == 0)
     std::cout << debug_log.str();
 
@@ -440,6 +493,8 @@ inline void Analyzer::extractNonHalos(int i) {
     MPI_Barrier(comm);
   }
 }
+
+
 
 /* -------------------------------------------------------------------------- */
 void Analyzer::dumpNonHalosData() {

@@ -6,18 +6,18 @@
 #SBATCH --job-name analysis
 
 # enable or disable steps
-EXTRACT_NON_HALOS=false
+EXTRACT_NON_HALOS=true
 COMPRESS_NON_HALOS=false
 MERGE_DATASETS=false
-COMPUTE_POWER_SPECTRUM=true
+COMPUTE_POWER_SPECTRUM=false
 
 # parameters
 NRANKS=8
 TIMESTEP=499
-SUFFIX="20bits"
+SUFFIX="sampled"
 HACC="/projects/exasky/HACC"
 BUILD="/projects/exasky/hoby-projects/cbench/build"
-INPUT_JSON="../inputs/hacc/analysis_${SUFFIX}.json"
+INPUT_JSON="../inputs/hacc/analysis_pipeline-${SUFFIX}.json"
 POWER_SPECTRUM="${HACC}/trunk/Darwin/mpi/bin/hacc_pk_gio_auto"
 PARTICLES_DATA="/projects/exasky_data/hoby/analysis/data-combined-zip-${SUFFIX}"
 OUTPUT_DATA="/projects/exasky_data/hoby/analysis/pk-combined-zip-${SUFFIX}.dat"
