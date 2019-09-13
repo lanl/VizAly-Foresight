@@ -114,3 +114,5 @@ CMakeFiles/cmake\.check_cache
 src/CMakeLists.txt.cori
 src/*/*.old
 *.hdf5
+
+inputs/hacc/analysis_*bits.json
