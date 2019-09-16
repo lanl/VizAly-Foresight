@@ -44,7 +44,7 @@
   },
   "merge": {
     "halos": "/projects/exasky_data/hoby/analysis/data-halo-sz",
-    "non-halos":"/projects/exasky_data/hoby/analysis/data-non-halo-fpzip-26bits-sampled__data-non-halo-raw",
+    "non-halos":"/projects/exasky_data/hoby/analysis/data-non-halo-fpzip-26bits-sampled",
     "output": "/projects/exasky_data/hoby/analysis/data-combined-zip-26bits-sampled",
     "logs": "logs/log_analysis_post-process"
   }

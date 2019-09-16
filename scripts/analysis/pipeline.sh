@@ -7,7 +7,7 @@
 
 # enable or disable steps
 EXTRACT_NON_HALOS=false
-COMPRESS_NON_HALOS=true
+COMPRESS_NON_HALOS=false
 MERGE_DATASETS=true
 COMPUTE_POWER_SPECTRUM=false
 
@@ -26,21 +26,21 @@ STATUS=0
 # extract non-halos and compute entropy if required
 if ${EXTRACT_NON_HALOS}; then
   source "/home/hoby/.bashrc" && cd ${BUILD} &&
-  mpirun -np ${NRANKS} ./analyzer ${INPUT_JSON}
+  mpirun -np ${NRANKS} ./analyzer ${INPUT_JSON} &&
   STATUS=$?
 fi
 
 # compress non-halo particles dataset
 if ${COMPRESS_NON_HALOS} && [ ${STATUS} -eq 0 ]; then
-  source "${HACC}.darwin_setup" && cd ${BUILD} &&
-  mpirun -np ${NRANKS} ./CBench ${INPUT_JSON}
+  source "/home/hoby/.bashrc" && cd ${BUILD} &&
+  mpirun -np ${NRANKS} ./CBench ${INPUT_JSON} &&
   STATUS=$?
 fi
 
 # merge it with halo ones
 if ${MERGE_DATASETS} && [ ${STATUS} -eq 0 ]; then
   source "/home/hoby/.bashrc" && cd ${BUILD} &&
-  mpirun -np ${NRANKS} ./merger ${INPUT_JSON}
+  mpirun -np ${NRANKS} ./merger ${INPUT_JSON} &&
   STATUS=$?
 fi
 

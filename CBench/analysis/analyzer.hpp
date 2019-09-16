@@ -396,7 +396,7 @@ inline void Analyzer::filterParticles() {
 
   MPI_Barrier(comm);
 
-    if (is_sampled) {
+  if (is_sampled) {
 
     debug_log << "step 5/6: sampling non-halos to "<< 100 * sampling_factor
               <<"% ... " << std::endl;
