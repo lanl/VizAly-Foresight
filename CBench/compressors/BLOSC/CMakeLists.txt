@@ -1,6 +1,6 @@
-option(CBENCH_ENABLE_BLOSC "Enable BLOSC." OFF)
+option(CBENCH_COMPRESSOR_BLOSC "Enable BLOSC." OFF)
 
-if(CBENCH_ENABLE_BLOSC)
+if(CBENCH_COMPRESSOR_BLOSC)
 	set(MY_LIBS "")
 
     #Asks for zfp library + set that in EXTRA_LIBS

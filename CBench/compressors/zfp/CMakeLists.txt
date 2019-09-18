@@ -1,6 +1,6 @@
-option(CBENCH_ENABLE_ZFP "use the zfp compressor" OFF)
+option(CBENCH_COMPRESSOR_ZFP "use the zfp compressor" OFF)
 
-if(CBENCH_ENABLE_ZFP)
+if(CBENCH_COMPRESSOR_ZFP)
 	set(MY_LIBS "")
 
     #Asks for zfp library + set that in EXTRA_LIBS

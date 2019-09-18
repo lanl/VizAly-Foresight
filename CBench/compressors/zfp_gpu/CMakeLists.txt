@@ -1,6 +1,6 @@
-option(CBENCH_ENABLE_ZFP_GPU "use the zfp_gpu compressor" OFF)
+option(CBENCH_COMPRESSOR_ZFP_GPU "use the zfp_gpu compressor" OFF)
 
-if(CBENCH_ENABLE_ZFP_GPU)
+if(CBENCH_COMPRESSOR_ZFP_GPU)
 	set(MY_LIBS "")
 
     #Asks for zfp library + set that in EXTRA_LIBS

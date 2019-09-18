@@ -5,7 +5,7 @@ Copyright (c) 2017, Los Alamos National Security, LLC.
 All rights reserved.
 
 Authors:
- - Jesus Pulido
+ - Pascal Grosset
 ================================================================================*/
 
 #ifndef _VTK_LOADER_H_
@@ -15,11 +15,11 @@ Authors:
 #include <string>
 #include <unordered_map>
 
+#include <vtkPointData.h>
 #include <vtkMPIController.h>
 #include <vtkTrivialProducer.h>
 #include <vtkSmartPointer.h>
 #include <vtkCellData.h>
-#include <vtkPointData.h>
 
 #include <vtkXMLPImageDataWriter.h>
 #include <vtkXMLImageDataReader.h>

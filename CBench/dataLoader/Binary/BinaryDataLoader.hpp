@@ -7,6 +7,7 @@ All rights reserved.
 Authors:
  - Jesus Pulido
 ================================================================================*/
+#ifdef CBENCH_HAS_BINARY
 
 #ifndef _BINARY_LOADER_H_
 #define _BINARY_LOADER_H_
@@ -308,4 +309,5 @@ size_t BinaryDataLoader::findByteAddress(size_t x, size_t y, size_t z, size_t fi
 	return byteLocation;
 }
 
+#endif
 #endif

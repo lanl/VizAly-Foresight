@@ -33,19 +33,7 @@ Authors:
 // Factories
 #include "compressorFactory.hpp"
 #include "metricFactory.hpp"
-
-// Readers
-#include "BinaryDataLoader.hpp"
-#include "HACCDataLoader.hpp"
-
-#ifdef CBENCH_HAS_NYX
-	#include "NYXDataLoader.hpp"
-#endif
-
-#ifdef CBENCH_HAS_VTK
-	#include "VTKDataLoader.hpp"
-#endif
-
+#include "dataLoaderFactory.hpp"
 
 
 int main(int argc, char *argv[])
@@ -66,8 +54,6 @@ int main(int argc, char *argv[])
 		MPI_Finalize();
 		return 0;
 	}
-
-
 
 	//
 	// Load input
@@ -152,40 +138,22 @@ int main(int argc, char *argv[])
 	DataLoaderInterface *ioMgr;
 	{
 		std::string inputFileType = jsonInput["input"]["filetype"];
-
-		if (inputFileType == "Binary")
-			ioMgr = new BinaryDataLoader();
-		else if (inputFileType == "HACC")
-			ioMgr = new HACCDataLoader();
-		#ifdef CBENCH_HAS_NYX
-		else if (inputFileType == "NYX")
+		ioMgr = DataLoaderFactory::createLoader(inputFileType);
+		
+		if (ioMgr == NULL)
 		{
-			ioMgr = new NYXDataLoader();
-			if (inputFileType == "NYX")
-			{
-				if (jsonInput["input"].find("group") != jsonInput["input"].end())
-				{
-					ioMgr->setParam("group", "string", jsonInput["input"]["group"]);
-				}
-			}
-		}
-		#endif
-		#ifdef CBENCH_HAS_VTK
-		else if (inputFileType == "VTI")
-		{
-			ioMgr = new VTKDataLoader();
-		}
-		#endif
-		else
-		{
-			// Exit if no input file is provided
 			if (myRank == 0)
-				std::cout << "Unsupported format " << inputFileType << "!!!" << std::endl;
-
+				std::cout << "Unsupported loader: " << inputFileType << " ... exiting!" << std::endl;
+			
 			MPI_Finalize();
 			return 0;
 		}
-	
+		else if (inputFileType == "NYX")
+		{
+			if (jsonInput["input"].find("group") != jsonInput["input"].end())
+				ioMgr->setParam("group", "string", jsonInput["input"]["group"]);
+		}
+
 
 		//
 		// Check if the datainfo field exist for a dataset

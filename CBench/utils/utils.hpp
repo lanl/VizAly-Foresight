@@ -203,6 +203,37 @@ inline int deAllocateMem(std::string dataType, void *& data)
 }
 
 
+
+// Generic memory deallocator
+inline int getDataypeSize(std::string dataType)
+{
+    if (dataType == "float")
+       	return 4;
+    else if (dataType == "double")
+        return 8;
+    else if (dataType == "int")
+        return 4;
+    else if (dataType == "int8_t")
+        return 1;
+    else if (dataType == "int16_t")
+        return 2;
+    else if (dataType == "int32_t")
+        return 4;
+    else if (dataType == "int64_t")
+        return 8;
+    else if (dataType == "uint8_t")
+        return 1;
+    else if (dataType == "uint16_t")
+        return 2;
+    else if (dataType == "uint32_t")
+        return 4;
+    else if (dataType == "uint64_t")
+        return 8;
+
+    return 0;
+}
+
+
 //
 // Function to validate whatever could be wrong with the input
 inline int validateInput(int argc, char *argv[], int myRank, int numRanks)

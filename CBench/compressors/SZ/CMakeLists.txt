@@ -1,6 +1,6 @@
-option(CBENCH_ENABLE_SZ "Enable SZ." OFF)
+option(CBENCH_COMPRESSOR_SZ "Enable SZ." OFF)
 
-if (CBENCH_ENABLE_SZ)
+if (CBENCH_COMPRESSOR_SZ)
 	set(MY_LIBS "")
 
     #Asks for SZ library + set that in EXTRA_LIBS

@@ -1,6 +1,6 @@
-option(CBENCH_ENABLE_ISABELA "Enable ISABELA." OFF)
+option(CBENCH_COMPRESSOR_ISABELA "Enable ISABELA." OFF)
 
-if (CBENCH_ENABLE_ISABELA)
+if (CBENCH_COMPRESSOR_ISABELA)
 	set(MY_LIBS "")
 
     #Asks for Isabela library + set that in EXTRA_LIBS

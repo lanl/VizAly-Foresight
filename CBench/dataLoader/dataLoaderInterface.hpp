@@ -18,7 +18,7 @@ Authors:
 #include <unordered_map>
 #include <list>
 
-#include "gioData.hpp"
+#include "HACC/gioData.hpp"
 
 
 class DataLoaderInterface 
@@ -110,11 +110,12 @@ class Partition
 		max_x(in_max_x),
 		max_y(in_max_y),
 		max_z(in_max_z)
-	{}
+	{
+	}
 
 	void print()
 	{
-		std::cout << min_x << ", " << min_y << ", " << min_z << " - "
+		std::cout << "Dims: " << min_x << ", " << min_y << ", " << min_z << " - "
 			<< max_x << ", " << max_y << ", " << max_z << std::endl;
 	}
 };
@@ -123,6 +124,7 @@ Partition getPartition(int myRank, int numRanks, int extentsX, int extentsY, int
 {
 	std::list<Partition> partitions;
 	partitions.push_back(Partition{ 0, 0, 0, extentsX, extentsY, extentsZ });
+
 
 	Partition first_half, second_half;
 

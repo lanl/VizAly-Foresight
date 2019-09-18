@@ -1,6 +1,6 @@
-option(CBENCH_ENABLE_FPZIP "Enable FPZIP." OFF)
+option(CBENCH_COMPRESSOR_FPZIP "Enable FPZIP." OFF)
 
-if (CBENCH_ENABLE_FPZIP)
+if (CBENCH_COMPRESSOR_FPZIP)
     set(MY_LIBS "")
 
     #Asks for fpzip library + set that in EXTRA_LIBS

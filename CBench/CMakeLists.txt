@@ -13,26 +13,29 @@ set (EXTRA_LIBS "")
 include_directories(${CMAKE_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/metrics)
 include_directories(${CMAKE_SOURCE_DIR}/utils)
-
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader)
-include_directories(${CMAKE_SOURCE_DIR}/dataLoader/Binary)
-include_directories(${CMAKE_SOURCE_DIR}/dataLoader/HACC)
-include_directories(${CMAKE_SOURCE_DIR}/dataLoader/VTK)
+
 
 
 # HACC Loader
-include_directories(${CMAKE_SOURCE_DIR}/thirdparty/genericio)
-add_definitions(-DGENERICIO_NO_COMPRESSION)
-add_library(GenericIO STATIC "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO.cxx")
-set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
+include_directories(${CMAKE_SOURCE_DIR}/dataLoader/HACC)
+
+
+# VPIC GDA Loader
+option(CBENCH_LOADER_GDA "Enables the reading of VPIC GDA data" OFF)
+if (CBENCH_LOADER_GDA)
+	add_definitions(-DCBENCH_HAS_GDA)
+	include_directories(${CMAKE_SOURCE_DIR}/dataLoader/VPIC_GDA)
+endif()
 
 
 # VTK Loader
-option(CBENCH_ENABLE_VTK_LOADER "Enables the reading of VTK data" OFF)
-if (CBENCH_ENABLE_VTK_LOADER)
+option(CBENCH_LOADER_VTK "Enables the reading of VTK data" OFF)
+if (CBENCH_LOADER_VTK)
 	find_package(VTK REQUIRED)
 	if (VTK_FOUND)
 		add_definitions(-DCBENCH_HAS_VTK)
+		include_directories(${CMAKE_SOURCE_DIR}/dataLoader/VTK)
 
 		include(${VTK_USE_FILE})
 		set (EXTRA_LIBS ${EXTRA_LIBS} ${VTK_LIBRARIES})
@@ -43,8 +46,8 @@ endif()
 
 
 # NYX Loader
-option(CBENCH_ENABLE_NYX_LOADER "Enables the reading of NyX HDF5 data" OFF)
-if (CBENCH_ENABLE_NYX_LOADER)
+option(CBENCH_LOADER_NYX "Enables the reading of NyX HDF5 data" OFF)
+if (CBENCH_LOADER_NYX)
 	set(HDF5_USE_STATIC_LIBRARIES ON)
 	find_package(HDF5 REQUIRED COMPONENTS C)
 
@@ -69,7 +72,70 @@ if (CBENCH_ENABLE_NYX_LOADER)
 	endif()
 endif()
 
+
+# Add external loaders
+#include_directories(${CMAKE_SOURCE_DIR}/dataLoader)
+#file(GLOB subdir "${CMAKE_SOURCE_DIR}/dataLoader/*")
+#foreach (dir ${subdir})
+#	# Skip files ending in .h
+#	if ("${dir}" MATCHES "\\.h$")
+#		continue()
+#	endif()
+
+#	# Skip files ending in .hpp
+#	if ("${dir}" MATCHES "\\.hpp$")
+#		continue()
+#	endif()
 	
+	# Skip files ending in .md
+#	if ("${dir}" MATCHES "\\.md$")
+#		continue()
+#	endif()
+
+
+#	include_directories(${dir})
+
+#	if (NOT EXISTS ${dir}/CMakeLists.txt)
+#		continue()
+#	else()
+		# Only process folders with a CMakelists.txt
+#		set_property(GLOBAL PROPERTY includeDirectories "")
+#		set_property(GLOBAL PROPERTY linkDirectories "")
+#		set_property(GLOBAL PROPERTY linkLibraries "")
+#		set_property(GLOBAL PROPERTY definitions "")
+#		set_property(GLOBAL PROPERTY includes "")
+		
+#		add_subdirectory(${dir})
+
+		#include directories to add
+#		get_property(incDir GLOBAL PROPERTY includeDirectories)
+#		include_directories(${incDir})
+
+		#include directories to add
+#		get_property(lnkDir GLOBAL PROPERTY linkDirectories)
+#		link_directories(${lnkDir})
+#		message(WARNING "lnkDir " ${lnkDir})
+
+		#link libraries to add directories to add
+#		get_property(linkLibs GLOBAL PROPERTY linkLibraries)
+#		set(EXTRA_LIBS ${EXTRA_LIBS}  ${linkLibs})
+#		message(WARNING "EXTRA_LIBS " ${linkLibs})
+
+		# add defintions
+#		get_property(def GLOBAL PROPERTY definitions)
+#		add_definitions (${def})
+
+		# add includes
+#		get_property(incs GLOBAL PROPERTY includes)
+#		if (incs STREQUAL "")
+#		else()
+#			include(${incs})
+#		endif()
+
+#	endif()
+#endforeach()
+
+
 
 # Creates header file, compressorIncludes.h, with all available compressors
 file(GLOB_RECURSE header_files "${CMAKE_SOURCE_DIR}/compressors/*/*.hpp")
@@ -161,9 +227,18 @@ endif()
 add_executable(CBench main.cpp)
 target_link_libraries(CBench ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO)
 
+
 # Install instructions
 install(TARGETS CBench DESTINATION .)
+
+
+# GenericIO
+include_directories(${CMAKE_SOURCE_DIR}/thirdparty/genericio)
+add_definitions(-DGENERICIO_NO_COMPRESSION)
+add_library(GenericIO STATIC "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO.cxx")
+set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
 install(TARGETS GenericIO DESTINATION .)
+
 
 # Prevent in source builds since they are evil
 if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
@@ -171,6 +246,7 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 						delete CMake generated things (CMakeFiles folder and CMakeCache.txt)
 						, and build out of source") 
 endif()
+
 
 # OS things
 if(WIN32)
