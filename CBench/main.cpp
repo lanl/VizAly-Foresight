@@ -484,6 +484,9 @@ int main(int argc, char *argv[])
 
 			clockWrite.stop();
 
+			if (myRank == 0)
+				std::cout << "wrote out " << decompressedOutputName << "." << std::endl;
+
 			debuglog << ioMgr->getLog();
 			debuglog << "Write output took: " << clockWrite.getDuration() << " s " << std::endl;
 			appendLog(outputLogFilename, debuglog);

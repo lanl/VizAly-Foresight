@@ -129,6 +129,7 @@ inline int GDADataLoader::loadData(std::string paramName)
 
 	// Create space for data and store data there
 	allocateMem(dataType, numElements, 0, data);
+	elemSize = Memory::sizeOf[dataType];
 
 	// Read the binary file
 	std::string dataFile = filename + ".gda";

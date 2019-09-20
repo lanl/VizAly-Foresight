@@ -21,11 +21,14 @@
 			"abs": 1E-3
 		},
 
+
 		{
 			"name": "fpzip",
-			"bits": 24,
-			"output-prefix": "fpzip_24_"
+			"bits": 14,
+			"output-prefix": "fpzip_14_"
 		},
+
+		
 
 		{
 			"name": "zfp",
@@ -33,10 +36,11 @@
 			"abs": 1E-2
 		},
 
+		
 		{
 			"name": "fpzip",
-			"bits": 14,
-			"output-prefix": "fpzip_14_"
+			"bits": 24,
+			"output-prefix": "fpzip_24_"
 		},
 
 		{
