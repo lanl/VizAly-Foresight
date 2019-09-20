@@ -1,13 +1,15 @@
 {
-    "project-home": "",
-    "wflow-path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly",
-    "foresight-home": "/projects/exasky_data/testforesight_pat/",
+    "project-home": "/projects/exasky/pascal-projects/VizAly-Foresight/",
+    "wflow-path": "yx__512_42__zfp_abs__interactive_velonly_3",
+    "foresight-home": "/projects/exasky/pascal-projects/VizAly-Foresight/",
     "input": {
         "filetype": "NYX",
         "filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",
         "filename-512": "/project/projectdirs/nyx/www/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",
         "filename-1024": "/project/projectdirs/nyx/www/highz/1024/NVB_C009_l20n1024_S12345T632_z42.hdf5",
         "filename-2048": "/project/projectdirs/nyx/www/highz/2048/NVB_C009_l40n2048_S12345T692_z42.hdf5",
+        "metrics-csv": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly/cbench/metrics_.csv",
+        "analysis-results": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly/",
         "group": "native_fields",
         "scalars": [
             "baryon_density",
@@ -324,31 +326,31 @@
             },
             {
                 "output-prefix": "blosc_",
-                "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/blosc___NVB_C009_l10n512_S12345T692_z42.hdf5"
+                "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/blosc___NVB_C009_l10n512_S12345T692_z42.hdf5"
             },
             {
                 "output-prefix": "fpzip_",
-                "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/fpzip___NVB_C009_l10n512_S12345T692_z42.hdf5"
+                "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/fpzip___NVB_C009_l10n512_S12345T692_z42.hdf5"
             },
             {
                 "output-prefix": "sz_pwrel_",
-                "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/sz_pwrel___NVB_C009_l10n512_S12345T692_z42.hdf5"
+                "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/sz_pwrel___NVB_C009_l10n512_S12345T692_z42.hdf5"
             },
             {
                 "output-prefix": "sz_abs_run1_",
-                "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/sz_abs_run1___NVB_C009_l10n512_S12345T692_z42.hdf5"
+                "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/sz_abs_run1___NVB_C009_l10n512_S12345T692_z42.hdf5"
             },
             {
                 "output-prefix": "sz_abs_run2_",
-                "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/sz_abs_run2___NVB_C009_l10n512_S12345T692_z42.hdf5"
+                "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/sz_abs_run2___NVB_C009_l10n512_S12345T692_z42.hdf5"
             },
             {
                 "output-prefix": "zfp_abs_run1_",
-                "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/zfp_abs_run1___NVB_C009_l10n512_S12345T692_z42.hdf5"
+                "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/zfp_abs_run1___NVB_C009_l10n512_S12345T692_z42.hdf5"
             },
             {
                 "output-prefix": "zfp_abs_run2_",
-                "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/zfp_abs_run2___NVB_C009_l10n512_S12345T692_z42.hdf5"
+                "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly/cbench/decompressed_files/zfp_abs_run2___NVB_C009_l10n512_S12345T692_z42.hdf5"
             }
         ],
         "analysis": [
@@ -357,35 +359,35 @@
                 "files": [
                     {
                         "name": "orig",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/origrhob_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/origrhob_ps3d.txt"
                     },
                     {
                         "name": "blosc_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/blosc_rhob_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/blosc_rhob_ps3d.txt"
                     },
                     {
                         "name": "fpzip_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/fpzip_rhob_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/fpzip_rhob_ps3d.txt"
                     },
                     {
                         "name": "sz_pwrel_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_pwrel_rhob_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_pwrel_rhob_ps3d.txt"
                     },
                     {
                         "name": "sz_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run1_rhob_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_abs_run1_rhob_ps3d.txt"
                     },
                     {
                         "name": "sz_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run2_rhob_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_abs_run2_rhob_ps3d.txt"
                     },
                     {
                         "name": "zfp_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run1_rhob_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/zfp_abs_run1_rhob_ps3d.txt"
                     },
                     {
                         "name": "zfp_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run2_rhob_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/zfp_abs_run2_rhob_ps3d.txt"
                     }
                 ]
             },
@@ -394,35 +396,35 @@
                 "files": [
                     {
                         "name": "orig",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/origrhom_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/origrhom_ps3d.txt"
                     },
                     {
                         "name": "blosc_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/blosc_rhom_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/blosc_rhom_ps3d.txt"
                     },
                     {
                         "name": "fpzip_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/fpzip_rhom_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/fpzip_rhom_ps3d.txt"
                     },
                     {
                         "name": "sz_pwrel_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_pwrel_rhom_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_pwrel_rhom_ps3d.txt"
                     },
                     {
                         "name": "sz_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run1_rhom_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_abs_run1_rhom_ps3d.txt"
                     },
                     {
                         "name": "sz_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run2_rhom_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_abs_run2_rhom_ps3d.txt"
                     },
                     {
                         "name": "zfp_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run1_rhom_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/zfp_abs_run1_rhom_ps3d.txt"
                     },
                     {
                         "name": "zfp_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run2_rhom_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/zfp_abs_run2_rhom_ps3d.txt"
                     }
                 ]
             },
@@ -431,35 +433,35 @@
                 "files": [
                     {
                         "name": "orig",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/origrhodm_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/origrhodm_ps3d.txt"
                     },
                     {
                         "name": "blosc_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/blosc_rhodm_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/blosc_rhodm_ps3d.txt"
                     },
                     {
                         "name": "fpzip_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/fpzip_rhodm_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/fpzip_rhodm_ps3d.txt"
                     },
                     {
                         "name": "sz_pwrel_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_pwrel_rhodm_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_pwrel_rhodm_ps3d.txt"
                     },
                     {
                         "name": "sz_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run1_rhodm_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_abs_run1_rhodm_ps3d.txt"
                     },
                     {
                         "name": "sz_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run2_rhodm_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_abs_run2_rhodm_ps3d.txt"
                     },
                     {
                         "name": "zfp_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run1_rhodm_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/zfp_abs_run1_rhodm_ps3d.txt"
                     },
                     {
                         "name": "zfp_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run2_rhodm_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/zfp_abs_run2_rhodm_ps3d.txt"
                     }
                 ]
             },
@@ -468,35 +470,35 @@
                 "files": [
                     {
                         "name": "orig",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/origtemp_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/origtemp_ps3d.txt"
                     },
                     {
                         "name": "blosc_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/blosc_temp_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/blosc_temp_ps3d.txt"
                     },
                     {
                         "name": "fpzip_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/fpzip_temp_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/fpzip_temp_ps3d.txt"
                     },
                     {
                         "name": "sz_pwrel_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_pwrel_temp_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_pwrel_temp_ps3d.txt"
                     },
                     {
                         "name": "sz_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run1_temp_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_abs_run1_temp_ps3d.txt"
                     },
                     {
                         "name": "sz_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run2_temp_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_abs_run2_temp_ps3d.txt"
                     },
                     {
                         "name": "zfp_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run1_temp_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/zfp_abs_run1_temp_ps3d.txt"
                     },
                     {
                         "name": "zfp_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run2_temp_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/zfp_abs_run2_temp_ps3d.txt"
                     }
                 ]
             },
@@ -505,35 +507,35 @@
                 "files": [
                     {
                         "name": "orig",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/origvelmag_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/origvelmag_ps3d.txt"
                     },
                     {
                         "name": "blosc_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/blosc_velmag_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/blosc_velmag_ps3d.txt"
                     },
                     {
                         "name": "fpzip_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/fpzip_velmag_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/fpzip_velmag_ps3d.txt"
                     },
                     {
                         "name": "sz_pwrel_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_pwrel_velmag_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_pwrel_velmag_ps3d.txt"
                     },
                     {
                         "name": "sz_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run1_velmag_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_abs_run1_velmag_ps3d.txt"
                     },
                     {
                         "name": "sz_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run2_velmag_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_abs_run2_velmag_ps3d.txt"
                     },
                     {
                         "name": "zfp_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run1_velmag_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/zfp_abs_run1_velmag_ps3d.txt"
                     },
                     {
                         "name": "zfp_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run2_velmag_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/zfp_abs_run2_velmag_ps3d.txt"
                     }
                 ]
             },
@@ -542,35 +544,35 @@
                 "files": [
                     {
                         "name": "orig",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/origvz_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/origvz_ps3d.txt"
                     },
                     {
                         "name": "blosc_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/blosc_vz_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/blosc_vz_ps3d.txt"
                     },
                     {
                         "name": "fpzip_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/fpzip_vz_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/fpzip_vz_ps3d.txt"
                     },
                     {
                         "name": "sz_pwrel_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_pwrel_vz_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_pwrel_vz_ps3d.txt"
                     },
                     {
                         "name": "sz_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run1_vz_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_abs_run1_vz_ps3d.txt"
                     },
                     {
                         "name": "sz_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/sz_abs_run2_vz_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/sz_abs_run2_vz_ps3d.txt"
                     },
                     {
                         "name": "zfp_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run1_vz_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/zfp_abs_run1_vz_ps3d.txt"
                     },
                     {
                         "name": "zfp_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/sim_stats/zfp_abs_run2_vz_ps3d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//sim_stats/zfp_abs_run2_vz_ps3d.txt"
                     }
                 ]
             },
@@ -579,35 +581,35 @@
                 "files": [
                     {
                         "name": "orig",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/origx_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/origx_flux_ps1d.txt"
                     },
                     {
                         "name": "blosc_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/blosc_x_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/blosc_x_flux_ps1d.txt"
                     },
                     {
                         "name": "fpzip_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/fpzip_x_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/fpzip_x_flux_ps1d.txt"
                     },
                     {
                         "name": "sz_pwrel_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_pwrel_x_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/sz_pwrel_x_flux_ps1d.txt"
                     },
                     {
                         "name": "sz_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_abs_run1_x_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/sz_abs_run1_x_flux_ps1d.txt"
                     },
                     {
                         "name": "sz_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_abs_run2_x_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/sz_abs_run2_x_flux_ps1d.txt"
                     },
                     {
                         "name": "zfp_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/zfp_abs_run1_x_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/zfp_abs_run1_x_flux_ps1d.txt"
                     },
                     {
                         "name": "zfp_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/zfp_abs_run2_x_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/zfp_abs_run2_x_flux_ps1d.txt"
                     }
                 ]
             },
@@ -616,35 +618,35 @@
                 "files": [
                     {
                         "name": "orig",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/origy_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/origy_flux_ps1d.txt"
                     },
                     {
                         "name": "blosc_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/blosc_y_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/blosc_y_flux_ps1d.txt"
                     },
                     {
                         "name": "fpzip_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/fpzip_y_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/fpzip_y_flux_ps1d.txt"
                     },
                     {
                         "name": "sz_pwrel_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_pwrel_y_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/sz_pwrel_y_flux_ps1d.txt"
                     },
                     {
                         "name": "sz_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_abs_run1_y_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/sz_abs_run1_y_flux_ps1d.txt"
                     },
                     {
                         "name": "sz_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_abs_run2_y_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/sz_abs_run2_y_flux_ps1d.txt"
                     },
                     {
                         "name": "zfp_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/zfp_abs_run1_y_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/zfp_abs_run1_y_flux_ps1d.txt"
                     },
                     {
                         "name": "zfp_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/zfp_abs_run2_y_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/zfp_abs_run2_y_flux_ps1d.txt"
                     }
                 ]
             },
@@ -653,35 +655,35 @@
                 "files": [
                     {
                         "name": "orig",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/origz_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/origz_flux_ps1d.txt"
                     },
                     {
                         "name": "blosc_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/blosc_z_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/blosc_z_flux_ps1d.txt"
                     },
                     {
                         "name": "fpzip_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/fpzip_z_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/fpzip_z_flux_ps1d.txt"
                     },
                     {
                         "name": "sz_pwrel_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_pwrel_z_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/sz_pwrel_z_flux_ps1d.txt"
                     },
                     {
                         "name": "sz_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_abs_run1_z_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/sz_abs_run1_z_flux_ps1d.txt"
                     },
                     {
                         "name": "sz_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/sz_abs_run2_z_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/sz_abs_run2_z_flux_ps1d.txt"
                     },
                     {
                         "name": "zfp_abs_run1_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/zfp_abs_run1_z_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/zfp_abs_run1_z_flux_ps1d.txt"
                     },
                     {
                         "name": "zfp_abs_run2_",
-                        "path": "/projects/exasky_data/Nyx__512_42__zfp_abs__interactive_velonly/lya_all_axes/zfp_abs_run2_z_flux_ps1d.txt"
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/yx__512_42__zfp_abs__interactive_velonly//lya_all_axes/zfp_abs_run2_z_flux_ps1d.txt"
                     }
                 ]
             }
@@ -693,13 +695,20 @@
             "x-range": [
                 0,
                 11
+            ],
+            "checks": [
+                {
+                    "operand": "pk_ratio",
+                    "operator": "<",
+                    "result": 0.01
+                }
             ]
         },
         "evn_path": "scripts/VizAly-CBench.bash.darwin",
         "configuration": {
-            "partition": "scaling",
+            "partition": "general",
             "nodes": 1
         }
     },
-    "git-tag": "v1.3-11-gd4d277c"
+    "git-tag": "v1.3-13-g8057496"
 }
