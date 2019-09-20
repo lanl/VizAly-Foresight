@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
 	{
 		std::string inputFileType = jsonInput["input"]["filetype"];
 		ioMgr = DataLoaderFactory::createLoader(inputFileType);
-		
+
 		if (ioMgr == NULL)
 		{
 			if (myRank == 0)
@@ -387,6 +387,7 @@ int main(int argc, char *argv[])
 				debuglog << "writing: " << scalars[i] << std::endl;
 
 				ioMgr->saveCompData(scalars[i], decompdata);
+				
 				debuglog << ioMgr->getLog();
 			}
 
@@ -457,6 +458,7 @@ int main(int argc, char *argv[])
 			{
 				if (!ioMgr->inOutData[i].doWrite)
 				{
+					debuglog << "writing uncoompressed" << std::endl;
 					ioMgr->loadData(ioMgr->inOutData[i].name);
 					ioMgr->saveCompData(ioMgr->inOutData[i].name, ioMgr->data);
 					ioMgr->close();

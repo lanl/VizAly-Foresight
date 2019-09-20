@@ -29,9 +29,10 @@ class GDADataLoader: public DataLoaderInterface
 	int myRank;
 
 	float origRealDims[3];
-	int mpiDivisions[3];
 
 	void *tempData;
+	MPI_Datatype mpiDataType;
+	int mpiDivisions[3];
 
   public:
 	GDADataLoader();
@@ -84,17 +85,22 @@ inline void GDADataLoader::init(std::string _filename, MPI_Comm _comm)
 		getline(myfile, line); strConvert::to_x(line, origRealDims[0]);// lx
 		getline(myfile, line); strConvert::to_x(line, origRealDims[1]);// ly
 		getline(myfile, line); strConvert::to_x(line, origRealDims[2]);// lz
+		getline(myfile, dataType); 
 
 		myfile.close();
 	}
 	else
-		std::cout << "Unable to open file " << metadataFile << std::endl;
+	{
+		if (myRank == 0)
+			std::cout << "Unable to open file " << metadataFile << ". This program will now exit!" << std::endl;
 
-	dataType = "float";
+		MPI_Finalize();
+	}
 
 
 	log << "original dims: " << origDims[0] << ", " << origDims[1] << ", " << origDims[1] << std::endl;
 	log << "real dims : " << origRealDims[0] << ", " << origRealDims[1] << ", " << origRealDims[1] << std::endl;
+	log << "dataType : " << dataType << std::endl;
 }
 
 
@@ -104,7 +110,7 @@ inline int GDADataLoader::loadData(std::string paramName)
 	Timer clock;
 	clock.start();
 
-
+	float minVal, maxVal, avg;
 	totalNumberOfElements = origDims[0] * origDims[1] * origDims[2];
 
 	//
@@ -121,42 +127,69 @@ inline int GDADataLoader::loadData(std::string paramName)
 	numElements = sizePerDim[0] * sizePerDim[1] * sizePerDim[2];
 
 
-
 	// Create space for data and store data there
 	allocateMem(dataType, numElements, 0, data);
 
 	// Read the binary file
 	std::string dataFile = filename + ".gda";
-	ifstream myFile (dataFile.c_str(), ios::in | ios::binary);
 
-	int dataSizeInBytes = 4;
-	size_t indexLocal = 0;
-	for (size_t z = 0; z < sizePerDim[2]; z++)
-		for (size_t y = 0; y < sizePerDim[1]; y++)
-		{
-			size_t globalStartIndex = z * (origDims[0] * origDims[1]) * dataSizeInBytes +
-			                          y * origDims[0] * dataSizeInBytes +
-			                          rankOffset[0] * dataSizeInBytes;
 
-			size_t localStartIndex = z * (sizePerDim[1] * sizePerDim[0]) +
-			                         y * sizePerDim[0];
 
-			size_t readLength = sizePerDim[2] * dataSizeInBytes;
-			char * memblock = new char[readLength];
+	// MPI collective File Read
+	MPI_File fh;
+	MPI_Status status;
+	MPI_Datatype filetype;
+	mpiDataType = getMPIType(dataType);
 
-			myFile.seekg(globalStartIndex);
-			myFile.read(memblock, readLength);
+	int distribs[3];
+	distribs[0] = MPI_DISTRIBUTE_BLOCK;;
+	distribs[1] = MPI_DISTRIBUTE_BLOCK;;
+	distribs[2] = MPI_DISTRIBUTE_BLOCK;;
 
-			memcpy ( &((( float *)data)[localStartIndex]), &memblock, readLength);
+	int dargs[3];
+	dargs[0] = MPI_DISTRIBUTE_DFLT_DARG;
+	dargs[1] = MPI_DISTRIBUTE_DFLT_DARG;
+	dargs[2] = MPI_DISTRIBUTE_DFLT_DARG;
 
-			delete [] memblock;
-		}
+	getMPIDivisions(numRanks, 3, mpiDivisions);
 
-	myFile.close();
 
+	int fullsize[3];
+	for (int i = 0; i < 3; i++)
+		fullsize[i] = origDims[i];
+
+	MPI_Type_create_darray(numRanks, myRank, 3, fullsize, distribs, dargs, mpiDivisions, MPI_ORDER_C, mpiDataType, &filetype);
+	MPI_Type_commit(&filetype);
+
+	MPI_File_open(comm, dataFile.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+
+	MPI_File_set_view(fh, 0, mpiDataType, filetype, "native", MPI_INFO_NULL);
+
+
+	if (dataType == "float")
+       	MPI_File_read_all(fh, ((float *)data), numElements, mpiDataType, &status);
+    else if (dataType == "double")
+        MPI_File_read_all(fh, ((double *)data), numElements, mpiDataType, &status);
+    else if (dataType == "int")
+        MPI_File_read_all(fh, ((int *)data), numElements, mpiDataType, &status);
+    else
+    {	
+    	if (myRank == 0)
+    		std::cout << "Unsupported data type " << dataType << " for VPIC GDA. The program will now exit!" << std::endl;
+
+    	MPI_Finalize();
+    }
+
+	MPI_File_close( &fh );
+
+
+	// TODO: Not extensible
+	minMax( ((float *)data), numElements, minVal, maxVal, avg);
+	
 
 	clock.stop();
-	log << "origDims: "     << origDims[0]		<< ", " << origDims[1]<< ", " << origDims[2]<< std::endl;
+	log << "min: " << minVal << ", max: " << maxVal<< ", avg: " << avg << std::endl;
+	log << "mpiDivisions: " << mpiDivisions[0] << ", " << mpiDivisions[1] << ", " << mpiDivisions[2] << std::endl;
 	log << "sizePerDim: "	<< sizePerDim[0]	<< ", " << sizePerDim[1]<< ", " << sizePerDim[2]<< std::endl;
 	log << "rankOffset: "	<< rankOffset[0]	<< ", " << rankOffset[1]<< ", " << rankOffset[2]<< std::endl;
 	log << "numElements: "	<< numElements << std::endl;
@@ -171,7 +204,7 @@ inline int GDADataLoader::saveCompData(std::string paramName, void * cData)
 {
 	Timer clock;
 	clock.start();
-
+	
 	allocateMem(dataType, numElements, 0, tempData);
 	memcpy(tempData, cData, numElements*getDataypeSize(dataType));
 
@@ -187,28 +220,48 @@ inline int GDADataLoader::writeData(std::string _filename)
 	clock.start();
 
 	MPI_File fh;
-	MPI_Comm commWrite;
 	MPI_Status status;
-
-	int periods[3] = { 0, 0, 0 };
-	int divisions[3] = {2, 2, 2};
-	MPI_Cart_create(comm, 3, divisions, periods, 0, &commWrite);
-
-	int fullsize[3], currentSize[3], offsets[3];
-	for (int i = 0; i < 3; i++)
-	{
-		fullsize[i] = origDims[i];
-		currentSize[i] = sizePerDim[i];
-		offsets[i] = rankOffset[i];
-	}
 	MPI_Datatype filetype;
-	MPI_Type_create_subarray(3, fullsize, currentSize, offsets, MPI_ORDER_C, MPI_FLOAT, &filetype);
 
+
+	int fullsize[3];
+	for (int i = 0; i < 3; i++)
+		fullsize[i] = origDims[i];
+
+	int distribs[3];
+	distribs[0] = MPI_DISTRIBUTE_BLOCK;;
+	distribs[1] = MPI_DISTRIBUTE_BLOCK;;
+	distribs[2] = MPI_DISTRIBUTE_BLOCK;;
+
+	int dargs[3];
+	dargs[0] = MPI_DISTRIBUTE_DFLT_DARG;
+	dargs[1] = MPI_DISTRIBUTE_DFLT_DARG;
+	dargs[2] = MPI_DISTRIBUTE_DFLT_DARG;
+
+	MPI_Type_create_darray(numRanks, myRank, 3, fullsize, distribs, dargs, mpiDivisions, MPI_ORDER_C, mpiDataType, &filetype);
 	MPI_Type_commit(&filetype);
-	MPI_File_open(commWrite, _filename.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fh);
 
-	MPI_File_set_view(fh, 0, MPI_FLOAT, filetype, "native", MPI_INFO_NULL);
-	MPI_File_write_all(fh, (float *)tempData, numElements, MPI_FLOAT, &status);
+	_filename = _filename + ".gda";
+	MPI_File_open(comm, _filename.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fh);
+
+	MPI_File_set_view(fh, 0, mpiDataType, filetype, "native", MPI_INFO_NULL);
+	
+
+	if (dataType == "float")
+       	MPI_File_write_all(fh, (float *)tempData, numElements, mpiDataType, &status);
+    else if (dataType == "double")
+        MPI_File_write_all(fh, (double *)tempData, numElements, mpiDataType, &status);
+    else if (dataType == "int")
+        MPI_File_write_all(fh, (int *)tempData, numElements, mpiDataType, &status);
+    else
+    {	
+    	if (myRank == 0)
+    		std::cout << "Unsupported data type " << dataType << " for VPIC GDA. The program will now exit!" << std::endl;
+
+    	MPI_Finalize();
+    }
+
+	MPI_File_close( &fh );
 
 	deAllocateMem(dataType, tempData);
 

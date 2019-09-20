@@ -148,6 +148,11 @@ inline int VTKDataLoader::loadData(std::string paramName)
 				case VTK_INT:
 					dataType = "int";
 					break;
+				default:
+					if (myRank == 0)
+						std::cout << "This datatype is not supported yet for VTK-VTK. This program will now exit!" << std::endl;
+
+					MPI_Finalize();
 			}
 
 			found = true;
@@ -221,9 +226,6 @@ inline int VTKDataLoader::loadData(std::string paramName)
 	// Create space for data and store data there
 	allocateMem(dataType, numElements, 0, data);
 
-	//data = myArray->GetVoidPointer(0);
-	// for (int i=0; i<numElements; i++)
-	// 	((float *)data)[i] = myArray->GetComponent(i, 0);
 
 	size_t indexLocal = 0;
 	for (size_t z=0; z<sizePerDim[2]; z++)
@@ -279,35 +281,53 @@ inline int VTKDataLoader::saveCompData(std::string paramName, void * cData)
 	clock.start();
 
 		
-	vtkSmartPointer<vtkFloatArray> temp = vtkFloatArray::New();
 
-
-	// if (dataType == "float")
-	// 	temp = vtkSmartPointer<vtkFloatArray>::New();
-	// else if (dataType == "double")
-	// 	temp = vtkSmartPointer<vtkDoubleArray>::New();
-	// else if (dataType == "int")
-	// 	temp = vtkSmartPointer<vtkIntArray>::New();
-
-	temp->SetNumberOfTuples(numElements);
-	temp->SetNumberOfComponents(numComponents);
-	temp->SetName(paramName.c_str());
-
-
-	for (size_t index=0; index<numElements; index++)
+	if (dataType == "float")
 	{
-		// if (dataType == "float")
-		// 	(vtkSmartPointer<vtkFloatArray>temp)->SetValue( index, ((float *)cData)[index]);
-		// else if (dataType == "double")
-		// 	(vtkSmartPointer<vtkFloatArray>temp)->SetValue( index, ((double *)cData)[index]);
-		// else if (dataType == "int")
-		// 	(vtkSmartPointer<vtkFloatArray>temp)->SetValue( index, ((int *)cData)[index]);
+		vtkSmartPointer<vtkFloatArray> temp = vtkFloatArray::New();
 
-		temp->SetValue( index, ((float *)cData)[index]);
+		temp->SetNumberOfTuples(numElements);
+		temp->SetNumberOfComponents(numComponents);
+		temp->SetName(paramName.c_str());
+
+
+		for (size_t index=0; index<numElements; index++)
+			temp->SetValue( index, ((float *)cData)[index]);
+
+		imageWriteData->GetCellData()->AddArray(temp);
 	}
+	else if (dataType == "double")
+	{
+		vtkSmartPointer<vtkDoubleArray> temp = vtkDoubleArray::New();
+
+		temp->SetNumberOfTuples(numElements);
+		temp->SetNumberOfComponents(numComponents);
+		temp->SetName(paramName.c_str());
 
 
-	imageWriteData->GetCellData()->AddArray(temp);
+		for (size_t index=0; index<numElements; index++)
+			temp->SetValue( index, ((double *)cData)[index]);
+
+		imageWriteData->GetCellData()->AddArray(temp);
+	}
+	else if (dataType == "int")
+	{
+		vtkSmartPointer<vtkIntArray> temp = vtkIntArray::New();
+
+		temp->SetNumberOfTuples(numElements);
+		temp->SetNumberOfComponents(numComponents);
+		temp->SetName(paramName.c_str());
+
+
+		for (size_t index=0; index<numElements; index++)
+			temp->SetValue( index, ((int *)cData)[index]);
+
+		imageWriteData->GetCellData()->AddArray(temp);
+	}
+	
+
+
+
 
 	imageWriteData->SetDimensions(sizePerDim[0], sizePerDim[1], sizePerDim[2]);
 	imageWriteData->SetExtent(rankOffset[0], rankOffset[0]+sizePerDim[0],

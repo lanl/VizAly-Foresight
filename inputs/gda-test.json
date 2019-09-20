@@ -1,12 +1,11 @@
 {
-	"project-home": "/home/pascal/projects/VizAly-Foresight",
+	"project-home": "/bigData/VPIC-GDA/foresight/",
 	"wflow-path": "test-GDA",
 	"foresight-home": "/home/pascal/projects/VizAly-Foresight",
 
 	"input": {
 		"filetype": "GDA",
-		"filename": "/bigData/absJ_8800",
-
+		"filename": "/bigData/VPIC-GDA/absJ_8800",
 		"scalars": 
 		[
 			"absJ_8800"
@@ -18,13 +17,8 @@
 	[
 		{
 			"name": "SZ",
-			"output-prefix": "SZ_",
+			"output-prefix": "SZ_abs_0.003_",
 			"abs": 1E-3
-		},
-
-		{
-			"name": "BLOSC",
-			"output-prefix": "BLOSC_"
 		},
 
 		{
@@ -43,6 +37,11 @@
 			"name": "fpzip",
 			"bits": 14,
 			"output-prefix": "fpzip_14_"
+		},
+
+		{
+			"name": "BLOSC",
+			"output-prefix": "BLOSC_"
 		}
 
 	],
@@ -66,7 +65,8 @@
 		"metrics": 
 		[
 			{
-				"name": "absolute_error"
+				"name": "absolute_error",
+				"histogramx" : [ "absJ_8800" ]
 			},
 
 			{
@@ -79,6 +79,10 @@
 
 			{
 				"name": "psnr"
+			},
+
+			{
+				"name" : "minmax"
 			}
 		],
 

@@ -1,11 +1,11 @@
 {
-	"project-home": "/home/pascal/projects/VizAly-Foresight",
+	"project-home": "/bigData/VPIC-Topology/Ay_2currentSheets/foresight",
 	"wflow-path": "test-VTK",
 	"foresight-home": "/home/pascal/projects/VizAly-Foresight",
 
 	"input": {
 		"filetype": "VTI",
-		"filename": "/datastore/Ay_2currentSheets/data_orig/Ay_29.vti",
+		"filename": "/bigData/VPIC-Topology/Ay_2currentSheets/data_orig/Ay_29.vti",
 
 		"scalars": 
 		[

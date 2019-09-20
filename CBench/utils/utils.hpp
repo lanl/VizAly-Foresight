@@ -234,6 +234,28 @@ inline int getDataypeSize(std::string dataType)
 }
 
 
+template <class T>
+inline void minMax(T * data, size_t numElements, T &minVal, T &maxVal, T &avg)
+{
+	minVal =  data[0];
+	maxVal =  data[0];
+	T sum = data[0];
+
+	for (size_t i=1; i<numElements; i++)
+	{
+	    T value = data[i];
+
+		if (minVal > value)
+			minVal = value;
+
+		if (maxVal < value)
+			maxVal = value;
+	}
+
+	avg = sum/numElements;
+}
+
+
 //
 // Function to validate whatever could be wrong with the input
 inline int validateInput(int argc, char *argv[], int myRank, int numRanks)

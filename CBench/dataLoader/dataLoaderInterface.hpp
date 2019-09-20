@@ -120,7 +120,7 @@ class Partition
 	}
 };
 
-Partition getPartition(int myRank, int numRanks, int extentsX, int extentsY, int extentsZ)
+inline Partition getPartition(int myRank, int numRanks, int extentsX, int extentsY, int extentsZ)
 {
 	std::list<Partition> partitions;
 	partitions.push_back(Partition{ 0, 0, 0, extentsX, extentsY, extentsZ });
@@ -212,7 +212,28 @@ Partition getPartition(int myRank, int numRanks, int extentsX, int extentsY, int
 	std::advance(it, myRank);
 
 	return *it;
+}
 
+
+inline void getMPIDivisions(int numRanks, int numDims, int divisions[3])
+{
+	divisions[0] = divisions[1] = divisions[2] = 1;
+	
+	int axis = 0;
+	while (divisions[0]*divisions[1]*divisions[2] < numRanks)
+	{
+		if (axis == 0)
+			divisions[0] = divisions[0]*2;
+		else if (axis == 1)
+			divisions[1] = divisions[1]*2;
+		else if (numDims > 2)
+			if (axis == 2)
+				divisions[2] = divisions[2]*2;
+
+		axis = axis + 1;
+		if (axis == numDims)
+			axis = 0;
+	}
 }
 
 #endif
