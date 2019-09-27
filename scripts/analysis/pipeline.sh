@@ -6,9 +6,9 @@
 #SBATCH --job-name analysis
 
 # enable or disable steps
-EXTRACT_NON_HALOS=false
+EXTRACT_NON_HALOS=true
 COMPRESS_NON_HALOS=false
-MERGE_DATASETS=true
+MERGE_DATASETS=false
 COMPUTE_POWER_SPECTRUM=false
 
 # parameters
@@ -19,8 +19,8 @@ HACC="/projects/exasky/HACC"
 BUILD="/projects/exasky/hoby-projects/cbench/build"
 INPUT_JSON="../inputs/hacc/analysis_pipeline_${SUFFIX}.json"
 POWER_SPECTRUM="${HACC}/trunk/Darwin/mpi/bin/hacc_pk_gio_auto"
-PARTICLES_DATA="/projects/exasky_data/hoby/analysis/data-combined-zip-${SUFFIX}"
-OUTPUT_DATA="/projects/exasky_data/hoby/analysis/pk-combined-zip-${SUFFIX}.dat"
+PARTICLES_DATA="/projects/exasky_data/hoby/analysis/data-combined-zip-${SUFFIX}-0.90"
+OUTPUT_DATA="/projects/exasky_data/hoby/analysis/pk-combined-zip-${SUFFIX}-0.90.dat"
 STATUS=0
 
 # extract non-halos and compute entropy if required
