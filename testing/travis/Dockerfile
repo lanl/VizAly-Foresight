@@ -12,22 +12,22 @@ RUN yum install -y epel-release && \
 
 # install gcc
 RUN yum install -y centos-release-scl && \
-    yum install -y devtoolset-6-gcc devtoolset-6-gcc-c++ \
-                   devtoolset-6-libquadmath-devel devtoolset-6-gcc-gfortran
+    yum install -y devtoolset-8-gcc devtoolset-8-gcc-c++ \
+                   devtoolset-8-libquadmath-devel devtoolset-8-gcc-gfortran
 
 # install OpenCL
 RUN yum install -y ocl-icd-devel
 
 # install CMake
 WORKDIR /src
-RUN source /opt/rh/devtoolset-6/enable && \
+RUN source /opt/rh/devtoolset-8/enable && \
     wget https://cmake.org/files/v3.11/cmake-3.11.0.tar.gz && \
     tar -zxvf cmake-3.11.0.tar.gz && cd cmake-3.11.0 && \
     ./bootstrap --prefix=/usr/local && \
     make -j $(getconf _NPROCESSORS_ONLN) install
 
 # install M4
-RUN source /opt/rh/devtoolset-6/enable && \
+RUN source /opt/rh/devtoolset-8/enable && \
     wget -O m4-1.4.9.tar.gz https://mirrors.ocf.berkeley.edu/gnu/m4/m4-1.4.9.tar.gz && \
     tar -zvxf m4-1.4.9.tar.gz && \
     cd m4-1.4.9 && \
@@ -35,7 +35,7 @@ RUN source /opt/rh/devtoolset-6/enable && \
     make -j $(getconf _NPROCESSORS_ONLN) install
 
 # install Autoconf
-RUN source /opt/rh/devtoolset-6/enable && \
+RUN source /opt/rh/devtoolset-8/enable && \
     wget https://mirrors.ocf.berkeley.edu/gnu/autoconf/autoconf-2.69.tar.gz && \
     gunzip autoconf-2.69.tar.gz && \
     tar -xvf autoconf-2.69.tar && \
@@ -44,7 +44,7 @@ RUN source /opt/rh/devtoolset-6/enable && \
     make -j $(getconf _NPROCESSORS_ONLN) install
 
 # install AutoMake
-RUN source /opt/rh/devtoolset-6/enable && \
+RUN source /opt/rh/devtoolset-8/enable && \
     wget https://mirrors.ocf.berkeley.edu/gnu/automake/automake-1.15.tar.gz && \
     tar -xvzf automake-1.15.tar.gz && \
     cd automake-1.15 && \
@@ -52,5 +52,5 @@ RUN source /opt/rh/devtoolset-6/enable && \
     make -j $(getconf _NPROCESSORS_ONLN) install
 
 # create env script
-RUN echo "source /opt/rh/devtoolset-6/enable" > env.sh && \
+RUN echo "source /opt/rh/devtoolset-8/enable" > env.sh && \
     echo "ldconfig" >> env.sh
