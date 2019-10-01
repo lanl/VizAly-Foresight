@@ -1,11 +1,11 @@
 {
-	"project-home": "/bigData/VPIC-GDA/foresight/",
-	"wflow-path": "test-GDA",
-	"foresight-home": "/home/pascal/projects/VizAly-Foresight",
+	"project-home": "/projects/exasky/pascal-projects/VizAly-Foresight/",
+	"wflow-path": "test-GDA22",
+	"foresight-home": "/projects/exasky/pascal-projects/VizAly-Foresight/",
 
 	"input": {
 		"filetype": "GDA",
-		"filename": "/bigData/VPIC-GDA/absJ_8800",
+		"filename": "/projects/groups/vizproject/dssdata/VPIC-GDA/absJ_8800",
 		"scalars": 
 		[
 			"absJ_8800"
@@ -17,18 +17,28 @@
 	[
 		{
 			"name": "SZ",
-			"output-prefix": "SZ_abs_0.003_",
+			"output-prefix": "SZ_abs_0.001_",
 			"abs": 1E-3
 		},
 
 
 		{
-			"name": "fpzip",
-			"bits": 14,
-			"output-prefix": "fpzip_14_"
-		},
+            "name": "SZ",
+            "output-prefix": "SZ_abs_0.01_",
+            "abs": 1E-2
+        },
 
-		
+		 {
+            "name": "BLOSC",
+            "output-prefix": "BLOSC_"
+        },
+
+
+		{
+			"name": "fpzip",
+			"bits": 16,
+			"output-prefix": "fpzip_24_"
+		},
 
 		{
 			"name": "zfp",
@@ -36,18 +46,11 @@
 			"abs": 1E-2
 		},
 
-		
 		{
 			"name": "fpzip",
-			"bits": 24,
-			"output-prefix": "fpzip_24_"
-		},
-
-		{
-			"name": "BLOSC",
-			"output-prefix": "BLOSC_"
+			"bits": 8,
+			"output-prefix": "fpzip_14_"
 		}
-
 	],
 
 	"cbench": 
@@ -95,8 +98,8 @@
 		"configuration": 
 		{
 			"partition": "galton",
-			"nodes": 1,
-			"ntasks-per-node": 16
+			"nodes": 8,
+			"ntasks-per-node": 8
 		}
 	},
 
@@ -141,3 +144,4 @@
 		}
 	}
 }
+

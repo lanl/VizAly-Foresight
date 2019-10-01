@@ -86,6 +86,7 @@ inline int HACCDataLoader::saveInputFileParameters()
 
 	// Open file
 	gioReader->openAndReadHeader(gio::GenericIO::MismatchRedistribute);
+	
 	int numDataRanks = gioReader->readNRanks();
 
 	if (numRanks > numDataRanks)
@@ -133,7 +134,8 @@ inline int HACCDataLoader::loadData(std::string paramName)
 
 
 	// Open file
-	gioReader->openAndReadHeader(gio::GenericIO::MismatchRedistribute);
+	//gioReader->openAndReadHeader(gio::GenericIO::MismatchRedistribute);
+	gioReader->openAndReadHeader(gio::GenericIO::MismatchAllowed);
 	int numDataRanks = gioReader->readNRanks();
 
 	if (numRanks > numDataRanks)
@@ -142,6 +144,7 @@ inline int HACCDataLoader::loadData(std::string paramName)
 		return -1;
 	}
 
+	log << "numRanks: " << numRanks << ", numDataRanks: " << numDataRanks << std::endl;
 
 	// Count number of elements
 	totalNumberOfElements = 0;
@@ -177,6 +180,7 @@ inline int HACCDataLoader::loadData(std::string paramName)
 		return -2;
 	}
 
+	MPI_Barrier(comm);
 
 	//
 	// Split ranks among data
@@ -190,7 +194,14 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	int splitDims[3];
 	gioReader->readDims(splitDims);
 	log << "splitDims: " << splitDims[0] << "," << splitDims[1] << "," << splitDims[2] << std::endl;
+	log << myRank << " ~ loadRange[0]: " << loadRange[0] << ", loadRange[1]: " << loadRange[1] << std::endl;
 
+	int diff = loadRange[1] - loadRange[0];
+	if (diff < 1)
+		std::cout << myRank << " ~ diff " << diff << std::endl;
+
+
+	MPI_Barrier(comm);
 
 
 	//
@@ -200,11 +211,19 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	for (int i = loadRange[0]; i < loadRange[1]; i++)
 	{
 		numElements += gioReader->readNumElems(i);
+
+		std::cout << "numElements: " << numElements << std::endl;
 		maxNumElementsPerRank = std::max(maxNumElementsPerRank,numElements);
 	}
 
+	std::cout << "aaaaaaaaaaaaaaaa"  << std::endl;
+	MPI_Barrier(comm);
+
 
 	allocateMem(dataType, numElements, 0, data);
+
+
+	std::cout << "bbbbbbbbbbbbbbbbbbbbbb"  << std::endl;
 
 	readInData.setNumElements(maxNumElementsPerRank);
 	readInData.alloc(1);
@@ -212,8 +231,10 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	sizePerDim[0] = numElements;	// For compression
 
 
-	log << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
-	log << "numElements: " << numElements << std::endl;
+	std::cout << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
+	
+	
+	MPI_Barrier(comm);
 
 	
 	//
@@ -225,13 +246,15 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	size_t offset = 0;
 	for (int i = loadRange[0]; i < loadRange[1]; i++) // for each rank
 	{
+		std::cout << "i: " << i << std::endl;
 		size_t Np = gioReader->readNumElems(i);
+		std::cout << "Np: " << Np << std::endl;
 
 		int coords[3];
 		gioReader->readCoords(coords, i);
-		log << "Coord indices: " << coords[0] << ", " << coords[1] << ", " << coords[2] << " | ";
+		std::cout  << "Coord indices: " << coords[0] << ", " << coords[1] << ", " << coords[2] << " | ";
 
-		log << "coordinates: (" << (float)coords[0] / splitDims[0] * physScale[0] + physOrigin[0] << ", "
+		std::cout  << "coordinates: (" << (float)coords[0] / splitDims[0] * physScale[0] + physOrigin[0] << ", "
                           << (float)coords[1] / splitDims[1] * physScale[1] + physOrigin[1] << ", "
                           << (float)coords[2] / splitDims[2] * physScale[2] + physOrigin[2] << ") -> ("
                           << (float)(coords[0] + 1) / splitDims[0] * physScale[0] + physOrigin[0] << ", "
@@ -273,7 +296,7 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	
 		gioReader->readDataSection(0, Np, i, false); // reading the whole file
 
-		
+		std::cout  << "readDataSection done! "  << std::endl;
 
 		if (readInData.dataType == "float")
 			memcpy( &((float*)data)[offset],  readInData.data, Np*readInData.size);
@@ -312,10 +335,12 @@ inline int HACCDataLoader::loadData(std::string paramName)
 		mpiCartPartitions[1] = physScale[1]/rangeY;
 		mpiCartPartitions[2] = physScale[2]/rangeZ;
 
-		log << "mpiCartPartitions: " << mpiCartPartitions[0] << ", " << mpiCartPartitions[1] << ", " << mpiCartPartitions[2] << std::endl;
+		std::cout  << "mpiCartPartitions: " << mpiCartPartitions[0] << ", " << mpiCartPartitions[1] << ", " << mpiCartPartitions[2] << std::endl;
 	}
 	
 	deAllocateMem(dataType, readInData.data);
+
+	std::cout << "data read in!!!"<< std::endl;
 
 	return 1; // All good
 }

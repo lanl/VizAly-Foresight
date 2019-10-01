@@ -132,7 +132,6 @@ int main(int argc, char *argv[])
 	overallClock.start();
 
 
-
 	//
 	// Open data file
 	DataLoaderInterface *ioMgr;
@@ -172,7 +171,6 @@ int main(int argc, char *argv[])
 		if (writeData)
 			ioMgr->saveInputFileParameters();
 	}
-
 
 
 	//

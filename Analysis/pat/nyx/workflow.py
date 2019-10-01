@@ -5,6 +5,7 @@ To run executable do:
 python3 -m pat.nyx.workflow --input-file ../inputs/tests/test-nyx-foresight.json
 python3 -m pat.nyx.workflow --input-file ../inputs/tests/test-nyx-analysis-cinema.json --analysis-cinema
 python3 -m pat.nyx.workflow --input-file ../inputs/tests/test-nyx-cinema.json --cinema
+python3 -m pat.nyx.workflow --input-file ../inputs/tests/test-nyx-foresight.json --cbench
 """
 
 import sys

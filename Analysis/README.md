@@ -35,6 +35,12 @@ $ python3 -m pat.nyx.workflow --input-file ../inputs/nyx/darwin_nyx_galton_wflow
 
 
 ### Options
+Available:
+ 	* --preview
+	* --cinema
+	* --analysis_cinema
+	* --cbench 
+
 Append the following options for the behavior below
 * --preview: only create the scripts but do not launch them
 
@@ -101,3 +107,5 @@ Append the following options for the behavior below
 	        ]
 	    }
 	    ```
+* --cbench: only runs CBench
+	
