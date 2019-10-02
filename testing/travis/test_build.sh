@@ -31,8 +31,9 @@ cat metrics_NYX_Travis_.csv
 cd ..
 pip3 install -r testing/travis/requirements.txt
 
+
 # test HACC workflow generator and executables
-cd Analysis
+cd /src/Analysis
 python3 -m pat.nyx.workflow --input-file ../testing/scripts/NYX_workflow.json --preview
 
 #python3 -m pat.hacc.pat_hacc --input-file ../inputs/hacc/hacc_wflow.json --preview
