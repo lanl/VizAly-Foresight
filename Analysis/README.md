@@ -108,4 +108,15 @@ Append the following options for the behavior below
 	    }
 	    ```
 * --cbench: only runs CBench
+		```
+		"pat" :
+		{
+			.
+			.
+			.
+
+			"input-files": [],
+			"analysis": []
+	    }
+	    ```
 	

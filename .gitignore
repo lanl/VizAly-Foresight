@@ -102,6 +102,9 @@ install-*/
 .idea/
 venv
 
+#MAC
+.Trash*
+
 # sublime text
 *-sublime-project
 *-sublime-project.sublime-workspace
