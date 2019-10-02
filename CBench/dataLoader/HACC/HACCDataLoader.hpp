@@ -82,8 +82,8 @@ inline void HACCDataLoader::init(std::string _filename, MPI_Comm _comm)
 inline int HACCDataLoader::saveInputFileParameters()
 {
 	gio::GenericIO *gioReader;
-	//gioReader = new gio::GenericIO(comm, filename);
-	gioReader = new gio::GenericIO(filename);
+	gioReader = new gio::GenericIO(comm, filename);
+	//gioReader = new gio::GenericIO(filename);
 
 
 	// Open file
@@ -131,8 +131,8 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	param = paramName;
 
 	// Init GenericIO reader + open file
-	//gioReader = new gio::GenericIO(comm, filename);
-	gioReader = new gio::GenericIO(filename);
+	gioReader = new gio::GenericIO(comm, filename);
+	//gioReader = new gio::GenericIO(filename);
 
 
 
