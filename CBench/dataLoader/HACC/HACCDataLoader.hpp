@@ -43,7 +43,7 @@ class HACCDataLoader: public DataLoaderInterface
 	int saveCompData(std::string paramName, void * cData);
 	int writeData(std::string _filename);
 	int saveInputFileParameters();
-	int close() { return deAllocateMem(data); }
+	int close() { return deAllocateMem(dataType, data); }
 	void setParam(std::string paramName, std::string type, std::string value){};
   bool loadUncompressedFields(nlohmann::json const&) { return false; }
 };
@@ -62,7 +62,7 @@ inline HACCDataLoader::HACCDataLoader()
 
 inline HACCDataLoader::~HACCDataLoader()
 {
-	deAllocateMem(data);
+	deAllocateMem(dataType, data);
 }
 
 
@@ -83,9 +83,12 @@ inline int HACCDataLoader::saveInputFileParameters()
 {
 	gio::GenericIO *gioReader;
 	gioReader = new gio::GenericIO(comm, filename);
+	//gioReader = new gio::GenericIO(filename);
+
 
 	// Open file
 	gioReader->openAndReadHeader(gio::GenericIO::MismatchRedistribute);
+	
 	int numDataRanks = gioReader->readNRanks();
 
 	if (numRanks > numDataRanks)
@@ -129,6 +132,8 @@ inline int HACCDataLoader::loadData(std::string paramName)
 
 	// Init GenericIO reader + open file
 	gioReader = new gio::GenericIO(comm, filename);
+	//gioReader = new gio::GenericIO(filename);
+
 
 
 
@@ -142,6 +147,7 @@ inline int HACCDataLoader::loadData(std::string paramName)
 		return -1;
 	}
 
+	log << "numRanks: " << numRanks << ", numDataRanks: " << numDataRanks << std::endl;
 
 	// Count number of elements
 	totalNumberOfElements = 0;
@@ -190,6 +196,11 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	int splitDims[3];
 	gioReader->readDims(splitDims);
 	log << "splitDims: " << splitDims[0] << "," << splitDims[1] << "," << splitDims[2] << std::endl;
+	log << myRank << " ~ loadRange[0]: " << loadRange[0] << ", loadRange[1]: " << loadRange[1] << std::endl;
+
+
+
+
 
 
 
@@ -206,14 +217,13 @@ inline int HACCDataLoader::loadData(std::string paramName)
 
 	allocateMem(dataType, numElements, 0, data);
 
+
 	readInData.setNumElements(maxNumElementsPerRank);
 	readInData.alloc(1);
 
 	sizePerDim[0] = numElements;	// For compression
 
 
-	log << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
-	log << "numElements: " << numElements << std::endl;
 
 	
 	//
@@ -273,7 +283,6 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	
 		gioReader->readDataSection(0, Np, i, false); // reading the whole file
 
-		
 
 		if (readInData.dataType == "float")
 			memcpy( &((float*)data)[offset],  readInData.data, Np*readInData.size);
@@ -312,10 +321,11 @@ inline int HACCDataLoader::loadData(std::string paramName)
 		mpiCartPartitions[1] = physScale[1]/rangeY;
 		mpiCartPartitions[2] = physScale[2]/rangeZ;
 
-		log << "mpiCartPartitions: " << mpiCartPartitions[0] << ", " << mpiCartPartitions[1] << ", " << mpiCartPartitions[2] << std::endl;
+		log  << "mpiCartPartitions: " << mpiCartPartitions[0] << ", " << mpiCartPartitions[1] << ", " << mpiCartPartitions[2] << std::endl;
 	}
 	
-	deAllocateMem(readInData.data);
+	deAllocateMem(dataType, readInData.data);
+
 
 	return 1; // All good
 }
@@ -347,6 +357,7 @@ inline int HACCDataLoader::saveCompData(std::string paramName, void * cData)
 
 inline int HACCDataLoader::writeData(std::string _filename)
 {
+  #ifndef GENERICIO_NO_MPI
 	Timer clock;
 	log.str("");
 	
@@ -413,7 +424,7 @@ inline int HACCDataLoader::writeData(std::string _filename)
 
 	clock.stop();
 	log << "Writing data took " << clock.getDuration() << " s" << std::endl;
-
+  #endif
 	return 1;
 }
 

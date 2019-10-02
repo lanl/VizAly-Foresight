@@ -1,6 +1,6 @@
-option(CBENCH_ENABLE_MGARD "Enable MGARD." OFF)
+option(CBENCH_COMPRESSOR_MGARD "Enable MGARD." OFF)
 
-if (CBENCH_ENABLE_MGARD)
+if (CBENCH_COMPRESSOR_MGARD)
 	set(MY_LIBS "")
 
     #Asks for MGARD library

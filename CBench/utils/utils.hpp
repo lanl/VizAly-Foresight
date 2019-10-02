@@ -20,6 +20,7 @@ Authors:
 #include <fstream>
 #include <iostream>
 #include <sys/stat.h>
+#include <mpi.h>
 
 #ifdef _WIN32
 	#include <direct.h>
@@ -96,6 +97,41 @@ inline std::string extractFileName(std::string inputString)
 }
 
 
+
+//
+// MPI datatype
+inline MPI_Datatype getMPIType(std::string dataType)
+{
+	if (dataType == "double")
+		return MPI_DOUBLE;
+	else if (dataType == "float")
+		return MPI_FLOAT;
+	else if (dataType == "int")
+		return MPI_INT;
+	else if (dataType == "long")
+		return MPI_LONG;
+	else if (dataType == "int8_t")
+		return MPI_INT8_T;
+	else if (dataType == "int16_t")
+		return MPI_INT16_T;
+	else if (dataType == "int32_t")
+		return MPI_INT32_T;
+	else if (dataType == "int64_t")
+		return MPI_INT64_T;
+	else if (dataType == "uint8_t")
+		return MPI_UINT8_T;
+	else if (dataType == "uint16_t")
+		return MPI_UINT16_T;
+	else if (dataType == "uint32_t")
+		return MPI_UINT32_T;
+	else if (dataType == "uint64_t")
+		return MPI_UINT64_T;
+	else if (dataType == "size_t")
+		return MPI_UNSIGNED_LONG_LONG;
+	else
+        return 0;
+}
+
 //
 // Allocates memory based on the string size name, adds an offset
 inline int allocateMem(std::string dataType, size_t numElements, int offset, void *& data)
@@ -104,6 +140,8 @@ inline int allocateMem(std::string dataType, size_t numElements, int offset, voi
 		data = new float[numElements + offset];
 	else if (dataType == "double")
 		data = new double[numElements + offset];
+	else if (dataType == "int")
+		data = new int[numElements + offset];
 	else if (dataType == "int8_t")
 		data = new int8_t[numElements + offset];
 	else if (dataType == "int16_t")
@@ -129,17 +167,93 @@ inline int allocateMem(std::string dataType, size_t numElements, int offset, voi
 
 //
 // Generic memory deallocator
-inline int deAllocateMem(void *& data)
+inline int deAllocateMem(std::string dataType, void *& data)
 {
-	if (data == NULL) // already deallocated!
-		return 1;
+    if (data == NULL) // already deallocated!
+        return 1;
 
-	delete[] data;
-	data = NULL;
+    if (dataType == "float")
+        delete[](float*) data;
+    else if (dataType == "double")
+        delete[](double*) data;
+    else if (dataType == "int")
+        delete[](int*) data;
+    else if (dataType == "int8_t")
+        delete[](int8_t*) data;
+    else if (dataType == "int16_t")
+        delete[](int16_t*) data;
+    else if (dataType == "int32_t")
+        delete[](int32_t*) data;
+    else if (dataType == "int64_t")
+        delete[](int64_t*) data;
+    else if (dataType == "uint8_t")
+        delete[](uint8_t*) data;
+    else if (dataType == "uint16_t")
+        delete[](uint16_t*) data;
+    else if (dataType == "uint32_t")
+        delete[](uint32_t*) data;
+    else if (dataType == "uint64_t")
+        delete[](uint64_t*) data;
+    else
+        return 0;
 
-	return 1;
+    data = NULL;
+
+    return 1;
 }
 
+
+
+// Generic memory deallocator
+inline int getDataypeSize(std::string dataType)
+{
+    if (dataType == "float")
+       	return 4;
+    else if (dataType == "double")
+        return 8;
+    else if (dataType == "int")
+        return 4;
+    else if (dataType == "int8_t")
+        return 1;
+    else if (dataType == "int16_t")
+        return 2;
+    else if (dataType == "int32_t")
+        return 4;
+    else if (dataType == "int64_t")
+        return 8;
+    else if (dataType == "uint8_t")
+        return 1;
+    else if (dataType == "uint16_t")
+        return 2;
+    else if (dataType == "uint32_t")
+        return 4;
+    else if (dataType == "uint64_t")
+        return 8;
+
+    return 0;
+}
+
+
+template <class T>
+inline void minMax(T * data, size_t numElements, T &minVal, T &maxVal, T &avg)
+{
+	minVal =  data[0];
+	maxVal =  data[0];
+	T sum = data[0];
+
+	for (size_t i=1; i<numElements; i++)
+	{
+	    T value = data[i];
+
+		if (minVal > value)
+			minVal = value;
+
+		if (maxVal < value)
+			maxVal = value;
+	}
+
+	avg = sum/numElements;
+}
 
 
 //

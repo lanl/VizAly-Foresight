@@ -33,15 +33,7 @@ Authors:
 // Factories
 #include "compressorFactory.hpp"
 #include "metricFactory.hpp"
-
-// Readers
-#include "BinaryDataLoader.hpp"
-#include "HACCDataLoader.hpp"
-
-#ifdef CBENCH_HAS_NYX
-	#include "NYXDataLoader.hpp"
-#endif
-
+#include "dataLoaderFactory.hpp"
 
 
 int main(int argc, char *argv[])
@@ -62,8 +54,6 @@ int main(int argc, char *argv[])
 		MPI_Finalize();
 		return 0;
 	}
-
-
 
 	//
 	// Load input
@@ -100,6 +90,7 @@ int main(int argc, char *argv[])
 			createFolder(outputPath);
 	}
 
+	createFolder("logs");
 	std::string outputLogFilename = "logs/" + jsonInput["cbench"]["output"]["log-file"].get<std::string>() + "_" + std::to_string(myRank);
 
 
@@ -141,40 +132,27 @@ int main(int argc, char *argv[])
 	overallClock.start();
 
 
-
 	//
 	// Open data file
 	DataLoaderInterface *ioMgr;
 	{
 		std::string inputFileType = jsonInput["input"]["filetype"];
+		ioMgr = DataLoaderFactory::createLoader(inputFileType);
 
-		if (inputFileType == "Binary")
-			ioMgr = new BinaryDataLoader();
-		else if (inputFileType == "HACC")
-			ioMgr = new HACCDataLoader();
-		#ifdef CBENCH_HAS_NYX
-		else if (inputFileType == "NYX")
+		if (ioMgr == NULL)
 		{
-			ioMgr = new NYXDataLoader();
-			if (inputFileType == "NYX")
-			{
-				if (jsonInput["input"].find("group") != jsonInput["input"].end())
-				{
-					ioMgr->setParam("group", "string", jsonInput["input"]["group"]);
-				}
-			}
-		}
-		#endif
-		else
-		{
-			// Exit if no input file is provided
 			if (myRank == 0)
-				std::cout << "Unsupported format " << inputFileType << "!!!" << std::endl;
-
+				std::cout << "Unsupported loader: " << inputFileType << " ... exiting!" << std::endl;
+			
 			MPI_Finalize();
 			return 0;
 		}
-	
+		else if (inputFileType == "NYX")
+		{
+			if (jsonInput["input"].find("group") != jsonInput["input"].end())
+				ioMgr->setParam("group", "string", jsonInput["input"]["group"]);
+		}
+
 
 		//
 		// Check if the datainfo field exist for a dataset
@@ -193,7 +171,6 @@ int main(int argc, char *argv[])
 		if (writeData)
 			ioMgr->saveInputFileParameters();
 	}
-
 
 
 	//
@@ -408,6 +385,7 @@ int main(int argc, char *argv[])
 				debuglog << "writing: " << scalars[i] << std::endl;
 
 				ioMgr->saveCompData(scalars[i], decompdata);
+				
 				debuglog << ioMgr->getLog();
 			}
 
@@ -478,6 +456,7 @@ int main(int argc, char *argv[])
 			{
 				if (!ioMgr->inOutData[i].doWrite)
 				{
+					debuglog << "writing uncoompressed" << std::endl;
 					ioMgr->loadData(ioMgr->inOutData[i].name);
 					ioMgr->saveCompData(ioMgr->inOutData[i].name, ioMgr->data);
 					ioMgr->close();
@@ -502,6 +481,9 @@ int main(int argc, char *argv[])
 
 
 			clockWrite.stop();
+
+			if (myRank == 0)
+				std::cout << "wrote out " << decompressedOutputName << "." << std::endl;
 
 			debuglog << ioMgr->getLog();
 			debuglog << "Write output took: " << clockWrite.getDuration() << " s " << std::endl;

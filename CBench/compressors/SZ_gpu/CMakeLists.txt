@@ -1,6 +1,6 @@
-option(CBENCH_ENABLE_SZ_GPU "Enable SZ_gpu." OFF)
+option(CBENCH_COMPRESSOR_SZ_GPU "Enable SZ_gpu." OFF)
 
-if (CBENCH_ENABLE_SZ_GPU)
+if (CBENCH_COMPRESSOR_SZ_GPU)
 	set(MY_LIBS "")
 
     #Asks for SZ_gpu library + set that in EXTRA_LIBS

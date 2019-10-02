@@ -1,5 +1,11 @@
 #! /usr/bin/env python
-import sys, os, json, csv, argparse
+import sys
+import os
+import json
+import csv
+import argparse
+import shutil
+import subprocess
 from collections import OrderedDict
 
 
@@ -17,10 +23,14 @@ def splitString(filename, char):
 	return filename[:k+1], filename[k+1:]
 
 
-
 # Commands
 def run_command(cmd):
 	return subprocess.call(cmd, shell=True)
+
+
+def get_git_version(path):
+	git_tag = os.popen("cd " + path + "; git describe --tags").read()
+	return git_tag
 
 
 # Folders
@@ -32,6 +42,16 @@ def create_folder(path):
 			print ("Creation of the directory %s failed" % path)
 		else:  
 			print ("Successfully created the directory %s " % path)
+
+
+def delete_folder(path):
+	if not os.path.exists(path):
+		try:  
+			shutil.rmtree(path)
+		except OSError:  
+			print ("Deletion of the directory %s failed" % path)
+		else:  
+			print ("Successfully deleted the directory %s " % path)
 
 
 def list_files_in_folder(folder):
@@ -85,6 +105,22 @@ def extract_csv_col(filename, delimiter_char, colpos):
 				col.append( float(row[colpos]) )
 
 			return col
+
+		except ValueError as e:
+			print ("CSV file " + filename + " is invalid! " + str(e))
+			exit(1)
+
+
+def extract_csv_cell(filename, delimiter_char, col, row):
+	if ( not os.path.isfile(filename) ):
+		print( filename + " does not exist! ")
+		return None
+
+
+	with open(filename) as csv_file:
+		try:
+			data = [row for row in csv.reader(csv_file, delimiter=delimiter_char)]
+			return data[col][row]
 
 		except ValueError as e:
 			print ("CSV file " + filename + " is invalid! " + str(e))

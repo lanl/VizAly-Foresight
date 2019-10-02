@@ -37,6 +37,22 @@ namespace strConvert
 		return sstr.str();
 	}
 
+	template <class T>
+	inline T to_x(std::string value)
+	{
+		std::stringstream sstr(value);
+		T val;
+		sstr >> val;
+		return val;
+	}
+
+	template <class T>
+	void to_x(std::string value, T &val)
+	{
+		std::stringstream sstr(value);
+		sstr >> val;
+	}
+
 	inline double to_double(std::string value)
 	{
 		std::stringstream sstr(value);

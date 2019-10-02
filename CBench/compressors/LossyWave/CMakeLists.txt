@@ -1,6 +1,6 @@
-option(CBENCH_ENABLE_LOSSY_WAVE "Enable LossyWave." OFF)
+option(CBENCH_COMPRESSOR_LOSSY_WAVE "Enable LossyWave." OFF)
 
-if (CBENCH_ENABLE_LOSSY_WAVE)
+if (CBENCH_COMPRESSOR_LOSSY_WAVE)
 	set(MY_LIBS "")
 
     #Asks for LossyWave library

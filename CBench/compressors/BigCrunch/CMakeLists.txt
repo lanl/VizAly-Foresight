@@ -1,6 +1,6 @@
-option(CBENCH_ENABLE_BIG_CRUNCH "Enable BigCrunch." OFF)
+option(CBENCH_COMPRESSOR_BIG_CRUNCH "Enable BigCrunch." OFF)
 
-if (CBENCH_ENABLE_BIG_CRUNCH)
+if (CBENCH_COMPRESSOR_BIG_CRUNCH)
 	set(MY_LIBS "")
 
     #Asks for BigCrucnch library

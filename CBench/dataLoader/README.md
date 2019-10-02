@@ -25,3 +25,13 @@ ccmake ../CBench
 4. turn 'USE_NEW_LOADER' 'ON', and re-configure. This should ask you to specify the locaton of your new reader's library and include path, e.g.:
 
 5. Add your loader to the input json file and run the benchmark
+
+
+
+## Supported Loaders
+1. GenericIO/HACC
+2. NYX HDF5
+3. VTI
+4. Binary Data (under VPIC GDA)
+
+More information about these are in their respective readme.

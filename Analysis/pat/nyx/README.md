@@ -39,4 +39,4 @@ Range of k (x-axis) to plot : 0-10
 
 
 ## Running:
-Run analysis as follows: python pat_nyx.py --input-file ../inputs/nyx/darwin-nyx-template.json --submit
+Run analysis as follows: python3 -m pat.nyx.workflow --input-file ../inputs/nyx/darwin-nyx-template.json
