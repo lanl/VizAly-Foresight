@@ -162,7 +162,7 @@ def main():
 
 
 	# create Workflow instance
-	wflow_dir = wflow_data["project-home"] + wflow_data['wflow-path']
+	wflow_dir = wflow_data["project-home"] + wflow_data["wflow-path"]
 	wflow = NYXWorkflow("wflow", wflow_data, workflow_dir=wflow_dir)
 
 
