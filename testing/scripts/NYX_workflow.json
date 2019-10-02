@@ -1,0 +1,391 @@
+{
+    "project-home": "/projects/exasky/pascal-projects/VizAly-Foresight/",
+    "wflow-path": "test-wflow",
+    "foresight-home": "/projects/exasky/pascal-projects/VizAly-Foresight/",
+
+    "input": 
+    {
+        "filetype": "NYX",
+        "filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",
+        "group": "native_fields",
+        "scalars": [
+            "baryon_density",
+            "dark_matter_density",
+            "temperature",
+            "velocity_x",
+            "velocity_y",
+            "velocity_z"
+        ],
+
+        "uncompressed": [
+            {
+                "group": "domain",
+                "attributes": [
+                    {
+                        "name": "shape",
+                        "type": "int",
+                        "size": 3
+                    },
+                    {
+                        "name": "size",
+                        "type": "double",
+                        "size": 3
+                    }
+                ]
+            },
+            {
+                "group": "universe",
+                "attributes": [
+                    {
+                        "name": "hubble",
+                        "type": "double",
+                        "size": 1
+                    },
+                    {
+                        "name": "omega_b",
+                        "type": "double",
+                        "size": 1
+                    },
+                    {
+                        "name": "omega_l",
+                        "type": "double",
+                        "size": 1
+                    },
+                    {
+                        "name": "omega_m",
+                        "type": "double",
+                        "size": 1
+                    },
+                    {
+                        "name": "redshift",
+                        "type": "double",
+                        "size": 1
+                    }
+                ]
+            }
+        ]
+    },
+
+    "compressors": 
+    [
+        {
+            "name": "BLOSC",
+            "output-prefix": "blosc_"
+        },
+        
+        {
+            "name": "fpzip",
+            "output-prefix": "fpzip_",
+            "compressor-params": [
+                {
+                    "scalar": [
+                        "baryon_density",
+                        "dark_matter_density"
+                    ],
+                    "bits": 18
+                },
+                {
+                    "scalar": [
+                        "temperature"
+                    ],
+                    "bits": 12
+                },
+                {
+                    "scalar": [
+                        "velocity_x",
+                        "velocity_y",
+                        "velocity_z"
+                    ],
+                    "bits": 14
+                }
+            ]
+        },
+        {
+            "name": "SZ",
+            "output-prefix": "sz_pwrel_",
+            "compressor-params": [
+                {
+                    "scalar": [
+                        "baryon_density",
+                        "dark_matter_density"
+                    ],
+                    "pw_rel": 0.01
+                },
+                {
+                    "scalar": [
+                        "temperature"
+                    ],
+                    "pw_rel": 0.25
+                },
+                {
+                    "scalar": [
+                        "velocity_x",
+                        "velocity_y",
+                        "velocity_z"
+                    ],
+                    "pw_rel": 0.05
+                }
+            ]
+        },
+        {
+            "name": "SZ",
+            "output-prefix": "sz_abs_run1_",
+            "compressor-params": [
+                {
+                    "scalar": [
+                        "baryon_density",
+                        "dark_matter_density"
+                    ],
+                    "abs": 1
+                },
+                {
+                    "scalar": [
+                        "temperature"
+                    ],
+                    "abs": 1000
+                },
+                {
+                    "scalar": [
+                        "velocity_x",
+                        "velocity_y",
+                        "velocity_z"
+                    ],
+                    "abs": 1000000
+                }
+            ]
+        },
+        {
+            "name": "SZ",
+            "output-prefix": "sz_abs_run2_",
+            "compressor-params": [
+                {
+                    "scalar": [
+                        "baryon_density",
+                        "dark_matter_density"
+                    ],
+                    "abs": 2
+                },
+                {
+                    "scalar": [
+                        "temperature"
+                    ],
+                    "abs": 5000
+                },
+                {
+                    "scalar": [
+                        "velocity_x",
+                        "velocity_y",
+                        "velocity_z"
+                    ],
+                    "abs": 1000000
+                }
+            ]
+        },
+        {
+            "name": "zfp",
+            "output-prefix": "zfp_abs_run1_",
+            "compressor-params": [
+                {
+                    "scalar": [
+                        "baryon_density",
+                        "dark_matter_density"
+                    ],
+                    "abs": 2
+                },
+                {
+                    "scalar": [
+                        "temperature"
+                    ],
+                    "abs": 5000
+                },
+                {
+                    "scalar": [
+                        "velocity_x",
+                        "velocity_y",
+                        "velocity_z"
+                    ],
+                    "abs": 1000000
+                }
+            ]
+        },
+        {
+            "name": "zfp",
+            "output-prefix": "zfp_abs_run2_",
+            "compressor-params": [
+                {
+                    "scalar": [
+                        "baryon_density",
+                        "dark_matter_density"
+                    ],
+                    "abs": 5
+                },
+                {
+                    "scalar": [
+                        "temperature"
+                    ],
+                    "abs": 10000
+                },
+                {
+                    "scalar": [
+                        "velocity_x",
+                        "velocity_y",
+                        "velocity_z"
+                    ],
+                    "abs": 5000000
+                }
+            ]
+        }
+    ],
+
+    "cbench": 
+    {
+        "path": "mpirun -np 64 --oversubscribe $foresight-home$build/CBench",
+        "output": 
+        {
+            "output-decompressed": true,
+            "output-decompressed-location": "decompressed_files",
+            "log-file": "runlog_",
+            "metrics-file": "metrics_"
+        },
+
+        "metrics-comment": "which metrics to use",
+        "metrics": 
+        [
+            {
+                "name": "absolute_error",
+                "histogram": [
+                    "baryon_density",
+                    "dark_matter_density",
+                    "temperature",
+                    "velocity_x",
+                    "velocity_y",
+                    "velocity_z"
+                ]
+            },
+            {
+                "name": "relative_error"
+            },
+            {
+                "name": "mse"
+            },
+            {
+                "name": "psnr"
+            },
+            {
+                "name": "minmax",
+                "histogram": [
+                    "baryon_density",
+                    "dark_matter_density",
+                    "temperature",
+                    "velocity_x",
+                    "velocity_y",
+                    "velocity_z"
+                ]
+            }
+        ],
+
+        "evn_path": "scripts/VizAly-CBench.bash.darwin",
+        "configuration": 
+        {
+            "partition": "amd-epyc",
+            "nodes": 1,
+            "ntasks-per-node": "64"
+        }
+    },
+
+    "pat": 
+    {
+        "evn_path": "scripts/VizAly-CBench.bash.darwin",
+        "analysis-tool": {
+            "gimlet-home": "/projects/exasky/gimlet2",
+            "analytics": [
+                {
+                    "name": "sim_stats",
+                    "type": [
+                        "rhob",
+                        "rhom",
+                        "rhodm",
+                        "temp",
+                        "velmag",
+                        "vz"
+                    ],
+                    "postfix": "_ps3d.txt",
+                    "path": "mpirun /projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex",
+                    "configuration": {
+                        "partition": "scaling",
+                        "nodes": 4,
+                        "ntasks-per-node": 16
+                    }
+                },
+                {
+                    "name": "lya_all_axes",
+                    "type": [
+                        "x",
+                        "y",
+                        "z"
+                    ],
+                    "postfix": "_flux_ps1d.txt",
+                    "path": "mpirun /projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex",
+                    "command": "cp /projects/exasky/gimlet2/treecools/TREECOOL_middle .",
+                    "configuration": {
+                        "partition": "scaling",
+                        "nodes": 4,
+                        "ntasks-per-node": 16
+                    }
+                }
+            ]
+        },
+        "input-files": 
+        [
+        
+        ],
+        "analysis": 
+        [
+            
+        ]
+    },
+
+    "cinema-plots": 
+    {
+        "cinema-db-name": "cinemaDB",
+        "plotting": 
+        {
+            "csv-entries" :
+            {
+                "header" : [  "FILE_Histogram", "FILE_Absolute_Error", "FILE_SimStats_Pk_1", "FILE_SimStats_Pk_2", "FILE_lya_all_axes_x_Pk", "FILE_lya_all_axes_y_Pk", "FILE_lya_all_axes_z_Pk" ],
+                "values" : 
+                [
+                    "histogram", 
+                    "Absolute_Error",  
+                    [ "sim_stats_rhob", "sim_stats_rhom", "sim_stats_temp","sim_stats_velmag","sim_stats_velmag", "sim_stats_velmag" ], 
+                    [ "rhodm", "rhodm", "", "", "", "sim_stats_vz" ],
+                     "lya_all_axes_x.png", 
+                     "lya_all_axes_y.png", 
+                     "lya_all_axes_z.png"
+                ]
+            },
+
+            "x-range": 
+            [
+                0,
+                11
+            ],
+
+            "checks": 
+            [
+                {
+                    "operand": "pk_ratio",
+                    "operator": "<",
+                    "result": 0.01
+                }
+            ]
+        },
+        "evn_path": "scripts/VizAly-CBench.bash.darwin",
+        "configuration": {
+            "partition": "scaling",
+            "nodes": 1
+        }
+    },
+
+    "git-tag": "v1.3-13-g8057496"
+}
