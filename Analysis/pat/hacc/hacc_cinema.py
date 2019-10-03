@@ -19,7 +19,6 @@ class PATCinema(cinema.CinemaWorkflow):
     def prepare_cinema(self):
 
         # open CSV file
-        print(self.json_data)
         metrics_csv = self.json_data["project-home"] +  self.json_data["wflow-path"] + "/cbench/" + self.json_data["cbench"]["output"]["metrics-file"] + ".csv"
 
         # get list of all images
