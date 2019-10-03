@@ -11,7 +11,6 @@ setuptools.setup(
     description="Toolkit for running analysis at scale using Slurm",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages
     url="https://github.com/lanl/VizAly-Foresight/tree/master/Analysis/pat",
     packages=setuptools.find_packages(),
     classifiers=[
