@@ -101,7 +101,7 @@
             {
                 "spectrum" :
                 {
-                    "path" : "/home/cmbiwer/projects/vpic/vpic_spectrum",
+                    "path" : "python /home/cmbiwer/projects/vpic/vpic_spectrum",
                     "configuration" :
                     {
                         "partition" : "general",
