@@ -71,7 +71,7 @@ class VPICWorkflow(workflow.Workflow):
         cinema_job = j.Job(name="cinema",
                            execute_dir="cinema",
                            executable=cinema_exe,
-                           arguments=["--input-file", self.workflow_dir + "/" + self.json_path],
+                           arguments=["--input-file", self.json_path],
                            configurations=configurations,
                            environment=environment)
 
