@@ -25,8 +25,6 @@ class VPICWorkflow(workflow.Workflow):
         spectrum_config = self.configuration_from_json_data(spectrum_section)
         spectrum_exe = self.json_data["pat"]["analysis-tool"]["analytics"] \
                                      [spectrum_section]["path"]
-        spectrum_config_path = self.json_data["pat"]["analysis-tool"]["analytics"] \
-                                             [spectrum_section]["config-file"]
 
         # create jobs to run analysis jobs on each output file from CBench
         for path in self.json_data["pat"]["input-files"]:
@@ -49,7 +47,7 @@ class VPICWorkflow(workflow.Workflow):
             self.add_job(spectrum_job)
 
             # track output files
-            self.json_data["pat"]["analysis"].append({"output-column" : "FILE_Spectrum{}".format(ext),
+            self.json_data["pat"]["analysis"].append({"output-column" : "FILE_Spectrum",
                                                       "output-prefix" : prefix, "path" : spectrum_file})
 
     def add_cinema_plotting_jobs(self):
