@@ -94,7 +94,7 @@
     },
 
     "pat" : {
-        "evn_path": "scripts/VizAly-CBench.bash.darwin",
+        "evn_path": "$foresight-home$/scripts/VizAly-CBench.bash.darwin",
         "analysis-tool" :
         {
             "analytics" :
