@@ -7,8 +7,8 @@ setuptools.setup(
     name="vizaly-pat_USERNAME",
     version="0.0.1",
     author="Pascal Grosset, Chris Biwer, Jesus Pulido",
-    author_email="exasky@lanl.com",
-    description="Toolkit for running analysis at scale using slurm",
+    author_email="exasky@lanl.gov",
+    description="Toolkit for running analysis at scale using Slurm",
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages
