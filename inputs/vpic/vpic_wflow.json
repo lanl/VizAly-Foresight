@@ -56,7 +56,7 @@
         "path" : "mpirun $foresight-home$/build/CBench",
         "output" :
         {
-            "run-path" : "/projects/exasky/run/hacc_wflow",
+            "run-path" : "/projects/exasky/run/vpic_wflow",
             "output-decompressed" : true,
             "output-decompressed-location" : "decompressed_files",
             "log-file" : "runlog",
