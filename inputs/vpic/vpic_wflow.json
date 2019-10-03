@@ -101,7 +101,7 @@
             {
                 "spectrum" :
                 {
-                    "path" : "/home/cmbiwer/projects/vpic",
+                    "path" : "/home/cmbiwer/projects/vpic/vpic_spectrum",
                     "configuration" :
                     {
                         "partition" : "general",
@@ -116,7 +116,7 @@
 
     "cinema-plots" :
     {
-        "path" : "python $foresight-home$/Analysis/vpic/pat_cinema.py",
+        "path" : "python $foresight-home$/Analysis/pat/hacc/hacc_cinema.py",
         "analysis" : {
             "FILE_Spectrum" :
             {
