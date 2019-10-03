@@ -85,6 +85,10 @@ install-*/
 # Compiled Python
 *.pyc
 
+# Python packaging
+dist/
+vizaly_pat_*.egg-info
+
 # Executables
 *.exe
 *.out
