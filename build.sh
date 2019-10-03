@@ -160,6 +160,7 @@ elif [ $buildOpt = "Default" ]; then
 	if [ $buildPlatform = "cori" ]; then
 		echo "..Building on Cori.."
 		cmake ../CBench $opt\
+                        -DCBENCH_LOADER_GDA=ON \
 			-DCBENCH_LOADER_NYX=ON \
 			-DHDF5_DIR=$externalDependencies/hdf5/install/share/cmake/hdf5 \
 			-DCBENCH_COMPRESSOR_BLOSC=ON \
@@ -182,6 +183,7 @@ elif [ $buildOpt = "Default" ]; then
 			-DCMAKE_BUILD_TYPE=$buildType
 	else
 		cmake ../CBench $opt\
+                        -DCBENCH_LOADER_GDA=ON \
 			-DCBENCH_LOADER_NYX=ON \
 			-DHDF5_DIR=$externalDependencies/hdf5/install/share/cmake/hdf5 \
 			-DCBENCH_COMPRESSOR_BLOSC=ON \
@@ -233,6 +235,7 @@ elif [ $buildOpt = "all" ]; then
 	if [ "$PLATFORM" = "travis" ]; then
 	  echo "Travis: Using internal HDF5 build"
 	  cmake ../CBench $opt\
+                -DCBENCH_LOADER_GDA=ON \
 		-DCBENCH_LOADER_NYX=ON \
 		-DCBENCH_COMPRESSOR_BLOSC=ON \
 		-DBLOSC_INCLUDE_PATH=$externalDependencies/c-blosc/install/include \
@@ -264,6 +267,7 @@ elif [ $buildOpt = "all" ]; then
 		-DCMAKE_BUILD_TYPE=$buildType
 	else
 	  cmake ../CBench $opt\
+                -DCBENCH_LOADER_GDA=ON \
 		-DCBENCH_LOADER_NYX=ON \
 		-DHDF5_DIR=$externalDependencies/hdf5/install/share/cmake/hdf5 \
 		-DCBENCH_COMPRESSOR_BLOSC=ON \
@@ -323,6 +327,7 @@ elif [ $buildOpt = "osx" ]; then
 		-DCBENCH_COMPRESSOR_ZFP=ON \
 		-DZFP_INCLUDE_PATH=$externalDependencies/zfp/install/include \
 		-DZFP_LIBRARY=$externalDependencies/zfp/install/lib/libzfp.dylib \
+                -DCBENCH_LOADER_GDA=ON \
 		-DCBENCH_LOADER_NYX=ON \
 		-DHDF5_DIR=$externalDependencies/hdf5/install/share/cmake/hdf5 \
 		-DCBENCH_COMPRESSOR_FPZIP=ON \
@@ -336,7 +341,8 @@ elif [ $buildOpt = "gpu" ]; then
 	echo "Building with gpu dependencies ..."
 
 	cmake ../CBench $opt\
-	    -DCBENCH_LOADER_NYX=ON \
+                -DCBENCH_LOADER_GDA=ON \
+                -DCBENCH_LOADER_NYX=ON \
 		-DHDF5_DIR=$projectPath/ExternalDependencies/hdf5/install/share/cmake/hdf5 \
 		-DCBENCH_COMPRESSOR_SZ_GPU=ON \
 		-DSZ_GPU_INCLUDE_PATH=$projectPath/ExternalDependencies/SZ-generic/sz/include \
