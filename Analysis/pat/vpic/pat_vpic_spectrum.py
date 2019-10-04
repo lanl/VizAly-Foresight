@@ -28,15 +28,15 @@ class VPICWorkflow(workflow.Workflow):
 
         # get energy information from configuration file
         e_section = "energy"
-        e_config = self.configuration_from_json_data(fft_section)
+        e_config = self.configuration_from_json_data(e_section)
         e_exe = self.json_data["pat"]["analysis-tool"]["analytics"] \
-                                     [fft_section]["path"]
+                                     [e_section]["path"]
 
         # get stack information from configuration file
         stack_section = "stack"
-        stack_config = self.configuration_from_json_data(fft_section)
+        stack_config = self.configuration_from_json_data(stack_section)
         stack_exe = self.json_data["pat"]["analysis-tool"]["analytics"] \
-                                     [fft_section]["path"]
+                                     [stack_section]["path"]
 
         # create jobs to run analysis jobs on each output file from CBench
         for path in self.json_data["pat"]["input-files"]:
