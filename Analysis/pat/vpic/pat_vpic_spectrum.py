@@ -63,7 +63,7 @@ class VPICWorkflow(workflow.Workflow):
             e_jobs = []
             for i, (start, end) in enumerate([(0, 100), (100, 200), (200, 300), (300, 400), (400, 511)]):
                 e_file = self.workflow_dir + "/" + fft_section + "/{}_e_{}.txt".format(prefix, i)
-                e_job = j.Job(name="{}_{}".format(prefix, e_section),
+                e_job = j.Job(name="{}_{}_{}".format(prefix, e_section, i),
                                 execute_dir=e_section,
                                 executable=e_exe,
                                 arguments=["--input-file", fft_file, "--output-file", e_file,
