@@ -42,8 +42,7 @@ class VPICWorkflow(workflow.Workflow):
         for path in self.json_data["pat"]["input-files"]:
             print("Creating analysis jobs for", path)
             prefix = path["output-prefix"]
-            cbench_path = path["path"]
-            timestep = cbench_path.split(".")[-1]
+            cbench_path = path["path"] + ".gda"
 
             # create job for FFT
             fft_file = self.workflow_dir + "/" + fft_section + "/{}_fft.npy".format(prefix)
