@@ -62,7 +62,7 @@ class VPICWorkflow(workflow.Workflow):
             e_files = []
             e_jobs = []
             for i, (start, end) in enumerate([(0, 100), (100, 200), (200, 300), (300, 400), (400, 511)]):
-                e_file = self.workflow_dir + "/" + fft_section + "/{}_e_{}.txt".format(prefix, i)
+                e_file = self.workflow_dir + "/" + e_section + "/{}_e_{}.txt".format(prefix, i)
                 e_job = j.Job(name="{}_{}_{}".format(prefix, e_section, i),
                                 execute_dir=e_section,
                                 executable=e_exe,
@@ -76,7 +76,7 @@ class VPICWorkflow(workflow.Workflow):
                 self.add_job(e_job)
 
             # stack
-            stack_file = self.workflow_dir + "/" + fft_section + "/{}_spectrum.txt".format(prefix)
+            stack_file = self.workflow_dir + "/" + stack_section + "/{}_spectrum.txt".format(prefix)
             stack_job = j.Job(name="{}_{}".format(prefix, stack_section),
                             execute_dir=stack_section,
                             executable=stack_exe,
