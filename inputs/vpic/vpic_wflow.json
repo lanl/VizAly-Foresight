@@ -99,9 +99,27 @@
         {
             "analytics" :
             {
-                "spectrum" :
+                "fft" :
                 {
-                    "path" : "python /home/cmbiwer/projects/vpic/vpic_spectrum",
+                    "path" : "python /home/cmbiwer/projects/vpic/vpic_spectrum_fft",
+                    "configuration" :
+                    {
+                        "partition" : "general",
+                        "ntasks-per-node" : 1
+                    }
+                },
+                "energy" :
+                {
+                    "path" : "python /home/cmbiwer/projects/vpic/vpic_spectrum_energy",
+                    "configuration" :
+                    {
+                        "partition" : "general",
+                        "ntasks-per-node" : 1
+                    }
+                },
+                "stack" :
+                {
+                    "path" : "python /home/cmbiwer/projects/vpic/vpic_spectrum_stack",
                     "configuration" :
                     {
                         "partition" : "general",

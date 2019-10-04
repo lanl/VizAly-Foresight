@@ -20,11 +20,23 @@ class VPICWorkflow(workflow.Workflow):
         # get environment script
         environment = self.environment_from_json_data()
 
-        # get spectrum information from configuration file
-        spectrum_section = "spectrum"
-        spectrum_config = self.configuration_from_json_data(spectrum_section)
-        spectrum_exe = self.json_data["pat"]["analysis-tool"]["analytics"] \
-                                     [spectrum_section]["path"]
+        # get FFT information from configuration file
+        fft_section = "fft"
+        fft_config = self.configuration_from_json_data(fft_section)
+        fft_exe = self.json_data["pat"]["analysis-tool"]["analytics"] \
+                                     [fft_section]["path"]
+
+        # get energy information from configuration file
+        e_section = "energy"
+        e_config = self.configuration_from_json_data(fft_section)
+        e_exe = self.json_data["pat"]["analysis-tool"]["analytics"] \
+                                     [fft_section]["path"]
+
+        # get stack information from configuration file
+        stack_section = "stack"
+        stack_config = self.configuration_from_json_data(fft_section)
+        stack_exe = self.json_data["pat"]["analysis-tool"]["analytics"] \
+                                     [fft_section]["path"]
 
         # create jobs to run analysis jobs on each output file from CBench
         for path in self.json_data["pat"]["input-files"]:
@@ -33,22 +45,50 @@ class VPICWorkflow(workflow.Workflow):
             cbench_path = path["path"]
             timestep = cbench_path.split(".")[-1]
 
-            # create job for power spectrum
-            spectrum_file = self.workflow_dir + "/" + spectrum_section + "/{}_spectrum.csv".format(prefix)
-            spectrum_job = j.Job(name="{}_{}".format(prefix, spectrum_section),
-                                 execute_dir=spectrum_section,
-                                 executable=spectrum_exe,
-                                 arguments=["--input-file", cbench_path, "--output-file", spectrum_file],
-                                 configurations=spectrum_config,
+            # create job for FFT
+            fft_file = self.workflow_dir + "/" + fft_section + "/{}_fft.npy".format(prefix)
+            fft_job = j.Job(name="{}_{}".format(prefix, fft_section),
+                                 execute_dir=fft_section,
+                                 executable=fft_exe,
+                                 arguments=["--input-file", cbench_path, "--output-file", fft_file],
+                                 configurations=fft_config,
                                  environment=environment)
 
             # make dependent on CBench job and add to workflow
-            spectrum_job.add_parents(cbench_job)
-            self.add_job(spectrum_job)
+            fft_job.add_parents(cbench_job)
+            self.add_job(fft_job)
+
+            # loop over wavevectors
+            e_files = []
+            e_jobs = []
+            for i, (start, end) in enumerate([(0, 100), (100, 200), (200, 300), (300, 400), (400, 511)]):
+                e_file = self.workflow_dir + "/" + fft_section + "/{}_e_{}.txt".format(prefix, i)
+                e_job = j.Job(name="{}_{}".format(prefix, e_section),
+                                execute_dir=e_section,
+                                executable=e_exe,
+                                arguments=["--input-file", fft_file, "--output-file", e_file,
+                                           "--slice", start, end],
+                                configurations=e_config,
+                                environment=environment)
+                e_files.append(e_file)
+                e_jobs.append(e_job)
+                e_job.add_parents(fft_job)
+                self.add_job(e_job)
+
+            # stack
+            stack_file = self.workflow_dir + "/" + fft_section + "/{}_spectrum.txt".format(prefix)
+            stack_job = j.Job(name="{}_{}".format(prefix, stack_section),
+                            execute_dir=stack_section,
+                            executable=stack_exe,
+                            arguments=["--input-files"] + e_files +["--output-file", stack_file],
+                            configurations=stack_config,
+                            environment=environment)
+            stack_job.add_parents(*e_jobs)
+            self.add_job(stack_job)
 
             # track output files
             self.json_data["pat"]["analysis"].append({"output-column" : "FILE_Spectrum",
-                                                      "output-prefix" : prefix, "path" : spectrum_file})
+                                                      "output-prefix" : prefix, "path" : stack_file})
 
     def add_cinema_plotting_jobs(self):
 
@@ -96,6 +136,10 @@ wflow = VPICWorkflow("wflow", wflow_data, workflow_dir=wflow_dir)
 # make directories
 if not os.path.exists(wflow_dir + "/cbench"):
     os.makedirs(wflow_dir + "/cbench")
+if not os.path.exists(wflow_dir + "/fft"):
+    os.makedirs(wflow_dir + "/fft")
+if not os.path.exists(wflow_dir + "/energy"):
+    os.makedirs(wflow_dir + "/energy")
 if not os.path.exists(wflow_dir + "/spectrum"):
     os.makedirs(wflow_dir + "/spectrum")
 if not os.path.exists(wflow_dir + "/cinema"):
