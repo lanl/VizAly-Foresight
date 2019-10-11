@@ -6,6 +6,7 @@ import argparse
 import numpy
 from pat.utils import gioSqlite as gio_sqlite
 
+
 def load_sqlite_data(path, query, sqlite_file):
     """ Loads data using SQLite query.
     """
@@ -29,6 +30,7 @@ def load_sqlite_data(path, query, sqlite_file):
     assert(len(result.shape) == 1)
 
     return result
+
 
 # parse command line
 parser = argparse.ArgumentParser(description=__doc__)
