@@ -1,0 +1,12 @@
+if (CBENCH_LOADER_VTK)
+	find_package(VTK REQUIRED)
+	if (VTK_FOUND)
+		add_definitions(-DCBENCH_HAS_VTK)
+		include_directories(${CMAKE_SOURCE_DIR}/dataLoader/VTK)
+
+		include(${VTK_USE_FILE})
+		list(APPEND EXTRA_LIBS ${VTK_LIBRARIES})
+	else()
+		message(FATAL_ERROR "Could not find vtk!!!") 
+	endif()
+endif()

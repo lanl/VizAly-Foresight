@@ -9,8 +9,8 @@ Authors:
  - Jesus Pulido
 ================================================================================*/
 
-#ifndef _DATA_LOADER_INTERFACE_H_
-#define _DATA_LOADER_INTERFACE_H_
+#pragma once
+
 
 #include <string>
 #include <mpi.h>
@@ -32,6 +32,7 @@ class DataLoaderInterface
 
 	bool saveData;
 	int origNumDims;
+	int timestep;
 
 	size_t origDims[5]{ 0,0,0,0,0 };	// Global dataset size
 	size_t sizePerDim[5]{ 0,0,0,0,0 };	// For compression, size of this mpi rank
@@ -59,6 +60,7 @@ class DataLoaderInterface
 	virtual void setParam(std::string paramName, std::string type, std::string value) = 0;
 	virtual bool loadUncompressedFields(nlohmann::json const& jsonInput) = 0; // Data passthrough, used by hdf5 reader
 
+	void setTimestep(int ts){ timestep = ts; }
 	size_t getNumElements() { return numElements; }
 	size_t * getSizePerDim() { return sizePerDim; }
 	size_t getTypeSize() { return elemSize; }
@@ -235,5 +237,3 @@ inline void getMPIDivisions(int numRanks, int numDims, int divisions[3])
 			axis = 0;
 	}
 }
-
-#endif

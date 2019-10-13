@@ -8,8 +8,7 @@ Authors:
  - Pascal Grosset
 ================================================================================*/
 
-#ifndef _VTK_LOADER_H_
-#define _VTK_LOADER_H_
+#pragma once
 
 #include <sstream>
 #include <string>
@@ -390,7 +389,3 @@ inline int VTKDataLoader::writeData(std::string _filename)
   	clock.stop();
 	log << "writing data took: " << clock.getDuration() << " s" << std::endl;
 }
-
-
-#endif
-

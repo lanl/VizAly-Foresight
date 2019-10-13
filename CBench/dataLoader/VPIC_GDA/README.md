@@ -1,4 +1,22 @@
-This loader will load an array of binary data. 
-This loader will allow you to read and write any binary file in parallel. It uses MPIIO
+The GDA reader is for VPIC binary data, which composed of two files: a binary file (with a .gda extension) with float data and a .info file describing the binary data with the following layout:
 
-Infomration about the size and tpe needs to be specified in a .info file. The binary file should have .gda as extension (becasue VPIC uses that and the first loaded was built for VPIC data)
+offset (int)
+x dimensions
+y dimensions
+z dimensions
+offset 
+real x dimensions
+real y dimensions
+real z dimensions
+
+An example is below:
+0
+511.0
+511.0
+511.0
+0
+300.0
+194.0
+194.0
+
+This loader uses MPIIO to read and write binary data in parallel.

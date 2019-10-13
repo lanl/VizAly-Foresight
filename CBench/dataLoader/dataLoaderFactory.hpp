@@ -24,8 +24,8 @@ class DataLoaderFactory
 			return new HACCDataLoader();
 
 	  #ifdef CBENCH_HAS_BINARY
-		if (loaderName == "Binary")
-			return new BinaryDataLoader();
+		if (loaderName == "GenericBinary")
+			return new GenericLoader();
 	  #endif
 
 	  #ifdef CBENCH_HAS_NYX

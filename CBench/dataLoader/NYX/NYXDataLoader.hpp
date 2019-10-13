@@ -5,11 +5,12 @@ Copyright (c) 2017, Los Alamos National Security, LLC.
 All rights reserved.
 
 Authors:
+ - Pascal Grosset
  - Jesus Pulido
+ - Hoby Rakotoarivelo
 ================================================================================*/
 
-#ifndef _NYX_LOADER_H_
-#define _NYX_LOADER_H_
+#pragma once
 
 #include <sstream>
 #include <string>
@@ -707,5 +708,3 @@ inline bool NYXDataLoader::loadUncompressedFields(nlohmann::json const& jsonInpu
 	H5Fclose(file);
 	return true;
 }
-
-#endif

@@ -9,8 +9,7 @@ Authors:
  - Jesus Pulido
 ================================================================================*/
 
-#ifndef _HACC_LOADER_H_
-#define _HACC_LOADER_H_
+#pragma once
 
 #include <algorithm>
 #include <sstream>
@@ -427,5 +426,3 @@ inline int HACCDataLoader::writeData(std::string _filename)
   #endif
 	return 1;
 }
-
-#endif

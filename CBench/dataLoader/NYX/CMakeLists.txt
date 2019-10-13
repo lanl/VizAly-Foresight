@@ -1,0 +1,22 @@
+option(CBENCH_LOADER_NYX "Enables the reading of NyX HDF5 data" OFF)
+# NYX loader
+if (CBENCH_LOADER_NYX)
+    # NYX Loader
+    set(HDF5_USE_STATIC_LIBRARIES ON)
+    #add_definitions (-DCBENCH_HAS_NYX)
+    #message(FATAL_ERROR "hdf555")
+    # assume that CBENCH_PLATFORM is set by the user
+    if (${CBENCH_PLATFORM} MATCHES "Cori")
+        set(HDF5_CORI "/usr/common/software/hdf5-parallel/1.10.1/gnu")
+        target_include_directories(CBench PRIVATE "${HDF5_CORI}/include")
+        link_directories(${HDF5_CORI}/lib)
+        target_link_libraries(CBench PRIVATE dl m z hdf5 hdf5_hl)
+    else ()
+    	message("hdf5")
+        find_package(HDF5 REQUIRED COMPONENTS C)
+        target_include_directories(CBench PRIVATE "${HDF5_INCLUDE_DIRS}")
+        target_link_libraries(CBench PRIVATE ${HDF5_LIBRARIES})
+    endif()
+    target_compile_definitions(CBench PRIVATE -DCBENCH_HAS_NYX)
+    target_include_directories(CBench PRIVATE "${CMAKE_SOURCE_DIR}/dataLoader/NYX")
+endif()

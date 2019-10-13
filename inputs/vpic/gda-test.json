@@ -5,6 +5,8 @@
 
 	"input": {
 		"filetype": "GDA",
+		"timesteps" : [0,50],
+
 		"filename": "/projects/groups/vizproject/dssdata/VPIC-GDA/absJ_8800",
 		"scalars": 
 		[
