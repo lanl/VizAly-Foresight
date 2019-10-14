@@ -6,7 +6,7 @@ VizAly is a general framework for **A**na**ly**sis and **Vi**suali**z**ation of 
 Foresight has three components:
 * CBench: the compression benchmark arm of Foresight desighned to run at scale on supercomputers
 * PAT: Python Analysis Toolkit, which contains a bunch of untilities to speed up analysis and plotting of results
-* [Cinema](https://cinemascience.github.io/): The tool used to visualize the results of this project 
+* Visualization: [Cinema](https://cinemascience.github.io/) is used to visualize the results of this project 
 
 ## Current Visualization results
 * Link to the live cinema database with results : [https://lanl.github.io/VizAly-Foresight/](https://lanl.github.io/VizAly-Foresight/)
@@ -17,7 +17,7 @@ The default master branch should always point to the latest working version. How
 
 ## Prerequisites:
 CBench
-* CMake 3.8.1 or higher
+* CMake 3.12 or higher
 * GCC 6.4 or higher (C++14 minimum)
 * OpenMPI 2 or higher
 
@@ -25,8 +25,8 @@ PAT
 * Python 3.6 or higher with (+matplotlib=3.0.2, +apsw=3.9.2, +numpy=1.15.4)
 * SLURM (for job launching)
 
-Cinema
-* Mozilla Firefox Recommended
+Visualization
+* Mozilla Firefox Recommended for Cinema Explorer
 
 ## Building:
 The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @ ANL, Cori @ NERSC, and Darwin @ LANL . These build a base version of Foresight:
