@@ -26,14 +26,25 @@ struct scalar
 	std::string name;
 	size_t offset;
 	std::string type;
+	bool toBeCompressed;
+	bool compressed;
 	void *data;
 
-	scalar(){};
+	scalar()
+	{
+		toBeCompressed = true;
+		compressed = false;
+		data = NULL;
+	}
+
 	scalar(std::string _name, size_t _offset, std::string _type)
 	{
 		name = _name;
 		offset = _offset;
 		type = _type;
+		toBeCompressed = true;
+		compressed = false;
+		data = NULL;
 	}
 
 	std::string toString()
@@ -54,6 +65,8 @@ class GenericBinaryLoader: public DataLoaderInterface
 	MPI_Datatype mpiDataType;
 	int mpiDivisions[3];
 
+	std::string rawDataFileName;
+
 	std::vector<scalar> scalars;
 
   public:
@@ -65,7 +78,7 @@ class GenericBinaryLoader: public DataLoaderInterface
 	int saveCompData(std::string paramName, void * cData);
 	int writeData(std::string _filename);
 
-	int saveInputFileParameters() { return 1; };
+	int saveInputFileParameters(){ return 1; }
 	int close() { return deAllocateMem(dataType, data); }
 	void setParam(std::string paramName, std::string type, std::string value) {};
 	bool loadUncompressedFields(nlohmann::json const&) { return false; }
@@ -75,6 +88,11 @@ class GenericBinaryLoader: public DataLoaderInterface
 inline GenericBinaryLoader::GenericBinaryLoader()
 {
 	timestep = -1;
+	myRank = 0;
+	numRanks = 0;
+	loader = "RAW";
+	saveData = false;
+	data = NULL;
 }
 
 
@@ -100,12 +118,13 @@ inline void GenericBinaryLoader::init(std::string _filename, MPI_Comm _comm)
 	std::ifstream ifs(metadataFile.c_str());
 	if (ifs.is_open()) 
 	{
+		ifs >> rawDataFileName;
 		ifs >> origDims[0] >> origDims[1] >> origDims[2];
 
 		while (ifs.good()) 
    	 	{
    	 		scalar temp;
-   	 		ifs >> temp.name >> temp.offset >> temp.type;
+   	 		ifs >> temp.name >> temp.type >> temp.offset;
    	 		scalars.push_back(temp);
     	}
   	}
@@ -118,12 +137,10 @@ inline void GenericBinaryLoader::init(std::string _filename, MPI_Comm _comm)
   	}
 
 
-
+  	log << "Raw data file: " << rawDataFileName << std::endl;
 	log << "original dims: " << origDims[0] << ", " << origDims[1] << ", " << origDims[1] << std::endl;
 	for (auto s: scalars)
   		log << s.toString() << std::endl;
-
-	log << "dataType : " << dataType << std::endl;
 }
 
 
@@ -168,17 +185,14 @@ inline int GenericBinaryLoader::loadData(std::string paramName)
 		return -1;
 
 
+	//
 	// Read the binary file
-	if (timestep != -1)
-		filename = filename + "_" + strConvert::toStr(timestep);
-	std::string dataFile = filename + ".raw";
-
 
 	// MPI collective File Read
 	MPI_File fh;
 	MPI_Status status;
 	MPI_Datatype filetype;
-	mpiDataType = getMPIType(dataType);
+	mpiDataType = getMPIType(currentDataType);
 
 	int distribs[3];
 	distribs[0] = MPI_DISTRIBUTE_BLOCK;;
@@ -197,30 +211,55 @@ inline int GenericBinaryLoader::loadData(std::string paramName)
 	for (int i = 0; i < 3; i++)
 		fullsize[i] = origDims[i];
 
+	MPI_Barrier(comm);
+
 	MPI_Type_create_darray(numRanks, myRank, 3, fullsize, distribs, dargs, mpiDivisions, MPI_ORDER_C, mpiDataType, &filetype);
 	MPI_Type_commit(&filetype);
 
-	MPI_File_open(comm, dataFile.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+	MPI_File_open(comm, rawDataFileName.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
 
 	MPI_File_set_view(fh, 0, mpiDataType, filetype, "native", MPI_INFO_NULL);
 
 
 	// Create space for data and store data there
-	allocateMem(dataType, numElements, 0, scalars[index].data);
+	if (scalars[index].toBeCompressed)
+	{
+		allocateMem(currentDataType, numElements, 0, data);
 
-	if (dataType == "float")
-       	MPI_File_read_at_all(fh, offset, ((float *)data), numElements, mpiDataType, &status);
-    else if (dataType == "double")
-        MPI_File_read_at_all(fh, offset, ((float *)data), numElements, mpiDataType, &status);
-    else if (dataType == "int")
-        MPI_File_read_at_all(fh, offset, ((float *)data), numElements, mpiDataType, &status);
-    else
-    {	
-    	if (myRank == 0)
-    		std::cout << "Unsupported data type " << dataType << " . The program will now exit!" << std::endl;
 
-    	MPI_Finalize();
-    }
+		if (currentDataType == "float")
+	       	MPI_File_read_at_all(fh, offset, ((float *)data), numElements, mpiDataType, &status);
+	    else if (currentDataType == "double")
+	        MPI_File_read_at_all(fh, offset, ((double *)data), numElements, mpiDataType, &status);
+	    else if (currentDataType == "int")
+	        MPI_File_read_at_all(fh, offset, ((int *)data), numElements, mpiDataType, &status);
+	    else
+	    {	
+	    	if (myRank == 0)
+	    		std::cout << "Unsupported data type " << currentDataType << " . The program will now exit!" << std::endl;
+
+	    	MPI_Finalize();
+	    }
+	}
+	else
+	{
+		allocateMem(currentDataType, numElements, 0, scalars[index].data);
+
+
+		if (currentDataType == "float")
+	       	MPI_File_read_at_all(fh, offset, ((float *)scalars[index].data), numElements, mpiDataType, &status);
+	    else if (currentDataType == "double")
+	        MPI_File_read_at_all(fh, offset, ((double *)scalars[index].data), numElements, mpiDataType, &status);
+	    else if (currentDataType == "int")
+	        MPI_File_read_at_all(fh, offset, ((int *)scalars[index].data), numElements, mpiDataType, &status);
+	    else
+	    {	
+	    	if (myRank == 0)
+	    		std::cout << "Unsupported data type " << currentDataType << " . The program will now exit!" << std::endl;
+
+	    	MPI_Finalize();
+	    }
+	}
 
 	MPI_File_close( &fh );
 
@@ -236,7 +275,10 @@ inline int GenericBinaryLoader::loadData(std::string paramName)
 	log << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
 
 	log << "Loading data took: " << clock.getDuration() << " s" << std::endl;
+
+	return 1;
 }
+
 
 
 
@@ -247,10 +289,16 @@ inline int GenericBinaryLoader::saveCompData(std::string paramName, void * cData
 	
 	for (auto s: scalars)
 		if (paramName == s.name)
+		{
+			s.compressed = true;
+			allocateMem(s.type, numElements, 0, s.data);
 			memcpy(s.data, cData, numElements*getDataypeSize(s.type));
+		}
 
 	clock.stop();
-	log << "saving data took: " << clock.getDuration() << " s" << std::endl;
+	log << "saving data " << <paramName << " took: " << clock.getDuration() << " s" << std::endl;
+
+	return 0;
 }
 
 
@@ -288,6 +336,12 @@ inline int GenericBinaryLoader::writeData(std::string _filename)
 	
 	for (auto s: scalars)
 	{
+		if (s.compressed == false)
+		{
+			s.toBeCompressed = false;
+			loadData(s.name);
+		}
+
 		if (dataType == "float")
 	       	MPI_File_write_at_all(fh, s.offset, (float *)s.data, numElements, mpiDataType, &status);
 	    else if (dataType == "double")
@@ -303,4 +357,6 @@ inline int GenericBinaryLoader::writeData(std::string _filename)
 	
 	clock.stop();
 	log << "writing data took: " << clock.getDuration() << " s" << std::endl;
+
+	return 0;
 }

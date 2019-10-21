@@ -196,6 +196,8 @@ inline int GDADataLoader::loadData(std::string paramName)
 	log << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
 
 	log << "Loading data took: " << clock.getDuration() << " s" << std::endl;
+
+	return 0;
 }
 
 
@@ -210,6 +212,8 @@ inline int GDADataLoader::saveCompData(std::string paramName, void * cData)
 
 	clock.stop();
 	log << "saving data took: " << clock.getDuration() << " s" << std::endl;
+
+	return 0;
 }
 
 
@@ -267,4 +271,6 @@ inline int GDADataLoader::writeData(std::string _filename)
 
 	clock.stop();
 	log << "writing data took: " << clock.getDuration() << " s" << std::endl;
+
+	return 0;
 }

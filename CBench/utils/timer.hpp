@@ -28,7 +28,7 @@ class Timer
 
 	void start();
 	void stop();
-	double stop(int x);
+	void stop(int x);
 	double getCurrentDuration();			// time in seconds since timer started
 	double getDuration();					// time in seconds
 
@@ -39,10 +39,31 @@ inline Timer::Timer() {}
 inline Timer::Timer(int x){ start(); }
 inline Timer::~Timer() {}
 
-inline void   Timer::start() { startTime = std::chrono::system_clock::now(); }
-inline void   Timer::stop() { endTime = std::chrono::system_clock::now(); elapsed_seconds = endTime - startTime; }
-inline double Timer::stop(int x) { endTime = std::chrono::system_clock::now(); elapsed_seconds = endTime - startTime; }
-inline double Timer::getDuration() { return elapsed_seconds.count(); }
+inline void Timer::start() 
+{ 
+	startTime = std::chrono::system_clock::now(); 
+}
+
+
+inline void Timer::stop() 
+{ 
+	endTime = std::chrono::system_clock::now(); 
+	elapsed_seconds = endTime - startTime; 
+}
+
+
+inline void Timer::stop(int x) 
+{ 
+	endTime = std::chrono::system_clock::now(); 
+	elapsed_seconds = endTime - startTime; 
+}
+
+
+inline double Timer::getDuration() 
+{ 
+	return elapsed_seconds.count(); 
+}
+
 
 inline double Timer::getCurrentDuration()
 { 

@@ -12,6 +12,6 @@
 	#include "VPIC_GDA/GDADataLoader.hpp"
 #endif
 
-#ifdef CBENCH_HAS_GENERICBINARY
+#ifdef CBENCH_HAS_RAW
 	#include "Generic_Binary/GenericBinaryLoader.hpp"
 #endif

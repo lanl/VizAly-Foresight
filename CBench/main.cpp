@@ -55,15 +55,16 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
+
 	//
 	// Load input
-
 
 	//
 	// Pass JSON file to json parser and
 	nlohmann::json jsonInput;
 	std::ifstream jsonFile(argv[1]);
 	jsonFile >> jsonInput;
+
 
 
 	//
@@ -74,8 +75,8 @@ int main(int argc, char *argv[])
 	int maxTimestep = 1;
 	if (jsonInput["input"].find("timesteps") != jsonInput["input"].end())
 	{
-		minTimestep = jsonInput["input"]["num-timesteps"][0];
-		maxTimestep = jsonInput["input"]["num-timesteps"][1];
+		minTimestep = jsonInput["input"]["timesteps"][0];
+		maxTimestep = jsonInput["input"]["timesteps"][1];
 	}
 	int numTimesteps = maxTimestep - minTimestep + 1;
 
@@ -117,6 +118,7 @@ int main(int argc, char *argv[])
 	for (int i = 0; i < jsonInput["cbench"]["metrics"].size(); i++)
 		metrics.push_back(jsonInput["cbench"]["metrics"][i]["name"]);
 
+	
 
 
 	//
@@ -125,12 +127,12 @@ int main(int argc, char *argv[])
 		std::cout << "Starting ... \nLook at the log for progress update ... \n" << std::endl;
 
 
-
 	//
 	// Create log and metrics files
 	Timer overallClock;
 	std::stringstream debuglog, metricsInfo, csvOutput;
 	writeLog(outputLogFilename, debuglog.str());
+
 
 	csvOutput << "Compressor_field" << "__" << "params" << ", " << "name, ";
 	for (int m = 0; m < metrics.size(); ++m)
@@ -142,6 +144,7 @@ int main(int argc, char *argv[])
 	overallClock.start();
 
 
+
 	// Process timesteps - usually 1
 	for (int ts=minTimestep; ts<maxTimestep; ts++)
 	{
@@ -149,6 +152,14 @@ int main(int argc, char *argv[])
 		// Open data file
 		DataLoaderInterface *ioMgr;
 		{
+			if (numTimesteps > 1)
+			{
+				std::string tempStr = inputFilename;
+				inputFilename = tempStr.replace( tempStr.find("%"), tempStr.find("%")+1, strConvert::toStr(ts) );
+				debuglog << "new filename: " << inputFilename << std::endl;
+			}
+
+
 			std::string inputFileType = jsonInput["input"]["filetype"];
 			ioMgr = DataLoaderFactory::createLoader(inputFileType);
 
@@ -368,7 +379,6 @@ int main(int argc, char *argv[])
 				debuglog << "\nMemory in use: " << memLoad.getMemoryInUseInMB() << " MB" << std::endl;
 
 
-
 				//
 				// Metrics Computation
 				double compress_time = compressClock.getDuration();
@@ -406,7 +416,9 @@ int main(int argc, char *argv[])
 
 				//
 				// deallocate
-				std::free(decompdata);
+				if (decompdata != NULL)
+					std::free(decompdata);
+				decompdata = NULL;
 
 
 				ioMgr->close();
@@ -449,6 +461,8 @@ int main(int argc, char *argv[])
 			}
 
 
+			std::cout << "uuuu" << std::endl;
+
 			//
 			// write data to disk if requested in the json file
 			if (writeData)
@@ -456,15 +470,16 @@ int main(int argc, char *argv[])
 				Timer clockWrite;
 				clockWrite.start();
 
-				#if CBENCH_HAS_NYX
-				debuglog << "\nLoading uncompressed fields" << std::endl;
-				ioMgr->loadUncompressedFields(jsonInput);
-				//debuglog << ioMgr->getLog();
-				MPI_Barrier(MPI_COMM_WORLD);
-				#endif
-
 				debuglog << "Write data .... \n";
 
+			  #if CBENCH_HAS_NYX
+				debuglog << "\nLoading uncompressed fields" << std::endl;
+				ioMgr->loadUncompressedFields(jsonInput);
+				MPI_Barrier(MPI_COMM_WORLD);
+			  #endif
+
+				
+			  #if CBENCH_HAS_HACC
 				// Pass through original data to preserve original file data structure
 				for (int i = 0; i < ioMgr->inOutData.size(); i++)
 				{
@@ -476,6 +491,7 @@ int main(int argc, char *argv[])
 						ioMgr->close();
 					}
 				}
+			  #endif
 
 
 
@@ -484,6 +500,9 @@ int main(int argc, char *argv[])
 					decompressedOutputName = jsonInput["compressors"][c]["output-prefix"];
 				else
 					decompressedOutputName = "__" + compressorMgr->getCompressorName() + "_" + std::to_string(rand());
+
+				if (outputFilename.find("%") != std::string::npos)
+					outputFilename = outputFilename.replace( outputFilename.find("%"), outputFilename.find("%")+1, strConvert::toStr(ts) );
 
 				if (outputPath != ".")
 					decompressedOutputName = outputPath + "/" + decompressedOutputName + "__" + outputFilename;
@@ -502,10 +521,17 @@ int main(int argc, char *argv[])
 				debuglog << ioMgr->getLog();
 				debuglog << "Write output took: " << clockWrite.getDuration() << " s " << std::endl;
 				appendLog(outputLogFilename, debuglog);
+	
+				std::cout << "xxxxx" << std::endl;
+
 			}
+
+			std::cout << "yyyy" << std::endl;
 
 			compressorMgr->close();
 		}
+
+		std::cout << "zzzz" << std::endl;
 
 	}
 

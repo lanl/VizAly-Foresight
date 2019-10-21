@@ -43,6 +43,11 @@ class DataLoaderFactory
 			return new GDADataLoader();
 	  #endif
 
+	  #ifdef CBENCH_HAS_RAW
+		if (loaderName == "RAW")
+			return new GenericBinaryLoader();
+	  #endif
+
 		return NULL;
 	}
 };
