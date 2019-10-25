@@ -56,7 +56,7 @@ prefix = sys.argv[13]
 
 files = []
 for ts in range(minTimestep, maxTimestep):
-	filaname = dataFolder + "/" + "turbulence_ts_" + str(ts) + ".raw"
+	filaname = dataFolder + "/" + prefix + str(ts) + ".raw"
 	files.append(filaname)
 
 raw_to_hdf5(outputFilename, maxTimestep-minTimestep, dims_x, dims_y, dims_z, 5, files)

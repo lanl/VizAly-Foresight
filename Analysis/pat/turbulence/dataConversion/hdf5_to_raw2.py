@@ -61,7 +61,7 @@ def hdf5_to_raw(filename, outputFolder, scalars, timestep):
 	readInDataset.tofile(out_file)
 
 	#write_info_file(outputFolder + "/ts_" + str(ts) + "_" + scalars[index] + ".info", dimx, dimy, dimz, "double")
-	write_info_file(outputFolder + "/turbulence_ts_" + str(ts) + ".info", dimx, dimy, dimz, scalars, dataTypes)
+	write_info_file(outputFolder + "/turbulence_ts_" + str(ts) + ".raw", dimx, dimy, dimz, scalars, dataTypes)
 	
 	print("wrote out ", outputfileName)
 
