@@ -164,7 +164,6 @@ int main(int argc, char *argv[])
 
 
 			metricsInfo << "Input file: " << fileToLoad << std::endl;
-
 			if (myRank == 0)
 				std::cout << "\nReading " << fileToLoad << std::endl;
 			

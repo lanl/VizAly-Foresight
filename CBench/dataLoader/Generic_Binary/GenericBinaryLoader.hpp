@@ -111,6 +111,7 @@ inline void GenericBinaryLoader::init(std::string _filename, MPI_Comm _comm)
 
 	MPI_Comm_size(comm, &numRanks);
 	MPI_Comm_rank(comm, &myRank);
+;
 
 	if (timestep != -1)
 		filename = filename + "_" + strConvert::toStr(timestep);
@@ -136,6 +137,7 @@ inline void GenericBinaryLoader::init(std::string _filename, MPI_Comm _comm)
 
 		MPI_Finalize();
   	}
+
 
 
   	log << "\nRaw data file: " << rawDataFileName << std::endl;
@@ -226,7 +228,13 @@ inline int GenericBinaryLoader::loadData(std::string paramName)
 	MPI_Type_create_darray(numRanks, myRank, 3, fullsize, distribs, dargs, mpiDivisions, MPI_ORDER_C, mpiDataType, &filetype);
 	MPI_Type_commit(&filetype);
 
-	MPI_File_open(comm, rawDataFileName.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+	int rc = MPI_File_open(comm, rawDataFileName.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
+	if (rc) 
+	{
+		if (myRank == 0)
+        	std::cout << "Unable to open file " << rawDataFileName << std::endl;
+        return -1;
+    }
 
 	MPI_File_set_view(fh, mpi_offset, MPI_BYTE, filetype, "native", MPI_INFO_NULL);
 
