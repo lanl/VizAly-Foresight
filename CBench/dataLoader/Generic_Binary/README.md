@@ -11,11 +11,13 @@ scalar_name offset type
    .		  .		.
 
 e.g.
+'''
 Path to raw file
 128 128 128
 vx 0 float
 vy 8388608 float
 vx 16777216 float
+'''
 
 Implmentation details:
  - This uses MPIIO to read and write binary data in parallel
