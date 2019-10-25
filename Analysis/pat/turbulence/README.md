@@ -41,3 +41,9 @@ e.g. python3 dataConversion/raw_to_hdf5.py raw50.h5 128 128 128 data/turbulence 
 
 
 python3 turbulence_analytics/debugInference.py /home/pascal/projects/VizAly-Foresight/Analysis/pat/turbulence/raw50.h5 /bigData/Turbulence/scalarHIT_fields100.h5
+
+
+Friday Oct 25 @ 10:00
+python dataConversion/hdf5_to_raw2.py /projects/ml_compression/data/scalarHIT_fields100.h5 one two vx vy vz 0 50  temp
+python dataConversion/raw_to_hdf52.py testAll50.h5 128 128 128 temp 0 50 one two vx vy vz turbulence_ts_
+python dataConversion/compareHDF5.py testAll50.h5 ../../../../data/scalarHIT_fields100.h5
