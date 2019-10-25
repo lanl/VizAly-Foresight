@@ -42,6 +42,7 @@ struct scalar
 		name = _name;
 		offset = _offset;
 		type = _type;
+		size_t numLocalElements;
 		toBeCompressed = true;
 		compressed = false;
 		data = NULL;
@@ -137,10 +138,11 @@ inline void GenericBinaryLoader::init(std::string _filename, MPI_Comm _comm)
   	}
 
 
-  	log << "Raw data file: " << rawDataFileName << std::endl;
+  	log << "\nRaw data file: " << rawDataFileName << std::endl;
 	log << "original dims: " << origDims[0] << ", " << origDims[1] << ", " << origDims[1] << std::endl;
 	for (auto s: scalars)
   		log << s.toString() << std::endl;
+  	log << std::endl;
 }
 
 
@@ -150,7 +152,7 @@ inline int GenericBinaryLoader::loadData(std::string paramName)
 	Timer clock;
 	clock.start();
 
-	float minVal, maxVal, avg;
+
 	totalNumberOfElements = origDims[0] * origDims[1] * origDims[2];
 
 	
@@ -171,18 +173,25 @@ inline int GenericBinaryLoader::loadData(std::string paramName)
 	std::string currentDataType;
 	size_t offset;
 	bool found = false;
-	int index = 0;
-	for (auto s: scalars)
-		if (paramName == s.name)
+
+	int index;
+	for (int i=0; i<scalars.size(); i++)
+		if (paramName == scalars[i].name)
 		{
 			found = true;
-			currentDataType = s.type;
-			offset = s.offset;
-			index++;
+			currentDataType = scalars[i].type;
+			offset = scalars[i].offset;
+
+			index = i;
+			break;
 		}
 
 	if (found == false)
 		return -1;
+
+
+	elemSize = Memory::sizeOf[currentDataType];
+	MPI_Offset mpi_offset = offset;
 
 
 	//
@@ -193,6 +202,7 @@ inline int GenericBinaryLoader::loadData(std::string paramName)
 	MPI_Status status;
 	MPI_Datatype filetype;
 	mpiDataType = getMPIType(currentDataType);
+	std::stringstream minMaxAvgLog;
 
 	int distribs[3];
 	distribs[0] = MPI_DISTRIBUTE_BLOCK;;
@@ -218,7 +228,7 @@ inline int GenericBinaryLoader::loadData(std::string paramName)
 
 	MPI_File_open(comm, rawDataFileName.c_str(), MPI_MODE_RDONLY, MPI_INFO_NULL, &fh);
 
-	MPI_File_set_view(fh, 0, mpiDataType, filetype, "native", MPI_INFO_NULL);
+	MPI_File_set_view(fh, mpi_offset, MPI_BYTE, filetype, "native", MPI_INFO_NULL);
 
 
 	// Create space for data and store data there
@@ -226,13 +236,30 @@ inline int GenericBinaryLoader::loadData(std::string paramName)
 	{
 		allocateMem(currentDataType, numElements, 0, data);
 
-
 		if (currentDataType == "float")
-	       	MPI_File_read_at_all(fh, offset, ((float *)data), numElements, mpiDataType, &status);
+		{
+	       	MPI_File_read_all(fh, ((float *)data), numElements, mpiDataType, &status);
+
+	       	float minVal, maxVal, avg;
+	        minMax( ((float *)data), numElements, minVal, maxVal, avg);
+	        minMaxAvgLog << "min: " << minVal << ", max: " << maxVal<< ", avg: " << avg << std::endl;
+		}
 	    else if (currentDataType == "double")
-	        MPI_File_read_at_all(fh, offset, ((double *)data), numElements, mpiDataType, &status);
+	    {
+	        MPI_File_read_all(fh, ((double *)data), numElements, mpiDataType, &status);
+
+	        double minVal, maxVal, avg;
+	        minMax( ((double *)data), numElements, minVal, maxVal, avg);
+	        minMaxAvgLog << "min: " << minVal << ", max: " << maxVal<< ", avg: " << avg << std::endl;
+	    }
 	    else if (currentDataType == "int")
-	        MPI_File_read_at_all(fh, offset, ((int *)data), numElements, mpiDataType, &status);
+	    {
+	        MPI_File_read_all(fh, ((int *)data), numElements, mpiDataType, &status);
+
+	        int minVal, maxVal, avg;
+	        minMax( ((int *)data), numElements, minVal, maxVal, avg);
+	        minMaxAvgLog << "min: " << minVal << ", max: " << maxVal<< ", avg: " << avg << std::endl;
+	    }
 	    else
 	    {	
 	    	if (myRank == 0)
@@ -244,14 +271,33 @@ inline int GenericBinaryLoader::loadData(std::string paramName)
 	else
 	{
 		allocateMem(currentDataType, numElements, 0, scalars[index].data);
-
+		
 
 		if (currentDataType == "float")
-	       	MPI_File_read_at_all(fh, offset, ((float *)scalars[index].data), numElements, mpiDataType, &status);
+		{
+	       	MPI_File_read_all(fh, ((float *)scalars[index].data), numElements, mpiDataType, &status);
+
+	       	float minVal, maxVal, avg;
+	        minMax( ((float *)scalars[index].data), numElements, minVal, maxVal, avg);
+
+	        minMaxAvgLog << "min: " << minVal << ", max: " << maxVal<< ", avg: " << avg << std::endl;
+		}
 	    else if (currentDataType == "double")
-	        MPI_File_read_at_all(fh, offset, ((double *)scalars[index].data), numElements, mpiDataType, &status);
+	    {
+	        MPI_File_read_all(fh, ((double *)scalars[index].data), numElements, mpiDataType, &status);
+
+	        double minVal, maxVal, avg;
+	        minMax( ((double *)scalars[index].data), numElements, minVal, maxVal, avg);
+	       	minMaxAvgLog << "min: " << minVal << ", max: " << maxVal<< ", avg: " << avg << std::endl;
+	    }
 	    else if (currentDataType == "int")
-	        MPI_File_read_at_all(fh, offset, ((int *)scalars[index].data), numElements, mpiDataType, &status);
+	    {
+	        MPI_File_read_all(fh, ((int *)scalars[index].data), numElements, mpiDataType, &status);
+
+	        int minVal, maxVal, avg;
+	        minMax( ((int *)scalars[index].data), numElements, minVal, maxVal, avg);
+	        minMaxAvgLog << "min: " << minVal << ", max: " << maxVal<< ", avg: " << avg << std::endl;
+	    }
 	    else
 	    {	
 	    	if (myRank == 0)
@@ -266,11 +312,12 @@ inline int GenericBinaryLoader::loadData(std::string paramName)
 	
 
 	clock.stop();
+	log << "\n--------------------------" << std::endl;
 	log << "Param: " << paramName << std::endl;
-	log << "min: " << minVal << ", max: " << maxVal<< ", avg: " << avg << std::endl;
 	log << "mpiDivisions: " << mpiDivisions[0] << ", " << mpiDivisions[1] << ", " << mpiDivisions[2] << std::endl;
 	log << "sizePerDim: "	<< sizePerDim[0]	<< ", " << sizePerDim[1]<< ", " << sizePerDim[2]<< std::endl;
 	log << "rankOffset: "	<< rankOffset[0]	<< ", " << rankOffset[1]<< ", " << rankOffset[2]<< std::endl;
+	log << minMaxAvgLog.str() << std::endl;
 	log << "numElements: "	<< numElements << std::endl;
 	log << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
 
@@ -287,16 +334,27 @@ inline int GenericBinaryLoader::saveCompData(std::string paramName, void * cData
 	Timer clock;
 	clock.start();
 	
+	int index = 0;
 	for (auto s: scalars)
+	{
 		if (paramName == s.name)
-		{
-			s.compressed = true;
-			allocateMem(s.type, numElements, 0, s.data);
-			memcpy(s.data, cData, numElements*getDataypeSize(s.type));
-		}
+			break;
+
+		index = index + 1;
+	}
+
+
+	if (index != scalars.size())
+	{
+		scalars[index].compressed = true;
+		allocateMem(scalars[index].type, numElements, 0, scalars[index].data);
+		memcpy(scalars[index].data, cData, numElements*getDataypeSize(scalars[index].type));
+	}
+	else
+		return -1;
 
 	clock.stop();
-	log << "saving data " << <paramName << " took: " << clock.getDuration() << " s" << std::endl;
+	log << "Saving data " << paramName << " took: " << clock.getDuration() << " s" << std::endl;
 
 	return 0;
 }
@@ -311,6 +369,7 @@ inline int GenericBinaryLoader::writeData(std::string _filename)
 	MPI_File fh;
 	MPI_Status status;
 	MPI_Datatype filetype;
+	std::stringstream minMaxAvgLog;
 
 	int fullsize[3];
 	for (int i = 0; i < 3; i++)
@@ -332,30 +391,51 @@ inline int GenericBinaryLoader::writeData(std::string _filename)
 	_filename = _filename + ".raw";
 	MPI_File_open(comm, _filename.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fh);
 
-	MPI_File_set_view(fh, 0, mpiDataType, filetype, "native", MPI_INFO_NULL);
 	
-	for (auto s: scalars)
+	for (int i=0; i<scalars.size(); i++)
 	{
-		if (s.compressed == false)
+
+		if (scalars[i].compressed == false)
 		{
-			s.toBeCompressed = false;
-			loadData(s.name);
+			scalars[i].toBeCompressed = false;
+			loadData(scalars[i].name);
+
+			//std::cout << "@@@@loaded name: " << scalars[i].name << " compressed = false" << std::endl;
+		}
+		else
+		{
+			//std::cout << "^^^^previously compressed name: " << scalars[i].name << std::endl;
 		}
 
-		if (dataType == "float")
-	       	MPI_File_write_at_all(fh, s.offset, (float *)s.data, numElements, mpiDataType, &status);
-	    else if (dataType == "double")
-	        MPI_File_write_at_all(fh, s.offset, (double *)s.data, numElements, mpiDataType, &status);
-	    else if (dataType == "int")
-	        MPI_File_write_at_all(fh, s.offset, (int *)s.data, numElements, mpiDataType, &status);
 
-	    deAllocateMem(s.type, s.data);
+		MPI_Offset mpi_offset = scalars[i].offset;
+		MPI_File_set_view(fh, mpi_offset, MPI_BYTE, filetype, "native", MPI_INFO_NULL);
+
+		if (scalars[i].type == "float")
+		{
+	       	MPI_File_write_all(fh, (float *)scalars[i].data, numElements, mpiDataType, &status);
+		}
+	    else if (scalars[i].type == "double")
+	    {
+	    	double minVal, maxVal, avg;
+	        minMax( (double *)scalars[i].data, numElements, minVal, maxVal, avg);
+	        minMaxAvgLog << "!!!! min: " << minVal << ", max: " << maxVal<< ", avg: " << avg << std::endl;
+
+	        MPI_File_write_all(fh, (double *)scalars[i].data, numElements, mpiDataType, &status);  
+	    }
+	    else if (scalars[i].type == "int")
+	    {
+	        MPI_File_write_all(fh, (int *)scalars[i].data, numElements, mpiDataType, &status);
+	    }
+
+	    deAllocateMem(scalars[i].type, scalars[i].data);
 	}
 
 	MPI_File_close( &fh );
 
 	
 	clock.stop();
+	log << minMaxAvgLog.str() << std::endl;
 	log << "writing data took: " << clock.getDuration() << " s" << std::endl;
 
 	return 0;

@@ -46,7 +46,6 @@ int main(int argc, char *argv[])
 	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
 
-
 	//
 	// Validate input params
 	if (!validateInput(argc, argv, myRank, numRanks))
@@ -139,15 +138,18 @@ int main(int argc, char *argv[])
 		csvOutput << metrics[m] << ", ";
 
 	csvOutput << "Compression Throughput(MB/s), DeCompression Throughput(MB/s), Compression Ratio" << std::endl;
-	metricsInfo << "Input file: " << inputFilename << std::endl;
+	
 
 	overallClock.start();
 
 
 
 	// Process timesteps - usually 1
+	std::string fileToLoad;
 	for (int ts=minTimestep; ts<maxTimestep; ts++)
 	{
+		debuglog << "\n\n*************************************************" << std::endl;
+
 		//
 		// Open data file
 		DataLoaderInterface *ioMgr;
@@ -155,9 +157,17 @@ int main(int argc, char *argv[])
 			if (numTimesteps > 1)
 			{
 				std::string tempStr = inputFilename;
-				inputFilename = tempStr.replace( tempStr.find("%"), tempStr.find("%")+1, strConvert::toStr(ts) );
-				debuglog << "new filename: " << inputFilename << std::endl;
+				fileToLoad = tempStr.replace( tempStr.find("%"), tempStr.find("%")+1, strConvert::toStr(ts) );
 			}
+			else
+				fileToLoad = inputFilename;
+
+
+			metricsInfo << "Input file: " << fileToLoad << std::endl;
+
+			if (myRank == 0)
+				std::cout << "\nReading " << fileToLoad << std::endl;
+			
 
 
 			std::string inputFileType = jsonInput["input"]["filetype"];
@@ -187,7 +197,7 @@ int main(int argc, char *argv[])
 					ioMgr->loaderParams[it.key()] = strConvert::toStr(it.value());
 			}
 
-			ioMgr->init(inputFilename, MPI_COMM_WORLD);
+			ioMgr->init(fileToLoad, MPI_COMM_WORLD);
 			ioMgr->setTimestep(ts);
 			ioMgr->setSave(writeData);
 
@@ -195,6 +205,9 @@ int main(int argc, char *argv[])
 			// Save parameters of input file to facilitate rewrite
 			if (writeData)
 				ioMgr->saveInputFileParameters();
+
+
+			debuglog << ioMgr->getLog();	ioMgr->clearLog();
 		}
 
 
@@ -211,6 +224,9 @@ int main(int argc, char *argv[])
 					std::cout << "Unsupported compressor: " << compressors[c] << " ... skipping!" << std::endl;
 				continue;
 			}
+
+			if (myRank == 0)
+				std::cout << "\tCompressor " << compressors[c]  << std::endl;
 
 
 			// initialize compressor
@@ -233,7 +249,7 @@ int main(int argc, char *argv[])
 			metricsInfo << "\n---------------------------------------" << std::endl;
 			metricsInfo << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
 
-			debuglog << "===============================================" << std::endl;
+			debuglog << "\n===============================================" << std::endl;
 			debuglog << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
 
 
@@ -241,6 +257,7 @@ int main(int argc, char *argv[])
 			// Cycle through scalars
 			for (int i = 0; i < scalars.size(); i++)
 			{
+
 				Timer compressClock, decompressClock;
 				Memory memLoad(true);
 
@@ -250,6 +267,9 @@ int main(int argc, char *argv[])
 					memLoad.stop();
 					continue;
 				}
+
+				if (myRank == 0)
+					std::cout << "\t\tscalars " << scalars[i] << std::endl;
 
 
 				// Read in compressor parameter for this field
@@ -276,8 +296,7 @@ int main(int argc, char *argv[])
 
 
 				// log stuff
-				debuglog << ioMgr->getDataInfo();
-				debuglog << ioMgr->getLog();
+				debuglog << ioMgr->getLog();	ioMgr->clearLog();
 				appendLog(outputLogFilename, debuglog);
 
 				metricsInfo << compressorMgr->getParamsInfo() << std::endl;
@@ -369,7 +388,7 @@ int main(int argc, char *argv[])
 						{
 							createFolder("logs");
 							std::string outputHistogramName = "logs/";
-							outputHistogramName += extractFileName(inputFilename) + "_" + compressors[c] + "_" + scalars[i];
+							outputHistogramName += extractFileName(fileToLoad) + "_" + compressors[c] + "_" + scalars[i];
 							outputHistogramName += "_" + metrics[m] + "_" + compressorMgr->getParamsInfo() + "_hist.py";
 							writeFile(outputHistogramName, metricsMgr->additionalOutput);
 						}
@@ -406,8 +425,6 @@ int main(int argc, char *argv[])
 				// Store the uncompressed data pointer, does not actually write yet
 				if (writeData)
 				{
-					debuglog << "writing: " << scalars[i] << std::endl;
-
 					ioMgr->saveCompData(scalars[i], decompdata);
 					
 					debuglog << ioMgr->getLog();
@@ -461,8 +478,6 @@ int main(int argc, char *argv[])
 			}
 
 
-			std::cout << "uuuu" << std::endl;
-
 			//
 			// write data to disk if requested in the json file
 			if (writeData)
@@ -501,13 +516,20 @@ int main(int argc, char *argv[])
 				else
 					decompressedOutputName = "__" + compressorMgr->getCompressorName() + "_" + std::to_string(rand());
 
+				std::string fileToOutput;
 				if (outputFilename.find("%") != std::string::npos)
-					outputFilename = outputFilename.replace( outputFilename.find("%"), outputFilename.find("%")+1, strConvert::toStr(ts) );
+				{
+					std::string tempStr = outputFilename;
+					fileToOutput = tempStr.replace( outputFilename.find("%"), outputFilename.find("%")+1, strConvert::toStr(ts) );
+					
+				}
+				else
+					fileToOutput = outputFilename;
 
 				if (outputPath != ".")
-					decompressedOutputName = outputPath + "/" + decompressedOutputName + "__" + outputFilename;
+					decompressedOutputName = outputPath + "/" + decompressedOutputName + "__" + fileToOutput;
 				else
-					decompressedOutputName = decompressedOutputName + "__" + outputFilename;
+					decompressedOutputName = decompressedOutputName + "__" + fileToOutput;
 
 				// Write out uncompressed (lossy) data
 				ioMgr->writeData(decompressedOutputName);
@@ -516,23 +538,15 @@ int main(int argc, char *argv[])
 				clockWrite.stop();
 
 				if (myRank == 0)
-					std::cout << "wrote out " << decompressedOutputName << "." << std::endl;
+					std::cout << "wrote out " << decompressedOutputName << std::endl;
 
 				debuglog << ioMgr->getLog();
 				debuglog << "Write output took: " << clockWrite.getDuration() << " s " << std::endl;
 				appendLog(outputLogFilename, debuglog);
-	
-				std::cout << "xxxxx" << std::endl;
-
 			}
-
-			std::cout << "yyyy" << std::endl;
 
 			compressorMgr->close();
 		}
-
-		std::cout << "zzzz" << std::endl;
-
 	}
 
 	overallClock.stop();
