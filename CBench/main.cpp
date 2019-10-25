@@ -257,7 +257,6 @@ int main(int argc, char *argv[])
 			// Cycle through scalars
 			for (int i = 0; i < scalars.size(); i++)
 			{
-
 				Timer compressClock, decompressClock;
 				Memory memLoad(true);
 
