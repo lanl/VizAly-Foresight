@@ -109,13 +109,23 @@ class HACCWorkflow(workflow.Workflow):
 									parameters_path,
 									self.workflow_dir + "/" + new_parameters_path))
 
+			# write halo finder timestep file
+			# specify from parsing the input file
+			new_timesteps_path = halo_section + "/" + prefix + "_halo_timesteps.txt"
+			tfile = open(self.workflow_dir + "/" + new_timesteps_path, 'w+')
+			tfile.write(timestep)
+			tfile.close()
+
 			# write halo finder configuration file
 			# specify output prefix inside
 			tmp_path = "tmp.out"
+			tmp_path2 = "tmp2.out"
 			os.system("sed \"s/^BASE_OUTPUT_FILE_NAME.*/BASE_OUTPUT_FILE_NAME .\/{}/\" {} > {}".format(
 									prefix, config_path, tmp_path))
+			os.system("sed \"s/^EXPLICIT_TIMESTEPS.*/EXPLICIT_TIMESTEPS {}/\" {} > {}".format(
+                                    timestep, tmp_path, tmp_path2))
 			os.system("sed \"s/^ACCUMULATE_CORE_NAME.*/ACCUMULATE_CORE_NAME .\/{}/\" {} > {}".format(
-									prefix, tmp_path, self.workflow_dir + "/" + new_config_path))
+									prefix, tmp_path2, self.workflow_dir + "/" + new_config_path))
 			os.remove(tmp_path)
 
 
@@ -124,7 +134,7 @@ class HACCWorkflow(workflow.Workflow):
 							 execute_dir=halo_section,
 							 executable=halo_exe,
 							 arguments=["--config", os.path.basename(new_config_path),
-										"--timesteps", timesteps_path,
+										"--timesteps", os.path.basename(new_timesteps_path),
 										"--prefix", cbench_path[:-len(str(timestep)) - 1],
 										os.path.basename(new_parameters_path)],
 							 configurations=halo_config,
@@ -171,7 +181,7 @@ class HACCWorkflow(workflow.Workflow):
 				halo_query_job.add_parents(halo_job)
 				self.add_job(halo_query_job)
 
-
+			# TODO: Automate 'TOPOLOGY' in /projects/exasky/HACC/run/inputs/indat.params
 			# create job for power spectrum
 			spectrum_job = j.Job(name="{}_{}".format(prefix, spectrum_section),
 								 execute_dir=spectrum_section,
@@ -202,7 +212,7 @@ class HACCWorkflow(workflow.Workflow):
 
 		# get environment for Cinema job
 		if "evn_path" in self.json_data["cinema-plots"]:
-			environment = self.json_data["foresight-home"] + self.json_data["cinema-plots"]["evn_path"]
+			environment = self.json_data["foresight-home"] + "/"+ self.json_data["cinema-plots"]["evn_path"]
 		else:
 			environment = None
 
@@ -213,6 +223,7 @@ class HACCWorkflow(workflow.Workflow):
 			configurations = None
 
 		arg1 = self.json_data["project-home"] +  self.json_data['wflow-path'] + "/wflow.json"
+		arg2 = self.json_data["project-home"] +  self.json_data['wflow-path'] + "/cinema/results.cdb"
 		plot_path = self.json_data['project-home'] + self.json_data['wflow-path'] + "/plots"
 
 		# get executable for Cinema job
@@ -222,7 +233,7 @@ class HACCWorkflow(workflow.Workflow):
 		cinema_job = j.Job(name="cinema",
 						   execute_dir="cinema",
 						   executable="python -m pat.hacc.cinema", 
-						   arguments=[ "--input-file", arg1 ],
+						   arguments=[ "--input-file", arg1 , "--output-file" , arg2 ],
 						   configurations=configurations,
 						   environment=environment)
 
