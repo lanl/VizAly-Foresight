@@ -3,7 +3,11 @@
 To submit a workflow to a Slurm cluster, do:
 ``` Shell Script
 python pat_hacc.py --input-file ../input/hacc/hacc_wflow.json --submit
+
+
+python3 -m pat.hacc.workflow --input-file ../inputs/nyx/hacc_wflow.json
 ```
+
 
 ## Requirements
 

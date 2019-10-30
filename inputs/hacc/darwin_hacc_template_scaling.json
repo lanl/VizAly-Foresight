@@ -1,6 +1,6 @@
 {
     "project-home" : "/projects/exasky/run/hacc_ADD_NAME",
-    "foresight-home" : "/projects/exasky/VizAly-Foresight",
+    "foresight-home" : "/projects/exasky/VizAly-Foresight/",
     "wflow-path" : "",
 
     "input" : 
@@ -111,7 +111,7 @@
                 },
                 "halo_query" :
                 {
-                    "path": "source /projects/exasky/cmbiwer-projects/env.sh && python $foresight-home$/Analysis/hacc/pat_hacc_query.py",
+                    "path": "source $foresight-home$/scripts/VizAly-CBench.bash.darwin && cd $foresight-home$/Analysis/ && python3 -m pat.hacc.hacc_query",
                     "sqlite-file" : "/projects/exasky/VizAly-Vis_IO/genericio/frontend/GenericIOSQLite.so",
                     "query" :
                     [
@@ -158,7 +158,8 @@
 
     "cinema-plots" :
     {
-        "path" : "source /projects/exasky/cmbiwer-projects/env.sh && python $foresight-home$/Analysis/hacc/pat_cinema.py",
+        "path" : "$project-home$/cinema",
+        "evn_path" : "scripts/VizAly-CBench.bash.darwin",
         "analysis" : {
             "FILE_Halo_Distribution_0" :
             {

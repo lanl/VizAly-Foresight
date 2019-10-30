@@ -9,17 +9,24 @@ import matplotlib as mpl; mpl.use("Agg")
 import matplotlib.pyplot as plt
 import numpy
 import os
+
 from pat.utils import cinema
 from pat.utils import file_utilities as futils
 from pat.utils import plot_utilities as putils
 from pat.utils import job as j
 
+
 class PATCinema(cinema.CinemaWorkflow):
 
     def prepare_cinema(self):
 
-        # open CSV file
-        metrics_csv = self.json_data["project-home"] +  self.json_data["wflow-path"] + "/cbench/" + self.json_data["cbench"]["output"]["metrics-file"] + ".csv"
+        # Open CSV file
+        if "metrics-csv" in self.json_data["input"]:
+            metrics_csv = self.json_data["input"]["metrics-csv"]
+        else:
+            metrics_csv = self.json_data["project-home"] +  self.json_data['wflow-path'] + "/cbench/" + self.json_data['cbench']['output']['metrics-file'] + ".csv"
+
+        print(metrics_csv)
 
         # get list of all images
         image_data = {}
@@ -32,6 +39,8 @@ class PATCinema(cinema.CinemaWorkflow):
             image_data[col_name][prefix] = path
         image_columns = list(image_data.keys())
         image_columns.sort()
+
+        print(image_data)
 
         # loop over lines in metrics file and append image column and the image paths 
         all_runs = []
@@ -48,23 +57,26 @@ class PATCinema(cinema.CinemaWorkflow):
             for row in reader:
                 prefix = row[1][1:]
 
+
                 # loop over image types
                 for col_name in image_columns:
 
                     # get data file
                     # if no data file recorded then continue
+                    #print("image_data[col_name].keys():", image_data[col_name].keys())
                     if prefix in image_data[col_name].keys():
                         data_file = image_data[col_name][prefix]
                     else:
-                        print("Warning: Unable to match compressor name")
+                        print("Warning: Unable to match compressor name", prefix)
                         row.append("")
                         continue
 
+       
                     # see if data file exists
                     if not os.path.exists(data_file):
-                        print("Error: File does not exist")
+                        print("Error: File does not exist", data_file)
                         row.append("")
-                        continue
+                        #continue
 
                     # get original data
                     try:
@@ -113,9 +125,9 @@ class PATCinema(cinema.CinemaWorkflow):
             # write data CSV file
             futils.write_csv("data.csv", all_runs)
 
+
 # parse Input
-parser = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawTextHelpFormatter)
+parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument("--input-file", required=True)
 parser.add_argument("--output-file", default="results.cdb")
 opts = parser.parse_args()
@@ -125,7 +137,7 @@ cinema = PATCinema(opts.input_file)
 
 # create directory
 if not os.path.exists(opts.output_file):
-     os.mkdir(opts.output_file)
+    os.mkdir(opts.output_file)
 os.chdir(opts.output_file)
 
 # generate plots
