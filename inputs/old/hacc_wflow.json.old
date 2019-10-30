@@ -1,9 +1,9 @@
 {
-    "project-home" : "/projects/groups/vizproject/cosmo/hacc_wflow_test_1",
-    "foresight-home" : "/usr/projects/exasky/jesus-projects/foresight/",
+    "project-home" : "/projects/exasky/run/hacc_wflow",
+    "foresight-home" : "/projects/exasky/VizAly-Foresight",
     "wflow-path" : "",
 
-    "input" :
+    "input" : 
     {
         "filetype" : "HACC",
         "filename" : "/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP499/m000.full.mpicosmo.499",
@@ -56,7 +56,7 @@
         "path" : "mpirun $foresight-home$/build/CBench",
         "output" :
         {
-            "run-path" : "/projects/groups/vizproject/cosmo/hacc_wflow_test_1",
+            "run-path" : "/projects/exasky/run/hacc_wflow",
             "output-decompressed" : true,
             "output-decompressed-location" : "decompressed_files",
             "log-file" : "runlog",
@@ -92,10 +92,8 @@
 
     "pat" : {
         "evn_path" : "/projects/exasky/HACC_GPU.darwin_setup",
-        "analysis-folder" : "HACC_Test_",
         "analysis-tool" :
         {
-            "HACC-home" : "/projects/exasky/HACC_GPU",
             "analytics" :
             {
                 "halo" :
@@ -106,14 +104,15 @@
                     "parameters-file" : "/projects/exasky/HACC_GPU/run/haloInputs/indat.params",
                     "configuration" :
                     {
-                        "partition" : "shared-gpu",
+                        "partition" : "general",
                         "nodes" : 8,
-                        "ntasks-per-node" : 1
+                        "ntasks-per-node" : 1,
+                        "constraint" : "gpu1_model:Tesla_K40m"
                     }
                 },
                 "halo_query" :
                 {
-                    "path": "source /projects/exasky/HACC_GPU.darwin_setup && cd $foresight-home$/Analysis/ && python3 -m pat.hacc.hacc_query",
+                    "path": "source /projects/exasky/cmbiwer-projects/env.sh && python $foresight-home$/Analysis/hacc/pat_hacc_query.py",
                     "sqlite-file" : "/projects/exasky/VizAly-Vis_IO/genericio/frontend/GenericIOSQLite.so",
                     "query" :
                     [
@@ -137,7 +136,7 @@
                     ],
                     "configuration" :
                     {
-                        "partition" : "scaling",
+                        "partition" : "general",
                         "nodes" : 1
                     }
                 },
@@ -148,7 +147,7 @@
                     "configuration" :
                     {
                         "partition" : "scaling",
-                        "nodes" : 8,
+                        "nodes" : 32,
                         "ntasks-per-node" : 16
                     }
                 }
@@ -160,8 +159,7 @@
 
     "cinema-plots" :
     {
-        "path" : "$project-home$/cinema",
-        "evn_path" : "scripts/VizAly-CBench.bash.darwin",
+        "path" : "source /projects/exasky/cmbiwer-projects/env.sh && python $foresight-home$/Analysis/hacc/pat_cinema.py",
         "analysis" : {
             "FILE_Halo_Distribution_0" :
             {
