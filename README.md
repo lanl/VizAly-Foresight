@@ -101,7 +101,7 @@ The following experimental **GPU** compressors are also supported:
 * Compute times
 
 # Development
-For information on how to add new compressors and/or metrics, look at the [readme in CBench/compressors](CBench/compressors) and [CBench/metrics](CBench/metrics) respectively. To add new analysis routines, look at the [readme in Analysis/ folder](Analysis/README.md).
+For information on how to add new compressors and/or metrics, look at the readme in [CBench/compressors](CBench/compressors) and [CBench/metrics](CBench/metrics) respectively. To add new analysis routines, look at the [readme in Analysis/ folder](Analysis/README.md).
 
 For information on Travis CI and Docker image, look at the [travis folder](testing/travis) 
 
