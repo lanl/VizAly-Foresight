@@ -469,7 +469,10 @@ int main(int argc, char *argv[])
 					{
 						std::string metricsFile = jsonInput["cbench"]["output"]["metrics-file"];
 						writeFile(metricsFile, metricsInfo.str());
-						writeFile(metricsFile + std::to_string(ts) + ".csv", csvOutput.str());
+						if (numTimesteps > 1)
+							writeFile(metricsFile + std::to_string(ts) + ".csv", csvOutput.str());
+						else
+							writeFile(metricsFile + ".csv", csvOutput.str());
 					}
 				}
 
