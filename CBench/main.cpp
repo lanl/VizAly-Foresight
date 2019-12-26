@@ -20,7 +20,7 @@ Authors:
 
 // Helper Functions
 #include "json.hpp"
-#include "timer.hpp"
+#include "timers.hpp"
 #include "log.hpp"
 #include "memory.hpp"
 #include "utils.hpp"
@@ -59,11 +59,10 @@ int main(int argc, char *argv[])
 	// Load input
 
 	//
-	// Pass JSON file to json parser and
+	// Pass JSON file to json parser
 	nlohmann::json jsonInput;
 	std::ifstream jsonFile(argv[1]);
 	jsonFile >> jsonInput;
-
 
 
 	//
@@ -104,7 +103,6 @@ int main(int argc, char *argv[])
 	std::string outputLogFilename = "logs/" + jsonInput["cbench"]["output"]["log-file"].get<std::string>() + "_" + std::to_string(myRank);
 
 
-
 	std::vector<std::string> compressors;
 	for (int i = 0; i < jsonInput["compressors"].size(); i++)
 		compressors.push_back(jsonInput["compressors"][i]["name"]);
@@ -119,7 +117,6 @@ int main(int argc, char *argv[])
 
 	
 
-
 	//
 	// For humans; all seems valid, let's start ...
 	if (myRank == 0)
@@ -128,12 +125,12 @@ int main(int argc, char *argv[])
 
 	//
 	// Create log and metrics files
-	Timer overallClock;
+	Timers clock;
 	std::stringstream debuglog, metricsInfo, csvOutputHeader;
 	writeLog(outputLogFilename, debuglog.str());
 
-	overallClock.start();
 
+	clock.start("overall");
 
 
 	// Process timesteps - usually 1
@@ -148,6 +145,7 @@ int main(int argc, char *argv[])
 
 		debuglog << "\n********************************** timestep: " << ts << " of " << numTimesteps << std::endl;
 
+
 		//
 		// Open data file
 		DataLoaderInterface *ioMgr;
@@ -160,13 +158,13 @@ int main(int argc, char *argv[])
 				fileToLoad = tempStr.replace( tempStr.find("%"), tempStr.find("%")+1, strConvert::toStr(ts) );
 			}
 				
-
 			metricsInfo << "Input file: " << fileToLoad << std::endl;
 			if (myRank == 0)
 				std::cout << "\nReading " << fileToLoad << std::endl;
 
 
 
+			// Create DataLoader
 			std::string inputFileType = jsonInput["input"]["filetype"];
 			ioMgr = DataLoaderFactory::createLoader(inputFileType);
 
@@ -221,14 +219,12 @@ int main(int argc, char *argv[])
 					std::cout << "Unsupported compressor: " << compressors[c] << " ... skipping!" << std::endl;
 				continue;
 			}
+			compressorMgr->init();
+
 
 			if (myRank == 0)
 				std::cout << "\tCompressor " << compressors[c]  << std::endl;
-
-
-			// initialize compressor
-			compressorMgr->init();
-
+			
 
 			// Apply parameter if same for all scalars, else delay for later
 			bool sameCompressorParams = true;
@@ -254,7 +250,6 @@ int main(int argc, char *argv[])
 			// Cycle through scalars
 			for (int i = 0; i < scalars.size(); i++)
 			{
-				Timer compressClock, decompressClock;
 				Memory memLoad(true);
 
 				// Check if parameter is valid before proceding
@@ -295,12 +290,10 @@ int main(int argc, char *argv[])
 				debuglog << ioMgr->getLog();	ioMgr->clearLog();
 				appendLog(outputLogFilename, debuglog);
 
-				//std::cout << csvOutput.str() << std::endl;
 				metricsInfo << compressorMgr->getParamsInfo() << std::endl;
 				csvOutput << compressorMgr->getCompressorName() << "_" << scalars[i] << "__" << compressorMgr->getParamsInfo()
 						  << ", " << jsonInput["compressors"][c]["output-prefix"].get<std::string>() << ", ";
 
-				//std::cout << csvOutput.str() << std::endl;
 
 				MPI_Barrier(MPI_COMM_WORLD);
 
@@ -309,18 +302,21 @@ int main(int argc, char *argv[])
 				// compress
 				void *cdata = NULL;
 
-				compressClock.start();
+				clock.start("compress");
 				compressorMgr->compress(ioMgr->data, cdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim());
-				compressClock.stop();
+				clock.stop("compress");
+
 
 
 				//
 				// decompress
 				void *decompdata = NULL;
 
-				decompressClock.start();
+
+				clock.start("decompress");
 				compressorMgr->decompress(cdata, decompdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim());
-				decompressClock.stop();
+				clock.stop("decompress");
+
 
 
 				// Get compression ratio
@@ -349,6 +345,7 @@ int main(int argc, char *argv[])
 				MetricInterface *metricsMgr;
 				for (int m = 0; m < metrics.size(); ++m)
 				{
+					// Create metric
 					metricsMgr = MetricsFactory::createMetric(metrics[m]);
 					if (metricsMgr == NULL)
 					{
@@ -357,7 +354,6 @@ int main(int argc, char *argv[])
 
 						continue;
 					}
-
 
 					// Read in additional params for metrics
 					for (auto it = jsonInput["cbench"]["metrics"][m].begin(); it != jsonInput["cbench"]["metrics"][m].end(); it++)
@@ -375,7 +371,7 @@ int main(int argc, char *argv[])
 					}
 
 
-					// Launch
+					// Compute metrics locally
 					metricsMgr->init(MPI_COMM_WORLD);
 					metricsMgr->execute(ioMgr->data, decompdata, ioMgr->getNumElements());
 					debuglog << metricsMgr->getLog();
@@ -398,9 +394,9 @@ int main(int argc, char *argv[])
 
 
 				//
-				// Metrics Computation
-				double compress_time = compressClock.getDuration();
-				double decompress_time = decompressClock.getDuration();
+				// Gather global metrics
+				double compress_time   = clock.getDuration("compress"); 
+				double decompress_time = clock.getDuration("decompress"); 
 
 				double compress_throughput   = ((double) (ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0 * 1024.0)) / compress_time;     // MB/s
 				double decompress_throughput = ((double) (ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0 * 1024.0)) / decompress_time;	// MB/s
@@ -484,10 +480,8 @@ int main(int argc, char *argv[])
 			// write data to disk if requested in the json file
 			if (writeData)
 			{
-				Timer clockWrite;
-				clockWrite.start();
-
 				debuglog << "Write data .... \n";
+				clock.start("write");
 
 
 				// Loading uncompressed fields
@@ -521,26 +515,25 @@ int main(int argc, char *argv[])
 				// Write out uncompressed (lossy) data
 				ioMgr->writeData(decompressedOutputName);
 
-
-				clockWrite.stop();
+				clock.stop("write");
 
 				if (myRank == 0)
 					std::cout << "wrote out " << decompressedOutputName << std::endl;
 
 				debuglog << ioMgr->getLog();
-				debuglog << "Write output took: " << clockWrite.getDuration() << " s " << std::endl;
+				debuglog << "Write output took: " << clock.getDuration("write") << " s " << std::endl;
 				appendLog(outputLogFilename, debuglog);
 			}
-
 
 			compressorMgr->close();
 		}
 	}
 
-	overallClock.stop();
-	debuglog << "\nTotal run time: " << overallClock.getDuration() << " s " << std::endl;
-	appendLog(outputLogFilename, debuglog);
 
+	clock.stop("overall");
+
+	debuglog << "\nTotal run time: " << clock.getDuration("overall") << " s " << std::endl;
+	appendLog(outputLogFilename, debuglog);
 
 
 	// For humans

@@ -17,11 +17,11 @@ Authors:
 
 class Timers
 {
-	std::multimap<
+	std::map<
         std::string,
         std::chrono::time_point<std::chrono::system_clock> 
                 > timers;
-    std::multimap< 
+    std::map< 
         std::string, 
         std::chrono::duration<double> 
                 > timers_duration;
@@ -30,11 +30,11 @@ class Timers
 	Timers();
 	~Timers();
 
-	void start(std::string timerName);
-	void stop(std::string timerName);
+	int start(std::string timerName);
+	int stop(std::string timerName);
 
-	double getCurrentDuration(timerName);	// time in seconds since timer started
-	double getDuration(timerName);		    // time in seconds
+	double getCurrentDuration(std::string timerName);	// time in seconds since timer started
+	double getDuration(std::string timerName);		    // time in seconds
 
 	static std::string getCurrentTime();	// get the current time
 };
@@ -43,31 +43,62 @@ inline Timers::Timers() {}
 inline Timers::~Timers() {}
 
 
-inline void Timers::start(std::string timerName) 
+inline int Timers::start(std::string timerName) 
 { 
-	auto startTime = std::chrono::system_clock::now(); 
-	timers.insert( std::pair<std::string,std::chrono::time_point<std::chrono::system_clock>>(timerName,startTime) );
+	auto startTime = std::chrono::system_clock::now();
+	if (timers.find(timerName) == timers.end())
+		timers.insert( std::pair<std::string,std::chrono::time_point<std::chrono::system_clock>>(timerName,startTime) );	
+	else
+		timers[timerName] = startTime;
+
+	return 1;
 }
 
 
-inline void Timers::stop(std::string timerName) 
+inline int Timers::stop(std::string timerName) 
 { 
-	auto endTime = std::chrono::system_clock::now(); 
-	auto elapsed_seconds = endTime - timers[timerName]; 
-    timers_duration.insert( std::pair<std::string,std::chrono::duration<double>>(timerName, elapsed_seconds) );
+	if (timers.find(timerName) != timers.end())
+	{
+		auto endTime = std::chrono::system_clock::now(); 
+		auto elapsed_seconds = endTime - timers[timerName]; 
+   		timers_duration.insert( std::pair<std::string,std::chrono::duration<double>>(timerName, elapsed_seconds) );
+		   return 1;
+	}
+	else
+	{
+		std::cout << "Timer " << timerName << " does NOT exist!!!" << std::endl;
+		return -1;
+	}
 }
 
 
 inline double Timers::getDuration(std::string timerName) 
 { 
-	return (timers_duration[timerName]).count(); 
+	if (timers_duration.find(timerName) != timers_duration.end())
+	{
+
+		return (timers_duration[timerName]).count(); 
+	}
+	else
+	{
+		std::cout << "Timer " << timerName << " does NOT exist!!!" << std::endl;
+		return -1;
+	}
 }
 
 
 inline double Timers::getCurrentDuration(std::string timerName)
 { 
-	auto timeNow = std::chrono::system_clock::now();
-	return (timeNow - timers[timerName]).count(); 
+	if (timers.find(timerName) != timers.end())
+	{
+		auto timeNow = std::chrono::system_clock::now();
+		return (timeNow - timers[timerName]).count(); 
+	}
+	else
+	{
+		std::cout << "Timer " << timerName << " does NOT exist!!!" << std::endl;
+		return -1;
+	}
 }
 
 
