@@ -81,68 +81,6 @@ if (CBENCH_LOADER_NYX)
 endif()
 
 
-# Add external loaders
-#include_directories(${CMAKE_SOURCE_DIR}/dataLoader)
-#file(GLOB subdir "${CMAKE_SOURCE_DIR}/dataLoader/*")
-#foreach (dir ${subdir})
-#	# Skip files ending in .h
-#	if ("${dir}" MATCHES "\\.h$")
-#		continue()
-#	endif()
-
-#	# Skip files ending in .hpp
-#	if ("${dir}" MATCHES "\\.hpp$")
-#		continue()
-#	endif()
-	
-	# Skip files ending in .md
-#	if ("${dir}" MATCHES "\\.md$")
-#		continue()
-#	endif()
-
-
-#	include_directories(${dir})
-
-#	if (NOT EXISTS ${dir}/CMakeLists.txt)
-#		continue()
-#	else()
-		# Only process folders with a CMakelists.txt
-#		set_property(GLOBAL PROPERTY includeDirectories "")
-#		set_property(GLOBAL PROPERTY linkDirectories "")
-#		set_property(GLOBAL PROPERTY linkLibraries "")
-#		set_property(GLOBAL PROPERTY definitions "")
-#		set_property(GLOBAL PROPERTY includes "")
-		
-#		add_subdirectory(${dir})
-
-		#include directories to add
-#		get_property(incDir GLOBAL PROPERTY includeDirectories)
-#		include_directories(${incDir})
-
-		#include directories to add
-#		get_property(lnkDir GLOBAL PROPERTY linkDirectories)
-#		link_directories(${lnkDir})
-#		message(WARNING "lnkDir " ${lnkDir})
-
-		#link libraries to add directories to add
-#		get_property(linkLibs GLOBAL PROPERTY linkLibraries)
-#		set(EXTRA_LIBS ${EXTRA_LIBS}  ${linkLibs})
-#		message(WARNING "EXTRA_LIBS " ${linkLibs})
-
-		# add defintions
-#		get_property(def GLOBAL PROPERTY definitions)
-#		add_definitions (${def})
-
-		# add includes
-#		get_property(incs GLOBAL PROPERTY includes)
-#		if (incs STREQUAL "")
-#		else()
-#			include(${incs})
-#		endif()
-
-#	endif()
-#endforeach()
-
 
 
 # Creates header file, compressorIncludes.h, with all available compressors

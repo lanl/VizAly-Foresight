@@ -1,7 +1,7 @@
 The file format to include in the input JSON file; "filetype": "RAW"
 
 This is a generic loader for binary data.
-- the binary data is has .raw extension.
+- the binary data has .raw extension.
 - the info file has a .info extension describing the binary data. The layout is as follows:
 
 path to raw file
