@@ -7,14 +7,13 @@ All rights reserved.
 Authors:
  - Pascal Grosset
 ================================================================================*/
-
-#ifndef _TIMER_H_
-#define _TIMER_H_
+#pragma once
 
 #include <chrono>
 #include <string>
 #include <ctime>
 #include <sstream>
+#include <map>
 
 class Timer
 {
@@ -27,8 +26,10 @@ class Timer
 	~Timer();
 
 	void start();
+
 	void stop();
 	void stop(int x);
+
 	double getCurrentDuration();			// time in seconds since timer started
 	double getDuration();					// time in seconds
 
@@ -50,7 +51,6 @@ inline void Timer::stop()
 	endTime = std::chrono::system_clock::now(); 
 	elapsed_seconds = endTime - startTime; 
 }
-
 
 inline void Timer::stop(int x) 
 { 
@@ -83,5 +83,3 @@ inline std::string Timer::getCurrentTime()
 	ss << "_" << 1 + ltm->tm_mon << "_" << ltm->tm_mday << "__" << ltm->tm_hour << "_" << ltm->tm_min << "_" << ltm->tm_sec << "_" << std::endl;
 	return ss.str();
 }
-
-#endif

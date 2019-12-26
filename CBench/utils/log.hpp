@@ -7,9 +7,7 @@ All rights reserved.
 Authors:
  - Pascal Grosset
 ================================================================================*/
-
-#ifndef _LOG_H_
-#define _LOG_H_
+#pragma once
 
 #include <fstream>
 #include <string>
@@ -67,4 +65,3 @@ inline void appendLog(std::string filename, std::stringstream & log)
   #endif
 }
 
-#endif

@@ -44,8 +44,10 @@ class HACCDataLoader: public DataLoaderInterface
 	int saveInputFileParameters();
 	int close() { return deAllocateMem(dataType, data); }
 	void setParam(std::string paramName, std::string type, std::string value){};
-  bool loadUncompressedFields(nlohmann::json const&) { return false; }
+	bool loadUncompressedFields(nlohmann::json const&);
 };
+
+
 
 
 inline HACCDataLoader::HACCDataLoader()
@@ -196,9 +198,6 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	gioReader->readDims(splitDims);
 	log << "splitDims: " << splitDims[0] << "," << splitDims[1] << "," << splitDims[2] << std::endl;
 	log << myRank << " ~ loadRange[0]: " << loadRange[0] << ", loadRange[1]: " << loadRange[1] << std::endl;
-
-
-
 
 
 
@@ -379,6 +378,7 @@ inline int HACCDataLoader::writeData(std::string _filename)
 		gioWriter->setPhysScale(physScale[d], d);
 	}
 
+
 	MPI_Barrier(comm);
 	// Populate parameters
 	for (int i=0; i<inOutData.size(); i++)
@@ -425,4 +425,20 @@ inline int HACCDataLoader::writeData(std::string _filename)
 	log << "Writing data took " << clock.getDuration() << " s" << std::endl;
   #endif
 	return 1;
+}
+
+
+inline bool HACCDataLoader::loadUncompressedFields(nlohmann::json const&)
+{
+	// Pass through original data to preserve original file data structure
+	for (int i = 0; i < inOutData.size(); i++)
+	{
+		if (!inOutData[i].doWrite)
+		{
+			loadData(inOutData[i].name);
+			saveCompData(inOutData[i].name, data);
+			close();
+		}
+	}
+	return true;
 }

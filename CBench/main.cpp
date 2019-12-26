@@ -70,14 +70,14 @@ int main(int argc, char *argv[])
 	// Load in the global input parameters
 	std::string inputFilename = jsonInput["input"]["filename"];
 
-	int minTimestep = 1;
+	int minTimestep = 0;
 	int maxTimestep = 1;
 	if (jsonInput["input"].find("timesteps") != jsonInput["input"].end())
 	{
 		minTimestep = jsonInput["input"]["timesteps"][0];
 		maxTimestep = jsonInput["input"]["timesteps"][1];
 	}
-	int numTimesteps = maxTimestep - minTimestep + 1;
+	int numTimesteps = maxTimestep - minTimestep;
 
 
 	bool writeData = false;
@@ -129,16 +129,8 @@ int main(int argc, char *argv[])
 	//
 	// Create log and metrics files
 	Timer overallClock;
-	std::stringstream debuglog, metricsInfo, csvOutput;
+	std::stringstream debuglog, metricsInfo, csvOutputHeader;
 	writeLog(outputLogFilename, debuglog.str());
-
-
-	csvOutput << "Compressor_field" << "__" << "params" << ", " << "name, ";
-	for (int m = 0; m < metrics.size(); ++m)
-		csvOutput << metrics[m] << ", ";
-
-	csvOutput << "Compression Throughput(MB/s), DeCompression Throughput(MB/s), Compression Ratio" << std::endl;
-	
 
 	overallClock.start();
 
@@ -148,26 +140,31 @@ int main(int argc, char *argv[])
 	std::string fileToLoad;
 	for (int ts=minTimestep; ts<maxTimestep; ts++)
 	{
-		debuglog << "\n\n*************************************************" << std::endl;
+		std::stringstream csvOutput;
+		csvOutput << "Compressor_field" << "__" << "params" << ", " << "name, ";
+		for (int m = 0; m < metrics.size(); ++m)
+			csvOutput << metrics[m] << ", ";
+		csvOutput << "Compression Throughput(MB/s), DeCompression Throughput(MB/s), Compression Ratio" << std::endl;
+
+		debuglog << "\n********************************** timestep: " << ts << " of " << numTimesteps << std::endl;
 
 		//
 		// Open data file
 		DataLoaderInterface *ioMgr;
 		{
+			// Get filename
+			fileToLoad = inputFilename;
 			if (numTimesteps > 1)
 			{
 				std::string tempStr = inputFilename;
 				fileToLoad = tempStr.replace( tempStr.find("%"), tempStr.find("%")+1, strConvert::toStr(ts) );
 			}
-			else
-				fileToLoad = inputFilename;
-
+				
 
 			metricsInfo << "Input file: " << fileToLoad << std::endl;
-
 			if (myRank == 0)
 				std::cout << "\nReading " << fileToLoad << std::endl;
-			
+
 
 
 			std::string inputFileType = jsonInput["input"]["filetype"];
@@ -298,9 +295,12 @@ int main(int argc, char *argv[])
 				debuglog << ioMgr->getLog();	ioMgr->clearLog();
 				appendLog(outputLogFilename, debuglog);
 
+				//std::cout << csvOutput.str() << std::endl;
 				metricsInfo << compressorMgr->getParamsInfo() << std::endl;
 				csvOutput << compressorMgr->getCompressorName() << "_" << scalars[i] << "__" << compressorMgr->getParamsInfo()
 						  << ", " << jsonInput["compressors"][c]["output-prefix"].get<std::string>() << ", ";
+
+				//std::cout << csvOutput.str() << std::endl;
 
 				MPI_Barrier(MPI_COMM_WORLD);
 
@@ -469,7 +469,7 @@ int main(int argc, char *argv[])
 					{
 						std::string metricsFile = jsonInput["cbench"]["output"]["metrics-file"];
 						writeFile(metricsFile, metricsInfo.str());
-						writeFile(metricsFile + ".csv", csvOutput.str());
+						writeFile(metricsFile + std::to_string(ts) + ".csv", csvOutput.str());
 					}
 				}
 
@@ -486,49 +486,34 @@ int main(int argc, char *argv[])
 
 				debuglog << "Write data .... \n";
 
-			  #if CBENCH_HAS_NYX
-				debuglog << "\nLoading uncompressed fields" << std::endl;
+
+				// Loading uncompressed fields
 				ioMgr->loadUncompressedFields(jsonInput);
 				MPI_Barrier(MPI_COMM_WORLD);
-			  #endif
-
-				
-			  #if CBENCH_HAS_HACC
-				// Pass through original data to preserve original file data structure
-				for (int i = 0; i < ioMgr->inOutData.size(); i++)
-				{
-					if (!ioMgr->inOutData[i].doWrite)
-					{
-						debuglog << "writing uncoompressed" << std::endl;
-						ioMgr->loadData(ioMgr->inOutData[i].name);
-						ioMgr->saveCompData(ioMgr->inOutData[i].name, ioMgr->data);
-						ioMgr->close();
-					}
-				}
-			  #endif
 
 
-
-				std::string decompressedOutputName;
+				// Get the name and path of the new file
+				std::string decompressedOutputName, fileToOutput;
 				if (jsonInput["compressors"][c].find("output-prefix") != jsonInput["compressors"][c].end())
 					decompressedOutputName = jsonInput["compressors"][c]["output-prefix"];
 				else
 					decompressedOutputName = "__" + compressorMgr->getCompressorName() + "_" + std::to_string(rand());
 
-				std::string fileToOutput;
+
 				if (outputFilename.find("%") != std::string::npos)
 				{
 					std::string tempStr = outputFilename;
 					fileToOutput = tempStr.replace( outputFilename.find("%"), outputFilename.find("%")+1, strConvert::toStr(ts) );
-					
 				}
 				else
 					fileToOutput = outputFilename;
+
 
 				if (outputPath != ".")
 					decompressedOutputName = outputPath + "/" + decompressedOutputName + "__" + fileToOutput;
 				else
 					decompressedOutputName = decompressedOutputName + "__" + fileToOutput;
+
 
 				// Write out uncompressed (lossy) data
 				ioMgr->writeData(decompressedOutputName);
@@ -543,6 +528,7 @@ int main(int argc, char *argv[])
 				debuglog << "Write output took: " << clockWrite.getDuration() << " s " << std::endl;
 				appendLog(outputLogFilename, debuglog);
 			}
+
 
 			compressorMgr->close();
 		}

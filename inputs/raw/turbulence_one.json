@@ -1,0 +1,125 @@
+{
+	"project-home": "/home/pascal/projects/run",
+	"wflow-path": "test-RAW",
+	"foresight-home": "/home/pascal/projects/VizAly-Foresight/",
+
+	"input": {
+		"filetype": "RAW",
+
+		"timesteps" : [0, 1],
+		"filename": "/home/pascal/data/turbulence/turbulence_one_ts_%.info",
+		
+		"scalars": [ "one"]
+	},
+
+	"compressor-comment": "which compressors to test",
+	"compressors": 
+	[
+		{
+			"name": "SZ",
+			"output-prefix": "SZ_abs_0.001_",
+			"abs": 1E-3
+		},
+
+
+		
+		{
+            "name": "BLOSC",
+            "output-prefix": "BLOSC_"
+        }
+
+
+	],
+
+	"cbench": 
+	{
+		"path": "mpirun $foresight-home$build/CBench",
+
+		"output": 
+		{
+			"output-decompressed": true,
+			"output-decompressed-location": "decompressed_files",
+
+			"logfname-comment": "name of output log file",
+			"log-file": "runlog_",
+
+			"metricsfname-comment": "name of file with output",
+			"metrics-file": "metrics_"
+		},
+
+		"metrics": 
+		[
+			{
+				"name": "absolute_error",
+				"histogramx" : [ "absJ_8800" ]
+			},
+
+			{
+				"name": "relative_error"
+			},
+
+			{
+				"name": "mse"
+			},
+
+			{
+				"name": "psnr"
+			},
+
+			{
+				"name" : "minmax"
+			}
+		],
+
+		"evn_path": "scripts/VizAly-CBench.bash.darwin",
+
+		"configuration": 
+		{
+			"partition": "galton",
+			"nodes": 8,
+			"ntasks-per-node": 8
+		}
+	},
+
+	"pat": {
+		"evn_path": "scripts/VizAly-CBench.bash.darwin",
+
+		"analysis-tool": 
+		{
+			"gimlet-home": "/projects/exasky/gimlet2",
+
+			"analytics": 
+			[
+				
+			]
+		},
+
+		"input-files": [],
+		"analysis": []
+	},
+
+
+	"cinema-plots": 
+	{
+		"cinema-db-name": "cinemaDB",
+		"plotting": {
+			"x-range": [0, 11],
+			"checks" :
+			[
+				{
+					"operand" : "pk_ratio",
+					"operator" : "<",
+					"result" : 0.01
+				}
+			]
+		},
+
+		"evn_path": "scripts/VizAly-CBench.bash.darwin",
+		"configuration": {
+			"partition": "galton",
+			"nodes": 1,
+			"ntasks-per-node": 8
+		}
+	}
+}
+

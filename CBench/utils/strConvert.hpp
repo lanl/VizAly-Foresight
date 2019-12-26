@@ -8,9 +8,7 @@ Authors:
  - Pascal Grosset
  - Jesus Pulido
 ================================================================================*/
-
-#ifndef _STR_CONV_H_
-#define _STR_CONV_H_
+#pragma once
 
 #include <sstream>
 #include <stdio.h>
@@ -143,4 +141,3 @@ namespace strConvert
 		return val;
 	}
 }
-#endif

@@ -8,9 +8,7 @@ Authors:
  - Pascal Grosset
  - Jesus Pulido
 ================================================================================*/
-
-#ifndef _MEM_H_
-#define _MEM_H_
+#pragma once
 
 #if defined(__unix__) || defined(__unix) || defined(unix)
 #include <sys/sysinfo.h>
@@ -24,7 +22,7 @@ Authors:
 #if defined(WIN32)
 #include <windows.h>
 #include "psapi.h" //MSVC Performance query
-#endif // Windows
+#endif  // Windows
 
 #include <stdio.h>
 #include <iostream>
@@ -255,5 +253,3 @@ inline void Memory::GetMemorySize(unsigned long &size, unsigned long &rss)
 	size = (size_t) info.virtual_size;
 }
 #endif
-
-#endif	// _MEM_H_2
