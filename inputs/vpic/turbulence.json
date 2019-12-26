@@ -1,0 +1,149 @@
+{
+	"project-home": "/projects/exasky/pascal-projects/VizAly-Foresight/",
+	"wflow-path": "test-GDA22",
+	"foresight-home": "/projects/exasky/pascal-projects/VizAly-Foresight/",
+
+	"input": {
+		"filetype": "GDA",
+		"timesteps" : [0,2],
+
+		"filename": "/projects/groups/vizproject/dssdata/VPIC-GDA/absJ_8800",
+		"scalars": 
+		[
+			"absJ_8800"
+		]
+	},
+
+	"compressor-comment": "which compressors to test",
+	"compressors": 
+	[
+		{
+			"name": "SZ",
+			"output-prefix": "SZ_abs_0.001_",
+			"abs": 1E-3
+		},
+
+
+		{
+            "name": "SZ",
+            "output-prefix": "SZ_abs_0.01_",
+            "abs": 1E-2
+        },
+
+		 {
+            "name": "BLOSC",
+            "output-prefix": "BLOSC_"
+        },
+
+
+		{
+			"name": "fpzip",
+			"bits": 16,
+			"output-prefix": "fpzip_24_"
+		},
+
+		{
+			"name": "zfp",
+			"output-prefix": "zfp_abs_.01_",
+			"abs": 1E-2
+		},
+
+		{
+			"name": "fpzip",
+			"bits": 8,
+			"output-prefix": "fpzip_14_"
+		}
+	],
+
+	"cbench": 
+	{
+		"path": "mpirun $foresight-home$build/CBench",
+
+		"output": 
+		{
+			"output-decompressed": true,
+			"output-decompressed-location": "decompressed_files",
+
+			"logfname-comment": "name of output log file",
+			"log-file": "runlog_",
+
+			"metricsfname-comment": "name of file with output",
+			"metrics-file": "metrics_"
+		},
+
+		"metrics": 
+		[
+			{
+				"name": "absolute_error",
+				"histogramx" : [ "absJ_8800" ]
+			},
+
+			{
+				"name": "relative_error"
+			},
+
+			{
+				"name": "mse"
+			},
+
+			{
+				"name": "psnr"
+			},
+
+			{
+				"name" : "minmax"
+			}
+		],
+
+		"evn_path": "scripts/VizAly-CBench.bash.darwin",
+
+		"configuration": 
+		{
+			"partition": "galton",
+			"nodes": 8,
+			"ntasks-per-node": 8
+		}
+	},
+
+	"pat": {
+		"evn_path": "scripts/VizAly-CBench.bash.darwin",
+
+		"analysis-tool": 
+		{
+			"gimlet-home": "/projects/exasky/gimlet2",
+
+			"analytics": 
+			[
+				
+			]
+		},
+
+		"input-files": [],
+		"analysis": []
+	},
+
+
+	"cinema-plots": 
+	{
+		"cinema-db-name": "cinemaDB",
+		"plotting": {
+			"x-range": [0, 11],
+			"checks" :
+			[
+				{
+					"operand" : "pk_ratio",
+					"operator" : "<",
+					"result" : 0.01
+				}
+			]
+		},
+
+		"evn_path": "scripts/VizAly-CBench.bash.darwin",
+		"configuration": {
+			"partition": "galton",
+			"nodes": 1,
+			"ntasks-per-node": 8
+		}
+	}
+}
+
