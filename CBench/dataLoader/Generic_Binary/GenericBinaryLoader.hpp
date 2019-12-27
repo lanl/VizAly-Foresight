@@ -127,7 +127,8 @@ inline void GenericBinaryLoader::init(std::string _filename, MPI_Comm _comm)
    	 	{
    	 		scalar temp;
    	 		ifs >> temp.name >> temp.type >> temp.offset;
-   	 		scalars.push_back(temp);
+			if (temp.name != "")
+   	 			scalars.push_back(temp);
     	}
   	}
   	else 
@@ -193,6 +194,7 @@ inline int GenericBinaryLoader::loadData(std::string paramName)
 
 
 	elemSize = Memory::sizeOf[currentDataType];
+	dataType = currentDataType;
 	MPI_Offset mpi_offset = offset;
 
 
@@ -399,20 +401,13 @@ inline int GenericBinaryLoader::writeData(std::string _filename)
 	_filename = _filename + ".raw";
 	MPI_File_open(comm, _filename.c_str(), MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fh);
 
-	
+
 	for (int i=0; i<scalars.size(); i++)
 	{
-
 		if (scalars[i].compressed == false)
 		{
 			scalars[i].toBeCompressed = false;
 			loadData(scalars[i].name);
-
-			//std::cout << "@@@@loaded name: " << scalars[i].name << " compressed = false" << std::endl;
-		}
-		else
-		{
-			//std::cout << "^^^^previously compressed name: " << scalars[i].name << std::endl;
 		}
 
 

@@ -80,7 +80,7 @@ inline int FPZIPCompressor::compress(void* input, void *&output, std::string dat
 	cbytes = fpzip_write(fpz, input);
 	if (!cbytes) 
 	{
-		fprintf(stderr, "compression failed: %s\n", fpzip_errstr[fpzip_errno]);
+		fprintf(stderr, "FPZIP compression failed: %s\n", fpzip_errstr[fpzip_errno]);
 		return 0;
 	}
 
@@ -129,7 +129,7 @@ inline int FPZIPCompressor::decompress(void *&input, void *&output, std::string 
 
 	if (!fpzip_read(fpz, output)) 
 	{
-		fprintf(stderr, "decompression failed: %s\n", fpzip_errstr[fpzip_errno]);
+		fprintf(stderr, "FPZIP decompression failed: %s\n", fpzip_errstr[fpzip_errno]);
 		return EXIT_FAILURE;
 	}
 

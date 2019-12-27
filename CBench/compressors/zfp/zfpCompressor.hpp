@@ -99,6 +99,8 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
 
 	zfp_type type = getZfpType( dataType );
 
+    //std::cout << "n: " << n[0] << ", " << n[1] << ", " << n[2] << " #dims: " << numDims << ", dt: " << dataType << " dt size: " << dataTypeSize << std::endl;
+
     // allocate meta data for the 1D input array
     zfp_field* field;
     if (numDims == 1)
@@ -134,7 +136,7 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
     size_t zfpsize = zfp_compress(zfp, field);
     if (!zfpsize)
     {
-        std::cout << "compression failed\n";
+        std::cout << "ZFP compression failed\n";
         return 0;
     }
 
@@ -190,6 +192,8 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
     // allocate meta data  array of decompressed data
     output = malloc(numel*dataTypeSize);
 
+    //std::cout << "n: " << n[0] << ", " << n[1] << ", " << n[2] << " #dims: " << numDims << std::endl;
+ 
     zfp_field* field;
     if (numDims == 1)
         field = zfp_field_1d(output, type, numel);
@@ -226,7 +230,7 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
     size_t zfpsize  = zfp_decompress(zfp, field);
     if (! zfpsize)
     {
-        std::cout << "decompression failed\n";
+        std::cout << "ZFP decompression failed\n";
         return 0;
     }
     

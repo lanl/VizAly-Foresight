@@ -16,6 +16,7 @@ from turb_funcs import diagnostics_np
 import os, sys
 import pdb
 
+
 def minmaxscaler(data):
     """ scale large turbulence dataset by channel"""
     nsnaps = data.shape[0]
@@ -36,6 +37,7 @@ def minmaxscaler(data):
     np.save('rescale_coeffs_3DHIT', rescale_coeffs)
     return data_scaled
 
+
 def inverse_minmaxscaler(data,filename):
     """ Invert scaling using previously saved minmax coefficients """
     rescale_coeffs = np.load(filename)
@@ -52,6 +54,7 @@ def inverse_minmaxscaler(data,filename):
         data_orig.append(temp)
     data_orig = np.stack(data_orig, axis=4)
     return data_orig
+
 
 def convert_to_torchchannel(data):
     """ converts from  [snaps,dim1,dim2,dim3,nch] ndarray to [snaps,nch,dim1,dim2,dim3] torch tensor"""
@@ -80,6 +83,7 @@ def convert_to_numpychannel_fromtorch(tensor):
 # Gather inputs
 filename1 = sys.argv[1]
 filename2 = sys.argv[2]
+outputdir = sys.argv[3]
 snapshots = 50
 numScalars = 5
 dimX = 128
@@ -100,6 +104,7 @@ data2 = fields2[:snapshots,:,:,:,:numScalars]
 mod = data1[0,:,:,:,:3]
 dns = data2[0,:,:,:,:3]
 
-diagnostics_np(mod,dns,save_dir='diagnosticsCAE/', iteration=1, pos=[0,0,1], dx=[0.049, 0.049, 0.049], diagnostics=['spectrum', 'intermittency', 'structure_functions','QR'])
+outputPath = outputdir + '/'
+diagnostics_np(mod,dns,save_dir=outputPath, iteration=1, pos=[0,0,1], dx=[0.049, 0.049, 0.049], diagnostics=['spectrum', 'intermittency', 'structure_functions','QR'])
 
 print('done')

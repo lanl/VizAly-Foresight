@@ -145,7 +145,7 @@ inline int ZFPCompressorGpu::compress(void *input, void *&output, std::string da
         size_t zfpsize = zfp_compress(zfp, field);
         if (!zfpsize)
         {
-            std::cout << "compression failed\n";
+            std::cout << "GPU ZFP compression failed\n";
             return 0;
         }
 
@@ -249,7 +249,7 @@ inline int ZFPCompressorGpu::decompress(void *&input, void *&output, std::string
         size_t zfpsize  = zfp_decompress(zfp, field);
         if (! zfpsize)
         {
-            std::cout << "decompression failed\n";
+            std::cout << "GPU ZFP decompression failed\n";
             return 0;
         }
     

@@ -41,6 +41,7 @@ def minmaxscaler(data):
     np.save('rescale_coeffs_3DHIT', rescale_coeffs)
     return data_scaled
 
+
 def inverse_minmaxscaler(data,filename):
     """ Invert scaling using previously saved minmax coefficients """
     rescale_coeffs = np.load(filename)
@@ -57,6 +58,7 @@ def inverse_minmaxscaler(data,filename):
         data_orig.append(temp)
     data_orig = np.stack(data_orig, axis=4)
     return data_orig
+
 
 def convert_to_torchchannel(data):
     """ converts from  [snaps,dim1,dim2,dim3,nch] ndarray to [snaps,nch,dim1,dim2,dim3] torch tensor"""

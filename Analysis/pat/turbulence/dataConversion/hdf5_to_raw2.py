@@ -5,17 +5,17 @@ import numpy as np
 
 
 def write_info_file(filename, dimsx, dimsy, dimsz, scalars, dataTypes):
-	file = open(filename,"w") 
-	file.write(filename + "\n") 
-	file.write(str(dimsx) + "\n") 
-	file.write(str(dimsy) + "\n") 
-	file.write(str(dimsz) + "\n") 
-	cummulativeOffset = 0
-	for i in range(len(scalars)):
-		file.write(scalars[i] + " double " + str(cummulativeOffset) + "\n") 
-		cummulativeOffset = cummulativeOffset + dimsx * dimsy * dimsz * 8
-	file.close() 
+    file = open(filename,"w")
+    file.write(filename + "\n")
+    file.write(str(dimsx) + "\n")
+    file.write(str(dimsy) + "\n")
+    file.write(str(dimsz) + "\n")
+    cummulativeOffset = 0
 
+    for i in range(len(scalars)):
+        file.write(scalars[i] + " double " + str(cummulativeOffset) + "\n")
+        cummulativeOffset = cummulativeOffset + dimsx * dimsy * dimsz * 8
+    file.close()
 
 
 def hdf5_to_raw(filename, outputFolder, scalars, timestep):
@@ -36,10 +36,8 @@ def hdf5_to_raw(filename, outputFolder, scalars, timestep):
 	print("num_scalars: ", num_scalars)
 
 	# Select scalars
-	#scalars = ["a","b","vx","vy","vz"]
 	dataTypes = []
 
-	#readInDataset = np.empty([dimx, dimy, dimz], dtype=np.float64)
 	num_elements = dimx * dimy * dimz * num_scalars
 	readInDataset = np.empty([num_elements], dtype=np.float64)
 
@@ -54,15 +52,17 @@ def hdf5_to_raw(filename, outputFolder, scalars, timestep):
 				for _x in range(dimx):
 					readInDataset[count] = dataTimestep1[_x][_y][_z][index]
 					count = count + 1
-
-
+	
+ 	# Do output
+	
+ 	# write file data
 	outputfileName =  "turbulence_ts_" + str(timestep) + ".raw"
 	out_file = open( (outputFolder+ "/" + outputfileName), 'wb')
 	readInDataset.tofile(out_file)
+ 
+	# write file info
+	write_info_file(outputFolder + "/turbulence_ts_" + str(timestep) + ".info", dimx, dimy, dimz, scalars, dataTypes)
 
-	#write_info_file(outputFolder + "/ts_" + str(ts) + "_" + scalars[index] + ".info", dimx, dimy, dimz, "double")
-	write_info_file(outputFolder + "/turbulence_ts_" + str(ts) + ".raw", dimx, dimy, dimz, scalars, dataTypes)
-	
 	print("wrote out ", outputfileName)
 
 
