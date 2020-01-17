@@ -1,59 +1,90 @@
 {
-	"project-home": "/usr/projects/ml_compression/runs/",
+	"project-home": "/usr/projects/ml_compression/VizAly-Foresight-CBench/build/runs/",
 	"wflow-path": "test-ml-turbulence",
 	"foresight-home": "/usr/projects/ml_compression/VizAly-Foresight-CBench/",
 
-    "input": 
-    {
+	"cbench-pre-process": [{
+		"script": "python /usr/projects/ml_compression/VizAly-Foresight-CBench/Analysis/pat/turbulence/dataConversion/hdf5_to_raw.py",
+		"env": "/usr/projects/ml_compression/VizAly-Foresight-CBench/scripts/VizAly-CBench.bash.darwin",
+		"exec-dir": "preprocess",
+		"params": [
+			"/usr/projects/ml_compression/data/original/scalarHIT_fields100.h5",
+			"one",
+			"two",
+			"vx",
+			"vy",
+			"vz",
+			"0",
+			"50",
+			"/usr/projects/ml_compression/data/convesion1/"
+		],
+
+		"configuration": {
+			"nodes": 1,
+			"ntasks-per-node": 8,
+			"partition": "scaling"
+		}
+	}],
+
+	"cbench-post-process": [{
+		"script": "python /usr/projects/ml_compression/VizAly-Foresight-CBench/Analysis/pat/turbulence/dataConversion/raw_to_hdf5.py",
+		"env": "/usr/projects/ml_compression/VizAly-Foresight-CBench/scripts/VizAly-CBench.bash.darwin",
+		"exec-dir": "postprocess",
+		"params": [
+			"128",
+			"128",
+			"128",
+			"/usr/projects/ml_compression/VizAly-Foresight-CBench/build/runs/test-ml-turbulence/cbench/decompressed_files/",
+			"0",
+			"50",
+			"one",
+			"two",
+			"vx",
+			"vy",
+			"vz",
+			"['SZ_abs_0.01_','BLOSC_']"
+		],
+
+		"configuration": {
+			"nodes": 1,
+			"ntasks-per-node": 8,
+			"partition": "scaling"
+		}
+	}],
+
+	"input": {
 		"filetype": "RAW",
 
-		"timesteps" : [0, 50],
+		"timesteps": [0, 50],
 		"filename": "/usr/projects/ml_compression/data/convesion1/turbulence_ts_%.info",
-		
-		"scalars": [ "vx", "vy", "vz" ],
-		"uncompressed" : ["one", "two"]
+
+		"scalars": ["vx", "vy", "vz"],
+		"uncompressed": ["one", "two"]
 	},
 
 	"compressor-comment": "which compressors to test",
-	"compressors": 
-	[
-		{
-            "name": "BLOSC",
-            "output-prefix": "BLOSC_"
-        },
+	"compressors": [{
+			"name": "BLOSC",
+			"output-prefix": "BLOSC_"
+		},
 
-        {
+		{
 			"name": "SZ",
 			"output-prefix": "SZ_abs_0.01_",
 			"abs": 1E-2
-        },
+		},
 
-        {
+		{
 			"name": "SZ",
 			"output-prefix": "SZ_abs_0.1_",
 			"abs": 1E-1
-        },
-
-        {
-            "name" : "zfp",
-            "output-prefix" : "zfp_abs_0.01_",
-            "abs" : 1E-2
-        },
-
-        {
-            "name" : "zfp",
-            "output-prefix" : "zfp_abs_0.1_",
-            "abs" : 1E-1
-        }
-  
+		}
 	],
 
-	"cbench": 
-	{
+	"cbench": {
 		"path": "mpirun $foresight-home$build/CBench",
 
-		"output": 
-		{
+		"output": {
 			"output-decompressed": true,
 			"output-decompressed-location": "decompressed_files",
 
@@ -64,9 +95,7 @@
 			"metrics-file": "metrics_"
 		},
 
-		"metrics": 
-		[
-			{
+		"metrics": [{
 				"name": "absolute_error"
 			},
 
@@ -83,31 +112,52 @@
 			},
 
 			{
-				"name" : "minmax"
+				"name": "minmax"
 			}
 		],
 
 		"evn_path": "scripts/VizAly-CBench.bash.darwin",
 
-		"configuration": 
-		{
+		"configuration": {
 			"partition": "scaling",
 			"nodes": 8,
 			"ntasks-per-node": 8
 		}
 	},
 
-    "pat": 
-    {
-		"evn_path": "scripts/VizAly-CBench.bash.darwin",
+	"pat": {
+		"evn_path": "scripts/VizAly-CBench.bash.darwin-autoencoder",
 
-		"analysis-tool": 
-		{
-			"gimlet-home": "/projects/exasky/gimlet2",
+		"analysis-tool": {
+			"analytics": [{
+					"name": "ml-comparison",
+					"params": [
+						"/usr/projects/ml_compression/VizAly-Foresight-CBench/Analysis/pat/turbulence/turbulence_analytics/debugInference.py",
+						"/usr/projects/ml_compression/data/scalarHIT_fields100.h5",
+						"['/usr/projects/ml_compression/VizAly-Foresight-CBench/build/runs/test-ml-turbulence/postprocess/SZ_abs_0.01_.h5','/usr/projects/ml_compression/VizAly-Foresight-CBench/build/runs/test-ml-turbulence/postprocess/BLOSC_.h5']",
+						"['SZ_abs_0.01_','BLOSC_']"
+					],
+					"path": "python /usr/projects/ml_compression/VizAly-Foresight-CBench/Analysis/pat/turbulence/turbulence_analytics/runInference.py",
+					"configuration": {
+						"nodes": 1,
+						"constraint": "volta-x86"
+					}
+				},
 
-			"analytics": 
-			[
-				
+				{
+					"name": "ml-comparison-plot",
+					"params": [
+						"/usr/projects/ml_compression/VizAly-Foresight-CBench/Analysis/pat/turbulence/turbulence_analytics/plot_all.py",
+						"['SZ_abs_0.01_','BLOSC_']",
+						"['SZ_abs_0.01_','BLOSC_']",
+						"plots"
+					],
+					"path": "python /usr/projects/ml_compression/VizAly-Foresight-CBench/Analysis/pat/turbulence/turbulence_analytics/runPlot.py",
+					"configuration": {
+						"nodes": 1,
+						"constraint": "general"
+					}
+				}
 			]
 		},
 
@@ -116,19 +166,15 @@
 	},
 
 
-	"cinema-plots": 
-	{
+	"cinema-plots": {
 		"cinema-db-name": "cinemaDB",
 		"plotting": {
 			"x-range": [0, 11],
-			"checks" :
-			[
-				{
-					"operand" : "pk_ratio",
-					"operator" : "<",
-					"result" : 0.01
-				}
-			]
+			"checks": [{
+				"operand": "pk_ratio",
+				"operator": "<",
+				"result": 0.01
+			}]
 		},
 
 		"evn_path": "scripts/VizAly-CBench.bash.darwin",
@@ -139,4 +185,3 @@
 		}
 	}
 }
-

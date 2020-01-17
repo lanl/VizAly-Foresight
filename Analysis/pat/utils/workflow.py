@@ -39,6 +39,17 @@ class Workflow(object):
 		self.json_data["git-tag"] = git_tag
 
 
+	def preprocess_cbench(self):
+		""" Place holder for operations that might need to be done before running cbench
+		"""
+		return None
+
+
+	def postprocess_cbench(self):
+		""" Place holder for operations that might need to be done after running cbench
+		"""
+		return None
+
 
 	def add_job(self, job, dependencies=None):
 		""" Adds a job to the workflow.
@@ -105,6 +116,9 @@ class Workflow(object):
 						 configurations=configurations,
 						 environment=environment)
 		cbench_job.add_command("mkdir -p logs")
+  
+		for job in self.jobs:
+			cbench_job.add_parents(job)
 		self.add_job(cbench_job)
 
 

@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 import sys
 import os
+import re
 import json
 import csv
 import argparse
@@ -18,9 +19,33 @@ def validate_num_args(num_arguments, min_count):
 	return True
 
 
+def parseList(s):
+	# s should be in the format ['aa','bb','cc']
+	try:
+		s1 = s.replace('[','')
+		s2 = s1.replace(']','')
+		s3 = s2.replace('\'','')
+
+		l = list(map(str, s3.split(',')))
+		return l
+
+	except:
+		raise argparse.ArgumentTypeError("Something is wrong with the list")
+
+
 def splitString(filename, char):
 	k = filename.rfind(char)
 	return filename[:k+1], filename[k+1:]
+
+
+# From: https://stackoverflow.com/questions/2669059/how-to-sort-alpha-numeric-set-in-python
+def sorted_nicely(l):
+	""" Sort the given iterable in the way that humans expect.""" 
+ 
+	convert = lambda text: int(text) if text.isdigit() else text 
+	alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+	return sorted(l, key = alphanum_key)
+
 
 
 # Commands
@@ -90,6 +115,38 @@ def write_csv(csv_file, contents):
 	with open(csv_file, 'w') as csvoutput:
 		writer = csv.writer(csvoutput, lineterminator='\n')
 		writer.writerows(contents)
+
+
+def merge_CSV(csv_file1, csv_file2, output_csv):
+	all_runs = []
+
+	# Open file 1
+	reader1 = open_csv_file(csv_file1)
+	row1 = next(reader1)
+	all_runs.append(row1)
+
+	# Open file 2
+	reader2 = open_csv_file(csv_file2)
+	row2 = next(reader2)
+	all_runs.append(row2)
+
+
+	# Write out file
+	write_csv(output_csv, all_runs)
+
+
+def append_csv(csv_file, row):
+
+	# Open file
+	reader = open_csv_file(csv_file)
+
+	# Append row
+	all_runs = []
+	row = next(reader)
+	all_runs.append(row)
+
+	# Write out file
+	write_csv(csv_file, all_runs)
 
 
 def extract_csv_col(filename, delimiter_char, colpos):

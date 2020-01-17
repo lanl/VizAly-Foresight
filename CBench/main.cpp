@@ -498,7 +498,6 @@ int main(int argc, char *argv[])
 			}
 
 
-
 			//
 			// write data to disk if requested in the json file
 			//

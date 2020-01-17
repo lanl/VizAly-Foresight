@@ -4,19 +4,18 @@ import h5py
 import numpy as np
 
 
-def write_info_file(filename, dimsx, dimsy, dimsz, dataType):
-	file = open(filename,"w") 
- 
-	file.write("0\n") 
-	file.write(str(dimsx) + "\n") 
-	file.write(str(dimsy) + "\n") 
-	file.write(str(dimsz) + "\n") 
-	file.write("0\n") 
-	file.write(str(dimsx) + "\n") 
-	file.write(str(dimsy) + "\n") 
-	file.write(str(dimsz) + "\n") 
-	file.write(dataType) 	 
-	file.close() 
+def write_info_file(filename, dimsx, dimsy, dimsz, scalars, dataTypes):
+    file = open(filename,"w")
+    file.write(filename + "\n")
+    file.write(str(dimsx) + "\n")
+    file.write(str(dimsy) + "\n")
+    file.write(str(dimsz) + "\n")
+    cummulativeOffset = 0
+
+    for i in range(len(scalars)):
+        file.write(scalars[i] + " double " + str(cummulativeOffset) + "\n")
+        cummulativeOffset = cummulativeOffset + dimsx * dimsy * dimsz * 8
+    file.close()
 
 
 def hdf5_to_raw(filename, outputFolder, scalars, timestep):
@@ -32,26 +31,39 @@ def hdf5_to_raw(filename, outputFolder, scalars, timestep):
 	dimx = dataTimestep1.shape[0]
 	dimy = dataTimestep1.shape[1]
 	dimz = dataTimestep1.shape[2]
+	num_scalars = dataTimestep1.shape[3]
+
+	print("num_scalars: ", num_scalars)
 
 	# Select scalars
-	#scalars = ["vx", "vy", "vz"]
+	dataTypes = []
 
-	readInDataset = np.empty([dimx, dimy, dimz], dtype=np.float64)
+	num_elements = dimx * dimy * dimz * num_scalars
+	readInDataset = np.empty([num_elements], dtype=np.float64)
 
 	# Process data and output
-	for index in range(dataTimestep1.shape[3]):
+	count = 0
+	for index in range(num_scalars):
+		dataTypes.append( type(dataTimestep1[0][0][0][index]) )
+		print("index:", index)
+
 		for _z in range(dimz):
 			for _y in range(dimy):
 				for _x in range(dimx):
-					readInDataset[_x][_y][_z] = dataTimestep1[_x][_y][_z][index]
+					readInDataset[count] = dataTimestep1[_x][_y][_z][index]
+					count = count + 1
+	
+ 	# Do output
+	
+ 	# write file data
+	outputfileName =  "turbulence_ts_" + str(timestep) + ".raw"
+	out_file = open( (outputFolder+ "/" + outputfileName), 'wb')
+	readInDataset.tofile(out_file)
+ 
+	# write file info
+	write_info_file(outputFolder + "/turbulence_ts_" + str(timestep) + ".info", dimx, dimy, dimz, scalars, dataTypes)
 
-
-		outputfileName =  "ts_" + str(timestep) + "_" + scalars[index] + ".gda"
-		out_file = open( (outputFolder+ "/" + outputfileName), 'wb')
-		
-		write_info_file(outputFolder + "/ts_" + str(ts) + "_" + scalars[index] + ".info", dimx, dimy, dimz, "double")
-		readInDataset.tofile(out_file)
-		print("wrote out ", outputfileName)
+	print("wrote out ", outputfileName)
 
 
 
@@ -92,5 +104,4 @@ for ts in range(timestep1, timestep2):
 
 
 # Run as:
-# python hdf5_to_raw.py /bigData/Turbulence/scalarHIT_fields100.h5 one two vx vy vz 0 50  gdaFiles 
-# python3 dataConversion/hdf5_to_raw.py /bigData/Turbulence/scalarHIT_fields100.h5 one two vx vy vz 0 50  data/gdaOriginalFiles
+# python dataConversion/hdf5_to_raw2.py /projects/ml_compression/data/scalarHIT_fields100.h5 one two vx vy vz 0 50  temp

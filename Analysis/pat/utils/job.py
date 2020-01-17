@@ -8,8 +8,7 @@ class Job(object):
 	""" Class that describes a single job in a workflow.
 	"""
 
-	def __init__(self, executable, execute_dir=".", arguments=None, configurations=[], name=None,
-				 environment=None):
+	def __init__(self, executable, execute_dir=".", arguments=None, configurations=[], name=None, environment=None):
 
 		# store meta-data about the job
 		self.name = name
@@ -20,6 +19,7 @@ class Job(object):
 		# store command
 		self.execute_dir = execute_dir
 		self.executable = executable
+		print("args", arguments)
 		self.arguments = arguments if arguments != None else []
 		self.commands = []
 
@@ -34,7 +34,7 @@ class Job(object):
 
 	def add_command(self, command):
 		self.commands.append(command)
-		
+
 
 	def add_parents(self, *jobs):
 		self._parents += jobs

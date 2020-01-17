@@ -3,6 +3,7 @@ Debugging weird error in Pascal converted Raw data
 """
 
 import numpy as np
+import os
 import torch
 from torch import nn
 from tqdm import tqdm
@@ -105,6 +106,7 @@ mod = data1[0,:,:,:,:3]
 dns = data2[0,:,:,:,:3]
 
 outputPath = outputdir + '/'
+#os.mkdir("outputPath")
 diagnostics_np(mod,dns,save_dir=outputPath, iteration=1, pos=[0,0,1], dx=[0.049, 0.049, 0.049], diagnostics=['spectrum', 'intermittency', 'structure_functions','QR'])
 
 print('done')
