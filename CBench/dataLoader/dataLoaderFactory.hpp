@@ -43,6 +43,11 @@ class DataLoaderFactory
 			return new GDADataLoader();
 	  #endif
 
+	  #ifdef CBENCH_HAS_AMReX
+		if (loaderName == "PLT")
+			return new PltDataLoader();
+	  #endif
+
 		return NULL;
 	}
 };

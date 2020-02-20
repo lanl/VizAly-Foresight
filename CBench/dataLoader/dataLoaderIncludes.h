@@ -15,3 +15,7 @@
 #ifdef CBENCH_HAS_GDA
 	#include "VPIC_GDA/GDADataLoader.hpp"
 #endif
+
+#ifdef CBENCH_HAS_AMReX
+	#include "AMReX/PltDataLoader.hpp"
+#endif

@@ -29,6 +29,17 @@ if (CBENCH_LOADER_GDA)
 endif()
 
 
+# AMRex Plt File Loader
+option(CBENCH_LOADER_AMReX "Enables the reading of AMRex Plt Files" OFF)
+if (CBENCH_LOADER_AMReX)
+	add_definitions(-DCBENCH_HAS_AMReX)
+	set (AMReX_PATH ${AMReX_PATH} CACHE PATH "AMReX directory")
+	include_directories(${AMReX_PATH}/include)
+	link_directories(${AMReX_PATH}/lib)
+	set (EXTRA_LIBS ${EXTRA_LIBS} libamrex.so)
+endif()
+
+
 # VTK Loader
 option(CBENCH_LOADER_VTK "Enables the reading of VTK data" OFF)
 if (CBENCH_LOADER_VTK)
@@ -71,70 +82,6 @@ if (CBENCH_LOADER_NYX)
 		message(FATAL_ERROR "HDF5 library not found")
 	endif()
 endif()
-
-
-# Add external loaders
-#include_directories(${CMAKE_SOURCE_DIR}/dataLoader)
-#file(GLOB subdir "${CMAKE_SOURCE_DIR}/dataLoader/*")
-#foreach (dir ${subdir})
-#	# Skip files ending in .h
-#	if ("${dir}" MATCHES "\\.h$")
-#		continue()
-#	endif()
-
-#	# Skip files ending in .hpp
-#	if ("${dir}" MATCHES "\\.hpp$")
-#		continue()
-#	endif()
-	
-	# Skip files ending in .md
-#	if ("${dir}" MATCHES "\\.md$")
-#		continue()
-#	endif()
-
-
-#	include_directories(${dir})
-
-#	if (NOT EXISTS ${dir}/CMakeLists.txt)
-#		continue()
-#	else()
-		# Only process folders with a CMakelists.txt
-#		set_property(GLOBAL PROPERTY includeDirectories "")
-#		set_property(GLOBAL PROPERTY linkDirectories "")
-#		set_property(GLOBAL PROPERTY linkLibraries "")
-#		set_property(GLOBAL PROPERTY definitions "")
-#		set_property(GLOBAL PROPERTY includes "")
-		
-#		add_subdirectory(${dir})
-
-		#include directories to add
-#		get_property(incDir GLOBAL PROPERTY includeDirectories)
-#		include_directories(${incDir})
-
-		#include directories to add
-#		get_property(lnkDir GLOBAL PROPERTY linkDirectories)
-#		link_directories(${lnkDir})
-#		message(WARNING "lnkDir " ${lnkDir})
-
-		#link libraries to add directories to add
-#		get_property(linkLibs GLOBAL PROPERTY linkLibraries)
-#		set(EXTRA_LIBS ${EXTRA_LIBS}  ${linkLibs})
-#		message(WARNING "EXTRA_LIBS " ${linkLibs})
-
-		# add defintions
-#		get_property(def GLOBAL PROPERTY definitions)
-#		add_definitions (${def})
-
-		# add includes
-#		get_property(incs GLOBAL PROPERTY includes)
-#		if (incs STREQUAL "")
-#		else()
-#			include(${incs})
-#		endif()
-
-#	endif()
-#endforeach()
-
 
 
 # Creates header file, compressorIncludes.h, with all available compressors
