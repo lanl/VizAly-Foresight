@@ -174,8 +174,8 @@ endif()
 add_executable(CBench main.cpp)
 target_link_libraries(CBench ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO)
 
-add_executable(TestAMReX test.cpp)
-target_link_libraries(TestAMReX ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO)
+#add_executable(TestAMReX test.cpp)
+#target_link_libraries(TestAMReX ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO)
 
 
 # Install instructions
