@@ -10,7 +10,7 @@ mkdir install
 mkdir build
 cd build
 
-cmake .. -DCMAKE_INSTALL_PREFIX=../install
+cmake .. -DCMAKE_INSTALL_PREFIX=../install -DBUILD_SHARED_LIBS=ON
 make -j
 make install
 

@@ -1,0 +1,99 @@
+{
+	"project-home" : "/projects/exasky/VizAly-Foresight/",
+	"wflow-path": "epyc-fpzip-wflow-1",
+	"foresight-home" : "/projects/exasky/VizAly-Foresight/",
+
+	"input": 
+	{
+		"filetype": "PLT",
+		"filename": "/bigData/plt02669",  
+
+		"scalars-others": [ "rho_X", "rho_E", "rho_e", "xmom" , "ymom" , "zmom" ],
+		"scalars": [ "Temp", "density" ]
+	},
+
+	"compressor-comment" : "which compressors to test",
+	"compressors": 
+	[
+		{
+            "name" : "BLOSC",
+            "output-prefix" : "blosc"
+        },
+
+        {
+            "name" : "SZ",
+            "output-prefix" : "sz",
+            "abs" : 2E-3
+        },
+        
+        {
+            "name" : "zfp",
+            "output-prefix" : "zfp",
+            "abs" : 2E-3
+        }
+	],
+
+	
+	"cbench": 
+	{
+		"path" : "mpirun $foresight-home$build/CBench",
+
+		"output" :
+		{
+			"run-path" : "/projects/exasky/VizAly-Foresight/build/",
+
+			"output-decompressed": false,
+			"output-decompressed-location" : "decompressed_files",
+			
+			"logfname-comment": "name of output log file",
+			"log-file" : "runlog_",
+
+			"metricsfname-comment": "name of file with output",
+			"metrics-file" : "metrics_"
+		},
+
+
+		"metrics": 
+		[
+			{
+				"name" : "absolute_error"
+			},
+
+			{
+				"name" : "relative_error"
+			},
+
+			{
+				"name" : "mse"
+			},
+
+			{
+				"name" : "psnr"
+			},
+
+			{
+				"name" : "minmax",
+				"histogram" : [ "baryon_density" , "temperature" , "velocity_x" ]
+			}
+		],
+
+		"evn_path": "scripts/VizAly-CBench.bash.darwin",
+
+		"configuration": 
+		{
+			"partition": "amd-epyc",
+			"nodes": 1,
+			"ntasks-per-node": 64
+		}
+	},
+
+
+	"pat" :
+	{
+	},
+
+
+	"cinema-plots": 
+	{
+	}
+}

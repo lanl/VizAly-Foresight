@@ -56,7 +56,7 @@ class PltDataLoader: public DataLoaderInterface
 
 inline PltDataLoader::PltDataLoader()
 {
-	amrex::Initialize(MPI_COMM_WORLD);
+	
 }
 
 
@@ -74,36 +74,36 @@ inline void PltDataLoader::init(std::string _filename, MPI_Comm _comm)
 
 	MPI_Comm_size(comm, &numRanks);
 	MPI_Comm_rank(comm, &myRank);
-
-
-	amrex::DataServices::SetBatchMode();
-	amrex::Amrvis::FileType fileType(amrex::Amrvis::NEWPLT);
-	dataServices.Init(filename.c_str(), fileType);
-	if (!dataServices.AmrDataOk()) 
-	{
-		std::cout << "!dataServices.AmrDataOk()" << std::endl;
-		amrex::DataServices::Dispatch(amrex::DataServices::ExitRequest, NULL);
-	}
-
-	if (amrex::ParallelDescriptor::IOProcessor()) 
-	{
-		std::cout << "done." << std::endl;
-	}
+	
 
 	
 	dataType = "double";
 
 	
-
-	log << "original dims: " << origDims[0] << ", " << origDims[1] << ", " << origDims[1] << std::endl;
-	log << "real dims : " << origRealDims[0] << ", " << origRealDims[1] << ", " << origRealDims[1] << std::endl;
-	log << "dataType : " << dataType << std::endl;
+	amrex::Initialize(comm);
+	
 }
 
 
 
 inline int PltDataLoader::loadData(std::string paramName)
 {
+
+	log << "loading plt file " << filename << std::endl;
+	
+
+	amrex::DataServices::SetBatchMode();
+	amrex::Amrvis::FileType fileType(amrex::Amrvis::NEWPLT);
+	amrex::DataServices dataServices(filename.c_str(), fileType);
+	if (!dataServices.AmrDataOk()) 
+	{
+		std::cout << "!dataServices.AmrDataOk()" << std::endl;
+		amrex::DataServices::Dispatch(amrex::DataServices::ExitRequest, NULL);
+	}
+
+	amrex::ParallelDescriptor::IOProcessor();
+
+
 	//
 	// Read metadata.
 	//
@@ -136,7 +136,6 @@ inline int PltDataLoader::loadData(std::string paramName)
 		destFillComps[i] = i;
 	}
 
-
 	//
 	// Make boxes and boxarray.
 	//
@@ -151,17 +150,10 @@ inline int PltDataLoader::loadData(std::string paramName)
 
 	amrex::ParallelDescriptor::IOProcessor();
 
-	// if (amrex::ParallelDescriptor::IOProcessor()) 
-	// {
-	//     printf("The grid has a shape of (%i, %i, %i), %.3e cells total.\n\n",
-	//            (int)grid_nx, (int)grid_ny, (int)grid_nz, (double)num_cells);
-	//     printf("Making skewer chunks.\n");
-	//     fflush(stdout);
-	// }
 
 
 	 // Check if we can split along x evenly.
-	if (grid_nx % myRank != 0) 
+	if (grid_nx % numRanks != 0) 
 	{
 		if (amrex::ParallelDescriptor::IOProcessor()) 
 		{
@@ -173,8 +165,7 @@ inline int PltDataLoader::loadData(std::string paramName)
 	}
 
 
-
-	int chunk_size = grid_nx / myRank;
+	int chunk_size = grid_nx / numRanks;
 
 	// The box for z-pencils
 	amrex::Box bx_pencil(amrData.ProbDomain()[0]);
@@ -184,7 +175,7 @@ inline int PltDataLoader::loadData(std::string paramName)
 
 	// indexes
 	int i, ix_lo, ix_hi;
-	for (i=0; i<myRank; ++i) 
+	for (i=0; i<numRanks; ++i) 
 	{
 		ix_lo = chunk_size * i;
 		ix_hi = ix_lo + chunk_size - 1;
@@ -217,9 +208,8 @@ inline int PltDataLoader::loadData(std::string paramName)
 
 
 	//
-	// Start outputting.
+	// Start reading.
 	//
-
 	amrex::MultiFab mf1(ba, dmap, num_comps, ng);
 
 	amrData.FillVar(mf1, level, paramName.c_str(), comp_start);
@@ -294,8 +284,17 @@ inline int PltDataLoader::loadData(std::string paramName)
 	}
 	else
 	{
-		std::cout << "Something failed" << std::endl;
+		std::cout << myRank << " ~ Something failed" << std::endl;
 	}
+
+
+	log << "original dims: " << origDims[0] << ", " << origDims[1] << ", " << origDims[1] << std::endl;
+	log << "real dims : " << origRealDims[0] << ", " << origRealDims[1] << ", " << origRealDims[1] << std::endl;
+	log << "dataType : " << dataType << std::endl;
+
+	log << "loading plt param " << paramName  << " done!"<< std::endl;
+
+	return 1;
 }
 
 
