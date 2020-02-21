@@ -21,8 +21,8 @@ RUN yum install -y ocl-icd-devel
 # install CMake
 WORKDIR /src
 RUN source /opt/rh/devtoolset-6/enable && \
-    wget https://cmake.org/files/v3.11/cmake-3.11.0.tar.gz && \
-    tar -zxvf cmake-3.11.0.tar.gz && cd cmake-3.11.0 && \
+    wget https://cmake.org/files/v3.15/cmake-3.15.7.tar.gz && \
+    tar -zxvf cmake-3.15.7.tar.gz && cd cmake-3.15.7 && \
     ./bootstrap --prefix=/usr/local && \
     make -j $(getconf _NPROCESSORS_ONLN) install
 
