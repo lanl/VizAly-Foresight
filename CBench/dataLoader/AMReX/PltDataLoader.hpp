@@ -32,8 +32,6 @@ class PltDataLoader: public DataLoaderInterface
 	int numRanks;
 	int myRank;
 
-	float origRealDims[3];
-
 	void *tempData;
 
 	amrex::DataServices dataServices;
@@ -90,7 +88,7 @@ inline int PltDataLoader::loadData(std::string paramName)
 {
 
 	log << "loading plt file " << filename << std::endl;
-	
+	param = paramName;
 
 	amrex::DataServices::SetBatchMode();
 	amrex::Amrvis::FileType fileType(amrex::Amrvis::NEWPLT);
@@ -289,9 +287,11 @@ inline int PltDataLoader::loadData(std::string paramName)
 
 
 	log << "original dims: " << origDims[0] << ", " << origDims[1] << ", " << origDims[1] << std::endl;
-	log << "real dims : " << origRealDims[0] << ", " << origRealDims[1] << ", " << origRealDims[1] << std::endl;
+	log << "dims on this rank: " << sizePerDim[0] << ", " << sizePerDim[1] << ", " << sizePerDim[1] << std::endl;
+	log << "rankOffset: " << rankOffset[0] << ", " << rankOffset[1] << ", " << rankOffset[1] << std::endl;
 	log << "dataType : " << dataType << std::endl;
-
+	log << "elemSize : " << elemSize << std::endl << std::endl;
+	
 	log << "loading plt param " << paramName  << " done!"<< std::endl;
 
 	return 1;
