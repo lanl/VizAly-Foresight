@@ -20,8 +20,8 @@ Authors:
 #include <iterator>
 #include <algorithm>
 
-class UncompressedData{
-
+class UncompressedData
+{
   public:
 	std::string paramName = "";
 	std::string dataType = "";

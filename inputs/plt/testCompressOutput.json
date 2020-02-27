@@ -6,10 +6,12 @@
 	"input": 
 	{
 		"filetype": "PLT",
-		"filename": "/bigData/plt02669",  
+		"filename": "/bigData/plt00875",  
 
 		"scalars-uncompressed": [ "adv_0", "rho_X", "rho_E", "rho_e", "xmom" , "ymom" , "zmom" ],
-		"scalars": [ "Temp", "density", "adv_0", "rho_X", "rho_E", "rho_e", "xmom" , "ymom" , "zmom" ]
+		"scalars": [ "Temp", "density", "particle_mass_density", "phi_grav", "rho_e", "xmom" , "ymom" , "zmom" ]
+
+
 	},
 
 	"compressor-comment" : "which compressors to test",
@@ -42,7 +44,7 @@
 		{
 			"run-path" : "/projects/exasky/VizAly-Foresight/build/",
 
-			"output-decompressed": false,
+			"output-decompressed": true,
 			"output-decompressed-location" : "decompressed_files",
 			
 			"logfname-comment": "name of output log file",

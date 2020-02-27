@@ -33,6 +33,8 @@ class HACCDataLoader: public DataLoaderInterface
 	int mpiCartPartitions[3];
 
   public:
+  	
+  	
 	HACCDataLoader();
 	~HACCDataLoader();
 

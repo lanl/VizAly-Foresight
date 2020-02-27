@@ -9,8 +9,7 @@ Authors:
  - Jesus Pulido
 ================================================================================*/
 
-#ifndef _DATA_LOADER_INTERFACE_H_
-#define _DATA_LOADER_INTERFACE_H_
+#pragma once
 
 #include <string>
 #include <mpi.h>
@@ -19,6 +18,47 @@ Authors:
 #include <list>
 
 #include "HACC/gioData.hpp"
+
+
+class ScalarData
+{
+  public:
+	std::string paramName = "";
+	std::string dataType = "";
+	size_t numElements = 0;
+	size_t dims[3] = {0, 0, 0};	
+	size_t offset[3] = {0, 0, 0};	
+
+
+  	void *data = nullptr;
+
+	ScalarData() = default;
+	ScalarData(ScalarData const&) = default;
+	ScalarData(ScalarData&&) = default;
+	ScalarData(
+		std::string in_param_name,
+		std::string in_data_type,
+		size_t in_numElements,
+		size_t in_dims[3],
+		size_t in_offset[3]
+	) : paramName(in_param_name),
+		dataType (in_data_type),
+		numElements (in_numElements),
+		dims { in_dims[0], in_dims[1], in_dims[2] },
+		offset{ in_offset[0], in_offset[1], in_offset[2]}
+	{}
+
+	inline bool allocateMem()
+	{
+		return Memory::allocate(data, dataType, numElements);
+	}
+
+	inline bool deAllocateMem()
+	{
+		return Memory::release(data, dataType);
+	}
+};
+
 
 
 class DataLoaderInterface 
@@ -45,18 +85,20 @@ class DataLoaderInterface
   public:   // TO_CHANGE, *data should not be public
 	void *data;							// raw data pointer (do not touch outside!!)
 	
-	std::unordered_map<std::string, std::string> loaderParams;  // data-specific parameters, used by binary reader
+	//std::unordered_map<std::string, std::string> loaderParams;  // data-specific parameters, used by binary reader
 	std::vector<GioData> inOutData;				// passthrough data, used by genericio reader
-	std::vector<std::string> inOutDataName;		// passthrough data
+
 
   public:
 	virtual void init(std::string _filename, MPI_Comm _comm) = 0;
 	virtual int loadData(std::string paramName) = 0;					// Read op
 	virtual int saveCompData(std::string paramName, void * cData) = 0;	// Stores the data-pointer for future writing
 	virtual int writeData(std::string _filename) = 0;					// Write op
-	virtual int saveInputFileParameters() = 0;							// Reads file header only and stores data properties
 	virtual int close() = 0;
+
+	// these 3 need to be generalized -  each are used for one loaded only!!!
 	virtual void setParam(std::string paramName, std::string type, std::string value) = 0;
+	virtual int saveInputFileParameters() = 0;							// Reads file header only and stores data 
 	virtual bool loadUncompressedFields(nlohmann::json const& jsonInput) = 0; // Data passthrough, used by hdf5 reader
 
 	size_t getNumElements() { return numElements; }
@@ -236,4 +278,3 @@ inline void getMPIDivisions(int numRanks, int numDims, int divisions[3])
 	}
 }
 
-#endif

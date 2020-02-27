@@ -154,14 +154,14 @@ int main(int argc, char *argv[])
 		}
 
 
-		//
-		// Check if the datainfo field exist for a dataset
-		if (jsonInput["input"].find("datainfo") != jsonInput["input"].end())
-		{
-			// insert datainfo into loader parameter list
-			for (auto it = jsonInput["input"]["datainfo"].begin(); it != jsonInput["input"]["datainfo"].end(); it++)
-				ioMgr->loaderParams[it.key()] = strConvert::toStr(it.value());
-		}
+		// //
+		// // Check if the datainfo field exist for a dataset
+		// if (jsonInput["input"].find("datainfo") != jsonInput["input"].end())
+		// {
+		// 	// insert datainfo into loader parameter list
+		// 	for (auto it = jsonInput["input"]["datainfo"].begin(); it != jsonInput["input"]["datainfo"].end(); it++)
+		// 		ioMgr->loaderParams[it.key()] = strConvert::toStr(it.value());
+		// }
 
 		ioMgr->init(inputFilename, MPI_COMM_WORLD);
 		ioMgr->setSave(writeData);
@@ -442,12 +442,12 @@ int main(int argc, char *argv[])
 			Timer clockWrite;
 			clockWrite.start();
 
-			#if CBENCH_HAS_NYX
+		  #if CBENCH_HAS_NYX
 			debuglog << "\nLoading uncompressed fields" << std::endl;
 			ioMgr->loadUncompressedFields(jsonInput);
 			//debuglog << ioMgr->getLog();
 			MPI_Barrier(MPI_COMM_WORLD);
-			#endif
+		  #endif
 
 			debuglog << "Write data .... \n";
 
@@ -456,7 +456,7 @@ int main(int argc, char *argv[])
 			{
 				if (!ioMgr->inOutData[i].doWrite)
 				{
-					debuglog << "writing uncoompressed" << std::endl;
+					debuglog << "writing un-compressed" << std::endl;
 					ioMgr->loadData(ioMgr->inOutData[i].name);
 					ioMgr->saveCompData(ioMgr->inOutData[i].name, ioMgr->data);
 					ioMgr->close();
