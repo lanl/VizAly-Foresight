@@ -337,6 +337,9 @@ inline int PltDataLoader::writeData(std::string _filename)
 	Timer clock;
 	clock.start();
 
+	// Added the extension
+	_filename = _filename + ".h5";
+
 	//
 	// Create the HDF5 file
 	createHDF5(_filename);
