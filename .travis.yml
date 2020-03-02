@@ -8,6 +8,6 @@ jobs:
     - stage: test build
       script:
       # pull container
-      - docker pull cmbiwer/vizaly-cbench:v7
+      - docker pull cmbiwer/vizaly-cbench:v8
       # create a volume and run testing/travis/test_build.sh
-      - docker run -v "$(pwd)":/src/VizAly-CBench -it cmbiwer/vizaly-cbench:v7 /bin/bash /src/VizAly-CBench/testing/travis/test_build.sh
+      - docker run -v "$(pwd)":/src/VizAly-CBench -it cmbiwer/vizaly-cbench:v8 /bin/bash /src/VizAly-CBench/testing/travis/test_build.sh
