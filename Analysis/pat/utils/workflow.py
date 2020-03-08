@@ -1,12 +1,11 @@
-""" This module contains the base Workflow class.
-"""
 import sys
 import os
 import json
 import csv
+import argparse
 from collections import OrderedDict
 
-from pat.utils import file_utilities as futils
+from pat.utils import utilities as utils
 from pat.utils import plot_utilities as putils
 from pat.utils import job as j
 
@@ -34,45 +33,65 @@ class Workflow(object):
 		self.submit_file = None
 
 		# Add git tag
-		git_tag = futils.get_git_version(self.json_data['foresight-home'])
+		git_tag = utils.get_git_version(self.json_data['foresight-home'])
 		git_tag = git_tag.strip('\n')
 		self.json_data["git-tag"] = git_tag
 
 
-
-	def add_job(self, job, dependencies=None):
-		""" Adds a job to the workflow.
+	def fill_reduc_output_presets(self):
+		""" Fill in  ["data-reduction"]["output-files"] with some user specified presets
 		"""
-		self.jobs.append(job)
+		for item in self.json_data["data-reduction"]["pre-compressed"]:
+			json_item = {
+				"output-prefix" : item["output-prefix"],
+				"path" : item["path"]
+			}
+
+			self.json_data['data-reduction']['output-files'].append(json_item)
 
 
+	def fill_reduc_csv(self, filename):
+		""" Append cbench csv with other results
+		"""
+		header = utils.get_csv_header(filename)
+
+		for item in self.json_data["data-reduction"]["pre-compressed"]:
+			mylist = [''] * len(header)
+   
+			for params in item["compression-params"]:
+				index = 0
+				for h in header:
+					if h == params.key():
+						mylist[index] = params.value()
+					index = index + 1
+    
+			utils.append_list_as_row(filename, mylist)
 
 
-	def fill_input_files(self):
-		""" Fill in  ["pat"]["input-files"]
+	def fill_cbench_output_files(self):
+		""" Fill in  ["data-reduction"]["output-files"]
 		"""
 		base_path = self.json_data['project-home'] + self.json_data['wflow-path']
 
-		# Remove all entries if any
-		self.json_data['pat']['input-files'].clear()
+		## Remove all entries if any - useful for rerunning an existing workflow
+		self.json_data['data-reduction']['output-files'].clear()
 
 		# Add the original
-		orig_path_filename = futils.splitString(self.json_data['input']['filename'],'/')
+		orig_path_filename = utils.splitString(self.json_data['input']['filename'],'/')
 		orig_item = {
 			"output-prefix" : "orig",
 			"path" : self.json_data['input']['filename']
 		}
-		self.json_data['pat']['input-files'].append(orig_item)
+		self.json_data['data-reduction']['output-files'].append(orig_item)
 
 		# Add decompressed ones
-		for _file in self.json_data['compressors']:
+		for _file in self.json_data['data-reduction']['cbench-compressors']:
 			json_item = {
 				"output-prefix" : _file["output-prefix"],
-				"path" : base_path + "/cbench/" + self.json_data['cbench']['output']['output-decompressed-location'] + "/" + _file['output-prefix'] + "__" + orig_path_filename[1]
+				"path" : base_path + "/cbench/" + self.json_data['data-reduction']['cbench-output']['output-decompressed-location'] + "/" + _file['output-prefix'] + "__" + orig_path_filename[1]
 			}
 
-			self.json_data['pat']['input-files'].append(json_item)
-
+			self.json_data['data-reduction']['output-files'].append(json_item)
 
 
 	def add_cbench_job(self):
@@ -80,44 +99,85 @@ class Workflow(object):
 		"""
 	
 		# Set up environment
-		execute_dir = "cbench"
+		execute_dir = "reduction/cbench"
 
-		if "configuration" in self.json_data["cbench"].keys():
-			configurations = list(sum(self.json_data["cbench"]["configuration"].items(), ()))
+		if "configuration" in self.json_data["data-reduction"].keys():
+			configurations = list(sum(self.json_data["data-reduction"]["configuration"].items(), ()))
 		else:
 			configurations = None
 
-		if "evn_path" in self.json_data["cbench"]:
-			environment =  self.json_data["foresight-home"] + self.json_data["cbench"]["evn_path"]
+		if "evn_path" in self.json_data["data-reduction"]:
+			environment =  self.json_data["foresight-home"] + self.json_data["data-reduction"]["evn_path"]
 		else:
 			environment = None
 
-		# Find executable command
-		exec_command = self.json_data["cbench"]["path"]
-
-
-
 		# add a single CBench job to workflow for entire sweep
 		cbench_job = j.Job(name="cbench",
+						 job_type = "reduction",
 						 execute_dir=execute_dir,
-						 executable=exec_command,
+						 executable=self.json_data["data-reduction"]["path"],
 						 arguments=[self.json_path],
 						 configurations=configurations,
 						 environment=environment)
 		cbench_job.add_command("mkdir -p logs")
 		self.add_job(cbench_job)
+  
+		# Fill output files for cbench
+		self.fill_cbench_output_files()
 
 
-		# Fill in  ["pat"]["input-files"]
-		self.fill_input_files()
+	def add_job(self, this_job, dependencies="all_previous", filter=""):
+		""" Adds a job to the workflow.
+		"""
+		if dependencies == "all_previous":
+			if len(self.jobs) > 0:
+				job_list = []
+				for job in self.jobs:
+					job_list.append(job)
 
+				this_job.add_parents(job_list)
+			self.jobs.append(this_job)
+
+
+		elif dependencies == "type":
+			if len(self.jobs) > 0:
+				job_list = []
+				for job in self.jobs:
+					if job.job_type == filter:
+						job_list.append(job)
+
+				this_job.add_parents(job_list)
+
+			self.jobs.append(this_job)
+
+
+		elif dependencies == "single":
+			if len(self.jobs) > 0:
+				found_job = False
+				for job in self.jobs:
+					if job.name == filter:
+						this_job.add_parents([job])
+						found_job = True
+						break
+
+			self.jobs.append(this_job)
+
+
+		else:
+			self.jobs.append(this_job)
+
+
+
+	def add_data_reduction_jobs(self):
+		""" Adds analysis jobs to workflow that do not produce final products.
+		"""
+		raise NotImplementedError("Implement the `add_data_reduction` function to your workflow!")
 
 
 	def add_analysis_jobs(self):
 		""" Adds analysis jobs to workflow that do not produce final products.
 		"""
 		raise NotImplementedError("Implement the `add_analysis` function to your workflow!")
-
 
 
 	def add_cinema_plotting_jobs(self):
@@ -136,7 +196,7 @@ class Workflow(object):
 
 		# create workflow output dir
 		# change to workflow output dir
-		futils.create_folder(self.workflow_dir)
+		utils.create_folder(self.workflow_dir)
 		os.chdir(self.workflow_dir)
 	
 		# write JSON data
@@ -180,14 +240,23 @@ class Workflow(object):
 				fp.write("mkdir -p {}/{}\n".format(self.workflow_dir, job.execute_dir))
 				fp.write("cd {}/{}\n".format(self.workflow_dir, job.execute_dir))
 
-				for cmd in job.commands:
-					fp.write(cmd + "\n")
+				# Pre-job execution command
+				if job.commands != []:
+					for _cmd in job.commands:
+						fp.write(_cmd + "\n")
 
 				if job.environment != None:
 					fp.write("source {}\n".format(job.environment))
+
 				cmd = job.executable + " " + " ".join(map(str, job.arguments)) + "\n"
 				cmd = cmd.replace("$foresight-home$", foresight_home)
 				fp.write(cmd)
+
+				# post-job execution command
+				if job.post_commands != []:
+					for _cmd in job.post_commands:
+						fp.write(_cmd + "\n")
+
 				fp.write("date\n")
 
 			# append job to controller file
@@ -202,20 +271,57 @@ class Workflow(object):
 		""" Submits Slurm workflow.
 		"""
 		os.system("bash {}".format(self.submit_path))
+  
+  
+  
+  # Workflow specific utils
+  
+def parse_args():
+	# Parse Input
+	parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
+	parser.add_argument("--input-file")
+	parser.add_argument("--preview", 		 	action="store_true", help="preview the job, create scripts, ... but won't run")
+	
+	# run modes
+	#parser.add_argument("--all", action="store_true", help="run full pipeline")
+
+	parser.add_argument("--reduction-analysis", action="store_true", help="run data reduction and analysis only")
+	parser.add_argument("--analysis-cinema", 	action="store_true", help="run analysis and cinema job only")
+
+	parser.add_argument("--reduction",  	 	action="store_true", help="run data-reduction only")
+	parser.add_argument("--analysis",        	action="store_true", help="run analysis only")
+	parser.add_argument("--vis",             	action="store_true", help="run cinema only")
+	
+	opts = parser.parse_args()
+	return opts
 
 
-	def configuration_from_json_data(self, name):
-		if "configuration" in self.json_data["pat"]["analysis-tool"]["analytics"][name].keys():
-			configurations = list(sum(self.json_data["pat"]["analysis-tool"]["analytics"]
-													[name]["configuration"].items(), ()))
-		else:
-			configurations = None
-		return configurations
 
+def process_input(wflow, opts):
+	# add jobs to workflow
+	if opts.reduction:
+		print("Run data reduction only")
+		wflow.add_data_reduction_jobs()
+	elif opts.analysis:
+		print("Run data analysis only")
+		wflow.add_analysis_jobs()
+	elif opts.vis:
+		print("Run data analysis only")
+		wflow.add_cinema_plotting_jobs()
 
-	def environment_from_json_data(self):
-		if "evn_path" in self.json_data["pat"].keys():
-			env = self.json_data["pat"]["evn_path"]
-		else:
-			env = None
-		return env
+	elif opts.reduction_analysis:
+		print("Run data reduction + analysis")
+		wflow.add_data_reduction_jobs()
+		wflow.add_analysis_jobs()
+	elif opts.analysis_cinema:
+		print("Run analysis + cinema")
+		wflow.add_analysis_jobs()
+		wflow.add_cinema_plotting_jobs()
+
+	else:	
+		print("Run full: data reduction, analysis, and Cinema")
+		wflow.add_data_reduction_jobs()
+		wflow.add_analysis_jobs()
+		wflow.add_cinema_plotting_jobs()
+  
+	return wflow

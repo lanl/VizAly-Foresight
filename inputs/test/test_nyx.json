@@ -1,0 +1,228 @@
+{
+	"project-home" : "/Users/pascalgrosset/projects/VizAly-Foresight/runs/",
+	"wflow-path": "epyc-fpzip-wflow-8",
+	"foresight-home" : "/Users/pascalgrosset/projects/VizAly-Foresight/",
+
+	"input": 
+	{
+		"filetype": "NYX",
+		"filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",  
+
+
+		"group" : "native_fields",
+		"scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ],
+
+		"uncompressed": 
+		[
+			{
+				"group": "domain",
+				"attributes": [
+					{
+						"name": "shape",
+						"type": "int",
+						"size": 3
+					},
+					{
+						"name": "size",
+						"type": "double",
+						"size": 3
+					}
+				]
+			},
+
+			{
+				"group": "universe",
+				"attributes": 
+				[
+					{
+						"name": "hubble",
+						"type": "double",
+						"size": 1 
+					},
+
+					{
+						"name": "omega_b",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "omega_l",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "omega_m",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "redshift",
+						"type": "double",
+						"size": 1
+					}
+				]
+			}
+		]
+	},
+
+	
+	"data-reduction": 
+	{
+		"cbench-compressors": 
+		[
+			{
+				"name": "fpzip",
+				"bits" : 32,
+				"output-prefix" : "fpzip_32_"
+			},
+
+			{
+				"name": "fpzip",
+				"bits" : 14,
+				"output-prefix" : "fpzip_14_"
+			}
+		],
+
+		"cbench-metrics": 
+		[
+			{
+				"name" : "absolute_error"
+			},
+
+			{
+				"name" : "relative_error"
+			},
+
+			{
+				"name" : "mse"
+			},
+
+			{
+				"name" : "psnr"
+			},
+
+			{
+				"name" : "minmax",
+				"histogram" : [ "baryon_density",  "temperature",  "velocity_x" ]
+			}
+		],
+
+		"cbench-output" :
+		{
+			"run-path" : "/projects/exasky/VizAly-Foresight/build/",
+
+			"output-decompressed": true,
+			"output-decompressed-location" : "decompressed_files",
+			
+			"logfname-comment": "name of output log file",
+			"log-file" : "runlog_",
+
+			"metricsfname-comment": "name of file with output",
+			"metrics-file" : "metrics_"
+		},
+
+		"name" : "cbench",
+		"path" : "mpirun $foresight-home$build/CBench",
+		"evn_path": "scripts/VizAly-CBench.bash.darwin",
+		"configuration": 
+		{
+			"partition": "amd-epyc",
+			"nodes": 1,
+			"ntasks-per-node": 64
+		},
+
+
+		"pre-compressed" :
+		[
+			{
+                "output-prefix": "sampling_ayan",
+				"path": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",
+				"compression-params" :
+				[
+					{ "compressor" : "sampling-ayan"},
+					{ "params" : "some_string"},
+					{ "relative_error" : 0.03 },
+					{ "Compression_ratio" : 3.4 }
+				]
+			},
+			
+            {
+                "output-prefix": "random_sampling",
+				"path": "/Users/pascalgrosset/projects/VizAly-Foresight/runs/epyc-fpzip-wflow-2/cbench/decompressed_files/fpzip_32___NVB_C009_l10n512_S12345T692_z42.hdf5",
+				"compression-params" :
+				[
+					{ "compressor" : "sampling-random"},
+					{ "params" : "some_string"},
+					{ "relative_error" : 0.05 },
+					{ "Compression_ratio" : 2.4 }
+				]
+            }
+		],
+
+		"output-files" : []
+	},
+
+
+	"analysis" :
+	{
+		"analytics": 
+		[
+			{
+				"name": "sim_stats", 
+				"path": "/projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex",
+				"params" : ["%data%", "%postfix%"],
+				"evn_path" : "scripts/VizAly-CBench.bash.darwin",
+				"configuration" : 
+				{
+					"partition" : "amd-epyc",
+					"nodes" : 1,
+					"ntasks-per-node" : 64
+				}
+			},
+
+
+			{
+				"name": "lya_all_axes", 
+				"path": "/projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex",
+				"params" : ["%data%", "%postfix%"],
+				"evn_path" : "scripts/VizAly-CBench.bash.darwin",
+				"configuration" : 
+				{
+					"partition" : "amd-epyc",
+					"nodes" : 1,
+					"ntasks-per-node" : 64
+				},
+				"commands" : [ "cp /projects/exasky/gimlet2/treecools/TREECOOL_middle .",  "echo 'hi'" ]
+			}
+		],
+		
+		"output-files" : []
+	},
+
+
+	"visualize" :
+	{
+		"plots" :
+		[
+			{
+				"evn_path": "scripts/VizAly-CBench.bash.darwin",
+				"configuration": 
+				{
+					"partition": "amd-epyc",
+					"nodes": 1,
+					"ntasks-per-node": 64
+				}
+			}
+		],
+
+		"cinema" :
+		{
+			"cinema-db-name" : "cinemaDB"
+		},
+		
+		"input-files" : []
+	}
+}
