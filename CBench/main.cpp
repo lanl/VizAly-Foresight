@@ -69,7 +69,8 @@ int main(int argc, char *argv[])
 	//
 	// Load in the global input parameters
 	std::string inputFilename = jsonInput["input"]["filename"];
-	
+
+
 	bool writeData = false;
 	std::string outputFilename = "";
 	if (jsonInput["data-reduction"]["cbench-output"].find("output-decompressed") != jsonInput["data-reduction"]["cbench-output"].end())
@@ -82,6 +83,7 @@ int main(int argc, char *argv[])
 		srand(time(NULL));
 	}
 
+
 	std::string outputPath = ".";
 	if ( jsonInput["data-reduction"]["cbench-output"].find("output-decompressed-location") != jsonInput["data-reduction"]["cbench-output"].end() )
 	{
@@ -90,14 +92,14 @@ int main(int argc, char *argv[])
 			createFolder(outputPath);
 	}
 
+
+
 	createFolder("logs");
 	std::string outputLogFilename = "logs/" + jsonInput["data-reduction"]["cbench-output"]["log-file"].get<std::string>() + "_" + std::to_string(myRank);
 
-
-
 	std::vector<std::string> compressors;
-	for (int i = 0; i < jsonInput["data-reduction"].size(); i++)
-		compressors.push_back(jsonInput["data-reduction"][i]["name"]);
+	for (int i = 0; i < jsonInput["data-reduction"]["cbench-compressors"].size(); i++)
+		compressors.push_back(jsonInput["data-reduction"]["cbench-compressors"][i]["name"]);
 
 	std::vector<std::string> scalars;
 	for (int i = 0; i < jsonInput["input"]["scalars"].size(); i++)
@@ -194,11 +196,11 @@ int main(int argc, char *argv[])
 
 		// Apply parameter if same for all scalars, else delay for later
 		bool sameCompressorParams = true;
-		if (jsonInput["data-reduction"][c].find("compressor-params") != jsonInput["data-reduction"][c].end())
+		if (jsonInput["data-reduction"]["cbench-compressors"][c].find("compressor-params") != jsonInput["data-reduction"]["cbench-compressors"][c].end())
 			sameCompressorParams = false;
 		else
 		{
-			for (auto it = jsonInput["data-reduction"][c].begin(); it != jsonInput["data-reduction"][c].end(); ++it)
+			for (auto it = jsonInput["data-reduction"]["cbench-compressors"][c].begin(); it != jsonInput["data-reduction"]["cbench-compressors"][c].end(); ++it)
 				if ((it.key() != "name") && (it.key() != "output-prefix"))
 					compressorMgr->compressorParameters[it.key()] = strConvert::toStr(it.value());
 		}
@@ -231,18 +233,18 @@ int main(int argc, char *argv[])
 			if (!sameCompressorParams)
 			{
 				compressorMgr->compressorParameters.clear();  // reset compression param for each field
-				int numdifferentParams = jsonInput["data-reduction"][c]["compressor-params"].size();
+				int numdifferentParams = jsonInput["data-reduction"]["cbench-compressors"][c]["compressor-params"].size();
 
 				for (int cp = 0; cp < numdifferentParams; cp++)
 				{
-					for (auto it = jsonInput["data-reduction"][c]["compressor-params"][cp]["scalar"].begin();
-							it != jsonInput["data-reduction"][c]["compressor-params"][cp]["scalar"].end(); it++)
+					for (auto it = jsonInput["data-reduction"]["cbench-compressors"][c]["compressor-params"][cp]["scalar"].begin();
+							it != jsonInput["data-reduction"]["cbench-compressors"][c]["compressor-params"][cp]["scalar"].end(); it++)
 					{
 						if (*it != scalars[i])
 							continue;
 
-						for (auto itt = jsonInput["data-reduction"][c]["compressor-params"][cp].begin();
-								itt != jsonInput["data-reduction"][c]["compressor-params"][cp].end(); ++itt)
+						for (auto itt = jsonInput["data-reduction"]["cbench-compressors"][c]["compressor-params"][cp].begin();
+								itt != jsonInput["data-reduction"]["cbench-compressors"][c]["compressor-params"][cp].end(); ++itt)
 							if (itt.key() != "scalar")
 								compressorMgr->compressorParameters[itt.key()] = strConvert::toStr(itt.value());
 					}
@@ -257,7 +259,7 @@ int main(int argc, char *argv[])
 
 			metricsInfo << compressorMgr->getParamsInfo() << std::endl;
 			csvOutput << compressorMgr->getCompressorName() << "_" << scalars[i] << "__" << compressorMgr->getParamsInfo()
-					  << ", " << jsonInput["data-reduction"][c]["output-prefix"].get<std::string>() << ", ";
+					  << ", " << jsonInput["data-reduction"]["cbench-compressors"][c]["output-prefix"].get<std::string>() << ", ";
 
 			MPI_Barrier(MPI_COMM_WORLD);
 
@@ -466,8 +468,8 @@ int main(int argc, char *argv[])
 
 
 			std::string decompressedOutputName;
-			if (jsonInput["data-reduction"][c].find("output-prefix") != jsonInput["data-reduction"][c].end())
-				decompressedOutputName = jsonInput["data-reduction"][c]["output-prefix"];
+			if (jsonInput["data-reduction"]["cbench-compressors"][c].find("output-prefix") != jsonInput["data-reduction"]["cbench-compressors"][c].end())
+				decompressedOutputName = jsonInput["data-reduction"]["cbench-compressors"][c]["output-prefix"];
 			else
 				decompressedOutputName = "__" + compressorMgr->getCompressorName() + "_" + std::to_string(rand());
 

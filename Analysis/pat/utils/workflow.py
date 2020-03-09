@@ -88,7 +88,7 @@ class Workflow(object):
 		for _file in self.json_data['data-reduction']['cbench-compressors']:
 			json_item = {
 				"output-prefix" : _file["output-prefix"],
-				"path" : base_path + "/cbench/" + self.json_data['data-reduction']['cbench-output']['output-decompressed-location'] + "/" + _file['output-prefix'] + "__" + orig_path_filename[1]
+				"path" : base_path + "/reduction/cbench/" + self.json_data['data-reduction']['cbench-output']['output-decompressed-location'] + "/" + _file['output-prefix'] + "__" + orig_path_filename[1]
 			}
 
 			self.json_data['data-reduction']['output-files'].append(json_item)
@@ -184,6 +184,7 @@ class Workflow(object):
 		""" Adds plotting jobs to workflow that produce final products.
 		"""
 		raise NotImplementedError("Implement the `add_plotting_jobs` function to your workflow!")
+
 
 
 

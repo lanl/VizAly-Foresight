@@ -28,7 +28,7 @@ class NYXWorkflow(workflow.Workflow):
 
 	def add_data_reduction_jobs(self):
 		self.add_cbench_job()
-		self.fill_reduc_output_presets()
+		#self.fill_reduc_output_presets()
 
 
 	# Re-write the json data to include the analysis
@@ -94,8 +94,8 @@ class NYXWorkflow(workflow.Workflow):
 					if param == "%data%":
 						current_params[i] = item["path"]
 
-					if param == "%postfix%":
-						current_params[i] = "_" + item["output-prefix"]
+					if param == "%prefix%":
+						current_params[i] = item["output-prefix"] + "_"
 
 
 				# create job for sim_stats
