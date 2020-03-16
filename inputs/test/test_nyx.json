@@ -138,7 +138,7 @@
 		"pre-compressed" :
 		[
 			{
-                "output-prefix": "sampling_ayan",
+				"output-prefix": "sampling_ayan",
 				"path": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",
 				"compression-params" :
 				[
@@ -149,8 +149,8 @@
 				]
 			},
 			
-            {
-                "output-prefix": "random_sampling",
+			{
+				"output-prefix": "random_sampling",
 				"path": "/Users/pascalgrosset/projects/VizAly-Foresight/runs/epyc-fpzip-wflow-2/cbench/decompressed_files/fpzip_32___NVB_C009_l10n512_S12345T692_z42.hdf5",
 				"compression-params" :
 				[
@@ -159,7 +159,7 @@
 					{ "relative_error" : 0.05 },
 					{ "Compression_ratio" : 2.4 }
 				]
-            }
+			}
 		],
 
 		"output-files" : []
@@ -199,6 +199,24 @@
 			}
 		],
 		
+
+		"output-files-filter" : 
+		[
+			{
+				"name": "sim_stats", 
+				"path" : "$foresight-run$/$wflow-path$/plots/sim_stats/",
+				"postfix" : "_ps3d.txt",
+				"fields" : ["rhob", "rhom", "rhodm", "temp", "velmag", "vz"]
+			},
+
+			{
+				"name": "lya_all_axes", 
+				"path" : "$foresight-run$/$wflow-path$/plots/lya_all_axes/",
+				"postfix" : "_ps1d.txt",
+				"fields" : ["x_flux", "y_flux","z_flux"]
+			}
+		],
+
 		"output-files" : []
 	},
 
@@ -208,6 +226,22 @@
 		"plots" :
 		[
 			{
+				"name" : "sim_stats",
+				"path" : "python /Users/pascalgrosset/projects/VizAly-Foresight/Workflow/test/plot_simstats.py",
+				"params" : ["%title%","%files%"],
+				"evn_path": "scripts/VizAly-CBench.bash.darwin",
+				"configuration": 
+				{
+					"partition": "amd-epyc",
+					"nodes": 1,
+					"ntasks-per-node": 64
+				}
+			},
+
+			{
+				"name" : "lya_all_axes",
+				"path" : "python /Users/pascalgrosset/projects/VizAly-Foresight/Workflow/test/plot_lya.py",
+				"params" : ["%title%","%files%"],
 				"evn_path": "scripts/VizAly-CBench.bash.darwin",
 				"configuration": 
 				{
@@ -218,11 +252,19 @@
 			}
 		],
 
-		"cinema" :
+
+		"cinema" : 
 		{
-			"cinema-db-name" : "cinemaDB"
-		},
-		
-		"input-files" : []
+			"evn_path": "scripts/VizAly-CBench.bash.darwin",
+			"configuration": 
+			{
+				"name" : "cinema",
+				"path" : "python -m $foresight-home$/Workflow/test/cinema.py",
+				"commands" : [ "cp /projects/exasky/gimlet2/treecools/TREECOOL_middle ."],
+				"partition": "general",
+				"nodes": 1,
+				"ntasks-per-node": 1
+			}
+		}
 	}
 }

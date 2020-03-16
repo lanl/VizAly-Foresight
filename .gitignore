@@ -46,6 +46,7 @@ install-*/
 *.mtc1
 *.out
 *.synctex.gz
+*.DS_Store
 
 # Prerequisites
 *.d

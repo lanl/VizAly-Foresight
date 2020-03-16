@@ -11,17 +11,16 @@ python pat_nyx.py --input-file <absolute path to input file> <--submit>
 --submit: causes the pipeline to be launched. Without it, you can see the scripts generated for debugging.
 
 e.g.
-python3 -m pat.nyx.workflow --input-file ../inputs/hacc/<>.json --cbench
+python -m tests.workflow --input-file
 """
 
 import argparse
 import os
 
-from pat.utils import workflow as workflow
-from pat.utils import job as j
-from pat.utils import utilities as utils
-from pat.utils import file_utilities as futils
-from pat.utils import plot_utilities as putils
+from draw.workflow import workflow as workflow
+from draw.job import job as j
+from draw.utilities import utilities as utils
+from draw.plot_utilities import plot_utilities as putils
 
 
 class NYXWorkflow(workflow.Workflow):
@@ -31,28 +30,31 @@ class NYXWorkflow(workflow.Workflow):
 		#self.fill_reduc_output_presets()
 
 
-	# Re-write the json data to include the analysis
-	def add_analysis_input(self):		
-		""" Create analysis settings """
-		analyis_path = self.json_data["project-home"] +  self.json_data['wflow-path']
-		
+	# Re-write the json data to include the analysis; ["pat"]["analysis"]
+	def fill_analysis_results(self):	
 
-		for ana in self.json_data['pat']['analysis-tool']['analytics']:
-			for item in ana['type']:
+		analysis_path = self.json_data["project-home"] +  self.json_data['wflow-path']
+
+		# Remove all entries if any
+		self.json_data['analysis']['output-files'].clear()
+
+		# Add analysis entries
+		for ana in self.json_data['analysis']['output-files-filter']:
+			for item in ana['fields']:
 				json_item = {
 					"title" : ana['name'] + "_" + item,
 					"files" : []
 				}
 
-				for inputItem in self.json_data['pat']['input-files']:
+				for inputItem in self.json_data['data-reduction']['output-files']:
 					input_item = { 
 						'name' : inputItem["output-prefix"],
-						'path' : analyis_path + "/" + ana['name'] + "/" + inputItem['output-prefix'] + item + ana['postfix']
+						'path' : analysis_path + "/" + ana['name'] + "/" + inputItem['output-prefix'] + item + ana['postfix']
 					}
 
 					json_item['files'].append(input_item)
 
-				self.json_data['pat']['analysis'].append(json_item)
+				self.json_data['analysis']['output-files'].append(json_item)
 
 
 	def add_analysis_jobs(self):
@@ -113,56 +115,66 @@ class NYXWorkflow(workflow.Workflow):
  
 				# make dependent on CBench job and add to workflow
 				self.add_job(analysis_job,dependencies="single", filter="cbench")
+		
+		self.fill_analysis_results()
 
-		#self.add_analysis_input()
 
 
-	def add_cinema_plotting_jobs(self):
+	def add_vis_jobs(self):
 		""" Create the plots and draw a cinema database """
 
-		# sources the modules to be loaded on that cluster
-		if "evn_path" in self.json_data["cinema-plots"]:
-			environment = self.json_data["foresight-home"] + self.json_data["cinema-plots"]["evn_path"]
-		else:
-			environment = None
+		## Create Plots
+		for plot in self.json_data["plots"]["visualize"]:
 
-		# pull the cluster parameters with which to launch job
-		if "configuration" in self.json_data["cinema-plots"]:
-			configurations = list( sum( self.json_data["cinema-plots"]["configuration"].items(), () ) )
-		else:
-			configurations = None
+			# sources the modules to be loaded on that cluster
+			if "evn_path" in plot:
+				environment = self.json_data["foresight-home"] + plot["evn_path"]
+			else:
+				environment = None
+
+			# pull the cluster parameters with which to launch job
+			if "configuration" in plot:
+				configurations = list( sum( plot["configuration"].items(), () ) )
+			else:
+				configurations = None
 
 
-		if "commands" in self.json_data["cinema-plots"]:
-			commands = self.json_data["cinema-plots"]["commands"]
-		else:
-			commands = None
+			# Parameters to run the job with
+			params = utils.get_list_from_json_array(analysis, "params")
 
-		if "slurm_commands" in self.json_data["cinema-plots"]:
-			slurm_commands = self.json_data["cinema-plots"]["slurm_commands"]
-		else:
-			slurm_commands = None
 
-		# Create the job script
-		arg1 = self.json_data["project-home"] +  self.json_data['wflow-path'] + "/cbench/wflow.json"
-		plot_path = self.json_data['project-home'] + self.json_data['wflow-path'] + "/plots"
+			for item in self.json_data["analysis"]["output-files"]:
+				print("Creating plots jobs for {} on {}".format(analysis, item))
 
-		cinema_job = j.Job(name="cinema_",
-			execute_dir="cinema",
-			executable="python " + self.json_data["foresight-home"] + "/Analysis/" + "pat_nyx_cinema.py", 
-			arguments=[ "--input-file", arg1 ],
-			configurations=configurations,
-			environment=environment,
-			commands=commands,
-			slurm_commands=slurm_commands)
-		
-		cinema_job.add_command("mkdir " + plot_path)
+				if plot["name"] in item["title"]:
+				
+					current_params = params.copy()
+					for i, param in enumerate(current_params):
+						if param == "%title%":
+							current_params[i] = item["title"]
 
-		# make dependent on analysis job and add to workflow
-		print(self.jobs)
-		for job in self.jobs:
-			cinema_job.add_parents(job)
-		self.add_job(cinema_job)
+						if param == "%files%":
+							file_list = []
+							for f in item["files"]
+								file_list.append([f["name"],f["path"]])
+							current_params[i] = file_list
+
+				# create job for sim_stats
+				plot_job = j.Job(name=plot["name"]),
+										job_type = "plot",
+										execute_dir="plots/" + plot["name"],
+										executable=plot["path"], 
+										arguments=current_params,
+										configurations=configurations,
+										environment=environment)
+ 
+				# make dependent on CBench job and add to workflow
+				self.add_job(analysis_job, dependencies="type", filter="analysis")
+
+
+		## Create Cinema DB
+
+
 
 
 

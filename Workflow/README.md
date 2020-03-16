@@ -1,6 +1,6 @@
-# PAT: Python Analysis Toolkit
+# DRAW: Data Reduction Analysis Workflow tool
 
-This folder contains PAT, the Python package that is used to run the Foresight workflows. The Analysis toolkit will generate a Cinema database from the input file specified.
+DRAW is a python tool for creating  Foresight workflows. It contains utilities for data reductio, analysis, and visualizing data
 
 
 ## Prerequisites:
@@ -120,3 +120,6 @@ Append the following options for the behavior below
 	    }
 	    ```
 	
+
+https://gaopinghuang0.github.io/2018/08/03/python3-import-and-project-layout
+https://www.internalpointers.com/post/modules-and-packages-create-python-project

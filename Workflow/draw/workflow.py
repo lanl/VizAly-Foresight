@@ -5,10 +5,9 @@ import csv
 import argparse
 from collections import OrderedDict
 
-from pat.utils import utilities as utils
-from pat.utils import plot_utilities as putils
-from pat.utils import job as j
-
+from .utilities import utilities as utils
+from .plot_utilities import plot_utilities as putils
+from .job import job as j
 
 
 class Workflow(object):
@@ -94,6 +93,38 @@ class Workflow(object):
 			self.json_data['data-reduction']['output-files'].append(json_item)
 
 
+	def add_cinema_job(self):
+		""" Adds a Cinema job to the workflow
+		"""
+  
+		# Set up environment
+		execute_dir = "cinema_db"
+
+		if "configuration" in self.json_data["visualize"]["cinema"].keys():
+			configurations = list(sum(self.json_data["visualize"]["cinema"]["configuration"].items(), ()))
+		else:
+			configurations = None
+
+		if "evn_path" in self.json_data["visualize"]["cinema"]:
+			environment =  self.json_data["foresight-home"] + self.json_data["visualize"]["cinema"]["evn_path"]
+		else:
+			environment = None
+
+   
+		params = utils.get_list_from_json_array(analysis, "params")
+   
+		# add a single CBench job to workflow for entire sweep
+		cinema_job = j.Job(name="cinema_db",
+						 job_type = "visualize",
+						 execute_dir=execute_dir,
+						 executable=self.json_data["visualize"]["cinema"]["path"],
+						 arguments=[self.json_path],
+						 configurations=configurations,
+						 environment=environment)
+		self.add_job(cinema_job, dependencies="type", filer="analysis")
+
+
+
 	def add_cbench_job(self):
 		""" Adds a CBench job to the workflow.
 		"""
@@ -124,6 +155,8 @@ class Workflow(object):
   
 		# Fill output files for cbench
 		self.fill_cbench_output_files()
+
+
 
 
 	def add_job(self, this_job, dependencies="all_previous", filter=""):
@@ -168,6 +201,7 @@ class Workflow(object):
 
 
 
+
 	def add_data_reduction_jobs(self):
 		""" Adds analysis jobs to workflow that do not produce final products.
 		"""
@@ -180,10 +214,10 @@ class Workflow(object):
 		raise NotImplementedError("Implement the `add_analysis` function to your workflow!")
 
 
-	def add_cinema_plotting_jobs(self):
-		""" Adds plotting jobs to workflow that produce final products.
+	def add_vis_jobs(self):
+		""" Adds visualization jobs to workflow that produce final products.
 		"""
-		raise NotImplementedError("Implement the `add_plotting_jobs` function to your workflow!")
+		raise NotImplementedError("Implement the `add_visualization_jobs` function to your workflow!")
 
 
 
