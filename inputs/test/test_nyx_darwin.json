@@ -1,0 +1,397 @@
+{
+	"project-home" : "/projects/exasky/pascal-projects/VizAly-Foresight/runs/",
+	"wflow-path": "epyc-fpzip-wflow-3",
+	"foresight-home" : "/projects/exasky/pascal-projects/VizAly-Foresight/",
+
+	"input": 
+	{
+		"filetype": "NYX",
+		"filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",  
+
+
+		"group" : "native_fields",
+		"scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ],
+
+		"uncompressed": 
+		[
+			{
+				"group": "domain",
+				"attributes": [
+					{
+						"name": "shape",
+						"type": "int",
+						"size": 3
+					},
+					{
+						"name": "size",
+						"type": "double",
+						"size": 3
+					}
+				]
+			},
+
+			{
+				"group": "universe",
+				"attributes": 
+				[
+					{
+						"name": "hubble",
+						"type": "double",
+						"size": 1 
+					},
+
+					{
+						"name": "omega_b",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "omega_l",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "omega_m",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "redshift",
+						"type": "double",
+						"size": 1
+					}
+				]
+			}
+		]
+	},
+
+	
+	"data-reduction": 
+	{
+		"cbench-compressors": 
+		[
+			{
+				"name": "fpzip",
+				"bits" : 32,
+				"output-prefix" : "fpzip_32_"
+			},
+
+			{
+				"name": "fpzip",
+				"bits" : 14,
+				"output-prefix" : "fpzip_14_"
+			}
+		],
+
+		"cbench-metrics": 
+		[
+			{
+				"name" : "absolute_error"
+			},
+
+			{
+				"name" : "relative_error"
+			},
+
+			{
+				"name" : "mse"
+			},
+
+			{
+				"name" : "psnr"
+			},
+
+			{
+				"name" : "minmax",
+				"histogram" : [ "baryon_density",  "temperature",  "velocity_x" ]
+			}
+		],
+
+		"cbench-output" :
+		{
+			"run-path" : "/projects/exasky/VizAly-Foresight/build/",
+
+			"output-decompressed": true,
+			"output-decompressed-location" : "decompressed_files",
+			
+			"logfname-comment": "name of output log file",
+			"log-file" : "runlog_",
+
+			"metricsfname-comment": "name of file with output",
+			"metrics-file" : "metrics"
+		},
+
+		"name" : "cbench",
+		"path" : "mpirun $foresight-home$build/CBench",
+		"evn_path": "scripts/VizAly-CBench.bash.darwin",
+		"configuration": 
+		{
+			"partition": "amd-epyc",
+			"nodes": 1,
+			"ntasks-per-node": 64
+		},
+
+		"output-files": [
+            {
+                "output-prefix": "orig",
+                "path": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5"
+            },
+            {
+                "output-prefix": "fpzip_32_",
+                "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/reduction/cbench/decompressed_files/fpzip_32___NVB_C009_l10n512_S12345T692_z42.hdf5"
+            },
+            {
+                "output-prefix": "fpzip_14_",
+                "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/reduction/cbench/decompressed_files/fpzip_14___NVB_C009_l10n512_S12345T692_z42.hdf5"
+            }
+        ]
+	},
+
+
+	"analysis" :
+	{
+		"analytics": 
+		[
+			{
+				"name": "sim_stats", 
+				"path": "/projects/exasky/gimlet2/apps/sim_stats/sim_stats.ex",
+				"params" : ["%data%", "%prefix%"],
+				"evn_path" : "scripts/VizAly-CBench.bash.darwin",
+				"configuration" : 
+				{
+					"partition" : "amd-epyc",
+					"nodes" : 1,
+					"ntasks-per-node" : 64
+				}
+			},
+
+
+			{
+				"name": "lya_all_axes", 
+				"path": "/projects/exasky/gimlet2/apps/lya_all_axes/lya_all_axes.ex",
+				"params" : ["%data%", "%prefix%"],
+				"evn_path" : "scripts/VizAly-CBench.bash.darwin",
+				"configuration" : 
+				{
+					"partition" : "amd-epyc",
+					"nodes" : 1,
+					"ntasks-per-node" : 64
+				},
+				"commands" : [ "cp /projects/exasky/gimlet2/treecools/TREECOOL_middle ." ]
+			}
+		],
+
+
+		"output-files-filter" : 
+		[
+			{
+				"name": "sim_stats", 
+				"path" : "$foresight-run$/$wflow-path$/plots/sim_stats/",
+				"postfix" : "_ps3d.txt",
+				"fields" : ["rhob", "rhom", "rhodm", "temp", "velmag", "vz"]
+			},
+
+			{
+				"name": "lya_all_axes", 
+				"path" : "$foresight-run$/$wflow-path$/plots/lya_all_axes/",
+				"postfix" : "_ps1d.txt",
+				"fields" : ["x_flux", "y_flux","z_flux"]
+			}
+		],
+		
+		"output-files": 
+        [
+            {
+                "title": "sim_stats_rhob",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/orig_rhob_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_32_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/fpzip_32__rhob_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_14_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/fpzip_14__rhob_ps3d.txt"
+                    }
+                ]
+            },
+            {
+                "title": "sim_stats_rhom",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/orig_rhom_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_32_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/fpzip_32__rhom_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_14_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/fpzip_14__rhom_ps3d.txt"
+                    }
+                ]
+            },
+            {
+                "title": "sim_stats_rhodm",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/orig_rhodm_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_32_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/fpzip_32__rhodm_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_14_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/fpzip_14__rhodm_ps3d.txt"
+                    }
+                ]
+            },
+            {
+                "title": "sim_stats_temp",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/orig_temp_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_32_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/fpzip_32__temp_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_14_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/fpzip_14__temp_ps3d.txt"
+                    }
+                ]
+            },
+            {
+                "title": "sim_stats_velmag",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/orig_velmag_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_32_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/fpzip_32__velmag_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_14_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/fpzip_14__velmag_ps3d.txt"
+                    }
+                ]
+            },
+            {
+                "title": "sim_stats_vz",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/orig_vz_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_32_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/fpzip_32__vz_ps3d.txt"
+                    },
+                    {
+                        "name": "fpzip_14_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/sim_stats/fpzip_14__vz_ps3d.txt"
+                    }
+                ]
+            },
+            {
+                "title": "lya_all_axes_x_flux",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/lya_all_axes/orig_x_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "fpzip_32_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/lya_all_axes/fpzip_32__x_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "fpzip_14_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/lya_all_axes/fpzip_14__x_flux_ps1d.txt"
+                    }
+                ]
+            },
+            {
+                "title": "lya_all_axes_y_flux",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/lya_all_axes/orig_y_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "fpzip_32_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/lya_all_axes/fpzip_32__y_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "fpzip_14_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/lya_all_axes/fpzip_14__y_flux_ps1d.txt"
+                    }
+                ]
+            },
+            {
+                "title": "lya_all_axes_z_flux",
+                "files": [
+                    {
+                        "name": "orig",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/lya_all_axes/orig_z_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "fpzip_32_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/lya_all_axes/fpzip_32__z_flux_ps1d.txt"
+                    },
+                    {
+                        "name": "fpzip_14_",
+                        "path": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/epyc-fpzip-wflow-3/analysis/lya_all_axes/fpzip_14__z_flux_ps1d.txt"
+                    }
+                ]
+            }
+        ]
+	},
+
+
+	"visualize" :
+	{
+		"plots" :
+		[
+			{
+				"name" : "plots",
+				"path" : "python /projects/exasky/pascal-projects/VizAly-Foresight/Workflow/test/plot_sim_stats.py",
+				"params" : ["/projects/exasky/pascal-projects/VizAly-Foresight/inputs/test/test_nyx_darwin.json"],
+				"evn_path": "scripts/VizAly-CBench.bash.darwin",
+				"configuration": 
+				{
+					"partition": "amd-epyc",
+					"nodes": 1,
+					"ntasks-per-node": 64
+				}
+			}
+		],
+
+
+		"cinema" : 
+		{
+			"name" : "nyx_cinema",
+			"path" : "python -m $foresight-home$/Workflow/test/cinema.py",
+			"params" : ["/projects/exasky/pascal-projects/VizAly-Foresight/inputs/test/test_nyx_darwin.json"],
+			"evn_path": "scripts/VizAly-CBench.bash.darwin",
+			"configuration": 
+			{
+				"partition": "general",
+				"nodes": 1,
+				"ntasks-per-node": 1
+			}
+		}
+	}
+}

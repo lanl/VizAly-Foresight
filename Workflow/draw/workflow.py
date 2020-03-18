@@ -5,9 +5,8 @@ import csv
 import argparse
 from collections import OrderedDict
 
-from .utilities import utilities as utils
-from .plot_utilities import plot_utilities as putils
-from .job import job as j
+import Workflow.draw.utils as utils
+import Workflow.draw.job as j
 
 
 class Workflow(object):
@@ -36,7 +35,7 @@ class Workflow(object):
 		git_tag = git_tag.strip('\n')
 		self.json_data["git-tag"] = git_tag
 
-
+	
 	def fill_reduc_output_presets(self):
 		""" Fill in  ["data-reduction"]["output-files"] with some user specified presets
 		"""
@@ -341,8 +340,8 @@ def process_input(wflow, opts):
 		print("Run data analysis only")
 		wflow.add_analysis_jobs()
 	elif opts.vis:
-		print("Run data analysis only")
-		wflow.add_cinema_plotting_jobs()
+		print("Run plotting only")
+		wflow.add_vis_jobs()
 
 	elif opts.reduction_analysis:
 		print("Run data reduction + analysis")
@@ -351,12 +350,12 @@ def process_input(wflow, opts):
 	elif opts.analysis_cinema:
 		print("Run analysis + cinema")
 		wflow.add_analysis_jobs()
-		wflow.add_cinema_plotting_jobs()
+		wflow.add_vis_jobs()
 
 	else:	
 		print("Run full: data reduction, analysis, and Cinema")
 		wflow.add_data_reduction_jobs()
 		wflow.add_analysis_jobs()
-		wflow.add_cinema_plotting_jobs()
+		wflow.add_vis_jobs()
   
 	return wflow

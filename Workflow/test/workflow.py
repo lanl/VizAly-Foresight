@@ -1,26 +1,22 @@
 #! /usr/bin/env python
 """
 pat_nyx fun the foresight pipeline for nyx analysis. In other words, it does:
-- run cbench
-- run the analysis tool
-- create a cinema databse of the result
+- compression
+- data analysis
+- plot graphs
+- create a cinema data
 
 To run:
-python pat_nyx.py --input-file <absolute path to input file> <--submit>
-
---submit: causes the pipeline to be launched. Without it, you can see the scripts generated for debugging.
-
-e.g.
-python -m tests.workflow --input-file
+python3 -m Workflow.test.workflow --input-file inputs/test/test_nyx_darwin.json --vis
 """
 
 import argparse
 import os
+import sys
 
-from draw.workflow import workflow as workflow
-from draw.job import job as j
-from draw.utilities import utilities as utils
-from draw.plot_utilities import plot_utilities as putils
+import Workflow.draw.workflow as workflow
+import Workflow.draw.job as j
+import Workflow.draw.utils as utils
 
 
 class NYXWorkflow(workflow.Workflow):
@@ -33,7 +29,7 @@ class NYXWorkflow(workflow.Workflow):
 	# Re-write the json data to include the analysis; ["pat"]["analysis"]
 	def fill_analysis_results(self):	
 
-		analysis_path = self.json_data["project-home"] +  self.json_data['wflow-path']
+		analysis_path = self.json_data["project-home"] +  self.json_data['wflow-path'] + "analysis/"
 
 		# Remove all entries if any
 		self.json_data['analysis']['output-files'].clear()
@@ -115,7 +111,7 @@ class NYXWorkflow(workflow.Workflow):
  
 				# make dependent on CBench job and add to workflow
 				self.add_job(analysis_job,dependencies="single", filter="cbench")
-		
+  
 		self.fill_analysis_results()
 
 
@@ -124,7 +120,7 @@ class NYXWorkflow(workflow.Workflow):
 		""" Create the plots and draw a cinema database """
 
 		## Create Plots
-		for plot in self.json_data["plots"]["visualize"]:
+		for plot in self.json_data["visualize"]["plots"]:
 
 			# sources the modules to be loaded on that cluster
 			if "evn_path" in plot:
@@ -132,47 +128,57 @@ class NYXWorkflow(workflow.Workflow):
 			else:
 				environment = None
 
+
 			# pull the cluster parameters with which to launch job
 			if "configuration" in plot:
 				configurations = list( sum( plot["configuration"].items(), () ) )
 			else:
 				configurations = None
 
-
 			# Parameters to run the job with
-			params = utils.get_list_from_json_array(analysis, "params")
+			params = utils.get_list_from_json_array(plot, "params")
 
 
-			for item in self.json_data["analysis"]["output-files"]:
-				print("Creating plots jobs for {} on {}".format(analysis, item))
-
-				if plot["name"] in item["title"]:
-				
-					current_params = params.copy()
-					for i, param in enumerate(current_params):
-						if param == "%title%":
-							current_params[i] = item["title"]
-
-						if param == "%files%":
-							file_list = []
-							for f in item["files"]
-								file_list.append([f["name"],f["path"]])
-							current_params[i] = file_list
-
-				# create job for sim_stats
-				plot_job = j.Job(name=plot["name"]),
-										job_type = "plot",
-										execute_dir="plots/" + plot["name"],
-										executable=plot["path"], 
-										arguments=current_params,
-										configurations=configurations,
-										environment=environment)
+			# create job for sim_stats
+			plot_job = j.Job(name=plot["name"],
+								job_type = "plot",
+								execute_dir=plot["name"] +"/",
+								executable=plot["path"], 
+								arguments=params,
+								configurations=configurations,
+								environment=environment)
  
-				# make dependent on CBench job and add to workflow
-				self.add_job(analysis_job, dependencies="type", filter="analysis")
+			# make dependent on CBench job and add to workflow
+			#self.add_job(plot_job, dependencies="type", filter="analysis")
+			self.add_job(plot_job)
 
 
 		## Create Cinema DB
+		"""
+		if "evn_path" in self.json_data["visualize"]["cinema"]:
+			environment = self.json_data["foresight-home"] + self.json_data["visualize"]["cinema"]
+		else:
+			environment = None
+
+		# pull the cluster parameters with which to launch job
+		if "configuration" in self.json_data["visualize"]["cinema"]:
+			configurations = list( sum( self.json_data["visualize"]["cinema"]["configuration"].items(), () ) )
+		else:
+			configurations = None
+  
+  
+		# create job for sim_stats
+		cinema_job = j.Job(name=self.json_data["visualize"]["cinema"]["name"],
+								job_type = "cinema",
+								execute_dir="cinema/",
+								executable=self.json_data["visualize"]["cinema"]["path"], 
+								configurations=configurations,
+								environment=environment)
+
+		# make dependent on CBench job and add to workflow
+		self.add_job(cinema_job, dependencies="type", filter="plot")
+		"""
+
 
 
 
@@ -184,6 +190,9 @@ def main():
  
 	# Read input JSON file
 	wflow_data = utils.read_json(opts.input_file)
+	if wflow_data == None:
+		sys.exit(0)
+
 
 	# create Workflow instance
 	wflow_dir = wflow_data["project-home"] + wflow_data["wflow-path"]

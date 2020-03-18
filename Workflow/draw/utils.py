@@ -162,7 +162,7 @@ def read_json(filename):
 			json_data = json.load(read_file,  object_pairs_hook=OrderedDict)
 			return json_data
 		except ValueError as e:
-			print ("Json file " + filename + " is invalid! " + str(e))
+			print ("JSON file " + filename + " is invalid! \n\t" + str(e) + "\n")
 			return None
 
 

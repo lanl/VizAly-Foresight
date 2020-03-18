@@ -33,7 +33,6 @@ class CinemaCreator:
 		cmd = "cp " + self.json_file + " " + cinema_database + "/wflow.json"
 		os.system(cmd)
 
-
 		print("Create cinema database " + cinema_database)
 
 
@@ -42,8 +41,8 @@ class CinemaCreator:
 
 		# Create cinema database
 		output_path = self.json_data['project-home'] + self.json_data['wflow-path'] + "/"
-		cinema_database = output_path + self.json_data['visualize']['cinema'] + ".cdb"
-		img_files = utils.list_files_in_folder( output_path + "plots/" , ".png")
+		cinema_database = output_path + self.json_data['visualize']['cinema']['configuration']['name'] + ".cdb"
+		img_files = utils.list_files_in_folder( output_path + "vis/plots/" , ".png")
 		cinema_csv = output_path + "cinema/" + "data.csv"
 
 		self.create_cinema_database(cinema_database, cinema_csv, img_files)

@@ -1,6 +1,6 @@
 {
 	"project-home" : "/Users/pascalgrosset/projects/VizAly-Foresight/runs/",
-	"wflow-path": "epyc-fpzip-wflow-8",
+	"wflow-path": "epyc-fpzip-wflow-a",
 	"foresight-home" : "/Users/pascalgrosset/projects/VizAly-Foresight/",
 
 	"input": 
@@ -258,9 +258,8 @@
 			"evn_path": "scripts/VizAly-CBench.bash.darwin",
 			"configuration": 
 			{
-				"name" : "cinema",
+				"name" : "nyx_cinema",
 				"path" : "python -m $foresight-home$/Workflow/test/cinema.py",
-				"commands" : [ "cp /projects/exasky/gimlet2/treecools/TREECOOL_middle ."],
 				"partition": "general",
 				"nodes": 1,
 				"ntasks-per-node": 1
