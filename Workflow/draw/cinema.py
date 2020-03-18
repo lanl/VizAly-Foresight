@@ -6,7 +6,7 @@ import json
 import csv
 from collections import OrderedDict
 
-from .utilities import utilities as utils
+import Workflow.draw.utils as utils
 
 class CinemaCreator:
 
@@ -18,7 +18,7 @@ class CinemaCreator:
 
 	def create_cinema_database(self, cinema_database, csv_file, image_files):
 		#create cdb file
-		os.makedirs(cinema_database)
+		utils.create_folder(cinema_database)
 
 		# Copy img files to cinema
 		for img in image_files:
@@ -41,9 +41,11 @@ class CinemaCreator:
 
 		# Create cinema database
 		output_path = self.json_data['project-home'] + self.json_data['wflow-path'] + "/"
-		cinema_database = output_path + self.json_data['visualize']['cinema']['configuration']['name'] + ".cdb"
-		img_files = utils.list_files_in_folder( output_path + "vis/plots/" , ".png")
+		cinema_database = output_path + self.json_data['visualize']['cinema']['name'] + ".cdb"
+		img_files = utils.list_files_in_folder( output_path + "plots/" , ".png")
 		cinema_csv = output_path + "cinema/" + "data.csv"
+		print(output_path)
+		print(img_files)
 
 		self.create_cinema_database(cinema_database, cinema_csv, img_files)
 
