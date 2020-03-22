@@ -119,7 +119,7 @@ class NYXWorkflow(workflow.Workflow):
 	def add_vis_jobs(self):
 		""" Create the plots and draw a cinema database """
 
-		"""
+		
 		## Create Plots
 		for plot in self.json_data["visualize"]["plots"]:
 
@@ -150,25 +150,10 @@ class NYXWorkflow(workflow.Workflow):
 								environment=environment)
  
 			# make dependent on CBench job and add to workflow
-			#self.add_job(plot_job, dependencies="type", filter="analysis")
-			self.add_job(plot_job)
-		"""
+			self.add_job(plot_job, dependencies="type", filter="analysis")
+			#self.add_job(plot_job)
   
-		"""
-  "cinema" : 
-		{
-			"name" : "nyx_cinema",
-			"path" : "python -m $foresight-home$/Workflow/test/cinema.py",
-			"params" : ["/projects/exasky/pascal-projects/VizAly-Foresight/inputs/test/test_nyx_darwin.json"],
-			"evn_path": "scripts/VizAly-CBench.bash.darwin",
-			"configuration": 
-			{
-				"partition": "general",
-				"nodes": 1,
-				"ntasks-per-node": 1
-			}
-		}
-		"""
+
   
 		## Create Cinema DB
 		if "evn_path" in self.json_data["visualize"]["cinema"]:
@@ -186,14 +171,14 @@ class NYXWorkflow(workflow.Workflow):
 		# create job for sim_stats
 		cinema_job = j.Job(name=self.json_data["visualize"]["cinema"]["name"],
 								job_type = "cinema",
-								execute_dir="",
+								execute_dir="cinema",
 								executable=self.json_data["visualize"]["cinema"]["path"], 
 								configurations=configurations,
 								environment=environment)
 
 		# make dependent on CBench job and add to workflow
-		#self.add_job(cinema_job, dependencies="type", filter="plot")
-		self.add_job(cinema_job)
+		self.add_job(cinema_job, dependencies="type", filter="plot")
+		#self.add_job(cinema_job)
 
 
 
