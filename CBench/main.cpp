@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 
 	bool writeData = false;
 	std::string outputFilename = "";
-	if (jsonInput["data-reduction"]["cbench-output"].find("output-decompressed") != jsonInput["data-reduction"]["cbench-output"].end())
+	if (jsonInput["data-reduction"]["cbench-output"].contains("output-decompressed"))
 	{
 		writeData = jsonInput["data-reduction"]["cbench-output"]["output-decompressed"];
 		if (writeData)
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 
 
 	std::string outputPath = ".";
-	if ( jsonInput["data-reduction"]["cbench-output"].find("output-decompressed-location") != jsonInput["data-reduction"]["cbench-output"].end() )
+	if ( jsonInput["data-reduction"]["cbench-output"].contains("output-decompressed-location"))
 	{
 		outputPath = jsonInput["data-reduction"]["cbench-output"]["output-decompressed-location"];
 		if (myRank == 0)
@@ -536,7 +536,6 @@ int main(int argc, char *argv[])
 	overallClock.stop();
 	debuglog << "\nTotal run time: " << overallClock.getDuration() << " s " << std::endl;
 	appendLog(outputLogFilename, debuglog);
-
 
 
 	// For humans

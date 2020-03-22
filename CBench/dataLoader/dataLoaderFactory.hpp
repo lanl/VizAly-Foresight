@@ -23,11 +23,6 @@ class DataLoaderFactory
 		if (loaderName == "HACC")
 			return new HACCDataLoader();
 
-	  #ifdef CBENCH_HAS_BINARY
-		if (loaderName == "Binary")
-			return new BinaryDataLoader();
-	  #endif
-
 	  #ifdef CBENCH_HAS_NYX
 		if (loaderName == "NYX")
 			return new NYXDataLoader();
@@ -41,6 +36,11 @@ class DataLoaderFactory
 	  #ifdef CBENCH_HAS_GDA
 		if (loaderName == "GDA")
 			return new GDADataLoader();
+	  #endif
+
+	  #ifdef CBENCH_HAS_RAW
+		if (loaderName == "RAW")
+			return new GenericBinaryLoader();
 	  #endif
 
 		return NULL;
