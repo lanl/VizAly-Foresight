@@ -68,67 +68,54 @@
 		]
 	},
 
-	"compressor-comment": "which compressors to test",
-	"compressors": 
-	[
-		{
-			"name": "SZ",
-			"output-prefix": "SZ_",
-			"compressor-params": 
-			[
-				{
-					"scalar": [
-						"baryon_density",
-						"dark_matter_density",
-						"temperature"
-					],
-					"abs": 1E-3
-				},
-				{
-					"scalar": 
-					[
-						"velocity_x",
-						"velocity_y",
-						"velocity_z"
-					],
-					"pw_rel": 1E-2
-				}
-			]
-		},
-
-		{
-			"name": "BLOSC",
-			"output-prefix" : "BLOSC_"
-		},
-
-		{
-			"name": "fpzip",
-			"bits" : 24,
-			"output-prefix" : "fpzip_24_"
-		},
-
-		{
-            "name": "zfp",
-            "output-prefix" : "zfp_abs_.01_",
-            "abs" : 1E-2
-		}
-	],
-
-	"cbench": 
+	"data-reduction": 
 	{
-		"path": "build/CBench",
+		"cbench-compressors": 
+		[
+			{
+				"name": "SZ",
+				"output-prefix": "SZ_",
+				"compressor-params": 
+				[
+					{
+						"scalar": [
+							"baryon_density",
+							"dark_matter_density",
+							"temperature"
+						],
+						"abs": 1E-3
+					},
+					{
+						"scalar": 
+						[
+							"velocity_x",
+							"velocity_y",
+							"velocity_z"
+						],
+						"pw_rel": 1E-2
+					}
+				]
+			},
 
-		"output": 
-		{
-			"output-decompressed": true,
-			"output-decompressed-location": "NYX_Travis_",
+			{
+				"name": "BLOSC",
+				"output-prefix" : "BLOSC_"
+			},
 
-			"log-file": "runlog_NYX_Travis_",
-			"metrics-file": "metrics_NYX_Travis_"
-		},
+			{
+				"name": "fpzip",
+				"bits" : 24,
+				"output-prefix" : "fpzip_24_"
+			},
 
-		"metrics-comment": "which metrics to use",
-		"metrics": 
+			{
+				"name": "zfp",
+				"output-prefix" : "zfp_abs_.01_",
+				"abs" : 1E-2
+			}
+		],
+
+		"cbench-metrics": 
 		[
 			{
 				"name": "absolute_error",
@@ -143,6 +130,29 @@
 			{
 				"name": "psnr"
 			}
-		]
+		],
+
+		"cbench-output" :
+		{
+			"run-path" : "build/",
+
+			"output-decompressed": true,
+			"output-decompressed-location": "NYX_Travis_",
+
+			"log-file": "runlog_NYX_Travis_",
+			"metrics-file": "metrics_NYX_Travis_"
+		},
+
+		"name" : "cbench",
+		"path" : "build/CBench",
+		"evn_path": "scripts/VizAly-CBench.bash.darwin",
+		"configuration": 
+		{
+			"partition": "general",
+			"nodes": 1,
+			"ntasks-per-node": 8
+		},
+
+		"output-files": []
 	}
 }

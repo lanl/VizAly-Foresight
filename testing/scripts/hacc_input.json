@@ -9,61 +9,47 @@
 		"scalars": ["x", "y", "z", "vx", "vy", "vz"]
 	},
 
-	
-	"compressor-comment" : "which compressors to test",
-	"compressors" : 
-	[
-		{
-			"name": "BLOSC",
-			"output-prefix" : "BLOSC_HACC_"
-		},
-
-		{
-			"name": "SZ",
-			"output-prefix" : "SZ_HACC_pos_vel_",
-			"compressor-params" :
-			[
-				{
-					"scalar" : ["x", "y", "z"],
-					"abs" : 1E-3
-				},
-
-				{
-					"scalar" : ["vx", "vy", "vz"],
-					"pw_rel" : 1E-2
-				}
-			]
-		},
-
-		{
-			"name": "fpzip",
-			"bits" : 24,
-			"output-prefix" : "fpzip_24_"
-		},
-
-
-		{
-            "name": "zfp",
-            "output-prefix" : "zfp_abs_.01_",
-            "abs" : 1E-2
-		}
-	],
-
-	"metrics-comment" : "which metrics to use",
-	
-
-	"cbench" :
+	"data-reduction": 
 	{
-		"output" :
-		{
-			"output-decompressed": true,
-			"output-decompressed-location" : "HACC_Travis_",
-			
-			"log-file" : "runlog_HACC_Travis_",
-			"metrics-file" : "metrics_HACC_Travis_"
-		},
+		"cbench-compressors" : 
+		[
+			{
+				"name": "BLOSC",
+				"output-prefix" : "BLOSC_HACC_"
+			},
 
-		"metrics": 
+			{
+				"name": "SZ",
+				"output-prefix" : "SZ_HACC_pos_vel_",
+				"compressor-params" :
+				[
+					{
+						"scalar" : ["x", "y", "z"],
+						"abs" : 1E-3
+					},
+
+					{
+						"scalar" : ["vx", "vy", "vz"],
+						"pw_rel" : 1E-2
+					}
+				]
+			},
+
+			{
+				"name": "fpzip",
+				"bits" : 24,
+				"output-prefix" : "fpzip_24_"
+			},
+
+
+			{
+				"name": "zfp",
+				"output-prefix" : "zfp_abs_.01_",
+				"abs" : 1E-2
+			}
+		],
+
+		"bench-metrics": 
 		[
 			{
 				"name" : "absolute_error",
@@ -81,7 +67,28 @@
 			{
 				"name" : "psnr"
 			}
-		]
+		],
+
+		"cbench-output" :
+		{
+			"output-decompressed": true,
+			"output-decompressed-location" : "HACC_Travis_",
+			
+			"log-file" : "runlog_HACC_Travis_",
+			"metrics-file" : "metrics_HACC_Travis_"
+		},
+
+		"name" : "cbench",
+		"path" : "mpirun $foresight-home$build/CBench",
+		"evn_path": "scripts/VizAly-CBench.bash.darwin",
+		"configuration": 
+		{
+			"partition": "general",
+			"nodes": 1,
+			"ntasks-per-node": 16
+		},
+
+		"output-files": []
 	}
 }
 
