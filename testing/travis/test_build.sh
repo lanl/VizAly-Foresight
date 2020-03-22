@@ -33,8 +33,8 @@ pip3 install -r testing/travis/requirements.txt
 
 
 # test HACC workflow generator and executables
-cd /src/VizAly-CBench/Analysis
-python3 -m pat.nyx.workflow --input-file ../testing/scripts/NYX_workflow.json --preview
+#cd /src/VizAly-CBench/Analysis
+#python3 -m pat.nyx.workflow --input-file ../testing/scripts/NYX_workflow.json --preview
 
 #python3 -m pat.hacc.pat_hacc --input-file ../inputs/hacc/hacc_wflow.json --preview
 #python3 -m pat.hacc.pat_hacc_query.py --help
