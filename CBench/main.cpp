@@ -227,6 +227,9 @@ int main(int argc, char *argv[])
 			{
 				if (myRank == 0)
 					std::cout << "Unsupported compressor: " << compressors[c] << " ... skipping!" << std::endl;
+
+				debuglog << "Unsupported compressor: " << compressors[c] << " ... skipping!" << std::endl;
+
 				continue;
 			}
 
@@ -266,6 +269,7 @@ int main(int argc, char *argv[])
 				if (!ioMgr->loadData(scalars[i]))
 				{
 					memLoad.stop();
+					std::cout << "ioMgr->loadData(" << scalars[i] << ") failed!" << std::endl; 
 					continue;
 				}
 
@@ -490,40 +494,69 @@ int main(int argc, char *argv[])
 				Timer clockWrite;
 				clockWrite.start();
 
-				#if CBENCH_HAS_NYX
-				debuglog << "\nLoading uncompressed fields" << std::endl;
 				ioMgr->loadUncompressedFields(jsonInput);
-				//debuglog << ioMgr->getLog();
-				MPI_Barrier(MPI_COMM_WORLD);
-				#endif
 
-				debuglog << "Write data .... \n";
+			//   #if CBENCH_HAS_NYX
+			// 	debuglog << "\nLoading uncompressed fields" << std::endl;
+			// 	ioMgr->loadUncompressedFields(jsonInput);
+			// 	//debuglog << ioMgr->getLog();
+			// 	MPI_Barrier(MPI_COMM_WORLD);
+			//   #endif
 
-				// Pass through original data to preserve original file data structure
-				for (int i = 0; i < ioMgr->inOutData.size(); i++)
-				{
-					if (!ioMgr->inOutData[i].doWrite)
-					{
-						debuglog << "writing uncoompressed" << std::endl;
-						ioMgr->loadData(ioMgr->inOutData[i].name);
-						ioMgr->saveCompData(ioMgr->inOutData[i].name, ioMgr->data);
-						ioMgr->close();
-					}
-				}
+				// debuglog << "Write data .... \n";
+
+				// // Pass through original data to preserve original file data structure
+				// for (int i = 0; i < ioMgr->inOutData.size(); i++)
+				// {
+				// 	if (!ioMgr->inOutData[i].doWrite)
+				// 	{
+				// 		debuglog << "writing uncoompressed" << std::endl;
+				// 		ioMgr->loadData(ioMgr->inOutData[i].name);
+				// 		ioMgr->saveCompData(ioMgr->inOutData[i].name, ioMgr->data);
+				// 		ioMgr->close();
+				// 	}
+				// }
+
+				// std::string decompressedOutputName;
+				// if (jsonInput["data-reduction"]["cbench-compressors"][c].find("output-prefix") != jsonInput["data-reduction"]["cbench-compressors"][c].end())
+				// 	decompressedOutputName = jsonInput["data-reduction"]["cbench-compressors"][c]["output-prefix"];
+				// else
+				// 	decompressedOutputName = "__" + compressorMgr->getCompressorName() + "_" + std::to_string(rand());
+
+				// if (outputPath != ".")
+				// 	decompressedOutputName = outputPath + "/" + decompressedOutputName + "__" + outputFilename;
+				// else
+				// 	decompressedOutputName = decompressedOutputName + "__" + outputFilename;
+
+				// // Write out uncompressed (lossy) data
+				// ioMgr->writeData(decompressedOutputName);
 
 
-
-				std::string decompressedOutputName;
-				if (jsonInput["data-reduction"]["cbench-compressors"][c].find("output-prefix") != jsonInput["data-reduction"]["cbench-compressors"][c].end())
-					decompressedOutputName = jsonInput["data-reduction"]["cbench-compressors"][c]["output-prefix"];
+				//
+				// Get the name and path of the new file
+				std::string decompressedOutputName, fileToOutput;
+				if (jsonInput["compressors"][c].contains("output-prefix"))
+					decompressedOutputName = jsonInput["compressors"][c]["output-prefix"];
 				else
 					decompressedOutputName = "__" + compressorMgr->getCompressorName() + "_" + std::to_string(rand());
 
-				if (outputPath != ".")
-					decompressedOutputName = outputPath + "/" + decompressedOutputName + "__" + outputFilename;
+				// deal with timesteps
+				if (outputFilename.find("%") != std::string::npos)
+				{
+					std::string tempStr = outputFilename;
+					fileToOutput = tempStr.replace( outputFilename.find("%"), outputFilename.find("%")+1, strConvert::toStr(ts) );
+				}
 				else
-					decompressedOutputName = decompressedOutputName + "__" + outputFilename;
+					fileToOutput = outputFilename;
 
+				// path for folders
+				if (outputPath != ".")
+					decompressedOutputName = outputPath + "/" + decompressedOutputName + "__" + fileToOutput;
+				else
+					decompressedOutputName = decompressedOutputName + "__" + fileToOutput;
+
+
+				//
 				// Write out uncompressed (lossy) data
 				ioMgr->writeData(decompressedOutputName);
 

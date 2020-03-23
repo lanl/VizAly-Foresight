@@ -160,8 +160,9 @@ elif [ $buildOpt = "Default" ]; then
 	if [ $buildPlatform = "cori" ]; then
 		echo "..Building on Cori.."
 		cmake ../CBench $opt\
-                        -DCBENCH_LOADER_GDA=ON \
+			-DCBENCH_LOADER_GDA=ON \
 			-DCBENCH_LOADER_NYX=ON \
+			-DCBENCH_LOADER_GENERICBINARY=ON \
 			-DHDF5_DIR=$externalDependencies/hdf5/install/share/cmake/hdf5 \
 			-DCBENCH_COMPRESSOR_BLOSC=ON \
 			-DBLOSC_INCLUDE_PATH=$externalDependencies/c-blosc/install/include \
@@ -183,7 +184,8 @@ elif [ $buildOpt = "Default" ]; then
 			-DCMAKE_BUILD_TYPE=$buildType
 	else
 		cmake ../CBench $opt\
-                        -DCBENCH_LOADER_GDA=ON \
+			-DCBENCH_LOADER_GDA=ON \
+			-DCBENCH_LOADER_GENERICBINARY=ON \
 			-DCBENCH_LOADER_NYX=ON \
 			-DHDF5_DIR=$externalDependencies/hdf5/install/share/cmake/hdf5 \
 			-DCBENCH_COMPRESSOR_BLOSC=ON \
@@ -235,8 +237,9 @@ elif [ $buildOpt = "all" ]; then
 	if [ "$PLATFORM" = "travis" ]; then
 	  echo "Travis: Using internal HDF5 build"
 	  cmake ../CBench $opt\
-                -DCBENCH_LOADER_GDA=ON \
+		-DCBENCH_LOADER_GDA=ON \
 		-DCBENCH_LOADER_NYX=ON \
+		-DCBENCH_LOADER_GENERICBINARY=ON \
 		-DCBENCH_COMPRESSOR_BLOSC=ON \
 		-DBLOSC_INCLUDE_PATH=$externalDependencies/c-blosc/install/include \
 		-DBLOSC_LIBRARY=$externalDependencies/c-blosc/install/lib/libblosc.so \
@@ -257,17 +260,11 @@ elif [ $buildOpt = "all" ]; then
 		-DCBENCH_COMPRESSOR_MGARD=ON \
 		-DMGARD_INCLUDE_PATH=$externalDependencies/MGARD/install/include \
 		-DMGARD_LIBRARY=$externalDependencies/MGARD/install/lib/libmgard.so \
-		-DCBENCH_COMPRESSOR_LOSSY_WAVE=ON \
-		-DLOSSYWAVE_INCLUDE_PATH=$externalDependencies/VizAly-LossyWave/install/include \
-		-DLOSSYWAVE_LIBRARY=$externalDependencies/VizAly-LossyWave/install/lib/liblossywave.so \
-		-DLOSSYWAVE_LZ4_LIBRARY=$externalDependencies/VizAly-LossyWave/build/3rdparty/lz4/lz4-external/src/lz4-external/lib/liblz4.a \
-		-DCBENCH_COMPRESSOR_BIG_CRUNCH=ON \
-		-DBIGCRUNCH_INCLUDE_PATH=$externalDependencies/VizAly-BigCrunch/install/include \
-		-DBIGCRUNCH_LIBRARY=$externalDependencies/VizAly-BigCrunch/install/lib/libbigcrunch.so \
 		-DCMAKE_BUILD_TYPE=$buildType
 	else
 	  cmake ../CBench $opt\
-                -DCBENCH_LOADER_GDA=ON \
+		-DCBENCH_LOADER_GDA=ON \
+		-DCBENCH_LOADER_GENERICBINARY=ON \
 		-DCBENCH_LOADER_NYX=ON \
 		-DHDF5_DIR=$externalDependencies/hdf5/install/share/cmake/hdf5 \
 		-DCBENCH_COMPRESSOR_BLOSC=ON \
@@ -290,13 +287,6 @@ elif [ $buildOpt = "all" ]; then
 		-DCBENCH_COMPRESSOR_MGARD=ON \
 		-DMGARD_INCLUDE_PATH=$externalDependencies/MGARD/install/include \
 		-DMGARD_LIBRARY=$externalDependencies/MGARD/install/lib/libmgard.so \
-		-DCBENCH_COMPRESSOR_LOSSY_WAVE=ON \
-		-DLOSSYWAVE_INCLUDE_PATH=$externalDependencies/VizAly-LossyWave/install/include \
-		-DLOSSYWAVE_LIBRARY=$externalDependencies/VizAly-LossyWave/install/lib/liblossywave.so \
-		-DLOSSYWAVE_LZ4_LIBRARY=$externalDependencies/VizAly-LossyWave/build/3rdparty/lz4/lz4-external/src/lz4-external/lib/liblz4.a \
-		-DCBENCH_COMPRESSOR_BIG_CRUNCH=ON \
-		-DBIGCRUNCH_INCLUDE_PATH=$externalDependencies/VizAly-BigCrunch/install/include \
-		-DBIGCRUNCH_LIBRARY=$externalDependencies/VizAly-BigCrunch/install/lib/libbigcrunch.so \
 		-DCMAKE_BUILD_TYPE=$buildType
 	fi
 	
@@ -314,20 +304,13 @@ elif [ $buildOpt = "osx" ]; then
 		-DSZ_LIBRARY=$externalDependencies/SZ/install/lib/libSZ.dylib \
 		-DZLIB_LIBRARY=$externalDependencies/SZ/install/lib/libzlib.dylib \
 		-DZSTD_LIBRARY=$externalDependencies/SZ/install/lib/libzstd.dylib \
-		-DCBENCH_COMPRESSOR_BIG_CRUNCH=ON \
-		-DBIGCRUNCH_INCLUDE_PATH=$externalDependencies/VizAly-BigCrunch/install/include \
-		-DBIGCRUNCH_LIBRARY=$externalDependencies/VizAly-BigCrunch/install/lib/libbigcrunch.dylib \
-		-DCBENCH_COMPRESSOR_LOSSY_WAVE=ON \
-		-DLOSSYWAVE_INCLUDE_PATH=$externalDependencies/VizAly-LossyWave/install/include \
-		-DLOSSYWAVE_LIBRARY=$externalDependencies/VizAly-LossyWave/install/lib/liblossywave.dylib \
-		-DLOSSYWAVE_LZ4_LIBRARY=$externalDependencies/VizAly-LossyWave/build/3rdparty/lz4/lz4-external/src/lz4-external/lib/liblz4.a \
 		-DCBENCH_COMPRESSOR_MGARD=OFF \
 		-DMGARD_INCLUDE_PATH=$externalDependencies/MGARD/install/include \
 		-DMGARD_LIBRARY=$externalDependencies/MGARD/install/lib/libmgard.dylib \
 		-DCBENCH_COMPRESSOR_ZFP=ON \
 		-DZFP_INCLUDE_PATH=$externalDependencies/zfp/install/include \
 		-DZFP_LIBRARY=$externalDependencies/zfp/install/lib/libzfp.dylib \
-                -DCBENCH_LOADER_GDA=ON \
+		-DCBENCH_LOADER_GDA=ON \
 		-DCBENCH_LOADER_NYX=ON \
 		-DHDF5_DIR=$externalDependencies/hdf5/install/share/cmake/hdf5 \
 		-DCBENCH_COMPRESSOR_FPZIP=ON \
@@ -341,8 +324,8 @@ elif [ $buildOpt = "gpu" ]; then
 	echo "Building with gpu dependencies ..."
 
 	cmake ../CBench $opt\
-                -DCBENCH_LOADER_GDA=ON \
-                -DCBENCH_LOADER_NYX=ON \
+		-DCBENCH_LOADER_GDA=ON \
+		-DCBENCH_LOADER_NYX=ON \
 		-DHDF5_DIR=$projectPath/ExternalDependencies/hdf5/install/share/cmake/hdf5 \
 		-DCBENCH_COMPRESSOR_SZ_GPU=ON \
 		-DSZ_GPU_INCLUDE_PATH=$projectPath/ExternalDependencies/SZ-generic/sz/include \

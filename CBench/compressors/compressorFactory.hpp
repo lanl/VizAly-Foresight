@@ -24,36 +24,16 @@ class CompressorFactory
 		if (compressorName == "BLOSC")
 		  return new BLOSCCompressor();
 	  #endif
-		
-	  #ifdef CBENCH_HAS_BIG_CRUNCH
-		if (compressorName == "BigCrunch")
-		  return new BigCrunchCompressor();
-	  #endif
 
 	  #ifdef CBENCH_HAS_ZFP
 		if (compressorName == "zfp")
 		 return new ZFPCompressor();
 	  #endif
 
-	  #ifdef CBENCH_HAS_ZFP_GPU
-		if (compressorName == "zfp_gpu")
-		 return new ZFPCompressorGpu();
-	  #endif
-
 	  #ifdef CBENCH_HAS_SZ
 		if (compressorName == "SZ")
 		  return new SZCompressor();
-	  #endif
-
-	  #ifdef CBENCH_HAS_SZ_GPU
-		if (compressorName == "SZ_gpu")
-		  return new SZCompressorGpu();
-	  #endif
-
-	  #ifdef CBENCH_HAS_LOSSY_WAVE
-		if (compressorName == "LossyWave")
-		  return new LossyWaveCompressor();
-	  #endif
+	  #endif	  
 
 	  #ifdef CBENCH_HAS_MGARD
 		if (compressorName == "MGARD")
@@ -68,6 +48,17 @@ class CompressorFactory
 	  #ifdef CBENCH_HAS_FPZIP
 		if (compressorName == "fpzip")
 			return new FPZIPCompressor();
+	  #endif
+
+
+	  #ifdef CBENCH_HAS_ZFP_GPU
+		if (compressorName == "zfp_gpu")
+		 return new ZFPCompressorGpu();
+	  #endif
+
+	  #ifdef CBENCH_HAS_SZ_GPU
+		if (compressorName == "SZ_gpu")
+		  return new SZCompressorGpu();
 	  #endif
 
 		  return NULL;

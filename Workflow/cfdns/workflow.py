@@ -2,7 +2,7 @@
 """
 To run executable do:
 
-python3 -m Workflow.cfdns.workflow --input-file inputs/cfdns/ml.json --reduction
+python3 -m Workflow.cfdns.workflow --input-file inputs/cfdns/ml_turbulence.json --reduction
 """
 
 import sys
