@@ -1,3 +1,4 @@
+#!/bin/bash
 module unload PrgEnv-intel
 module load PrgEnv-gnu
 module load cmake/3.14.4

@@ -124,7 +124,7 @@ class Workflow(object):
 
 
 
-	def add_cbench_job(self):
+	def add_cbench_job(self, dependency="", filters=""):
 		""" Adds a CBench job to the workflow.
 		"""
 	
@@ -150,7 +150,11 @@ class Workflow(object):
 						 configurations=configurations,
 						 environment=environment)
 		cbench_job.add_command("mkdir -p logs")
-		self.add_job(cbench_job)
+  
+		if dependency == "":
+			self.add_job(cbench_job)
+		else:
+			self.add_job(cbench_job, dependencies=dependency, filter=filters)
   
 		# Fill output files for cbench
 		self.fill_cbench_output_files()

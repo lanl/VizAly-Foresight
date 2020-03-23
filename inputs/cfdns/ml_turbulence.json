@@ -21,8 +21,8 @@
 		[
 			{
 				"path": "python /usr/projects/ml_compression/VizAly-Foresight-CBench/Analysis/pat/turbulence/dataConversion/hdf5_to_raw.py",
-				"env": "/usr/projects/ml_compression/VizAly-Foresight-CBench/scripts/VizAly-CBench.bash.darwin",
-				"exec-dir": "preprocess",
+				"evn_path": "/usr/projects/ml_compression/VizAly-Foresight-CBench/scripts/VizAly-CBench.bash.darwin",
+				"exec-dir": "cbench_preprocess",
 				"params": [
 					"/usr/projects/ml_compression/data/original/scalarHIT_fields100.h5",
 					"one",
@@ -49,7 +49,7 @@
 			{
 				"path": "python /usr/projects/ml_compression/VizAly-Foresight-CBench/Analysis/pat/turbulence/dataConversion/raw_to_hdf5.py",
 				"evn_path": "/usr/projects/ml_compression/VizAly-Foresight-CBench/scripts/VizAly-CBench.bash.darwin",
-				"exec-dir": "postprocess",
+				"exec-dir": "cbench_postprocess",
 				"params": [
 					"128",
 					"128",
@@ -98,16 +98,11 @@
 		{
 			"run-path": "mpirun $foresight-home$build/CBench",
 
-			"output": {
-				"output-decompressed": true,
-				"output-decompressed-location": "decompressed_files",
+			"output-decompressed": true,
+			"output-decompressed-location": "decompressed_files",
 
-				"logfname-comment": "name of output log file",
-				"log-file": "runlog_",
-
-				"metricsfname-comment": "name of file with output",
-				"metrics-file": "metrics"
-			}
+			"log-file": "runlog_",
+			"metrics-file": "metrics"
 		},
 
 		"cbench-metrics": 
@@ -137,7 +132,7 @@
 		"path" : "mpirun $foresight-home$build/CBench",
 		"evn_path": "scripts/VizAly-CBench.bash.darwin",
 		"configuration": {
-			"partition": "scaling",
+			"partition": "galton",
 			"nodes": 8,
 			"ntasks-per-node": 8
 		},

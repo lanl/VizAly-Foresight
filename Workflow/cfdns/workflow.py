@@ -2,80 +2,83 @@
 """
 To run executable do:
 
-python3 -m pat.nyx.workflow --input-file ../inputs/tests/test-nyx-foresight.json
-python3 -m pat.nyx.workflow --input-file ../inputs/tests/test-nyx-analysis-cinema.json --analysis-cinema
-python3 -m pat.nyx.workflow --input-file ../inputs/tests/test-nyx-cinema.json --cinema
-python3 -m pat.nyx.workflow --input-file ../inputs/tests/test-nyx-foresight.json --cbench
+python3 -m Workflow.cfdns.workflow --input-file inputs/cfdns/ml.json --reduction
 """
 
 import sys
 import os
 import argparse
 
-from pat.utils import workflow as workflow
-from pat.utils import job as j
-from pat.utils import file_utilities as futils
-from pat.utils import plot_utilities as putils
+import Workflow.draw.workflow as workflow
+import Workflow.draw.job as j
+import Workflow.draw.utils as utils
 
 
-class RAWWorkflow(workflow.Workflow):
+class CFDNSWorkflow(workflow.Workflow):
 
 	def __init__(self, name, json_data, workflow_dir=""):
 		# Write the new analysis file
 		super().__init__(name, json_data, workflow_dir)
 
 	def preprocess_cbench(self):
-		for script in self.json_data['cbench-pre-process']:
+		for script in self.json_data['data-reduction']['cbench-pre-process']:
       
 			# Create configuration
 			if "configuration" in script:
 				configurations = list(sum(script["configuration"].items(), ()))
 			else:
 				configurations = None
+    
+			if "evn_path" in script["evn_path"]:
+				environment =  script["evn_path"]
+			else:
+				environment = None
+
    
 			# Create Job
 			thisjob = j.Job(name="preprocess",
 				execute_dir=script['exec-dir'],
-				executable=script['script'], 
+				executable=script['path'], 
 				arguments=script['params'],
 				configurations=configurations,
-				environment=script['env'] )
+				environment=environment)
 			
-			# Add it to queue
-			for job in self.jobs:
-				thisjob.add_parents(job)
 			self.add_job(thisjob)
 
 
 	def postprocess_cbench(self):
-		for script in self.json_data['cbench-post-process']:
+		for script in self.json_data['data-reduction']['cbench-post-process']:
 
 			# Create configuration
 			if "configuration" in script:
 				configurations = list(sum(script["configuration"].items(), ()))
 			else:
 				configurations = None
+    
+			if "evn_path" in script["evn_path"]:
+				environment =  script["evn_path"]
+			else:
+				environment = None
 
 			print("script['params']:", script['params'])
 
 			# Create Job
 			thisjob = j.Job(name="postprocess",
 				execute_dir=script['exec-dir'],
-				executable=script['script'], 
+				executable=script['path'], 
 				arguments=script['params'],
 				configurations=configurations,
-				environment=script['env'] )
+				environment=environment)
 			
 			# Add it to queue
-			for job in self.jobs:
-				thisjob.add_parents(job)
-			self.add_job(thisjob)
+			self.add_job(thisjob, dependencies="single", filter="cbench")
 		
 		
 	# Run cbench job
-	def add_cbench_job(self):
-		self.preprocess_cbench()
-		super().add_cbench_job()
+	def add_data_reduction_jobs(self):
+		#self.preprocess_cbench()
+		#self.add_cbench_job(dependency="single", filters="preprocess")
+		self.add_cbench_job()
 		self.postprocess_cbench()
 
 
@@ -200,41 +203,20 @@ class RAWWorkflow(workflow.Workflow):
 
 def main():
 	# Parse Input
-	parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
-	parser.add_argument("--input-file")
-	parser.add_argument("--analysis-cinema", action="store_true", help="run analysis and cinema job only")
-	parser.add_argument("--cbench",          action="store_true", help="run cbench only")
-	parser.add_argument("--cinema",          action="store_true", help="run cinema only")
-	parser.add_argument("--preview", 		 action="store_true", help="preview the job, create scripts, ... but won't run")
-	opts = parser.parse_args()
-
-
+	opts = workflow.parse_args()
+ 
 	# Read input JSON file
-	wflow_data = futils.read_json(opts.input_file)
+	wflow_data = utils.read_json(opts.input_file)
+	if wflow_data == None:
+		sys.exit(0)
 
 
 	# create Workflow instance
 	wflow_dir = wflow_data["project-home"] + wflow_data["wflow-path"]
-	wflow = RAWWorkflow("wflow", wflow_data, workflow_dir=wflow_dir)
-
-
-	# add jobs to workflow
-	if opts.cinema:
-		print("Run cinema only")
-		wflow.add_cinema_plotting_jobs()
-	elif opts.cbench:
-		print("Run cbench only")
-		wflow.add_cbench_job()
-	elif opts.analysis_cinema:
-		print("Run analysis + cinema")
-		wflow.add_analysis_jobs()
-		#wflow.add_cinema_plotting_jobs()
-	else:	
-		print("Run full: CBench, analysis, and Cinema")
-		wflow.add_cbench_job()
-		wflow.add_analysis_jobs()
-		wflow.add_cinema_plotting_jobs()
-
+	wflow = CFDNSWorkflow("wflow", wflow_data, workflow_dir=wflow_dir)
+ 
+	# process intput
+	wflow = workflow.process_input(wflow,opts)
 
 	# submit workflow
 	if opts.preview:
@@ -244,6 +226,5 @@ def main():
 		wflow.submit()
 
 
-
 if __name__== "__main__":
-  	main()
+	main()

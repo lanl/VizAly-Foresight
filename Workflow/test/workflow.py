@@ -7,7 +7,7 @@ pat_nyx fun the foresight pipeline for nyx analysis. In other words, it does:
 - create a cinema data
 
 To run:
-python3 -m Workflow.test.workflow --input-file inputs/test/test_nyx_darwin.json --vis
+python3 -m Workflow.test.workflow --input-file inputs/test/test_nyx_darwin.json
 """
 
 import argparse

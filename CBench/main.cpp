@@ -46,7 +46,6 @@ int main(int argc, char *argv[])
 	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
 
-
 	//
 	// Validate input params
 	if (!validateInput(argc, argv, myRank, numRanks))
@@ -82,6 +81,7 @@ int main(int argc, char *argv[])
 	int numTimesteps = maxTimestep - minTimestep;
 
 
+	// write out decompressed files + output name
 	bool writeData = false;
 	std::string outputFilename = "";
 	if (jsonInput["data-reduction"]["cbench-output"].contains("output-decompressed"))
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 		srand(time(NULL));
 	}
 
-
+	// location of decompressed files
 	std::string outputPath = ".";
 	if ( jsonInput["data-reduction"]["cbench-output"].contains("output-decompressed-location"))
 	{
@@ -104,10 +104,12 @@ int main(int argc, char *argv[])
 	}
 
 
-
+	// Log file name
 	createFolder("logs");
 	std::string outputLogFilename = "logs/" + jsonInput["data-reduction"]["cbench-output"]["log-file"].get<std::string>() + "_" + std::to_string(myRank);
 
+
+	// Store compressors, scalars, and metrics to use
 	std::vector<std::string> compressors;
 	for (int i = 0; i < jsonInput["data-reduction"]["cbench-compressors"].size(); i++)
 		compressors.push_back(jsonInput["data-reduction"]["cbench-compressors"][i]["name"]);
@@ -132,25 +134,29 @@ int main(int argc, char *argv[])
 	//
 	// Create log and metrics files
 	Timer overallClock;
-	std::stringstream debuglog, metricsInfo, csvOutput;
+	std::stringstream debuglog, metricsInfo, csvOutputHeader;
 	writeLog(outputLogFilename, debuglog.str());
-
-	csvOutput << "Compressor_field" << "__" << "params" << ", " << "name, ";
-	for (int m = 0; m < metrics.size(); ++m)
-		csvOutput << metrics[m] << ", ";
-
-	csvOutput << "Compression Throughput(MB/s), DeCompression Throughput(MB/s), Compression Ratio" << std::endl;
-	metricsInfo << "Input file: " << inputFilename << std::endl;
 
 	overallClock.start();
 
 
-	std::string fileToLoad;
+	
 	for (int ts=minTimestep; ts<maxTimestep; ts++)
 	{
+		//
+		// Create header for metrics output
+		std::stringstream csvOutput;
+		csvOutput << "Compressor_field" << "__" << "params" << ", " << "name, ";
+		for (int m = 0; m < metrics.size(); ++m)
+			csvOutput << metrics[m] << ", ";
+		csvOutput << "Compression Throughput(MB/s), DeCompression Throughput(MB/s), Compression Ratio" << std::endl;
+
+		debuglog << "\n********************************** timestep: " << ts << " of " << numTimesteps << std::endl;
+
 
 		//
 		// Open data file
+		std::string fileToLoad;
 		DataLoaderInterface *ioMgr;
 		{
 			//
@@ -177,6 +183,9 @@ int main(int argc, char *argv[])
 				if (myRank == 0)
 					std::cout << "Unsupported loader: " << inputFileType << " ... exiting!" << std::endl;
 				
+				debuglog << "Unsupported loader: " << inputFileType << " ... exiting!"<< std::endl;
+				appendLog(outputLogFilename, debuglog);
+
 				MPI_Finalize();
 				return 0;
 			}
