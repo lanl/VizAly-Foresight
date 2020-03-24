@@ -79,7 +79,7 @@ class CFDNSWorkflow(workflow.Workflow):
 		#self.preprocess_cbench()
 		#self.add_cbench_job(dependency="single", filters="preprocess")
 		self.add_cbench_job()
-		self.postprocess_cbench()
+		#self.postprocess_cbench()
 
 
 	# Re-write the json data to include the analysis; ["pat"]["analysis"]

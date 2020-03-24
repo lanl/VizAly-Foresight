@@ -27,7 +27,7 @@ public:
 	~meansquareError();
 
 	void init(MPI_Comm _comm);
-	void execute(void *original, void *approx, size_t n);
+	void execute(void *original, void *approx, size_t n, std::string dataType="float");
 	void close() { }
 
 };
@@ -52,13 +52,16 @@ inline void meansquareError::init(MPI_Comm _comm)
 }
 
 
-inline void meansquareError::execute(void *original, void *approx, size_t n) {
+inline void meansquareError::execute(void *original, void *approx, size_t n, std::string dataType) {
 	//std::vector<double> mse(n);
 	double mse = 0;
 
 	for (std::size_t i = 0; i < n; ++i)
 	{
-		mse += pow(( static_cast<float *>(original)[i]-static_cast<float *>(approx)[i]), 2.0);
+		if (dataType == "float")
+			mse += pow(( static_cast<float *>(original)[i]-static_cast<float *>(approx)[i]), 2.0);
+		else if (dataType == "double")
+			mse += pow(( static_cast<double *>(original)[i]-static_cast<double *>(approx)[i]), 2.0);
 	}
 
 	double local_mse = mse / n;

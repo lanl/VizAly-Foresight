@@ -82,7 +82,14 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
 		}
 
 	std::size_t csize = 0;
-	std::uint8_t *cdata = SZ_compress_args(SZ_FLOAT, static_cast<float *>(input), &csize, mode, absTol, relTol, powerTol, n[4], n[3], n[2], n[1], n[0]);
+	std::uint8_t *cdata;
+	if (dataType == "float")
+	 	cdata = SZ_compress_args(SZ_FLOAT, static_cast<float *>(input), &csize, mode, absTol, relTol, powerTol, n[4], n[3], n[2], n[1], n[0]);
+	else if (dataType == "double")
+		cdata = SZ_compress_args(SZ_DOUBLE, static_cast<double *>(input), &csize, mode, absTol, relTol, powerTol, n[4], n[3], n[2], n[1], n[0]);
+	//else if (dataType == "int")
+	//	cdata = SZ_compress_args(SZ_INT, static_cast<int *>(input), &csize, mode, absTol, relTol, powerTol, n[4], n[3], n[2], n[1], n[0]);
+
 
 	output = cdata;
 	cTime.stop();
@@ -105,7 +112,13 @@ inline int SZCompressor::decompress(void *&input, void *&output, std::string dat
 			numel *= n[i];
 
 	Timer dTime; dTime.start();
-	output = SZ_decompress(SZ_FLOAT, static_cast<std::uint8_t *>(input), cbytes, n[4], n[3], n[2], n[1], n[0]);
+	if (dataType == "float")
+		output = SZ_decompress(SZ_FLOAT, static_cast<std::uint8_t *>(input), cbytes, n[4], n[3], n[2], n[1], n[0]);
+	else if (dataType == "double")
+		output = SZ_decompress(SZ_DOUBLE, static_cast<std::uint8_t *>(input), cbytes, n[4], n[3], n[2], n[1], n[0]);
+	//else if (dataType == "int")
+	//	output = SZ_decompress(SZ_INT, static_cast<std::uint8_t *>(input), cbytes, n[4], n[3], n[2], n[1], n[0]);
+
 	dTime.stop();
 
 	std::free(input);	input=NULL;

@@ -29,7 +29,7 @@ public:
 	~minmaxMetric();
 
 	void init(MPI_Comm _comm);
-	void execute(void *original, void *approx, size_t n);
+	void execute(void *original, void *approx, size_t n, std::string dataType="float");
 	void close() { }
 
 };
@@ -57,18 +57,30 @@ inline void minmaxMetric::init(MPI_Comm _comm)
 }
 
 
-inline void minmaxMetric::execute(void *original, void *approx, size_t n) {
+inline void minmaxMetric::execute(void *original, void *approx, size_t n, std::string dataType) {
 
 	double local_max = -std::numeric_limits<double>::max();
 	double local_min = std::numeric_limits<double>::max();
 
 	for (std::size_t i = 0; i < n; ++i)
 	{
-		if (static_cast<float *>(original)[i] > local_max)
-			local_max = static_cast<float *>(original)[i];
+		if (dataType == "float")
+		{
+			if (static_cast<float *>(original)[i] > local_max)
+				local_max = static_cast<float *>(original)[i];
 
-		if (static_cast<float *>(original)[i] < local_min)
-			local_min = static_cast<float *>(original)[i];
+			if (static_cast<float *>(original)[i] < local_min)
+				local_min = static_cast<float *>(original)[i];
+		} 
+		else if (dataType == "double")
+		{
+			if (static_cast<double *>(original)[i] > local_max)
+				local_max = static_cast<double *>(original)[i];
+
+			if (static_cast<double *>(original)[i] < local_min)
+				local_min = static_cast<double *>(original)[i];
+		}
+
 
 	}
 	

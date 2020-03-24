@@ -15,7 +15,6 @@
 	e.g. python3 dataConversion/raw_to_hdf5.py raw50.h5 128 128 128 data/gdaOriginalFiles 0 50 one two vx vy vz ts_
 
 
-
 ## Analytics step
 1. Run inference engine
 	# python3 turbulence_analytics/inference.py inputData checkpointspath outputPath

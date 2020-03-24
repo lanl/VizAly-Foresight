@@ -31,7 +31,7 @@ public:
 	~absoluteError();
 
 	void init(MPI_Comm _comm);
-	void execute(void *original, void *approx, size_t n);
+	void execute(void *original, void *approx, size_t n, std::string dataType="float");
 	void close() { }
 
 };
@@ -62,13 +62,19 @@ inline T absError(T original, T approx)
 	return std::abs(original - approx);
 }
 
-inline void absoluteError::execute(void *original, void *approx, size_t n) {
+inline void absoluteError::execute(void *original, void *approx, size_t n, std::string dataType) 
+{
 	std::vector<double> abs_err(n);
 
     double sum_abs_err = 0;
 	for (std::size_t i = 0; i < n; ++i)
 	{
-		double err = absError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i]);
+		double err;
+		if (dataType == "float")
+			err = absError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i]);
+		else if (dataType == "double")
+			err = absError(static_cast<double *>(original)[i], static_cast<double *>(approx)[i]);
+			
 		abs_err.push_back(err);
         sum_abs_err += err;
 	}

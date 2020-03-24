@@ -29,7 +29,7 @@ public:
 	~relativeError();
 
 	void init(MPI_Comm _comm);
-	void execute(void *original, void *approx, size_t n);
+	void execute(void *original, void *approx, size_t n, std::string dataType="float");
 	void close() { }
 
 };
@@ -75,14 +75,19 @@ inline T relError(T original, T approx, double tolerance)
 }
 
 
-inline void relativeError::execute(void *original, void *approx, size_t n) {
+inline void relativeError::execute(void *original, void *approx, size_t n, std::string dataType) {
 	std::vector<double> rel_err(n);
 
 	double sum_rel_err = 0;
 	for (std::size_t i = 0; i < n; ++i)
 	{
 		// Tolerance set to a value of 1
-		double err = relError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i], 1);
+		double err;
+		if (dataType == "float")
+			err = relError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i], 1);
+		else if (dataType == "double")
+			err = relError(static_cast<double *>(original)[i], static_cast<double *>(approx)[i], 1);
+
 		rel_err.push_back(err);
 		sum_rel_err += err;
 	}

@@ -75,7 +75,8 @@
 		],
 
 
-		"cbench-compressors": [
+		"cbench-compressors": 
+		[
 			{
 				"name": "BLOSC",
 				"output-prefix": "BLOSC_"
@@ -83,14 +84,50 @@
 
 			{
 				"name": "SZ",
-				"output-prefix": "SZ_abs_0.01_",
-				"abs": 1E-2
+				"output-prefix": "SZ_abs_1_",
+				"abs": 1
 			},
 
 			{
 				"name": "SZ",
-				"output-prefix": "SZ_abs_0.1_",
-				"abs": 1E-1
+				"output-prefix": "SZ_abs_2_",
+				"abs": 2
+			},
+			
+			{
+				"name": "SZ",
+				"output-prefix": "SZ_abs_4_",
+				"abs": 4
+			},
+
+			{
+				"name": "SZ",
+				"output-prefix": "SZ_abs_8_",
+				"abs": 8
+			},
+
+			{
+				"name": "zfp",
+				"output-prefix": "zfp_abs_1_",
+				"abs": 1
+			},
+
+			{
+				"name": "zfp",
+				"output-prefix": "zfp_abs_2_",
+				"abs": 2
+			},
+
+			{
+				"name": "zfp",
+				"output-prefix": "zfp_abs_4_",
+				"abs": 4
+			},
+
+			{
+				"name": "zfp",
+				"output-prefix": "zfp_abs_8_",
+				"abs": 8
 			}
 		],
 

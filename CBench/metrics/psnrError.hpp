@@ -28,7 +28,7 @@ public:
 	~psnrError();
 
 	void init(MPI_Comm _comm);
-	void execute(void *original, void *approx, size_t n);
+	void execute(void *original, void *approx, size_t n, std::string dataType="float");
 	void close() { }
 
 };
@@ -53,16 +53,26 @@ inline void psnrError::init(MPI_Comm _comm)
 }
 
 
-inline void psnrError::execute(void *original, void *approx, size_t n) {
+inline void psnrError::execute(void *original, void *approx, size_t n, std::string dataType) {
 
 	double local_max = -999999999;
 	double local_mse = 0;
 	for (std::size_t i = 0; i < n; ++i)
 	{
-		if (static_cast<float *>(original)[i] > local_max)
-			local_max = static_cast<float *>(original)[i];
+		if (dataType == "float")
+		{
+			if (static_cast<float *>(original)[i] > local_max)
+				local_max = static_cast<float *>(original)[i];
 
-		local_mse += (pow(static_cast<float *>(original)[i] - static_cast<float *>(approx)[i], (double)2.0));
+			local_mse += (pow(static_cast<float *>(original)[i] - static_cast<float *>(approx)[i], (double)2.0));
+		}
+		else if (dataType == "double")
+		{
+			if (static_cast<double *>(original)[i] > local_max)
+				local_max = static_cast<double *>(original)[i];
+
+			local_mse += (pow(static_cast<double *>(original)[i] - static_cast<double *>(approx)[i], (double)2.0));
+		}
 
 	}
 

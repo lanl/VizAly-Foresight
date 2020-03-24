@@ -257,9 +257,6 @@ elif [ $buildOpt = "all" ]; then
 		-DCBENCH_COMPRESSOR_ISABELA=ON \
 		-DISABELA_INCLUDE_PATH=$externalDependencies/ISABELA-compress-0.2.1/include \
 		-DISABELA_LIBRARY=$externalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
-		-DCBENCH_COMPRESSOR_MGARD=ON \
-		-DMGARD_INCLUDE_PATH=$externalDependencies/MGARD/install/include \
-		-DMGARD_LIBRARY=$externalDependencies/MGARD/install/lib/libmgard.so \
 		-DCMAKE_BUILD_TYPE=$buildType
 	else
 	  cmake ../CBench $opt\

@@ -5,8 +5,8 @@ import numpy as np
 
 
 def write_info_file(filename, dimsx, dimsy, dimsz, scalars, dataTypes):
-    file = open(filename,"w")
-    file.write(filename + "\n")
+    file = open((filename + ".info"),"w")
+    file.write((filename + ".raw") + "\n")
     file.write(str(dimsx) + "\n")
     file.write(str(dimsy) + "\n")
     file.write(str(dimsz) + "\n")
@@ -61,7 +61,7 @@ def hdf5_to_raw(filename, outputFolder, scalars, timestep):
 	readInDataset.tofile(out_file)
  
 	# write file info
-	write_info_file(outputFolder + "/turbulence_ts_" + str(timestep) + ".info", dimx, dimy, dimz, scalars, dataTypes)
+	write_info_file(outputFolder + "/turbulence_ts_" + str(timestep), dimx, dimy, dimz, scalars, dataTypes)
 
 	print("wrote out ", outputfileName)
 

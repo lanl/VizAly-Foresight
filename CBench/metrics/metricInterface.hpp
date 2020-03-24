@@ -54,7 +54,7 @@ class MetricInterface
                 
 
 	virtual void init(MPI_Comm _comm) = 0;
-    virtual void execute(void *original, void *approx, size_t n) = 0;
+    virtual void execute(void *original, void *approx, size_t n, std::string dataType="float") = 0;
     virtual void close() = 0;
 
     std::string getMetricInfo();

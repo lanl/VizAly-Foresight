@@ -69,6 +69,7 @@ class DataLoaderInterface
 	std::string getParam() { return param; }
 	
 	std::string getLog() { return log.str(); }
+	void clearLog() { log.str(""); }
 
 	void setSave(bool state) { saveData = state; }	// if true, write out decomp data
 
