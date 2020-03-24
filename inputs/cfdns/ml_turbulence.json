@@ -84,8 +84,14 @@
 
 			{
 				"name": "SZ",
-				"output-prefix": "SZ_abs_1_",
-				"abs": 1
+				"pw_rel" : 0.1,
+				"output-prefix" : "SZ_pwrel_0.1_"
+			},
+
+			{
+				"name": "SZ",
+				"pw_rel" : 0.1,
+				"output-prefix" : "SZ_pwrel_0.5_"
 			},
 
 			{
@@ -100,22 +106,17 @@
 				"abs": 4
 			},
 
-			{
-				"name": "SZ",
-				"output-prefix": "SZ_abs_8_",
-				"abs": 8
-			},
 
 			{
 				"name": "zfp",
-				"output-prefix": "zfp_abs_1_",
-				"abs": 1
+				"rel" : 24,
+				"output-prefix" : "zfp_24_"
 			},
-
+	
 			{
 				"name": "zfp",
-				"output-prefix": "zfp_abs_2_",
-				"abs": 2
+				"rel" : 16,
+				"output-prefix" : "zfp_16_"
 			},
 
 			{
@@ -158,10 +159,6 @@
 
 			{
 				"name": "psnr"
-			},
-
-			{
-				"name": "minmax"
 			}
 		],
 

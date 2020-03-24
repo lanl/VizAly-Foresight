@@ -19,6 +19,7 @@ Authors:
 #include <list>
 
 #include "HACC/gioData.hpp"
+#include "debugLog.hpp"
 
 
 class DataLoaderInterface 

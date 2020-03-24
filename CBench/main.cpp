@@ -21,7 +21,6 @@ Authors:
 #include "json.hpp"
 #include "timer.hpp"
 #include "log.hpp"
-//#include "debugLog.hpp"
 #include "memory.hpp"
 #include "utils.hpp"
 
@@ -35,7 +34,9 @@ Authors:
 #include "metricFactory.hpp"
 #include "dataLoaderFactory.hpp"
 
-//std::stringstream Log::Logging::debugLog;
+
+// Global log
+std::stringstream debugLog;
 
 
 int main(int argc, char *argv[])
@@ -55,6 +56,9 @@ int main(int argc, char *argv[])
 		MPI_Finalize();
 		return 0;
 	}
+
+	debugLog << "Hello" << std::endl;
+	writeFile("testLog.log", debugLog.str());
 
 	//
 	// Load input
@@ -215,6 +219,7 @@ int main(int argc, char *argv[])
 				ioMgr->saveInputFileParameters();
 		}
 
+		writeFile("testLog.log", debugLog.str());
 
 		//
 		// Cycle through compressors

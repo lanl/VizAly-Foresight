@@ -16,6 +16,8 @@ Authors:
 #include <sstream>
 #include <iostream>
 
+extern std::stringstream debugLog;
+
 
 inline void writeFile(std::string filename, std::string log)
 {
@@ -27,7 +29,7 @@ inline void writeFile(std::string filename, std::string log)
 
 inline void writeLog(std::string filename, std::stringstream log)
 {
-	std::ofstream outputFile( filename.c_str(), std::ios::out);
+	std::ofstream outputFile( (filename + ".log").c_str(), std::ios::out);
 	outputFile << log.str();
 	outputFile.close();
 }

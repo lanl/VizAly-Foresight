@@ -117,6 +117,9 @@ inline void NYXDataLoader::init(std::string _filename, MPI_Comm _comm)
 	comm = _comm;
 	saveData = false;
 
+	debugLog << "Hello 2" << std::endl;
+	
+
 	MPI_Comm_size(comm, &numRanks);
 	MPI_Comm_rank(comm, &myRank);
 }
