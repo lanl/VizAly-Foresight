@@ -44,7 +44,7 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
 		if (n[i] != 0)
 			numel *= n[i];
 
-	Timer cTime; cTime.start();
+	Timer clock("compress");
 	SZ_Init(NULL);
 
 	int mode = PW_REL; // Default by Sheng, PW_REL = 10
@@ -92,13 +92,13 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
 
 
 	output = cdata;
-	cTime.stop();
+	clock.stop("compress");
 
 	cbytes = csize;
 
-	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*numel / (float)csize) << ", #elements: " << numel << std::endl;
-	log << " ~ Mode used: " << _mode << " abs: " << absTol << ", rel: " << relTol << ", pw_tol: " << powerTol << " val: " << n[4] << ", " << n[3] << ", " << n[2] << ", " <<n[1] << ", " << n[0] << std::endl;
-	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
+	debugLog << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*numel / (float)csize) << ", #elements: " << numel << std::endl;
+	debugLog << " ~ Mode used: " << _mode << " abs: " << absTol << ", rel: " << relTol << ", pw_tol: " << powerTol << " val: " << n[4] << ", " << n[3] << ", " << n[2] << ", " <<n[1] << ", " << n[0] << std::endl;
+	debugLog << compressorName << " ~ CompressTime: " << clock.getDuration("compress") << " s " << std::endl;
 
 	return 1;
 }
@@ -111,7 +111,8 @@ inline int SZCompressor::decompress(void *&input, void *&output, std::string dat
 		if (n[i] != 0)
 			numel *= n[i];
 
-	Timer dTime; dTime.start();
+	Timer clock("decompress");
+
 	if (dataType == "float")
 		output = SZ_decompress(SZ_FLOAT, static_cast<std::uint8_t *>(input), cbytes, n[4], n[3], n[2], n[1], n[0]);
 	else if (dataType == "double")
@@ -119,11 +120,11 @@ inline int SZCompressor::decompress(void *&input, void *&output, std::string dat
 	//else if (dataType == "int")
 	//	output = SZ_decompress(SZ_INT, static_cast<std::uint8_t *>(input), cbytes, n[4], n[3], n[2], n[1], n[0]);
 
-	dTime.stop();
+	clock.stop("decompress");
 
 	std::free(input);	input=NULL;
 
-	log << compressorName << " ~ DecompressTime: " << dTime.getDuration() << " s " << std::endl;
+	debugLog << compressorName << " ~ DecompressTime: " << clock.getDuration("decompress") << " s " << std::endl;
 
 	return 1;
 }

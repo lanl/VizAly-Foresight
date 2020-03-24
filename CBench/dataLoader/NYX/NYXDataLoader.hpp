@@ -117,9 +117,6 @@ inline void NYXDataLoader::init(std::string _filename, MPI_Comm _comm)
 	comm = _comm;
 	saveData = false;
 
-	debugLog << "Hello 2" << std::endl;
-	
-
 	MPI_Comm_size(comm, &numRanks);
 	MPI_Comm_rank(comm, &myRank);
 }
@@ -146,18 +143,17 @@ inline bool NYXDataLoader::deAllocateMem()
 inline int NYXDataLoader::loadData(std::string paramName)
 {
 
-	Timer clock;
-	clock.start();
+	Timer clock("load");
 
-	log.str("");
-	log << "filename: " << filename << " param name: " << paramName << std::endl;
+	//log.str("");
+	debugLog << "filename: " << filename << " param name: " << paramName << std::endl;
 	hid_t file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 
 	herr_t status = loadGroupDataSet(file, defaultGroup, paramName);
 
 	H5Fclose(file);
-	clock.stop();
-	log << "Loading data took " << clock.getDuration() << " s" << std::endl;
+	clock.stop("load");
+	debugLog << "Loading data took " << clock.getDuration("load") << " s" << std::endl;
 
 	int const exit_code = (status < 0 ? 0 : 1);
 	return exit_code;
@@ -180,7 +176,7 @@ inline herr_t NYXDataLoader::loadGroupDataSet(
 	hsize_t zero[3] = {0, 0, 0};
 
 	std::string param_name = "/" + in_group_name + "/" + in_field_name;
-	log << "paramName: " << param_name << std::endl;
+	debugLog << "paramName: " << param_name << std::endl;
 
 	hid_t group     = H5Gopen(in_file, in_group_name.c_str(), H5P_DEFAULT);
 	herr_t err      = H5Gget_num_objs(group, &fields);
@@ -195,8 +191,8 @@ inline herr_t NYXDataLoader::loadGroupDataSet(
 
 	totalNumberOfElements = tdims[0] * tdims[1] * tdims[2];
 
-	log << "Param: " << param_name << std::endl;
-	log << "Data dimensions: " << tdims[0] << " " << tdims[1] << " " << tdims[2]
+	debugLog << "Param: " << param_name << std::endl;
+	debugLog << "Data dimensions: " << tdims[0] << " " << tdims[1] << " " << tdims[2]
 		<< " | totalNumberOfElements " << totalNumberOfElements << std::endl;
 
 	// Read only a subset of the file
@@ -219,9 +215,9 @@ inline herr_t NYXDataLoader::loadGroupDataSet(
 	rankOffset[1] = offset[1];
 	rankOffset[2] = offset[2];
 
-	log << myRank << " ~ Count : " << count[0] << " " << count[1] << " " << count[2] << " | " << numElements << "\n";
-	log << myRank << " ~ Offset: " << offset[0] << " " << offset[1] << " " << offset[2] << "\n";
-	log << myRank << " ~ numElements: " << numElements << "\n";
+	debugLog << myRank << " ~ Count : " << count[0] << " " << count[1] << " " << count[2] << " | " << numElements << "\n";
+	debugLog << myRank << " ~ Offset: " << offset[0] << " " << offset[1] << " " << offset[2] << "\n";
+	debugLog << myRank << " ~ numElements: " << numElements << "\n";
 
 	// select data section
 	hid_t memspace = H5Screate_simple(3, count, NULL);
@@ -262,7 +258,7 @@ inline herr_t NYXDataLoader::loadAttribute(
 
 	assert(num_elems > 0);
 	std::string param_name = "/" + in_group_name + "/" + in_attrib_name;
-	log << "attrib_name: " << param_name << std::endl;
+	debugLog << "attrib_name: " << param_name << std::endl;
 
 	hid_t group_id  = H5Gopen(in_file, in_group_name.c_str(), H5P_DEFAULT);
 	hid_t attrib_id = H5Aopen(group_id, in_attrib_name.c_str(), H5P_DEFAULT);
@@ -414,7 +410,7 @@ inline void NYXDataLoader::writeGroupAttrib(
 		}
 		// write it
 		herr_t const status = write(attrib, datatype, item);
-		log << "\twriting attrib: /" << in_group_name << "/" << item.paramName
+		debugLog << "\twriting attrib: /" << in_group_name << "/" << item.paramName
 			<< ", status: " << (status == -1) << std::endl;
 
 		H5Aclose(attrib);
@@ -425,7 +421,7 @@ inline void NYXDataLoader::writeGroupAttrib(
 	group_attrib.clear();
 
 	H5Gclose(group);
-	log << "Attributes writing finished for: " << in_group_name << std::endl;
+	debugLog << "Attributes writing finished for: " << in_group_name << std::endl;
 }
 
 
@@ -471,7 +467,7 @@ inline void NYXDataLoader::writeGroupData(
     );
 
 		auto const status = (dset_id[field_index] == -1);
-		log << "creating fieldname" << fieldname << ", status: " << status << std::endl;
+		debugLog << "creating fieldname" << fieldname << ", status: " << status << std::endl;
 		field_index++;
 	}
 
@@ -496,7 +492,7 @@ inline void NYXDataLoader::writeGroupData(
 				dset_id[field_index], data_type, in_memspace, filespace, plist_id, data
 			);
 
-			log << "writing field: " << item.paramName
+			debugLog << "writing field: " << item.paramName
 				<< ", status: " << (status == -1) << std::endl
 				<< data[0] << ", " << data[1] << ", "
 				<< data[shift - 2] << ", " << data[shift - 1] << std::endl;
@@ -545,7 +541,7 @@ inline void NYXDataLoader::writeGroupData(
 		}
 		else
 		{
-			log << "Error: Bad data type" << std::endl;
+			debugLog << "Error: Bad data type" << std::endl;
 			throw std::runtime_error("Bad data type");
 		}
 		field_index++;
@@ -553,7 +549,7 @@ inline void NYXDataLoader::writeGroupData(
 
 	// finalization
 	herr_t status = H5Gclose(group);
-	log << "group close status: " << (status == -1) << std::endl;
+	debugLog << "group close status: " << (status == -1) << std::endl;
 
 	H5Sclose(filespace);
 	H5Pclose(plist_id);
@@ -580,7 +576,7 @@ inline int NYXDataLoader::writeData(std::string in_filename)
 	hsize_t count[3];
 	hsize_t offset[3];
 
-	log << "writing to " << in_filename << std::endl;
+	debugLog << "writing to " << in_filename << std::endl;
 
 	hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
 #ifndef _WIN32
@@ -607,8 +603,8 @@ inline int NYXDataLoader::writeData(std::string in_filename)
 	hid_t filespace = H5Screate_simple(3, fileDims, NULL);
 	hid_t memspace  = H5Screate_simple(3, count, NULL);
 
-	log << "count " << count[0] << ", " << count[1] << ", " << count[2] << std::endl;
-	log << "offset " << offset[0] << ", " << offset[1] << ", " << offset[2] << std::endl;
+	debugLog << "count " << count[0] << ", " << count[1] << ", " << count[2] << std::endl;
+	debugLog << "offset " << offset[0] << ", " << offset[1] << ", " << offset[2] << std::endl;
 
 	// create attribute 'format'
 	{
@@ -656,7 +652,7 @@ inline bool NYXDataLoader::loadUncompressedFields(nlohmann::json const& jsonInpu
 	std::ifstream checkfile(filename);
 	if (not checkfile.good())
 	{
-		log << "\tError: unable to load file: " << filename << std::endl;
+		debugLog << "\tError: unable to load file: " << filename << std::endl;
 		checkfile.close();
 		return false;
 	}
@@ -668,7 +664,7 @@ inline bool NYXDataLoader::loadUncompressedFields(nlohmann::json const& jsonInpu
 	auto const& uncompressed_fields = jsonInput["input"]["uncompressed"];
 	for (auto && entry : uncompressed_fields)
 	{
-		log << "Loading uncompressed group data:" << std::endl;
+		debugLog << "Loading uncompressed group data:" << std::endl;
 		assert(entry.find("group") != entry.end());
 		std::string const& group = entry["group"];
 
@@ -678,10 +674,10 @@ inline bool NYXDataLoader::loadUncompressedFields(nlohmann::json const& jsonInpu
 			for (std::string field : entry["scalars"])
 			{
 				std::string const full_name = "/" + group + "/" + field;
-				log << "\tField: " << full_name << std::endl;
+				debugLog << "\tField: " << full_name << std::endl;
 				if (loadGroupDataSet(file, group, field) < 0)
 				{
-					log << "\tError while loading dataset: " << full_name << std::endl;
+					debugLog << "\tError while loading dataset: " << full_name << std::endl;
 					return false;
 				}
 			}
@@ -696,11 +692,11 @@ inline bool NYXDataLoader::loadUncompressedFields(nlohmann::json const& jsonInpu
 				int const size = attribute["size"];
 
 				std::string const full_name = "/" + group + "/" + name;
-				log << "\tAttribute: " << full_name << std::endl;
+				debugLog << "\tAttribute: " << full_name << std::endl;
 
 				if (loadAttribute(file, group, name, size) < 0)
 				{
-					log << "\tError while loading attribute: " << full_name << std::endl;
+					debugLog << "\tError while loading attribute: " << full_name << std::endl;
 					return false;
 				}
 			}

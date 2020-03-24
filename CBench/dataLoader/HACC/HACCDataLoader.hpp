@@ -123,10 +123,8 @@ inline int HACCDataLoader::saveInputFileParameters()
 
 inline int HACCDataLoader::loadData(std::string paramName)
 {
-	Timer clock;
-	log.str("");
+	Timer clock("load");
 
-	clock.start();
 	gio::GenericIO *gioReader;
 	param = paramName;
 
@@ -147,7 +145,7 @@ inline int HACCDataLoader::loadData(std::string paramName)
 		return -1;
 	}
 
-	log << "numRanks: " << numRanks << ", numDataRanks: " << numDataRanks << std::endl;
+	debugLog << "numRanks: " << numRanks << ", numDataRanks: " << numDataRanks << std::endl;
 
 	// Count number of elements
 	totalNumberOfElements = 0;
@@ -195,8 +193,8 @@ inline int HACCDataLoader::loadData(std::string paramName)
 
 	int splitDims[3];
 	gioReader->readDims(splitDims);
-	log << "splitDims: " << splitDims[0] << "," << splitDims[1] << "," << splitDims[2] << std::endl;
-	log << myRank << " ~ loadRange[0]: " << loadRange[0] << ", loadRange[1]: " << loadRange[1] << std::endl;
+	debugLog << "splitDims: " << splitDims[0] << "," << splitDims[1] << "," << splitDims[2] << std::endl;
+	debugLog << myRank << " ~ loadRange[0]: " << loadRange[0] << ", loadRange[1]: " << loadRange[1] << std::endl;
 
 
 
@@ -239,9 +237,9 @@ inline int HACCDataLoader::loadData(std::string paramName)
 
 		int coords[3];
 		gioReader->readCoords(coords, i);
-		log << "Coord indices: " << coords[0] << ", " << coords[1] << ", " << coords[2] << " | ";
+		debugLog << "Coord indices: " << coords[0] << ", " << coords[1] << ", " << coords[2] << " | ";
 
-		log << "coordinates: (" << (float)coords[0] / splitDims[0] * physScale[0] + physOrigin[0] << ", "
+		debugLog << "coordinates: (" << (float)coords[0] / splitDims[0] * physScale[0] + physOrigin[0] << ", "
                           << (float)coords[1] / splitDims[1] * physScale[1] + physOrigin[1] << ", "
                           << (float)coords[2] / splitDims[2] * physScale[2] + physOrigin[2] << ") -> ("
                           << (float)(coords[0] + 1) / splitDims[0] * physScale[0] + physOrigin[0] << ", "
@@ -308,7 +306,8 @@ inline int HACCDataLoader::loadData(std::string paramName)
 		
 		offset = offset + Np;
 	}
-	clock.stop();
+	clock.stop("load");
+	debugLog << "HACC loading data took: " << clock.getDuration("load") << " s" << std::endl;
 
 
 	if (saveData)
@@ -321,7 +320,7 @@ inline int HACCDataLoader::loadData(std::string paramName)
 		mpiCartPartitions[1] = physScale[1]/rangeY;
 		mpiCartPartitions[2] = physScale[2]/rangeZ;
 
-		log  << "mpiCartPartitions: " << mpiCartPartitions[0] << ", " << mpiCartPartitions[1] << ", " << mpiCartPartitions[2] << std::endl;
+		debugLog  << "mpiCartPartitions: " << mpiCartPartitions[0] << ", " << mpiCartPartitions[1] << ", " << mpiCartPartitions[2] << std::endl;
 	}
 	
 	deAllocateMem(dataType, readInData.data);
@@ -345,9 +344,9 @@ inline int HACCDataLoader::saveCompData(std::string paramName, void * cData)
 
 			inOutData[i].doWrite = true;
 
-			log.str("");
-			log << "\nHACCDataLoader::saveCompData" << std::endl;
-			log << paramName << " found. It has " << inOutData[i].numElements << " elements of size " << inOutData[i].size << std::endl;
+			//log.str("");
+			debugLog << "\nHACCDataLoader::saveCompData" << std::endl;
+			debugLog << paramName << " found. It has " << inOutData[i].numElements << " elements of size " << inOutData[i].size << std::endl;
 		}
 	}
 
@@ -358,8 +357,7 @@ inline int HACCDataLoader::saveCompData(std::string paramName, void * cData)
 inline int HACCDataLoader::writeData(std::string _filename)
 {
   #ifndef GENERICIO_NO_MPI
-	Timer clock;
-	log.str("");
+	Timer clock("write");
 	
 	gio::GenericIO *gioWriter;
 
@@ -418,12 +416,12 @@ inline int HACCDataLoader::writeData(std::string _filename)
 	}
 
 	gioWriter->write();
-	log << "HACCDataLoader::writeData " << _filename << std::endl;
+	debugLog << "HACCDataLoader::writeData " << _filename << std::endl;
 
 	MPI_Barrier(comm);
 
-	clock.stop();
-	log << "Writing data took " << clock.getDuration() << " s" << std::endl;
+	clock.stop("write");
+	debugLog << "Writing data took " << clock.getDuration("write") << " s" << std::endl;
   #endif
 	return 1;
 }

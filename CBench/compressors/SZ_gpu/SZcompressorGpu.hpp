@@ -54,7 +54,7 @@ inline int SZCompressorGpu::compress(void *input, void *&output, std::string dat
 		if (n[i] != 0)
 			numel *= n[i];
 
-	Timer cTime; cTime.start();
+	Timer clock("compress");
 	SZ_Init(NULL);
 
 	int mode = ABS;
@@ -97,13 +97,13 @@ inline int SZCompressorGpu::compress(void *input, void *&output, std::string dat
 	auto cdata = gpu_compress(static_cast<float *>(input), n[0], n[1], n[2], absEB, &csize);
 
 	output = cdata;
-	cTime.stop();
+	clock.stop("compress");
 
 	cbytes = csize;
 
 	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*numel / (float)csize) << ", #elements: " << numel << std::endl;
 	log << " ~ Mode used: " << _mode << " abs: " << absTol << ", rel: " << relTol << ", pw_tol: " << powerTol << " val: " << n[4] << ", " << n[3] << ", " << n[2] << ", " <<n[1] << ", " << n[0] << std::endl;
-	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
+	log << compressorName << " ~ CompressTime: " << clock.getDuration("compress") << " s " << std::endl;
 
 	return 1;
 }
@@ -126,7 +126,7 @@ inline int SZCompressorGpu::decompress(void *&input, void *&output, std::string 
 		if (n[i] != 0)
 			numel *= n[i];
 
-	Timer dTime; dTime.start();
+	Timer clock("decompress");
 
 	float* new_data;
 	gpu_decompress(&new_data,
@@ -135,7 +135,7 @@ inline int SZCompressorGpu::decompress(void *&input, void *&output, std::string 
         /*e5*/0,/*e4*/0,/*s3*/n[2],/*e2*/n[1],/*e1*/n[0], /*end positions*/
         static_cast<std::uint8_t *>(input), cbytes);
 	// output = SZ_decompress(SZ_FLOAT, static_cast<std::uint8_t *>(input), cbytes, n[4], n[3], n[2], n[1], n[0]);
-	dTime.stop();
+	clock.stop("decompress");
 
 	output = new_data;
 
@@ -143,7 +143,7 @@ inline int SZCompressorGpu::decompress(void *&input, void *&output, std::string 
 
 	input=NULL;
 
-	log << compressorName << " ~ DecompressTime: " << dTime.getDuration() << " s " << std::endl;
+	log << compressorName << " ~ DecompressTime: " << clock.getDuration("decompress") << " s " << std::endl;
 
 	return 1;
 }

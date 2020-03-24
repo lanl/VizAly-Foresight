@@ -8,15 +8,15 @@ Authors:
  - Pascal Grosset
 ================================================================================*/
 
-#ifndef _LOG_H_
-#define _LOG_H_
+#pragma once
 
 #include <fstream>
 #include <string>
 #include <sstream>
 #include <iostream>
 
-extern std::stringstream debugLog;
+
+extern std::stringstream debugLog;	// Global log for all files
 
 
 inline void writeFile(std::string filename, std::string log)
@@ -37,33 +37,7 @@ inline void writeLog(std::string filename, std::stringstream log)
 
 inline void writeLog(std::string filename, std::string log)
 {
-  #ifndef NDEBUG
 	std::ofstream outputFile( (filename + ".log").c_str(), std::ios::out);
 	outputFile << log;
 	outputFile.close();
-  #endif
 }
-
-
-
-inline void appendLog(std::string filename, std::string log)
-{
-  #ifndef NDEBUG
-	std::ofstream outputFile( (filename + ".log").c_str(), std::ios::out | std::ios::app);
-	outputFile << log;
-	outputFile.close();
-  #endif
-}
-
-inline void appendLog(std::string filename, std::stringstream & log)
-{
-  #ifndef NDEBUG
-	std::ofstream outputFile( (filename + ".log").c_str(), std::ios::out | std::ios::app);
-	outputFile << log.str();
-	outputFile.close();
-
-	log.str("");	// clears the log
-  #endif
-}
-
-#endif

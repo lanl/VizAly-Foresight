@@ -51,7 +51,7 @@ inline int IsabelaCompressor::compress(void *input, void *&output, std::string d
 		if (n[i] != 0)
 			numel *= n[i];
 
-	Timer cTime; cTime.start();
+	Timer clock("compress");
 
 	output = malloc(dataTypeSize * numel);
 
@@ -108,12 +108,12 @@ inline int IsabelaCompressor::compress(void *input, void *&output, std::string d
     status = isabelaDeflateEnd (&i_strm);
     assert (status == ISABELA_SUCCESS);
 
-	cTime.stop();
+	clock.stop("compress");
 
 	cbytes = csize;
 
-	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*numel / (float)csize) << ", #elements: " << numel << std::endl;
-	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
+	debugLog << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*numel / (float)csize) << ", #elements: " << numel << std::endl;
+	debugLog << compressorName << " ~ CompressTime: " << clock.getDuration("compress") << " s " << std::endl;
 
 	return 1;
 }
@@ -125,7 +125,7 @@ inline int IsabelaCompressor::decompress(void *&input, void *&output, std::strin
 		if (n[i] != 0)
 			numel *= n[i];
 
-	Timer dTime; dTime.start();
+	Timer clock("decompress");
 
 	output = malloc(dataTypeSize * numel);
 
@@ -172,7 +172,8 @@ inline int IsabelaCompressor::decompress(void *&input, void *&output, std::strin
     
 	std::free(input);	input=NULL;
 
-	log << compressorName << " ~ DecompressTime: " << dTime.getDuration() << " s " << std::endl;
+    clock.stop("decompress");
+	debugLog << compressorName << " ~ DecompressTime: " << clock.getDuration("decompress") << " s " << std::endl;
 
 	return 1;
 }

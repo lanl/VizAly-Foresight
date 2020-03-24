@@ -45,7 +45,7 @@ inline int BLOSCCompressor::compress(void *input, void *&output, std::string dat
 			numel *= n[i];
 
 	// compress
-	Timer cTime; cTime.start();
+	Timer clock("compress");
 
 	// Default Input Params: {clevel=9, shuffle=1, sizeof(data), idatasize, input, output, odatasize);
 
@@ -63,12 +63,12 @@ inline int BLOSCCompressor::compress(void *input, void *&output, std::string dat
 	{
 		output = std::realloc(output, osize);
 	}
-	cTime.stop();
+	clock.stop("compress");
 
 	cbytes = osize;
 
-	log << "\n" << compressorName << " ~ InputBytes: " << isize << ", OutputBytes: " << osize << ", cRatio: " << (isize/(float)osize) << ", #elements: " << numel << std::endl;
-	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
+	debugLog << "\n" << compressorName << " ~ InputBytes: " << isize << ", OutputBytes: " << osize << ", cRatio: " << (isize/(float)osize) << ", #elements: " << numel << std::endl;
+	debugLog << compressorName << " ~ CompressTime: " << clock.getDuration("compress") << " s " << std::endl;
 
     return 1;
 }
@@ -80,7 +80,8 @@ inline int BLOSCCompressor::decompress(void *&input, void *&output, std::string 
 		if (n[i] != 0)
 			numel *= n[i];
 
-	Timer dTime; dTime.start();
+	Timer clock("decompress");
+
 	size_t osize = dataTypeSize*numel;
 	output = std::malloc(osize);
 	size_t sz = blosc_decompress(input, output, osize);
@@ -89,8 +90,8 @@ inline int BLOSCCompressor::decompress(void *&input, void *&output, std::string 
 	
 	std::free(input); input = NULL;
 
-	dTime.stop(); 
-	log << compressorName << " ~ DecompressTime: " << dTime.getDuration() << " s " << std::endl;
+	clock.stop("decompress"); 
+	debugLog << compressorName << " ~ DecompressTime: " << clock.getDuration("decompress") << " s " << std::endl;
 
     return 1;
 }

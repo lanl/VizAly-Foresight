@@ -74,7 +74,7 @@ inline void meansquareError::execute(void *original, void *approx, size_t n, std
 	MPI_Allreduce(&n, &total_n, 1, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
 	total_val = total_mse/(double)total_n;
 	
-	log << "-mse: " << total_val << std::endl;
+	debugLog << "-mse: " << total_val << std::endl;
 
 	MPI_Barrier(comm);
 	return;

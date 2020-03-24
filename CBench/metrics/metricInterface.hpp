@@ -17,6 +17,8 @@ Authors:
 #include <vector>
 #include <mpi.h>
 
+#include "log.hpp"
+
 
 //
 // synchronizes local hist with global histogram when using MPI, and returns it

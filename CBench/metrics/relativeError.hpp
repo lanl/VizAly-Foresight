@@ -98,7 +98,7 @@ inline void relativeError::execute(void *original, void *approx, size_t n, std::
 	MPI_Allreduce(&max_rel_err, &total_max_rel_err, 1, MPI_DOUBLE, MPI_MAX, comm);// MPI_COMM_WORLD);
 	total_val = total_max_rel_err;
 
-	log << "-Max Rel Error: " << total_max_rel_err << std::endl;
+	debugLog << "-Max Rel Error: " << total_max_rel_err << std::endl;
 
 	// Additional debug metrics, only in run_log
 	// Global total sum of error
@@ -111,8 +111,8 @@ inline void relativeError::execute(void *original, void *approx, size_t n, std::
 
 	// Compute mean
 	double mean_rel_err = glob_sum_rel_err / global_n;
-	log << " Total Rel Error: " << glob_sum_rel_err << std::endl;
-	log << " Mean Rel Error: " << mean_rel_err << std::endl;
+	debugLog << " Total Rel Error: " << glob_sum_rel_err << std::endl;
+	debugLog << " Mean Rel Error: " << mean_rel_err << std::endl;
 
 	MPI_Barrier(comm);
 

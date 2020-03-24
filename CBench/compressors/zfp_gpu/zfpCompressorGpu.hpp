@@ -101,8 +101,7 @@ inline int ZFPCompressorGpu::compress(void *input, void *&output, std::string da
         compressionTypeBits = true;
     }
 
-    Timer cTime; 
-    cTime.start();
+    Timer clock("compress");
 
 	zfp_type type = getZfpType( dataType );
 
@@ -157,11 +156,11 @@ inline int ZFPCompressorGpu::compress(void *input, void *&output, std::string da
         cbytes = zfpsize;
     }
 
-    cTime.stop();
+    clock.stop("compress");
 
 
-    log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << cbytes << ", cRatio: " << (dataTypeSize*numel / (float)cbytes) << ", #elements: " << numel << std::endl;
-    log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
+    debugLog << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << cbytes << ", cRatio: " << (dataTypeSize*numel / (float)cbytes) << ", #elements: " << numel << std::endl;
+    debugLog << compressorName << " ~ CompressTime: " << clock.getDuration("compress") << " s " << std::endl;
 
     return 1;
 }
@@ -202,8 +201,7 @@ inline int ZFPCompressorGpu::decompress(void *&input, void *&output, std::string
         compressionTypeBits = true;
     }
 
-    Timer dTime; 
-    dTime.start();
+    Timer clock("decompress");
     
     zfp_type type = getZfpType( dataType );
 
@@ -259,9 +257,9 @@ inline int ZFPCompressorGpu::decompress(void *&input, void *&output, std::string
         stream_close(stream);
     }
 
-    dTime.stop();
+    clock.stop("decompress");
 
-    log << compressorName << " ~ DecompressTime: " << dTime.getDuration() << " s " << std::endl;
+    debugLog << compressorName << " ~ DecompressTime: " << clock.getDuration("decompress") << " s " << std::endl;
 
     return 1;
 }

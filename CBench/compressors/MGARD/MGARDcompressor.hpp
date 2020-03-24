@@ -59,7 +59,7 @@ inline int MGARDCompressor::compress(void *input, void *&output, std::string dat
 
 	int out_size;
 
-	Timer cTime; cTime.start();
+	Timer clock("compress");
 
 	// Create a copy of the input data because compressor will auto-destroy it
 	void * in_buff = std::malloc(numel*dataTypeSize);
@@ -74,10 +74,10 @@ inline int MGARDCompressor::compress(void *input, void *&output, std::string dat
 	std::uint64_t csize = out_size;
 	cbytes = csize;
 
-	cTime.stop();
+	clock.stop("compress");
 
-	log << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*numel / (float)csize) << ", #elements: " << numel << std::endl;
-	log << compressorName << " ~ CompressTime: " << cTime.getDuration() << " s " << std::endl;
+	debugLog << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*numel / (float)csize) << ", #elements: " << numel << std::endl;
+	debugLog << compressorName << " ~ CompressTime: " << clock.getDuration("compress") << " s " << std::endl;
 
     return 1;
 }
@@ -97,14 +97,14 @@ inline int MGARDCompressor::decompress(void *&input, void *&output, std::string 
 
 	int out_size = cbytes;
 
-	Timer dTime; dTime.start();
+	Timer clock("decompress");
 
 	//output = mgard_decompress(iflag, static_cast<std::uint8_t *>(input), out_size, n[0], n[1], n[2] );
 
 	std::uint64_t dsize = out_size; // Is out_size updated by mgard?
 
-	dTime.stop();
-	dTime.stop(); log << compressorName << " ~ DecompressTime: " << dTime.getDuration() << " s " << std::endl;
+	clock.stop("decompress");
+	debugLog << compressorName << " ~ DecompressTime: " << clock.getDuration("decompress") << " s " << std::endl;
 
     return 1;
 }

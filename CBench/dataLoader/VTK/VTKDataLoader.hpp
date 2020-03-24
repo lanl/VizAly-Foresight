@@ -96,21 +96,20 @@ inline void VTKDataLoader::init(std::string _filename, MPI_Comm _comm)
 
   	imageData = reader->GetOutput();
 	
-  	log << "vtkXMLImageDataReader Number of point array: " << reader->GetNumberOfPointArrays() << std::endl;
-  	log << "vtkXMLImageDataReader Number of cell array: " << reader->GetNumberOfCellArrays() << std::endl;
+  	debugLog << "vtkXMLImageDataReader Number of point array: " << reader->GetNumberOfPointArrays() << std::endl;
+  	debugLog << "vtkXMLImageDataReader Number of cell array: " << reader->GetNumberOfCellArrays() << std::endl;
 }
 
 
 
 inline int VTKDataLoader::loadData(std::string paramName)
 {
-	Timer clock;
-	clock.start();
+	Timer clock("load");
 
-	log << "vtkImageData Number of points: " << imageData->GetNumberOfPoints() << std::endl;
-    log << "vtkImageData Number of cells: " << imageData->GetNumberOfCells() << std::endl;
-	log << "Number of cell array: " << imageData->GetCellData()->GetNumberOfArrays() << std::endl;
-	log << "Number of point array: " << imageData->GetPointData()->GetNumberOfArrays() << std::endl;
+	debugLog << "vtkImageData Number of points: " << imageData->GetNumberOfPoints() << std::endl;
+    debugLog << "vtkImageData Number of cells: " << imageData->GetNumberOfCells() << std::endl;
+	debugLog << "Number of cell array: " << imageData->GetCellData()->GetNumberOfArrays() << std::endl;
+	debugLog << "Number of point array: " << imageData->GetPointData()->GetNumberOfArrays() << std::endl;
 
 
 	// Get Dimensions
@@ -263,22 +262,21 @@ inline int VTKDataLoader::loadData(std::string paramName)
 	}
 	
 
-	clock.stop();
-	log << "origDims: "   << origDims[0]   << ", " << origDims[1]   << ", " << origDims[2]   << std::endl;
-	log << "sizePerDim: " << sizePerDim[0] << ", " << sizePerDim[1] << ", " << sizePerDim[2] << std::endl;
-	log << "rankOffset: " << rankOffset[0] << ", " << rankOffset[1] << ", " << rankOffset[2] << std::endl;
-	log << "numElements: " << numElements << std::endl;
-	log << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
+	clock.stop("load");
+	debugLog << "origDims: "   << origDims[0]   << ", " << origDims[1]   << ", " << origDims[2]   << std::endl;
+	debugLog << "sizePerDim: " << sizePerDim[0] << ", " << sizePerDim[1] << ", " << sizePerDim[2] << std::endl;
+	debugLog << "rankOffset: " << rankOffset[0] << ", " << rankOffset[1] << ", " << rankOffset[2] << std::endl;
+	debugLog << "numElements: " << numElements << std::endl;
+	debugLog << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
 	
-	log << "Loading data took: " << clock.getDuration() << " s" << std::endl;
+	debugLog << "Loading data took: " << clock.getDuration("load") << " s" << std::endl;
 }
 
 
 
 inline int VTKDataLoader::saveCompData(std::string paramName, void * cData)
 {
-	Timer clock;
-	clock.start();
+	Timer clock("save");
 
 		
 
@@ -335,16 +333,15 @@ inline int VTKDataLoader::saveCompData(std::string paramName, void * cData)
 							  rankOffset[2], rankOffset[2]+sizePerDim[2]);
 
 
-	clock.stop();
-	log << "saving data took: " << clock.getDuration() << " s" << std::endl;
+	clock.stop("save");
+	debugLog << "saving data took: " << clock.getDuration("save") << " s" << std::endl;
 }
 
 
 
 inline int VTKDataLoader::writeData(std::string _filename)
 {
-	Timer clock;
-	clock.start();
+	Timer clock("write");
 
 
 	vtkSmartPointer<vtkXMLPImageDataWriter> writer = vtkSmartPointer<vtkXMLPImageDataWriter>::New();
@@ -387,8 +384,8 @@ inline int VTKDataLoader::writeData(std::string _filename)
 	writer->Write();
   	
 
-  	clock.stop();
-	log << "writing data took: " << clock.getDuration() << " s" << std::endl;
+  	clock.stop("write");
+	debugLog << "writing data took: " << clock.getDuration("write") << " s" << std::endl;
 }
 
 

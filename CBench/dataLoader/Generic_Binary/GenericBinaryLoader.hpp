@@ -142,11 +142,11 @@ inline void GenericBinaryLoader::init(std::string _filename, MPI_Comm _comm)
 
 
 
-  	log << "\nRaw data file: " << rawDataFileName << std::endl;
-	log << "original dims: " << origDims[0] << ", " << origDims[1] << ", " << origDims[1] << std::endl;
+  	debugLog << "\nRaw data file: " << rawDataFileName << std::endl;
+	debugLog << "original dims: " << origDims[0] << ", " << origDims[1] << ", " << origDims[1] << std::endl;
 	for (auto s: scalars)
-  		log << s.toString() << std::endl;
-  	log << std::endl;
+  		debugLog << s.toString() << std::endl;
+  	debugLog << std::endl;
 }
 
 
@@ -154,7 +154,7 @@ inline void GenericBinaryLoader::init(std::string _filename, MPI_Comm _comm)
 inline int GenericBinaryLoader::loadData(std::string paramName)
 {
 	Timer clock;
-	clock.start();
+	clock.start("load");
 
 
 	totalNumberOfElements = origDims[0] * origDims[1] * origDims[2];
@@ -322,17 +322,17 @@ inline int GenericBinaryLoader::loadData(std::string paramName)
 
 	
 
-	clock.stop();
-	log << "\n--------------------------" << std::endl;
-	log << "Param: " << paramName << std::endl;
-	log << "mpiDivisions: " << mpiDivisions[0] << ", " << mpiDivisions[1] << ", " << mpiDivisions[2] << std::endl;
-	log << "sizePerDim: "	<< sizePerDim[0]	<< ", " << sizePerDim[1]<< ", " << sizePerDim[2]<< std::endl;
-	log << "rankOffset: "	<< rankOffset[0]	<< ", " << rankOffset[1]<< ", " << rankOffset[2]<< std::endl;
-	log << minMaxAvgLog.str() << std::endl;
-	log << "numElements: "	<< numElements << std::endl;
-	log << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
+	clock.stop("load");
+	debugLog << "\n--------------------------" << std::endl;
+	debugLog << "Param: " << paramName << std::endl;
+	debugLog << "mpiDivisions: " << mpiDivisions[0] << ", " << mpiDivisions[1] << ", " << mpiDivisions[2] << std::endl;
+	debugLog << "sizePerDim: "	<< sizePerDim[0]	<< ", " << sizePerDim[1]<< ", " << sizePerDim[2]<< std::endl;
+	debugLog << "rankOffset: "	<< rankOffset[0]	<< ", " << rankOffset[1]<< ", " << rankOffset[2]<< std::endl;
+	debugLog << minMaxAvgLog.str() << std::endl;
+	debugLog << "numElements: "	<< numElements << std::endl;
+	debugLog << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
 
-	log << "Loading data took: " << clock.getDuration() << " s" << std::endl;
+	debugLog << "Loading data took: " << clock.getDuration("load") << " s" << std::endl;
 
 	return 1;
 }
@@ -342,8 +342,7 @@ inline int GenericBinaryLoader::loadData(std::string paramName)
 
 inline int GenericBinaryLoader::saveCompData(std::string paramName, void * cData)
 {
-	Timer clock;
-	clock.start();
+	Timer clock("save");
 	
 	int index = 0;
 	for (auto s: scalars)
@@ -364,8 +363,8 @@ inline int GenericBinaryLoader::saveCompData(std::string paramName, void * cData
 	else
 		return -1;
 
-	clock.stop();
-	log << "Saving data " << paramName << " took: " << clock.getDuration() << " s" << std::endl;
+	clock.stop("save");
+	debugLog << "Saving data " << paramName << " took: " << clock.getDuration("save") << " s" << std::endl;
 
 	return 0;
 }
@@ -374,8 +373,7 @@ inline int GenericBinaryLoader::saveCompData(std::string paramName, void * cData
 
 inline int GenericBinaryLoader::writeData(std::string _filename)
 {
-	Timer clock;
-	clock.start();
+	Timer clock("write");
 
 	MPI_File fh;
 	MPI_Status status;
@@ -438,9 +436,9 @@ inline int GenericBinaryLoader::writeData(std::string _filename)
 	MPI_File_close( &fh );
 
 	
-	clock.stop();
-	log << minMaxAvgLog.str() << std::endl;
-	log << "writing data took: " << clock.getDuration() << " s" << std::endl;
+	clock.stop("write");
+	debugLog << minMaxAvgLog.str() << std::endl;
+	debugLog << "writing data took: " << clock.getDuration("write") << " s" << std::endl;
 
 	return 0;
 }

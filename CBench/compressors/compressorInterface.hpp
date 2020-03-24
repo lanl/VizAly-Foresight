@@ -16,6 +16,8 @@ Authors:
 #include <string>
 #include <sstream>
 #include <unordered_map>
+
+#include "log.hpp"
 #include "timer.hpp"
 #include "memory.hpp"
 #include "strConvert.hpp"

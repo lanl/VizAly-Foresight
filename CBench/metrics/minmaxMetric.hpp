@@ -92,9 +92,9 @@ inline void minmaxMetric::execute(void *original, void *approx, size_t n, std::s
 	double global_min = 0;
 	MPI_Allreduce(&local_min, &global_min, 1, MPI_DOUBLE, MPI_MIN, comm);
 	
-	log << " local_minmax: " << local_min << " " << local_max << std::endl;
+	debugLog << " local_minmax: " << local_min << " " << local_max << std::endl;
 	// Currently only report Global minmax
-	log << "-minmax: " << global_min << " " << global_max << std::endl;
+	debugLog << "-minmax: " << global_min << " " << global_max << std::endl;
 
 	MPI_Barrier(comm);
 

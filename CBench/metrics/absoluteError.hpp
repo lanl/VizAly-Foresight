@@ -86,7 +86,7 @@ inline void absoluteError::execute(void *original, void *approx, size_t n, std::
 	MPI_Allreduce(&max_abs_err, &total_max_abs_err, 1, MPI_DOUBLE, MPI_MAX, comm);// MPI_COMM_WORLD);
 	total_val = total_max_abs_err;
 
-	log << "-Max Abs Error: " << total_max_abs_err << std::endl;
+	debugLog << "-Max Abs Error: " << total_max_abs_err << std::endl;
 
     // Additional debug metrics, only in run_log
     // Global total sum of error
@@ -99,8 +99,8 @@ inline void absoluteError::execute(void *original, void *approx, size_t n, std::
 
     // Compute mean
     double mean_abs_err = glob_sum_abs_err / global_n;
-    log << " Total Abs Error: " << glob_sum_abs_err << std::endl;
-    log << " Mean Abs Error: " << mean_abs_err << std::endl;
+    debugLog << " Total Abs Error: " << glob_sum_abs_err << std::endl;
+    debugLog << " Mean Abs Error: " << mean_abs_err << std::endl;
 
 	MPI_Barrier(comm);
 

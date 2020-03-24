@@ -57,8 +57,7 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	debugLog << "Hello" << std::endl;
-	writeFile("testLog.log", debugLog.str());
+
 
 	//
 	// Load input
@@ -139,10 +138,11 @@ int main(int argc, char *argv[])
 
 	//
 	// Create log and metrics files
-	Timer overallClock;
-	std::stringstream debuglog, metricsInfo, csvOutputHeader;
+	Timer clock;
+	std::stringstream metricsInfo, csvOutputHeader;
 
-	overallClock.start();
+	//overallClock.start();
+	clock.start("overall");
 
 	
 	for (int ts=minTimestep; ts<maxTimestep; ts++)
@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 			csvOutput << metrics[m] << ", ";
 		csvOutput << "Compression Throughput(MB/s), DeCompression Throughput(MB/s), Compression Ratio" << std::endl;
 
-		debuglog << "\n********************************** timestep: " << ts << " of " << numTimesteps << std::endl;
+		debugLog << "\n***************************************************** timestep: " << ts << " of " << numTimesteps << std::endl;
 
 
 		//
@@ -187,8 +187,8 @@ int main(int argc, char *argv[])
 				if (myRank == 0)
 					std::cout << "Unsupported loader: " << inputFileType << " ... exiting!" << std::endl;
 				
-				debuglog << "Unsupported loader: " << inputFileType << " ... exiting!"<< std::endl;
-				writeFile(outputLogFilename, debuglog.str());
+				debugLog << "Unsupported loader: " << inputFileType << " ... exiting!"<< std::endl;
+				writeLog(outputLogFilename, debugLog.str());
 
 				MPI_Finalize();
 				return 0;
@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
 				ioMgr->saveInputFileParameters();
 		}
 
-		writeFile("testLog.log", debugLog.str());
+		writeLog(outputLogFilename, debugLog.str());
 
 		//
 		// Cycle through compressors
@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
 				if (myRank == 0)
 					std::cout << "Unsupported compressor: " << compressors[c] << " ... skipping!" << std::endl;
 
-				debuglog << "Unsupported compressor: " << compressors[c] << " ... skipping!" << std::endl;
+				debugLog << "Unsupported compressor: " << compressors[c] << " ... skipping!" << std::endl;
 
 				continue;
 			}
@@ -259,15 +259,15 @@ int main(int argc, char *argv[])
 			metricsInfo << "\n---------------------------------------" << std::endl;
 			metricsInfo << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
 
-			debuglog << "===============================================" << std::endl;
-			debuglog << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
+			debugLog << "===============================================" << std::endl;
+			debugLog << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
 
 
 			//
 			// Cycle through scalars
 			for (int i = 0; i < scalars.size(); i++)
 			{
-				Timer compressClock, decompressClock;
+				//Timer compressClock, decompressClock;
 				Memory memLoad(true);
 
 				// Check if parameter is valid before proceding
@@ -275,7 +275,7 @@ int main(int argc, char *argv[])
 				{
 					memLoad.stop();
 					std::cout << "ioMgr->loadData(" << scalars[i] << ") failed!" << std::endl; 
-					debuglog << "ioMgr->loadData(" << scalars[i] << ") failed!" << std::endl; 
+					debugLog << "ioMgr->loadData(" << scalars[i] << ") failed!" << std::endl; 
 					continue;
 				}
 
@@ -304,11 +304,11 @@ int main(int argc, char *argv[])
 
 
 				// log stuff
-				debuglog << ioMgr->getDataInfo();
-				debuglog << ioMgr->getLog();
-				ioMgr->clearLog();
-				//writeLog(outputLogFilename, debuglog);
-				writeFile(outputLogFilename, debuglog.str());
+				debugLog << ioMgr->getDataInfo();
+				//debugLog << ioMgr->getLog();	ioMgr->clearLog();
+				
+				//writeLog(outputLogFilename, debugLog);
+				writeLog(outputLogFilename, debugLog.str());
 
 				metricsInfo << compressorMgr->getParamsInfo() << std::endl;
 				csvOutput << compressorMgr->getCompressorName() << "_" << scalars[i] << "__" << compressorMgr->getParamsInfo()
@@ -321,18 +321,22 @@ int main(int argc, char *argv[])
 				// compress
 				void *cdata = NULL;
 
-				compressClock.start();
+				//compressClock.start();
+				clock.start("compress");
 				compressorMgr->compress(ioMgr->data, cdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim());
-				compressClock.stop();
+				clock.stop("compress");
+				//compressClock.stop();
 
 
 				//
 				// decompress
 				void *decompdata = NULL;
 
-				decompressClock.start();
+				//decompressClock.start();
+				clock.start("decompress");
 				compressorMgr->decompress(cdata, decompdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim());
-				decompressClock.stop();
+				clock.stop("decompress");
+				//decompressClock.stop();
 
 
 				// Get compression ratio
@@ -345,18 +349,18 @@ int main(int argc, char *argv[])
 				MPI_Allreduce(&unCompressedSize, &totalUnCompressedSize, 1, MPI_UNSIGNED_LONG, MPI_SUM, MPI_COMM_WORLD);
 
 
-				debuglog << "\n\ncompressedSize: " << compressedSize << ", totalCompressedSize: " << totalCompressedSize << std::endl;
-				debuglog << "unCompressedSize: " << unCompressedSize << ", totalUnCompressedSize: " << totalUnCompressedSize << std::endl;
-				debuglog << "Compression ratio: " << totalUnCompressedSize / (float) totalCompressedSize << std::endl;
+				debugLog << "\n\ncompressedSize: " << compressedSize << ", totalCompressedSize: " << totalCompressedSize << std::endl;
+				debugLog << "unCompressedSize: " << unCompressedSize << ", totalUnCompressedSize: " << totalUnCompressedSize << std::endl;
+				debugLog << "Compression ratio: " << totalUnCompressedSize / (float) totalCompressedSize << std::endl;
 
 				//appendLog(outputLogFilename, compressorMgr->getLog());
-				debuglog << compressorMgr->getLog();
-				compressorMgr->clearLog();
+				//debugLog << compressorMgr->getLog();		compressorMgr->clearLog();
+				
 
 
 				//
 				// Cycle through metrics
-				debuglog << "\n----- " << scalars[i] << " error metrics ----- " << std::endl;
+				debugLog << "\n----- " << scalars[i] << " error metrics ----- " << std::endl;
 				metricsInfo << "\nField: " << scalars[i] << std::endl;
 
 				MetricInterface *metricsMgr;
@@ -368,7 +372,7 @@ int main(int argc, char *argv[])
 						if (myRank == 0)
 							std::cout << "Unsupported metric: " << metrics[m] << " ... Skipping!" << std::endl;
 
-						debuglog << "Unsupported metric: " << metrics[m] << " ... Skipping!"<< std::endl;
+						debugLog << "Unsupported metric: " << metrics[m] << " ... Skipping!"<< std::endl;
 						continue;
 					}
 
@@ -392,9 +396,9 @@ int main(int argc, char *argv[])
 					// Launch
 					metricsMgr->init(MPI_COMM_WORLD);
 					metricsMgr->execute(ioMgr->data, decompdata, ioMgr->getNumElements(), ioMgr->getType());
-					debuglog << metricsMgr->getLog();
-					metricsInfo << metricsMgr->getLog();
-					metricsMgr->clearLog();
+					//debugLog << metricsMgr->getLog();
+					//metricsInfo << metricsMgr->getLog();	metricsMgr->clearLog();
+					
 					csvOutput << metricsMgr->getGlobalValue() << ", ";
 
 					// darw histogram if needed
@@ -409,15 +413,17 @@ int main(int argc, char *argv[])
 						}
 					metricsMgr->close();
 				} // metrics
-				debuglog << "-----------------------------\n";
-				debuglog << "\nMemory in use: " << memLoad.getMemoryInUseInMB() << " MB" << std::endl;
+				debugLog << "-----------------------------\n";
+				debugLog << "\nMemory in use: " << memLoad.getMemoryInUseInMB() << " MB" << std::endl;
 
 
 
 				//
 				// Metrics Computation
-				double compress_time = compressClock.getDuration();
-				double decompress_time = decompressClock.getDuration();
+				//double compress_time = compressClock.getDuration();
+				//double decompress_time = decompressClock.getDuration();
+				double compress_time = clock.getDuration("compress");
+				double decompress_time = clock.getDuration("decompress");
 
 				double compress_throughput   = ((double) (ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0 * 1024.0)) / compress_time;     // MB/s
 				double decompress_throughput = ((double) (ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0 * 1024.0)) / decompress_time;	// MB/s
@@ -441,12 +447,11 @@ int main(int argc, char *argv[])
 				// Store the uncompressed data pointer, does not actually write yet
 				if (writeData)
 				{
-					debuglog << "writing: " << scalars[i] << std::endl;
+					debugLog << "writing: " << scalars[i] << std::endl;
 
 					ioMgr->saveCompData(scalars[i], decompdata);
 					
-					debuglog << ioMgr->getLog();
-					ioMgr->clearLog();
+					//debugLog << ioMgr->getLog();ioMgr->clearLog();
 				}
 
 
@@ -462,13 +467,13 @@ int main(int argc, char *argv[])
 
 				//
 				// log stuff
-				debuglog << "\nCompress time: " << compress_time << std::endl;
-				debuglog << "Decompress time: " << decompress_time << std::endl;
-				debuglog << "\nMemory leaked: " << memLoad.getMemorySizeInMB() << " MB" << std::endl;
-				debuglog << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl << std::endl;
+				debugLog << "\nCompress time: " << compress_time << std::endl;
+				debugLog << "Decompress time: " << decompress_time << std::endl;
+				debugLog << "\nMemory leaked: " << memLoad.getMemorySizeInMB() << " MB" << std::endl;
+				debugLog << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl << std::endl;
 
-				//writeLog(outputLogFilename, debuglog);
-				writeFile(outputLogFilename, debuglog.str());
+				//writeLog(outputLogFilename, debugLog);
+				writeLog(outputLogFilename, debugLog.str());
 
 
 				//
@@ -505,26 +510,27 @@ int main(int argc, char *argv[])
 			// write data to disk if requested in the json file
 			if (writeData)
 			{
-				Timer clockWrite;
-				clockWrite.start();
+				//Timer clockWrite;
+				//clockWrite.start();
+				clock.start("write");
 
 				ioMgr->loadUncompressedFields(jsonInput);
 
 				//   #if CBENCH_HAS_NYX
-				// 	debuglog << "\nLoading uncompressed fields" << std::endl;
+				// 	debugLog << "\nLoading uncompressed fields" << std::endl;
 				// 	ioMgr->loadUncompressedFields(jsonInput);
-				// 	//debuglog << ioMgr->getLog();
+				// 	//debugLog << ioMgr->getLog();
 				// 	MPI_Barrier(MPI_COMM_WORLD);
 				//   #endif
 
-				// debuglog << "Write data .... \n";
+				// debugLog << "Write data .... \n";
 
 				// // Pass through original data to preserve original file data structure
 				// for (int i = 0; i < ioMgr->inOutData.size(); i++)
 				// {
 				// 	if (!ioMgr->inOutData[i].doWrite)
 				// 	{
-				// 		debuglog << "writing uncoompressed" << std::endl;
+				// 		debugLog << "writing uncoompressed" << std::endl;
 				// 		ioMgr->loadData(ioMgr->inOutData[i].name);
 				// 		ioMgr->saveCompData(ioMgr->inOutData[i].name, ioMgr->data);
 				// 		ioMgr->close();
@@ -575,26 +581,30 @@ int main(int argc, char *argv[])
 				ioMgr->writeData(decompressedOutputName);
 
 
-				clockWrite.stop();
+				//clockWrite.stop();
+				clock.stop("write");
 
 				if (myRank == 0)
 					std::cout << "wrote out " << decompressedOutputName << "." << std::endl;
 
-				debuglog << ioMgr->getLog();	ioMgr->clearLog();
+				//debugLog << ioMgr->getLog();	ioMgr->clearLog();
 
-				debuglog << "Write output took: " << clockWrite.getDuration() << " s " << std::endl;
-				//writeLog(outputLogFilename, debuglog);
-				writeFile(outputLogFilename, debuglog.str());
+				//debugLog << "Write output took: " << clockWrite.getDuration() << " s " << std::endl;
+				debugLog << "Write output took: " << clock.getDuration("write") << " s " << std::endl;
+				//writeLog(outputLogFilename, debugLog);
+				writeLog(outputLogFilename, debugLog.str());
 			}  // write Data
 
 			compressorMgr->close();
 		} // compressors
 	} // timesteps
 
-	overallClock.stop();
-	debuglog << "\nTotal run time: " << overallClock.getDuration() << " s " << std::endl;
-	//writeLog(outputLogFilename, debuglog);
-	writeFile(outputLogFilename, debuglog.str());
+	//overallClock.stop();
+	clock.stop("overall");
+	debugLog << "\nTotal run time: " << clock.getDuration("overall") << " s " << std::endl;
+	//debugLog << "\nTotal run time: " << overallClock.getDuration() << " s " << std::endl;
+	//writeLog(outputLogFilename, debugLog);
+	writeLog(outputLogFilename, debugLog.str());
 
 
 	// For humans

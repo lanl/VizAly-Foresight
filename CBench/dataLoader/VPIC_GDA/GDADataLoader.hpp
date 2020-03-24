@@ -98,17 +98,16 @@ inline void GDADataLoader::init(std::string _filename, MPI_Comm _comm)
 	}
 
 
-	log << "original dims: " << origDims[0] << ", " << origDims[1] << ", " << origDims[1] << std::endl;
-	log << "real dims : " << origRealDims[0] << ", " << origRealDims[1] << ", " << origRealDims[1] << std::endl;
-	log << "dataType : " << dataType << std::endl;
+	debugLog << "original dims: " << origDims[0] << ", " << origDims[1] << ", " << origDims[1] << std::endl;
+	debugLog << "real dims : " << origRealDims[0] << ", " << origRealDims[1] << ", " << origRealDims[1] << std::endl;
+	debugLog << "dataType : " << dataType << std::endl;
 }
 
 
 
 inline int GDADataLoader::loadData(std::string paramName)
 {
-	Timer clock;
-	clock.start();
+	Timer clock("load");
 
 	float minVal, maxVal, avg;
 	totalNumberOfElements = origDims[0] * origDims[1] * origDims[2];
@@ -188,37 +187,35 @@ inline int GDADataLoader::loadData(std::string paramName)
 	minMax( ((float *)data), numElements, minVal, maxVal, avg);
 	
 
-	clock.stop();
-	log << "min: " << minVal << ", max: " << maxVal<< ", avg: " << avg << std::endl;
-	log << "mpiDivisions: " << mpiDivisions[0] << ", " << mpiDivisions[1] << ", " << mpiDivisions[2] << std::endl;
-	log << "sizePerDim: "	<< sizePerDim[0]	<< ", " << sizePerDim[1]<< ", " << sizePerDim[2]<< std::endl;
-	log << "rankOffset: "	<< rankOffset[0]	<< ", " << rankOffset[1]<< ", " << rankOffset[2]<< std::endl;
-	log << "numElements: "	<< numElements << std::endl;
-	log << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
+	clock.stop("load");
+	debugLog << "min: " << minVal << ", max: " << maxVal<< ", avg: " << avg << std::endl;
+	debugLog << "mpiDivisions: " << mpiDivisions[0] << ", " << mpiDivisions[1] << ", " << mpiDivisions[2] << std::endl;
+	debugLog << "sizePerDim: "	<< sizePerDim[0]	<< ", " << sizePerDim[1]<< ", " << sizePerDim[2]<< std::endl;
+	debugLog << "rankOffset: "	<< rankOffset[0]	<< ", " << rankOffset[1]<< ", " << rankOffset[2]<< std::endl;
+	debugLog << "numElements: "	<< numElements << std::endl;
+	debugLog << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
 
-	log << "Loading data took: " << clock.getDuration() << " s" << std::endl;
+	debugLog << "Loading data took: " << clock.getDuration("load") << " s" << std::endl;
 }
 
 
 
 inline int GDADataLoader::saveCompData(std::string paramName, void * cData)
 {
-	Timer clock;
-	clock.start();
+	Timer clock("save");
 	
 	allocateMem(dataType, numElements, 0, tempData);
 	memcpy(tempData, cData, numElements*getDataypeSize(dataType));
 
-	clock.stop();
-	log << "saving data took: " << clock.getDuration() << " s" << std::endl;
+	clock.stop("save");
+	debugLog << "saving data took: " << clock.getDuration("save") << " s" << std::endl;
 }
 
 
 
 inline int GDADataLoader::writeData(std::string _filename)
 {
-	Timer clock;
-	clock.start();
+	Timer clock("write");
 
 	MPI_File fh;
 	MPI_Status status;
@@ -266,8 +263,8 @@ inline int GDADataLoader::writeData(std::string _filename)
 
 	deAllocateMem(dataType, tempData);
 
-	clock.stop();
-	log << "writing data took: " << clock.getDuration() << " s" << std::endl;
+	clock.stop("write");
+	debugLog << "writing data took: " << clock.getDuration("write") << " s" << std::endl;
 }
 
 
