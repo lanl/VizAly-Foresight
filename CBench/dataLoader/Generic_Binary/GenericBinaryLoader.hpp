@@ -67,10 +67,11 @@ class GenericBinaryLoader: public DataLoaderInterface
 	int mpiDivisions[3];
 
 	std::string rawDataFileName;
-
 	std::vector<scalar> scalars;
 
   public:
+	
+
 	GenericBinaryLoader();
 	~GenericBinaryLoader();
 

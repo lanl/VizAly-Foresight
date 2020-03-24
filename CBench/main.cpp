@@ -386,7 +386,7 @@ int main(int argc, char *argv[])
 
 					// Launch
 					metricsMgr->init(MPI_COMM_WORLD);
-					metricsMgr->execute(ioMgr->data, decompdata, ioMgr->getNumElements());
+					metricsMgr->execute(ioMgr->data, decompdata, ioMgr->getNumElements(), ioMgr->getType());
 					debuglog << metricsMgr->getLog();
 					metricsInfo << metricsMgr->getLog();
 					metricsMgr->clearLog();
