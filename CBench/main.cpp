@@ -305,9 +305,6 @@ int main(int argc, char *argv[])
 
 				// log stuff
 				debugLog << ioMgr->getDataInfo();
-				//debugLog << ioMgr->getLog();	ioMgr->clearLog();
-				
-				//writeLog(outputLogFilename, debugLog);
 				writeLog(outputLogFilename, debugLog.str());
 
 				metricsInfo << compressorMgr->getParamsInfo() << std::endl;
@@ -321,22 +318,19 @@ int main(int argc, char *argv[])
 				// compress
 				void *cdata = NULL;
 
-				//compressClock.start();
 				clock.start("compress");
 				compressorMgr->compress(ioMgr->data, cdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim());
 				clock.stop("compress");
-				//compressClock.stop();
 
 
 				//
 				// decompress
 				void *decompdata = NULL;
 
-				//decompressClock.start();
 				clock.start("decompress");
 				compressorMgr->decompress(cdata, decompdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim());
 				clock.stop("decompress");
-				//decompressClock.stop();
+
 
 
 				// Get compression ratio
@@ -352,10 +346,6 @@ int main(int argc, char *argv[])
 				debugLog << "\n\ncompressedSize: " << compressedSize << ", totalCompressedSize: " << totalCompressedSize << std::endl;
 				debugLog << "unCompressedSize: " << unCompressedSize << ", totalUnCompressedSize: " << totalUnCompressedSize << std::endl;
 				debugLog << "Compression ratio: " << totalUnCompressedSize / (float) totalCompressedSize << std::endl;
-
-				//appendLog(outputLogFilename, compressorMgr->getLog());
-				//debugLog << compressorMgr->getLog();		compressorMgr->clearLog();
-				
 
 
 				//
@@ -420,8 +410,6 @@ int main(int argc, char *argv[])
 
 				//
 				// Metrics Computation
-				//double compress_time = compressClock.getDuration();
-				//double decompress_time = decompressClock.getDuration();
 				double compress_time = clock.getDuration("compress");
 				double decompress_time = clock.getDuration("decompress");
 
@@ -448,10 +436,7 @@ int main(int argc, char *argv[])
 				if (writeData)
 				{
 					debugLog << "writing: " << scalars[i] << std::endl;
-
 					ioMgr->saveCompData(scalars[i], decompdata);
-					
-					//debugLog << ioMgr->getLog();ioMgr->clearLog();
 				}
 
 
@@ -510,46 +495,23 @@ int main(int argc, char *argv[])
 			// write data to disk if requested in the json file
 			if (writeData)
 			{
-				//Timer clockWrite;
-				//clockWrite.start();
 				clock.start("write");
 
 				ioMgr->loadUncompressedFields(jsonInput);
 
-				//   #if CBENCH_HAS_NYX
-				// 	debugLog << "\nLoading uncompressed fields" << std::endl;
-				// 	ioMgr->loadUncompressedFields(jsonInput);
-				// 	//debugLog << ioMgr->getLog();
-				// 	MPI_Barrier(MPI_COMM_WORLD);
-				//   #endif
 
-				// debugLog << "Write data .... \n";
+				// Pass through original data to preserve original file data structure
+				for (int i = 0; i < ioMgr->inOutData.size(); i++)
+				{
+					if (!ioMgr->inOutData[i].doWrite)
+					{
+						debugLog << "writing uncoompressed" << std::endl;
+						ioMgr->loadData(ioMgr->inOutData[i].name);
+						ioMgr->saveCompData(ioMgr->inOutData[i].name, ioMgr->data);
+						ioMgr->close();
+					}
+				}
 
-				// // Pass through original data to preserve original file data structure
-				// for (int i = 0; i < ioMgr->inOutData.size(); i++)
-				// {
-				// 	if (!ioMgr->inOutData[i].doWrite)
-				// 	{
-				// 		debugLog << "writing uncoompressed" << std::endl;
-				// 		ioMgr->loadData(ioMgr->inOutData[i].name);
-				// 		ioMgr->saveCompData(ioMgr->inOutData[i].name, ioMgr->data);
-				// 		ioMgr->close();
-				// 	}
-				// }
-
-				// std::string decompressedOutputName;
-				// if (jsonInput["data-reduction"]["cbench-compressors"][c].find("output-prefix") != jsonInput["data-reduction"]["cbench-compressors"][c].end())
-				// 	decompressedOutputName = jsonInput["data-reduction"]["cbench-compressors"][c]["output-prefix"];
-				// else
-				// 	decompressedOutputName = "__" + compressorMgr->getCompressorName() + "_" + std::to_string(rand());
-
-				// if (outputPath != ".")
-				// 	decompressedOutputName = outputPath + "/" + decompressedOutputName + "__" + outputFilename;
-				// else
-				// 	decompressedOutputName = decompressedOutputName + "__" + outputFilename;
-
-				// // Write out uncompressed (lossy) data
-				// ioMgr->writeData(decompressedOutputName);
 
 
 				//
@@ -581,17 +543,13 @@ int main(int argc, char *argv[])
 				ioMgr->writeData(decompressedOutputName);
 
 
-				//clockWrite.stop();
 				clock.stop("write");
 
 				if (myRank == 0)
 					std::cout << "wrote out " << decompressedOutputName << "." << std::endl;
 
-				//debugLog << ioMgr->getLog();	ioMgr->clearLog();
-
-				//debugLog << "Write output took: " << clockWrite.getDuration() << " s " << std::endl;
 				debugLog << "Write output took: " << clock.getDuration("write") << " s " << std::endl;
-				//writeLog(outputLogFilename, debugLog);
+
 				writeLog(outputLogFilename, debugLog.str());
 			}  // write Data
 

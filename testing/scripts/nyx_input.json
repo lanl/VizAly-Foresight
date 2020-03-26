@@ -134,8 +134,6 @@
 
 		"cbench-output" :
 		{
-			"run-path" : "build/",
-
 			"output-decompressed": true,
 			"output-decompressed-location": "NYX_Travis_",
 

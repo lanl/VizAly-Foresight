@@ -41,7 +41,6 @@
 				"output-prefix" : "fpzip_24_"
 			},
 
-
 			{
 				"name": "zfp",
 				"output-prefix" : "zfp_abs_.01_",
@@ -79,7 +78,7 @@
 		},
 
 		"name" : "cbench",
-		"path" : "mpirun $foresight-home$build/CBench",
+		"path" : "build/CBench",
 		"evn_path": "scripts/VizAly-CBench.bash.darwin",
 		"configuration": 
 		{
