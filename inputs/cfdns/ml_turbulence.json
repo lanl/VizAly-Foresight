@@ -83,52 +83,27 @@
 			},
 
 			{
-				"name": "SZ",
-				"pw_rel" : 0.1,
-				"output-prefix" : "SZ_pwrel_0.1_"
-			},
-
-			{
-				"name": "SZ",
-				"pw_rel" : 0.1,
-				"output-prefix" : "SZ_pwrel_0.5_"
-			},
-
-			{
-				"name": "SZ",
-				"output-prefix": "SZ_abs_2_",
-				"abs": 2
-			},
-			
-			{
-				"name": "SZ",
-				"output-prefix": "SZ_abs_4_",
-				"abs": 4
-			},
-
-
-			{
 				"name": "zfp",
-				"rel" : 24,
-				"output-prefix" : "zfp_24_"
-			},
-	
-			{
-				"name": "zfp",
-				"rel" : 16,
-				"output-prefix" : "zfp_16_"
+				"rel" : 2,
+				"output-prefix" : "zfp_rel_2_"
 			},
 
 			{
 				"name": "zfp",
-				"output-prefix": "zfp_abs_4_",
-				"abs": 4
+				"rate" : 0.2,
+				"output-prefix" : "zfp_rate_0.2_"
 			},
 
 			{
-				"name": "zfp",
-				"output-prefix": "zfp_abs_8_",
-				"abs": 8
+				"name": "SZ",
+				"rel" : 0.6,
+				"output-prefix" : "SZ_rel_0.6_"
+			},
+
+			{
+				"name": "SZ",
+				"pw_rel" : 0.8,
+				"output-prefix" : "SZ_pwrel_0.8_"
 			}
 		],
 

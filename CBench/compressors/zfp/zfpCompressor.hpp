@@ -80,17 +80,35 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
     // Read in json compression parameters
     double abs = 1E-3;
     int rel = 32;
-    bool compressionTypeAbs = true;
+    double rate = 1.0;
+    std::string compressionType = "";
     if ( compressorParameters.find("abs") != compressorParameters.end() )
     {
         abs = strConvert::to_double( compressorParameters["abs"] );
-        compressionTypeAbs = true;
+        compressionType = "absolute";
+        debugLog << "Compressor type: " << compressionType << ", abs: " << abs << std::endl;
     }
     else if ( compressorParameters.find("rel") != compressorParameters.end())
     {
         rel = strConvert::to_int( compressorParameters["rel"] );
-        compressionTypeAbs = false;
+        compressionType = "relative";
+        debugLog << "Compressor type: " << compressionType << ", rel: " << rel << std::endl;
     }
+    else if ( compressorParameters.find("rate") != compressorParameters.end())
+    {
+        rate = strConvert::to_double( compressorParameters["rate"] );
+        compressionType = "rate";
+        debugLog << "Compressor type: " << compressionType << ", rate: " << rate << std::endl;
+    }
+
+    if (compressionType == "")
+    {
+        debugLog << "ZFP Compression type not supported!" << std::endl;
+        std::cout << "ZFP Compression type not supported!" << std::endl;
+        return -1;
+    }
+
+    debugLog << "\n" << compressorName << std::endl;
 
     Timer clock("compress");
 
@@ -113,10 +131,12 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
     zfp_stream* zfp = zfp_stream_open(NULL);
 
     // set absolute/relative error tolerance
-    if (compressionTypeAbs)
+    if (compressionType == "absolute")
         zfp_stream_set_accuracy(zfp, abs);
-    else
+    else if (compressionType == "relative")
         zfp_stream_set_precision(zfp, rel);
+    else if (compressionType == "rate")
+        zfp_stream_set_rate(zfp, rate, type, numDims, 0);
 
    	//allocate buffer for compressed data
     size_t bufsize = zfp_stream_maximum_size(zfp, field);
@@ -145,7 +165,7 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
     clock.stop("compress");
 
 
-    debugLog << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << cbytes << ", cRatio: " << (dataTypeSize*numel / (float)cbytes) << ", #elements: " << numel << std::endl;
+    debugLog << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << cbytes << ", cRatio: " << (dataTypeSize*numel / (float)cbytes) << ", #elements: " << numel << std::endl;
     debugLog << compressorName << " ~ CompressTime: " << clock.getDuration("compress") << " s " << std::endl;
 
     return 1;
@@ -166,16 +186,29 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
     // Read in json compression parameters
     double abs = 1E-3;
     int rel = 32;
-    bool compressionTypeAbs = true;
+    double rate = 1.0;
+    std::string compressionType = "";
     if ( compressorParameters.find("abs") != compressorParameters.end() )
     {
         abs = strConvert::to_double( compressorParameters["abs"] );
-        compressionTypeAbs = true;
+        compressionType = "absolute";
     }
     else if ( compressorParameters.find("rel") != compressorParameters.end())
     {
         rel = strConvert::to_int( compressorParameters["rel"] );
-        compressionTypeAbs = false;
+        compressionType = "relative";
+    }
+    else if ( compressorParameters.find("rate") != compressorParameters.end())
+    {
+        rate = strConvert::to_double( compressorParameters["rate"] );
+        compressionType = "rate";
+    }
+
+    if (compressionType == "")
+    {
+        debugLog << "ZFP Compression type not supported!" << std::endl;
+        std::cout << "ZFP Compression type not supported!" << std::endl;
+        return -1;
     }
 
 
@@ -202,10 +235,15 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
     zfp_stream* zfp = zfp_stream_open(NULL);
    
     // set absolute/relative error tolerance
-    if (compressionTypeAbs)
+    if (compressionType == "absolute")
         zfp_stream_set_accuracy(zfp, abs);
-    else
+    else if (compressionType == "relative")
         zfp_stream_set_precision(zfp, rel);
+    else if (compressionType == "rate")
+        zfp_stream_set_rate(zfp, rate, type, numDims, 0);
+        
+
+
 
     // allocate buffer for decompressed data and transfer data
     size_t bufsize = zfp_stream_maximum_size(zfp, field);
