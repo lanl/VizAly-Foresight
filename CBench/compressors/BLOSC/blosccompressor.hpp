@@ -47,12 +47,22 @@ inline int BLOSCCompressor::compress(void *input, void *&output, std::string dat
 	// compress
 	Timer clock("compress");
 
-	// Default Input Params: {clevel=9, shuffle=1, sizeof(data), idatasize, input, output, odatasize);
+	
 
 	size_t isize = dataTypeSize*numel;
 	size_t osize = isize + BLOSC_MAX_OVERHEAD;
 
 	output = std::malloc(isize); //byte array;
+	
+
+	std::string internalCompressor = "blosclz";
+	std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("mode");
+	if ( got != compressorParameters.end() )
+		if (compressorParameters["mode"] != "")
+			internalCompressor = compressorParameters["mode"];
+	blosc_set_compressor(internalCompressor.c_str());	//"blosclz", "lz4", "lz4hc", "snappy", "zlib" and "ztsd". "blosclz" is default 
+
+	// Default Input Params: {clevel=9, shuffle=1, sizeof(data), idatasize, input, output, odatasize);
 	osize = blosc_compress(9, 1, dataTypeSize, isize, input, output, osize);
 	
 	if (osize < 0)
@@ -67,8 +77,8 @@ inline int BLOSCCompressor::compress(void *input, void *&output, std::string dat
 
 	cbytes = osize;
 
-	debugLog << "\n" << compressorName << " ~ InputBytes: " << isize << ", OutputBytes: " << osize << ", cRatio: " << (isize/(float)osize) << ", #elements: " << numel << std::endl;
-	debugLog << compressorName << " ~ CompressTime: " << clock.getDuration("compress") << " s " << std::endl;
+	debugLog << "\n" << compressorName << ":" << internalCompressor << " ~ InputBytes: " << isize << ", OutputBytes: " << osize << ", cRatio: " << (isize/(float)osize) << ", #elements: " << numel << std::endl;
+	debugLog << "CompressTime: " << clock.getDuration("compress") << " s " << std::endl;
 
     return 1;
 }

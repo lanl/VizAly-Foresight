@@ -517,8 +517,8 @@ int main(int argc, char *argv[])
 				//
 				// Get the name and path of the new file
 				std::string decompressedOutputName, fileToOutput;
-				if (jsonInput["compressors"][c].contains("output-prefix"))
-					decompressedOutputName = jsonInput["compressors"][c]["output-prefix"];
+				if (jsonInput["data-reduction"]["cbench-compressors"][c].contains("output-prefix"))
+					decompressedOutputName = jsonInput["data-reduction"]["cbench-compressors"][c]["output-prefix"];
 				else
 					decompressedOutputName = "__" + compressorMgr->getCompressorName() + "_" + std::to_string(rand());
 

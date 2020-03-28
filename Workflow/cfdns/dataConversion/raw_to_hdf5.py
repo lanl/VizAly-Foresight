@@ -92,39 +92,14 @@ scalars.append(args.scalar4)
 scalars.append(args.scalar5)
 
 
-#dims_x = int(sys.argv[1])
-#dims_y = int(sys.argv[2])
-#dims_z = int(sys.argv[3])
 
-#dataFolder = sys.argv[4]
-
-#minTimestep = int(sys.argv[5])
-#maxTimestep = int(sys.argv[6])
-
-#scalars = []
-#scalars.append(sys.argv[7])
-#scalars.append(sys.argv[8])
-#scalars.append(sys.argv[9])
-#scalars.append(sys.argv[10])
-#scalars.append(sys.argv[11])
-
-#prefix = sys.argv[12]
-
-
-
-#files = []
-#for ts in range(minTimestep, maxTimestep):
-#	filaname = dataFolder + "/" + prefix + str(ts) + ".raw"
-#	files.append(filaname)
-
-
-#prefix = ["SZ_abs_0.01_", "BLOSC_"]
-#dataFolder = "/usr/projects/ml_compression/VizAly-Foresight-CBench/build/runs/test-ml-turbulence/cbench/decompressed_files"5output_filename = ""
-print("prefix:", args.prefix)
-print("len", len(args.prefix))
+print("prefix: ", args.prefix)
+print("len:", len(args.prefix))
+print("dataFolder: ", args.dataFolder)
 
 for each_prefix in args.prefix:
 	print("each_prefix:", each_prefix)
+	
 	outputFilename = each_prefix + ".h5"
  
 	file_list = []
