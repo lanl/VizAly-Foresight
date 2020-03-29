@@ -29,6 +29,8 @@ parser.add_argument('plot_dir')
 
 args = parser.parse_args()
 
+
+
 os.makedirs(args.plot_dir, exist_ok = True)
 
 for i in range( len(args.data_directories) ):

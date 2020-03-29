@@ -3,6 +3,8 @@
 To run executable do:
 
 python3 -m Workflow.cfdns.workflow --input-file inputs/cfdns/ml_turbulence.json --reduction
+python3 -m Workflow.cfdns.workflow --input-file inputs/cfdns/ml_turbulence_validation.json --analysis
+python3 -m Workflow.cfdns.workflow --input-file inputs/cfdns/ml_turbulence_validation.json --vis
 """
 
 import sys

@@ -131,7 +131,7 @@ def read_latnet_intermittency(iteration=[0]):
   #true_zdns_plot = true_zdns_plot[1]
   return latnet_ebins, latnet_zdns_plot, true_ebins, true_zdns_plot
 
-"""
+
 fig, ax = plt.subplots(num_iters+1, 1, figsize=(plot_size_x, plot_size_y), sharex=True, sharey=True)
 for i in range(num_iters+1):
   axi = ax[i]
@@ -156,7 +156,7 @@ plt.legend(loc=0)
 plt.savefig(outputPath + '/' + outputPrefix + '_intermittency.png')
 #plt.show()
 plt.close()
-"""
+
 ###############################################
 ## STRUCTURE PLOTS
 ###############################################

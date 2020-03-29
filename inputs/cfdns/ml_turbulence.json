@@ -189,7 +189,7 @@
 					"plots"
 				],
 				"path": "python /projects/exasky/pascal-projects/VizAly-Foresight/Workflow/cfdns/turbulence_analytics/runPlot.py",
-				"evn_path": "scripts/VizAly-CBench.bash.darwin",
+				"evn_path": "scripts/VizAly-CBench.bash.darwin-autoencoder",
 				"configuration": 
 				{
 					"nodes": 1,
