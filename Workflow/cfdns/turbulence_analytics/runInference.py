@@ -29,16 +29,9 @@ parser.add_argument('directories', type=parseList)
 
 args = parser.parse_args()
 
-#inference = sys.argv[1]
-#originalFile = sys.argv[2]
-#comparison_files = sys.argv[3]
-#directories = sys.argv[4]
-
-
-
-
-for i in range(comparison_files.len()):
-    os.mkdir(args.directory[i])
-    cmd = "python " + args.inference + " " + args.originalFile + " " + args.comparison_files[i] + " " + args.directory[i]
+# Run
+for i in range(len(args.comparison_files)):
+    os.makedirs(args.directories[i], exist_ok = True)
+    cmd = "python " + args.inference + " " + args.originalFile + " " + args.comparison_files[i] + " " + args.directories[i]
     print(cmd)
     os.system(cmd)

@@ -1,5 +1,8 @@
 
 # python3 turbulence_analytics/plot_all.py /home/pascal/projects/VizAly-Foresight/Analysis/pat/turbulence/data/test2 original original_plot
+import matplotlib
+matplotlib.use('Agg')
+
 import numpy as np
 import tensorflow as tf
 
@@ -38,7 +41,7 @@ print("outputPrefix: ", outputPrefix)
 
 outputPath = sys.argv[3]
 print("outputPath: ", outputPath)
-os.mkdir(outputPath)
+os.makedirs(outputPath, exist_ok = True)
 
 ###############################################
 ## SPECTRUM PLOTS
@@ -128,6 +131,7 @@ def read_latnet_intermittency(iteration=[0]):
   #true_zdns_plot = true_zdns_plot[1]
   return latnet_ebins, latnet_zdns_plot, true_ebins, true_zdns_plot
 
+"""
 fig, ax = plt.subplots(num_iters+1, 1, figsize=(plot_size_x, plot_size_y), sharex=True, sharey=True)
 for i in range(num_iters+1):
   axi = ax[i]
@@ -152,7 +156,7 @@ plt.legend(loc=0)
 plt.savefig(outputPath + '/' + outputPrefix + '_intermittency.png')
 #plt.show()
 plt.close()
-
+"""
 ###############################################
 ## STRUCTURE PLOTS
 ###############################################

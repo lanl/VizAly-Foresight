@@ -24,20 +24,14 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('plot')
 parser.add_argument('data_directories', type=parseList)
-parser.add_argument('ourput_prefixes', type=parseList)
+parser.add_argument('output_prefixes', type=parseList)
 parser.add_argument('plot_dir')
 
 args = parser.parse_args()
 
-#plot = sys.argv[1]
-#directories = sys.argv[2]
-#ourput_prefixes = sys.argv[3]
-#plot_dir = sys.argv[4]
+os.makedirs(args.plot_dir, exist_ok = True)
 
-
-os.mkdir(plot_dir)
-
-for i in range(directories.len()):
-    cmd = "python " + args.plot + " " + args.data_directories[i] + " " + args.ourput_prefixes[i] + " " + args.plot_dir
+for i in range( len(args.data_directories) ):
+    cmd = "python " + args.plot + " " + args.data_directories[i] + " " + args.output_prefixes[i] + " " + args.plot_dir
     print(cmd)
     os.system(cmd)

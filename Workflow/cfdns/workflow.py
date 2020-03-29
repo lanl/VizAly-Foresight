@@ -116,19 +116,11 @@ class CFDNSWorkflow(workflow.Workflow):
 	
 	# Create the analysis job; run gimlet
 	def add_analysis_jobs(self):
-
-		# get CBench job which is parent to all jobs in this function
-		has_parents = False
-		if ( len(self.jobs) > 0):
-			parent_job = self.jobs[0]
-			has_parents = True
-
-
 		# create job to run sim_stat and lya
-		for analysis in self.json_data["pat"]["analysis-tool"]["analytics"]:
+		for analysis in self.json_data["analysis"]["analytics"]:
 
-			if "evn_path" in self.json_data["pat"]:
-				environment = self.json_data["foresight-home"] + self.json_data["pat"]["evn_path"]
+			if "evn_path" in analysis:
+				environment = self.json_data["foresight-home"] + analysis["evn_path"]
 			else:
 				environment = None
 
@@ -138,67 +130,71 @@ class CFDNSWorkflow(workflow.Workflow):
 				configurations = None
 
 
-			for item in self.json_data["pat"]["input-files"]:
-				print("Creating analysis jobs for {} on {}".format(analysis, item))
+			analysis_job = j.Job(name=analysis["name"],
+									job_type = "analysis",
+									execute_dir="analysis/" + analysis["name"],
+									executable=analysis["path"], 
+									arguments=analysis['params'],
+									configurations=configurations,
+									environment=environment )
 
-				#execute_dir=self.json_data["project-home"] + "/" + analysis["name"],
-				# create job for sim_stats
-				gimlet_job = j.Job(name="{}_{}".format(item["output-prefix"], analysis["name"]),
-										execute_dir=analysis["name"],
-										executable=analysis["path"], 
-										arguments=[ item["path"], item["output-prefix"] ],
-										configurations=configurations,
-										environment=environment )
-
-				if "command" in analysis:
-					gimlet_job.add_command(analysis["command"])
+			#self.add_job(analysis_job,dependencies="single", filter="postprocess")
+			self.add_job(analysis_job)
 
 
-				# make dependent on CBench job and add to workflow
-				if (has_parents):
-					gimlet_job.add_parents(parent_job)
+	def add_vis_jobs(self):
+		## Create Plots
+		for plot in self.json_data["visualize"]["plots"]:
 
-				self.add_job(gimlet_job)
+			# sources the modules to be loaded on that cluster
+			if "evn_path" in plot:
+				environment = self.json_data["foresight-home"] + plot["evn_path"]
+			else:
+				environment = None
 
 
+			# pull the cluster parameters with which to launch job
+			if "configuration" in plot:
+				configurations = list( sum( plot["configuration"].items(), () ) )
+			else:
+				configurations = None
 
+			plot_job = j.Job(name=plot["name"],
+									job_type = "plot",
+									execute_dir="plot/" + plot["name"],
+									executable=plot["path"], 
+									arguments=plot['params'],
+									configurations=configurations,
+									environment=environment )
 
-	# Create plots for cinema + cinema database
-	def add_cinema_plotting_jobs(self):
+			#self.add_job(plot_job,dependencies="type", filter="analysis")
+			self.add_job(plot_job)
 
-		self.create_analysis_input()
-
-		if "evn_path" in self.json_data["cinema-plots"]:
-			environment = self.json_data["foresight-home"] + self.json_data["cinema-plots"]["evn_path"]
+		"""
+		## Create Cinema DB
+		if "evn_path" in self.json_data["visualize"]["cinema"]:
+			environment = self.json_data["visualize"]["cinema"]["evn_path"] 
 		else:
 			environment = None
 
-		if "configuration" in self.json_data["cinema-plots"]:
-			configurations = list( sum( self.json_data["cinema-plots"]["configuration"].items(), () ) )
+		# pull the cluster parameters with which to launch job
+		if "configuration" in self.json_data["visualize"]["cinema"]:
+			configurations = list( sum( self.json_data["visualize"]["cinema"]["configuration"].items(), () ) )
 		else:
 			configurations = None
-
-		arg1 = self.json_data["project-home"] +  self.json_data['wflow-path'] + "/wflow.json"
-		plot_path = self.json_data['project-home'] + self.json_data['wflow-path'] + "/plots"
-
-		cinema_job = j.Job(name="cinema_",
-			execute_dir="cinema",
-			executable="python -m pat.nyx.cinema", 
-			arguments=[ "--input-file", arg1 ],
-			configurations=configurations,
-			environment=environment )
-		cinema_job.add_command("mkdir " + plot_path)
-		cinema_job.add_command("cd " + self.json_data["foresight-home"] + "/Analysis/")
-		cinema_job.add_command("rm -rf " + self.json_data["project-home"] + "/" + self.json_data["wflow-path"] + "/" + "/cbench/" + self.json_data['cbench']['output']['output-decompressed-location'])
+  
+  
+		# create job for sim_stats
+		cinema_job = j.Job(name=self.json_data["visualize"]["cinema"]["name"],
+								job_type = "cinema",
+								execute_dir="cinema",
+								executable=self.json_data["visualize"]["cinema"]["path"], 
+								configurations=configurations,
+								environment=environment)
 
 		# make dependent on CBench job and add to workflow
-		if ( len(self.jobs) > 0):
-			#print(self.jobs)
-			for job in self.jobs:
-				cinema_job.add_parents(job)
-			self.add_job(cinema_job)
-		else:
-			self.add_job(cinema_job)
+		self.add_job(cinema_job, dependencies="type", filter="plot")
+		"""
 
 
 
