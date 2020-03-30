@@ -172,6 +172,13 @@ class CFDNSWorkflow(workflow.Workflow):
 			#self.add_job(plot_job,dependencies="type", filter="analysis")
 			self.add_job(plot_job)
 
+
+		## Create Average metrics
+		utils.average_csv(self.json_data["project-home"] + self.json_data["wflow-path"] + "/reduction/cbench/metrics", 
+							self.json_data["input"]["timesteps"][1], output_filename),
+							self.json_data["project-home"] + self.json_data["wflow-path"] + "/reduction/cbench/metrics_avg.csv"
+  
+  
 		"""
 		## Create Cinema DB
 		if "evn_path" in self.json_data["visualize"]["cinema"]:
