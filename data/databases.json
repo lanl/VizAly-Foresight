@@ -5,6 +5,11 @@
 	},
 
 	{
+		"name" : "Metrics (Feb 4, 2019)",
+		"directory" : "data/metrics.cdb"
+	},
+
+	{
 		"name" : "Metrics (Feb 7, 2019)",
 		"directory" : "data/metrics2.cdb"
 	},
@@ -22,6 +27,11 @@
 	{
 		"name" : "Metrics (Feb 7, 2019) - best <= 0.03",
 		"directory" : "data/metrics4.cdb"
+	},
+
+	{
+		"name" : "Compressors vs AutoEncoder",
+		"directory" : "data/ml_comparison.cdb"
 	},
 
 	{
