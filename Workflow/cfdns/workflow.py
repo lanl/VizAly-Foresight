@@ -24,13 +24,13 @@ class CFDNSWorkflow(workflow.Workflow):
 
 	def preprocess_cbench(self):
 		for script in self.json_data['data-reduction']['cbench-pre-process']:
-      
+	  
 			# Create configuration
 			if "configuration" in script:
 				configurations = list(sum(script["configuration"].items(), ()))
 			else:
 				configurations = None
-    
+	
 			if "evn_path" in script["evn_path"]:
 				environment =  script["evn_path"]
 			else:
@@ -56,7 +56,7 @@ class CFDNSWorkflow(workflow.Workflow):
 				configurations = list(sum(script["configuration"].items(), ()))
 			else:
 				configurations = None
-    
+	
 			if "evn_path" in script["evn_path"]:
 				environment =  script["evn_path"]
 			else:
@@ -74,14 +74,14 @@ class CFDNSWorkflow(workflow.Workflow):
 			
 			# Add it to queue
 			self.add_job(thisjob, dependencies="single", filter="cbench")
-		
-		
+
+
 	# Run cbench job
 	def add_data_reduction_jobs(self):
 		#self.preprocess_cbench()
 		#self.add_cbench_job(dependency="single", filters="preprocess")
 		
-		#self.add_cbench_job()
+		self.add_cbench_job()
 		self.postprocess_cbench()
 
 
@@ -115,7 +115,7 @@ class CFDNSWorkflow(workflow.Workflow):
 
 				self.json_data['pat']['analysis'].append(json_item)
 
-	
+
 	# Create the analysis job; run gimlet
 	def add_analysis_jobs(self):
 		# create job to run sim_stat and lya
@@ -174,9 +174,7 @@ class CFDNSWorkflow(workflow.Workflow):
 
 
 		## Create Average metrics
-		utils.average_csv(self.json_data["project-home"] + self.json_data["wflow-path"] + "/reduction/cbench/metrics", 
-							self.json_data["input"]["timesteps"][1], output_filename),
-							self.json_data["project-home"] + self.json_data["wflow-path"] + "/reduction/cbench/metrics_avg.csv"
+		#utils.average_csv(self.json_data["project-home"] + self.json_data["wflow-path"] + "/reduction/cbench/metrics", self.json_data["input"]["timesteps"][1], output_filename), self.json_data["project-home"] + self.json_data["wflow-path"] + "/reduction/cbench/metrics_avg.csv"
   
   
 		"""

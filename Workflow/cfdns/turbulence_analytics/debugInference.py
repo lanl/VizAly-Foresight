@@ -100,6 +100,7 @@ data1 = fields1[:snapshots,:,:,:,:numScalars]
 print('Load second snap')
 f2 = h5py.File(filename2,'r')
 fields2 = f2['fields']
+#fields2 = f2['mod']
 data2 = fields2[:snapshots,:,:,:,:numScalars]
 
 mod = data1[0,:,:,:,:3]

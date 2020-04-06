@@ -221,6 +221,10 @@ int main(int argc, char *argv[])
 
 		writeLog(outputLogFilename, debugLog.str());
 
+
+
+		// TODO: Compressor inner loop and scalar outer loop - only load data once//
+		
 		//
 		// Cycle through compressors
 		CompressorInterface *compressorMgr;
@@ -234,7 +238,6 @@ int main(int argc, char *argv[])
 					std::cout << "Unsupported compressor: " << compressors[c] << " ... skipping!" << std::endl;
 
 				debugLog << "Unsupported compressor: " << compressors[c] << " ... skipping!" << std::endl;
-
 				continue;
 			}
 
@@ -332,7 +335,6 @@ int main(int argc, char *argv[])
 				clock.stop("decompress");
 
 
-
 				// Get compression ratio
 				unsigned long totalCompressedSize;
 				unsigned long compressedSize = (unsigned long) compressorMgr->getCompressedSize();
@@ -386,12 +388,10 @@ int main(int argc, char *argv[])
 					// Launch
 					metricsMgr->init(MPI_COMM_WORLD);
 					metricsMgr->execute(ioMgr->data, decompdata, ioMgr->getNumElements(), ioMgr->getType());
-					//debugLog << metricsMgr->getLog();
-					//metricsInfo << metricsMgr->getLog();	metricsMgr->clearLog();
 					
 					csvOutput << metricsMgr->getGlobalValue() << ", ";
 
-					// darw histogram if needed
+					// draw histogram if needed
 					if (myRank == 0)
 						if (metricsMgr->additionalOutput != "")
 						{
@@ -407,11 +407,13 @@ int main(int argc, char *argv[])
 				debugLog << "\nMemory in use: " << memLoad.getMemoryInUseInMB() << " MB" << std::endl;
 
 
-
 				//
 				// Metrics Computation
 				double compress_time = clock.getDuration("compress");
 				double decompress_time = clock.getDuration("decompress");
+
+				debugLog << "compress_time: " << compress_time << std::endl;
+				debugLog << "decompress_time: " << decompress_time << std::endl;
 
 				double compress_throughput   = ((double) (ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0 * 1024.0)) / compress_time;     // MB/s
 				double decompress_throughput = ((double) (ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0 * 1024.0)) / decompress_time;	// MB/s
@@ -449,7 +451,6 @@ int main(int argc, char *argv[])
 				memLoad.stop();
 
 
-
 				//
 				// log stuff
 				debugLog << "\nCompress time: " << compress_time << std::endl;
@@ -457,7 +458,6 @@ int main(int argc, char *argv[])
 				debugLog << "\nMemory leaked: " << memLoad.getMemorySizeInMB() << " MB" << std::endl;
 				debugLog << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl << std::endl;
 
-				//writeLog(outputLogFilename, debugLog);
 				writeLog(outputLogFilename, debugLog.str());
 
 
@@ -560,8 +560,6 @@ int main(int argc, char *argv[])
 	//overallClock.stop();
 	clock.stop("overall");
 	debugLog << "\nTotal run time: " << clock.getDuration("overall") << " s " << std::endl;
-	//debugLog << "\nTotal run time: " << overallClock.getDuration() << " s " << std::endl;
-	//writeLog(outputLogFilename, debugLog);
 	writeLog(outputLogFilename, debugLog.str());
 
 

@@ -24,14 +24,13 @@ class minmaxMetric : public MetricInterface
 	int numRanks;
 	int myRank;
 
-public:
+  public:
 	minmaxMetric();
 	~minmaxMetric();
 
 	void init(MPI_Comm _comm);
 	void execute(void *original, void *approx, size_t n, std::string dataType="float");
 	void close() { }
-
 };
 
 
@@ -140,7 +139,6 @@ inline void minmaxMetric::execute(void *original, void *approx, size_t n, std::s
 			if (myRank == 0)
 				additionalOutput = python_histogram(numBins, global_min, global_max, histogram);
 				//additionalOutput = csv_histogram(numBins, global_max, histogram);
-				
 		}
 	}
 

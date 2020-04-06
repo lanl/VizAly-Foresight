@@ -10,25 +10,25 @@
 
 class MGARDCompressor: public CompressorInterface
 {
-    
+	
   public:
-    MGARDCompressor();
-    ~MGARDCompressor();
+	MGARDCompressor();
+	~MGARDCompressor();
 
-    void init();
-    int compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n);
-    int decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n);
-    void close();
+	void init();
+	int compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n);
+	int decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n);
+	void close();
 };
 
 inline MGARDCompressor::MGARDCompressor()
 {
-    compressorName = "MGARD";
+	compressorName = "MGARD";
 }
 
 inline MGARDCompressor::~MGARDCompressor()
 {
-    
+	
 }
 
 
@@ -45,7 +45,7 @@ inline int MGARDCompressor::compress(void *input, void *&output, std::string dat
 			numel *= n[i];
 
 	// Read in json compression parameters
-	float tol = 1E-3;
+	double tol = 1E-3;
 	std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("tolerance");
 	if( got != compressorParameters.end() )
 		if (compressorParameters["tolerance"] != "")
@@ -54,24 +54,32 @@ inline int MGARDCompressor::compress(void *input, void *&output, std::string dat
 	// Set compression parameters
 	int iflag = 0; //0 -> float, 1 -> double
 
-	if(dataTypeSize == 8)
+	if (dataTypeSize == 8)
 		iflag = 1;
 
-	int out_size;
+	int out_size[1];
 
 	Timer clock("compress");
 
 	// Create a copy of the input data because compressor will auto-destroy it
 	void * in_buff = std::malloc(numel*dataTypeSize);
-	memcpy (in_buff, input, numel*dataTypeSize);
+	memcpy(in_buff, input, numel*dataTypeSize);
 
 	//mgard_compress(flag, in_buff, &out_size, nrow, ncol, nfib, &tol)
-    // Note: "tol" must be of same "type" as set iflagz
-    std::cout << "n[0]: " << n[0] << std::endl;
-    std::cout << "n[0]: " << n[1] << std::endl;
-    std::cout << "n[0]: " << n[2] << std::endl;
-    output = mgard_compress(iflag, in_buff, out_size, n[0], n[1], n[2], &tol );
-	std::uint64_t csize = out_size;
+	// Note: "tol" must be of same "type" as set iflagz
+	std::cout << "n[0]: " << n[0] << std::endl;
+	std::cout << "n[0]: " << n[1] << std::endl;
+	std::cout << "n[0]: " << n[2] << std::endl;
+
+	int _n[3];
+	_n[0] = n[0];
+	_n[1] = n[1];
+	_n[2] = n[2];
+
+	float *_data = new float[numel];
+	//_data = in_buff;
+	unsigned char * compressed_data = mgard_compress(iflag, _data, out_size, _n[0], _n[1], _n[2], tol );
+	std::uint64_t csize = out_size[0];
 	cbytes = csize;
 
 	clock.stop("compress");
@@ -79,7 +87,7 @@ inline int MGARDCompressor::compress(void *input, void *&output, std::string dat
 	debugLog << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*numel / (float)csize) << ", #elements: " << numel << std::endl;
 	debugLog << compressorName << " ~ CompressTime: " << clock.getDuration("compress") << " s " << std::endl;
 
-    return 1;
+	return 1;
 }
 
 inline int MGARDCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
@@ -106,7 +114,7 @@ inline int MGARDCompressor::decompress(void *&input, void *&output, std::string 
 	clock.stop("decompress");
 	debugLog << compressorName << " ~ DecompressTime: " << clock.getDuration("decompress") << " s " << std::endl;
 
-    return 1;
+	return 1;
 }
 
 inline void MGARDCompressor::close()

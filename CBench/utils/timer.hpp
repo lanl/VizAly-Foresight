@@ -44,7 +44,13 @@ inline int Timer::start(std::string timerName)
 	if (timers.find(timerName) == timers.end())
 		timers.insert( std::pair<std::string,std::chrono::time_point<std::chrono::system_clock>>(timerName,startTime) );	
 	else
+	{
 		timers[timerName] = startTime;
+
+		// remove previous durarion
+		auto it=timers_duration.find(timerName);
+  		timers_duration.erase(it); 
+	}
 
 	return 1;
 }
