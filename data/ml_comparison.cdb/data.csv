@@ -1,26 +1,26 @@
 Compressor_field__params, name, absolute_error, relative_error, mse, psnr, Compression Throughput(MB/s), DeCompression Throughput(MB/s), Compression Ratio,FILE_spectrum,FILE_intermittency,FILE_qr
-BLOSC_vx__, BLOSC_, 0.0, 0.0, 0.0,inf, 65.8017, 269.11900000000014, 1.1195786,BLOSC__energy_spectrum.png,BLOSC__intermittency.png,BLOSC__qr_plot.png
-BLOSC_vy__, BLOSC_, 0.0, 0.0, 0.0,inf, 65.8017, 269.11900000000014, 1.1034926,BLOSC__energy_spectrum.png,BLOSC__intermittency.png,BLOSC__qr_plot.png
-BLOSC_vz__, BLOSC_, 0.0, 0.0, 0.0,inf, 65.8017, 269.11900000000014, 1.1068792,BLOSC__energy_spectrum.png,BLOSC__intermittency.png,BLOSC__qr_plot.png
-zfp_vx__rel2, zfp_rel_2_, 7.4367366, 7.1266108, 1.8134779999999997, 11.511492, 65.8017, 269.11900000000014, 273.8569600000002,zfp_rel_2__energy_spectrum.png,zfp_rel_2__intermittency.png,zfp_rel_2__qr_plot.png
-zfp_vy__rel2, zfp_rel_2_, 0.7351698799999999, 0.7351698799999999, 0.013509034, 11.94181, 65.8017, 269.11900000000014, 278.48533999999995,zfp_rel_2__energy_spectrum.png,zfp_rel_2__intermittency.png,zfp_rel_2__qr_plot.png
-zfp_vz__rel2, zfp_rel_2_, 1.8060348000000002, 1.8060348000000002, 0.12885936000000003, 7.818283000000001, 65.8017, 269.11900000000014, 277.72953999999993,zfp_rel_2__energy_spectrum.png,zfp_rel_2__intermittency.png,zfp_rel_2__qr_plot.png
-zfp_vx__rel1, zfp_rel_1_, 9.534666399999999, 7.4474454, 2.6322195999999995, 9.895186999999998, 65.8017, 269.11900000000014, 310.9019,zfp_rel_1__energy_spectrum.png,zfp_rel_1__intermittency.png,zfp_rel_1__qr_plot.png
-zfp_vy__rel1, zfp_rel_1_, 0.9928805799999999, 0.9928805799999999, 0.014861949999999999, 11.529974000000005, 65.8017, 269.11900000000014, 312.11260000000004,zfp_rel_1__energy_spectrum.png,zfp_rel_1__intermittency.png,zfp_rel_1__qr_plot.png
-zfp_vz__rel1, zfp_rel_1_, 2.1665832, 2.1665832, 0.15130502, 7.119226799999999, 65.8017, 269.11900000000014, 311.79963999999995,zfp_rel_1__energy_spectrum.png,zfp_rel_1__intermittency.png,zfp_rel_1__qr_plot.png
-zfp_vx__rate0.2, zfp_rate_0.2_, 9.534666399999999, 7.4474454, 2.6322195999999995, 9.895186999999998, 65.8017, 269.11900000000014, 315.07699999999977,zfp_rate_0.2__energy_spectrum.png,zfp_rate_0.2__intermittency.png,zfp_rate_0.2__qr_plot.png
-zfp_vy__rate0.2, zfp_rate_0.2_, 0.9928805799999999, 0.9928805799999999, 0.014861949999999999, 11.529974000000005, 65.8017, 269.11900000000014, 315.07699999999977,zfp_rate_0.2__energy_spectrum.png,zfp_rate_0.2__intermittency.png,zfp_rate_0.2__qr_plot.png
-zfp_vz__rate0.2, zfp_rate_0.2_, 2.1665832, 2.1665832, 0.15130502, 7.119226799999999, 65.8017, 269.11900000000014, 315.07699999999977,zfp_rate_0.2__energy_spectrum.png,zfp_rate_0.2__intermittency.png,zfp_rate_0.2__qr_plot.png
-zfp_vx__rate0.3, zfp_rate_0.3_, 6.332205000000001, 5.670613, 0.24236287999999998, 20.251616000000002, 65.8017, 269.11900000000014, 215.57899999999987,zfp_rate_0.3__energy_spectrum.png,zfp_rate_0.3__intermittency.png,zfp_rate_0.3__qr_plot.png
-zfp_vy__rate0.3, zfp_rate_0.3_, 0.8030873799999998, 0.8030873799999998, 0.004101382600000001, 17.118902, 65.8017, 269.11900000000014, 215.57899999999987,zfp_rate_0.3__energy_spectrum.png,zfp_rate_0.3__intermittency.png,zfp_rate_0.3__qr_plot.png
-zfp_vz__rate0.3, zfp_rate_0.3_, 1.9298206000000004, 1.9298206000000004, 0.039710232, 12.928964, 65.8017, 269.11900000000014, 215.57899999999987,zfp_rate_0.3__energy_spectrum.png,zfp_rate_0.3__intermittency.png,zfp_rate_0.3__qr_plot.png
-SZ_vx__rel0.8, SZ_rel_0.8_, 3.2747699999999997, 3.0751945999999997, 0.071636852, 25.544718, 65.8017, 269.11900000000014, 298.7720999999999,SZ_rel_0.8__energy_spectrum.png,SZ_rel_0.8__intermittency.png,SZ_rel_0.8__qr_plot.png
-SZ_vy__rel0.8, SZ_rel_0.8_, 0.5150772200000001, 0.5150772200000001, 0.0019795047999999994, 20.282918, 65.8017, 269.11900000000014, 277.86909999999995,SZ_rel_0.8__energy_spectrum.png,SZ_rel_0.8__intermittency.png,SZ_rel_0.8__qr_plot.png
-SZ_vz__rel0.8, SZ_rel_0.8_, 1.2864282000000002, 1.2864282000000002, 0.019324446000000006, 16.057010000000005, 65.8017, 269.11900000000014, 242.29859999999996,SZ_rel_0.8__energy_spectrum.png,SZ_rel_0.8__intermittency.png,SZ_rel_0.8__qr_plot.png
-SZ_vx__rel0.9, SZ_rel_0.9_, 3.2877536000000003, 3.0785120000000012, 0.07451042599999998, 25.373889999999996, 65.8017, 269.11900000000014, 315.9637399999999,SZ_rel_0.9__energy_spectrum.png,SZ_rel_0.9__intermittency.png,SZ_rel_0.9__qr_plot.png
-SZ_vy__rel0.9, SZ_rel_0.9_, 0.5148792799999999, 0.5148792799999999, 0.0020078839999999997, 20.221099999999996, 65.8017, 269.11900000000014, 293.77085999999997,SZ_rel_0.9__energy_spectrum.png,SZ_rel_0.9__intermittency.png,SZ_rel_0.9__qr_plot.png
-SZ_vz__rel0.9, SZ_rel_0.9_, 1.3430094000000004, 1.3430094000000004, 0.01948143, 16.021868, 65.8017, 269.11900000000014, 256.9083600000001,SZ_rel_0.9__energy_spectrum.png,SZ_rel_0.9__intermittency.png,SZ_rel_0.9__qr_plot.png
-SZ_vx__rel0.99, SZ_rel_0.99_, 3.2894752, 3.0898058, 0.07742680600000003, 25.20716, 65.8017, 269.11900000000014, 330.71256,SZ_rel_0.99__energy_spectrum.png,SZ_rel_0.99__intermittency.png,SZ_rel_0.99__qr_plot.png
-SZ_vy__rel0.99, SZ_rel_0.99_, 0.5178220600000001, 0.5178220600000001, 0.0020348432000000002, 20.163166, 65.8017, 269.11900000000014, 307.40011999999996,SZ_rel_0.99__energy_spectrum.png,SZ_rel_0.99__intermittency.png,SZ_rel_0.99__qr_plot.png
-SZ_vz__rel0.99, SZ_rel_0.99_, 1.3494868000000002, 1.3494868000000002, 0.01964044199999999, 15.986564000000001, 65.8017, 269.11900000000014, 269.19210000000015,SZ_rel_0.99__energy_spectrum.png,SZ_rel_0.99__intermittency.png,SZ_rel_0.99__qr_plot.png
-Autoencoder, autoencoder, , , , , , , 300,CAEdata__energy_spectrum.png,CAEdata__intermittency.png,CAEdata__qr_plot.png
+BLOSC_vx__, BLOSC_,0,0,0,inf,78.620234,494.13516,1.1195786,BLOSC__energy_spectrum.png,BLOSC__intermittency.png,BLOSC__qr_plot.png
+BLOSC_vy__, BLOSC_,0,0,0,inf,82.397476,560.96196,1.1034926,BLOSC__energy_spectrum.png,BLOSC__intermittency.png,BLOSC__qr_plot.png
+BLOSC_vz__, BLOSC_,0,0,0,inf,82.744146,554.0653,1.1068792,BLOSC__energy_spectrum.png,BLOSC__intermittency.png,BLOSC__qr_plot.png
+zfp_vx__rel2, zfp_rel_2_,7.4367366,7.1266108,1.813478,11.511492,299.93984,438.275,273.85696,zfp_rel_2__energy_spectrum.png,zfp_rel_2__intermittency.png,zfp_rel_2__qr_plot.png
+zfp_vy__rel2, zfp_rel_2_,0.73516988,0.73516988,0.013509034,11.94181,302.19476,437.46994,278.48534,zfp_rel_2__energy_spectrum.png,zfp_rel_2__intermittency.png,zfp_rel_2__qr_plot.png
+zfp_vz__rel2, zfp_rel_2_,1.8060348,1.8060348,0.12885936,7.818283,302.3358,432.14006,277.72954,zfp_rel_2__energy_spectrum.png,zfp_rel_2__intermittency.png,zfp_rel_2__qr_plot.png
+zfp_vx__rel1, zfp_rel_1_,9.5346664,7.4474454,2.6322196,9.895187,346.10772,448.39272,310.9019,zfp_rel_1__energy_spectrum.png,zfp_rel_1__intermittency.png,zfp_rel_1__qr_plot.png
+zfp_vy__rel1, zfp_rel_1_,0.99288058,0.99288058,0.01486195,11.529974,345.57496,438.458,312.1126,zfp_rel_1__energy_spectrum.png,zfp_rel_1__intermittency.png,zfp_rel_1__qr_plot.png
+zfp_vz__rel1, zfp_rel_1_,2.1665832,2.1665832,0.15130502,7.1192268,340.4955,444.59226,311.79964,zfp_rel_1__energy_spectrum.png,zfp_rel_1__intermittency.png,zfp_rel_1__qr_plot.png
+zfp_vx__rate0.2, zfp_rate_0.2_,9.5346664,7.4474454,2.6322196,9.895187,338.29364,435.78334,315.077,zfp_rate_0.2__energy_spectrum.png,zfp_rate_0.2__intermittency.png,zfp_rate_0.2__qr_plot.png
+zfp_vy__rate0.2, zfp_rate_0.2_,0.99288058,0.99288058,0.01486195,11.529974,342.25088,443.204,315.077,zfp_rate_0.2__energy_spectrum.png,zfp_rate_0.2__intermittency.png,zfp_rate_0.2__qr_plot.png
+zfp_vz__rate0.2, zfp_rate_0.2_,2.1665832,2.1665832,0.15130502,7.1192268,338.7335,442.79746,315.077,zfp_rate_0.2__energy_spectrum.png,zfp_rate_0.2__intermittency.png,zfp_rate_0.2__qr_plot.png
+zfp_vx__rate0.3, zfp_rate_0.3_,6.332205,5.670613,0.24236288,20.251616,237.9491,404.40798,215.579,zfp_rate_0.3__energy_spectrum.png,zfp_rate_0.3__intermittency.png,zfp_rate_0.3__qr_plot.png
+zfp_vy__rate0.3, zfp_rate_0.3_,0.80308738,0.80308738,0.004101383,17.118902,233.27829,408.4432,215.579,zfp_rate_0.3__energy_spectrum.png,zfp_rate_0.3__intermittency.png,zfp_rate_0.3__qr_plot.png
+zfp_vz__rate0.3, zfp_rate_0.3_,1.9298206,1.9298206,0.039710232,12.928964,237.23542,406.62552,215.579,zfp_rate_0.3__energy_spectrum.png,zfp_rate_0.3__intermittency.png,zfp_rate_0.3__qr_plot.png
+SZ_vx__rel0.8, SZ_rel_0.8_,3.27477,3.0751946,0.071636852,25.544718,6.195446,10.4265124,298.7721,SZ_rel_0.8__energy_spectrum.png,SZ_rel_0.8__intermittency.png,SZ_rel_0.8__qr_plot.png
+SZ_vy__rel0.8, SZ_rel_0.8_,0.51507722,0.51507722,0.001979505,20.282918,7.1832632,10.3806902,277.8691,SZ_rel_0.8__energy_spectrum.png,SZ_rel_0.8__intermittency.png,SZ_rel_0.8__qr_plot.png
+SZ_vz__rel0.8, SZ_rel_0.8_,1.2864282,1.2864282,0.019324446,16.05701,7.5095132,10.4439286,242.2986,SZ_rel_0.8__energy_spectrum.png,SZ_rel_0.8__intermittency.png,SZ_rel_0.8__qr_plot.png
+SZ_vx__rel0.9, SZ_rel_0.9_,3.2877536,3.078512,0.074510426,25.37389,7.4709896,10.3192674,315.96374,SZ_rel_0.9__energy_spectrum.png,SZ_rel_0.9__intermittency.png,SZ_rel_0.9__qr_plot.png
+SZ_vy__rel0.9, SZ_rel_0.9_,0.51487928,0.51487928,0.002007884,20.2211,7.2982516,10.3292304,293.77086,SZ_rel_0.9__energy_spectrum.png,SZ_rel_0.9__intermittency.png,SZ_rel_0.9__qr_plot.png
+SZ_vz__rel0.9, SZ_rel_0.9_,1.3430094,1.3430094,0.01948143,16.021868,7.4543584,10.44103,256.90836,SZ_rel_0.9__energy_spectrum.png,SZ_rel_0.9__intermittency.png,SZ_rel_0.9__qr_plot.png
+SZ_vx__rel0.99, SZ_rel_0.99_,3.2894752,3.0898058,0.077426806,25.20716,7.444384,10.503502,330.71256,SZ_rel_0.99__energy_spectrum.png,SZ_rel_0.99__intermittency.png,SZ_rel_0.99__qr_plot.png
+SZ_vy__rel0.99, SZ_rel_0.99_,0.51782206,0.51782206,0.002034843,20.163166,7.529727,10.4553862,307.40012,SZ_rel_0.99__energy_spectrum.png,SZ_rel_0.99__intermittency.png,SZ_rel_0.99__qr_plot.png
+SZ_vz__rel0.99, SZ_rel_0.99_,1.3494868,1.3494868,0.019640442,15.986564,7.5294966,10.4591462,269.1921,SZ_rel_0.99__energy_spectrum.png,SZ_rel_0.99__intermittency.png,SZ_rel_0.99__qr_plot.png
+Autoencoder, autoencoder, , , , , , ,300,CAEdata__energy_spectrum.png,CAEdata__intermittency.png,CAEdata__qr_plot.png
