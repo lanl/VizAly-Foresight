@@ -1,0 +1,244 @@
+{
+	"project-home" : "/projects/groups/vizproject/cosmo/",
+	"foresight-home" : "/projects/exasky/pascal-projects/VizAly-Foresight/",
+	"wflow-path" : "hacc_wflow_test_2",
+
+	"input" :
+	{
+		"filetype" : "HACC",
+		"filename-timesteps" : 
+		[ 
+			"/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP442/m000.full.mpicosmo.442",
+			"/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP464/m000.full.mpicosmo.464",
+			"/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP475/m000.full.mpicosmo.475",
+			"/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP487/m000.full.mpicosmo.487",
+			"/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP499/m000.full.mpicosmo.499"
+		],
+
+		"scalars" : ["x", "y", "z", "vx", "vy", "vz"]    
+	},
+	
+
+	"data-reduction": 
+	{
+		"cbench-compressors":
+		[
+			{
+				"name" : "BLOSC",
+				"output-prefix" : "blosc"
+			},
+			{
+				"name" : "SZ",
+				"output-prefix" : "sz",
+				"compressor-params" :
+				[
+					{
+						"scalar" : ["x", "y", "z"],
+						"abs" : 2E-3
+					},
+					{
+						"scalar" : ["vx", "vy", "vz"],
+						"pw_rel" : 1E-2
+					}
+				]
+			},
+			{
+				"name" : "Isabela",
+				"output-prefix" : "isabela",
+				"tolerance" : 27,
+				"nCoeff" : 30,
+				"window-size" : 2048
+			},
+			{
+				"name" : "fpzip",
+				"output-prefix" : "fpzip",
+				"bits" : 27
+			},
+			{
+				"name" : "zfp",
+				"output-prefix" : "zfp",
+				"abs" : 1E-3
+			}
+		],
+
+		"cbench-output":
+		{
+			"run-path" : "mpirun $foresight-home$/build/CBench",
+			
+			"output-decompressed" : true,
+			"output-decompressed-location" : "decompressed_files",
+			
+			"log-file" : "runlog",
+			"metrics-file" : "metrics"
+		},
+		
+		"cbench-metrics" :
+		[
+			{
+				"name" : "absolute_error",
+				"histogram" : ["x", "y", "z"]
+			},
+			{
+				"name" : "relative_error"
+			},
+			{
+				"name" : "mse"
+			},
+			{
+				"name" : "psnr"
+			},
+			{
+				"name" : "minmax",
+				"histogram" : ["vx", "vy", "vz"]
+			}
+		],
+
+		"name" : "cbench",
+		"path" : "mpirun $foresight-home$build/CBench",
+		"evn_path": "scripts/VizAly-CBench.bash.darwin",
+		"configuration": 
+		{
+			"partition": "scaling",
+			"nodes": 8,
+			"ntasks-per-node": 8
+		},
+		
+		"output-files": []
+	},
+
+
+	"analysis" : 
+	{
+		"analytics" :
+		[
+			{
+				"name" : "halo",
+				"path" : "mpirun /projects/exasky/HACC_GPU/trunk/Darwin_GPU/mpi/bin/cosmotools-driver",
+				"params" :
+				[
+					"/projects/exasky/HACC_GPU/run/haloInputs/cosmotools-config.dat",
+					"/projects/exasky/HACC_GPU/run/haloInputs/timesteps.dat",
+					"/projects/exasky/HACC_GPU/run/haloInputs/indat.params"
+				],
+				"evn_path" : "/projects/exasky/HACC_GPU.darwin_setup",
+				"configuration" :
+				{
+					"partition" : "shared-gpu",
+					"nodes" : 8,
+					"ntasks-per-node" : 1
+				}
+			},
+			
+
+			{
+				"name" : "halo_query",
+				"path": "python3 -m pat.hacc.hacc_query",
+				"params" :
+				[
+					"--input-file halo_file",
+					"--output-file halo_query_file",
+					"--sqlite-file /projects/exasky/VizAly-Vis_IO/genericio/frontend/GenericIOSQLite.so",
+					"--query select fof_halo_mass from __TABLE__",
+					"--xlabel Halo Mass",
+					"--ylabel Counts",
+					"--xlim [1e10, 1e15]",
+					"--log-bins true"
+				],
+				"evn_path" : "/projects/exasky/HACC_GPU.darwin_setup",
+				"configuration" :
+				{
+					"partition" : "scaling",
+					"nodes" : 1
+				}
+			},
+			
+
+			{
+				"name" : "spectrum",
+				"path" : "mpirun /projects/exasky/HACC/trunk/Darwin/mpi/bin/hacc_pk_gio_auto_rsd",
+				"params" : [ "/projects/exasky/HACC/run/inputs/indat.params" ],
+				"evn_path" : "/projects/exasky/HACC_GPU.darwin_setup",
+				"configuration" :
+				{
+					"partition" : "scaling",
+					"nodes" : 8,
+					"ntasks-per-node" : 16
+				}
+			}
+		],
+
+		"output-files": []
+	},
+
+	"visualize" :
+	{
+		"plots" :
+		[
+			{
+				"analysis" : 
+				{
+					"FILE_Halo_Distribution_0" :
+					{
+						"xscale" : "log",
+						"ylim" : [0.95, 1.05],
+						"xlabel" : "Halo Mass",
+						"ylabel" : "Ratio [Compressed/Uncompressed]"
+					},
+
+					"FILE_Spectrum" :
+					{
+						"xlim" : [0, 10],
+						"ylim" : [0.98, 1.01],
+						"xlabel" : "k",
+						"ylabel" : "Ratio [Compressed/Uncompressed]"
+					},
+
+					"FILE_Spectrum.rsd.0" :
+					{
+						"xlim" : [0, 10],
+						"ylim" : [0.98, 1.01],
+						"xlabel" : "k",
+						"ylabel" : "Ratio [Compressed/Uncompressed]"
+					},
+
+					"FILE_Spectrum.rsd.1" :
+					{
+						"xlim" : [0, 10],
+						"ylim" : [0.98, 1.01],
+						"xlabel" : "k",
+						"ylabel" : "Ratio [Compressed/Uncompressed]"
+					},
+
+					"FILE_Spectrum.rsd.2" :
+					{
+						"xlim" : [0, 10],
+						"ylim" : [0.98, 1.01],
+						"xlabel" : "k",
+						"ylabel" : "Ratio [Compressed/Uncompressed]"
+					}
+				},
+
+				"evn_path" : "scripts/VizAly-CBench.bash.darwin",
+				"configuration" :
+				{
+					"partition": "general",
+					"nodes" : 1
+				}
+			}
+		],
+
+		"cinema" : 
+		{
+			"name" : "ml_cinema",
+			"path" : "python -m $foresight-home$/Workflow/hacc/cinema.py",
+			"params" : [ ],
+			"evn_path": "scripts/VizAly-CBench.bash.darwin",
+			"configuration": 
+			{
+				"partition": "general",
+				"nodes": 1,
+				"ntasks-per-node": 1
+			}
+		}
+	}
+}

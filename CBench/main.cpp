@@ -72,29 +72,40 @@ int main(int argc, char *argv[])
 
 	//
 	// Load in the global input parameters
-	std::string inputFilename = jsonInput["input"]["filename"];
 
 
-	// timesteps
+	// file timesteps
+	std::string inputFilename = "";
 	int minTimestep = 0;
 	int maxTimestep = 1;
-	if (jsonInput["input"].contains("timesteps"))
+	std::vector<std::string> filenameTs;
+	if (jsonInput["input"].contains("timesteps"))	// files in order
 	{
 		minTimestep = jsonInput["input"]["timesteps"][0];  	// inclusive
 		maxTimestep = jsonInput["input"]["timesteps"][1];	// exclusive
+
+		inputFilename = jsonInput["input"]["filename"];
 	}
+	else if (jsonInput["input"].contains("filename-timesteps"))	// arbitrary file names
+		{
+			maxTimestep = jsonInput["input"]["filename-timesteps"].size();
+			for (int i=0; i<maxTimestep; i++)
+				filenameTs.push_back( jsonInput["input"]["filename-timesteps"][i] );
+		}
+		else
+			inputFilename = jsonInput["input"]["filename"];	// single timestep
+
 	int numTimesteps = maxTimestep - minTimestep;
 
 
 	// write out decompressed files + output name
 	bool writeData = false;
 	std::string outputFilename = "";
+	if (numTimesteps == 1)
 	if (jsonInput["data-reduction"]["cbench-output"].contains("output-decompressed"))
 	{
 		writeData = jsonInput["data-reduction"]["cbench-output"]["output-decompressed"];
-		if (writeData)
-			outputFilename = extractFileName(inputFilename);
-
+	
 		// Initial a random number in case output name is not provided
 		srand(time(NULL));
 	}
@@ -167,10 +178,13 @@ int main(int argc, char *argv[])
 			// Get filename
 			fileToLoad = inputFilename;
 			if (numTimesteps > 1)
-			{
-				std::string tempStr = inputFilename;
-				fileToLoad = tempStr.replace( tempStr.find("%"), tempStr.find("%")+1, strConvert::toStr(ts) );
-			}
+				if (filenameTs.size() > 0)
+					fileToLoad = filenameTs[ts];
+				else
+				{
+					std::string tempStr = inputFilename;
+					fileToLoad = tempStr.replace( tempStr.find("%"), tempStr.find("%")+1, strConvert::toStr(ts) );
+				}
 				
 			metricsInfo << "Input file: " << fileToLoad << std::endl;
 			if (myRank == 0)
@@ -412,9 +426,6 @@ int main(int argc, char *argv[])
 				double compress_time = clock.getDuration("compress");
 				double decompress_time = clock.getDuration("decompress");
 
-				debugLog << "compress_time: " << compress_time << std::endl;
-				debugLog << "decompress_time: " << decompress_time << std::endl;
-
 				double compress_throughput   = ((double) (ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0 * 1024.0)) / compress_time;     // MB/s
 				double decompress_throughput = ((double) (ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0 * 1024.0)) / decompress_time;	// MB/s
 
@@ -522,14 +533,7 @@ int main(int argc, char *argv[])
 				else
 					decompressedOutputName = "__" + compressorMgr->getCompressorName() + "_" + std::to_string(rand());
 
-				// deal with timesteps
-				if (outputFilename.find("%") != std::string::npos)
-				{
-					std::string tempStr = outputFilename;
-					fileToOutput = tempStr.replace( outputFilename.find("%"), outputFilename.find("%")+1, strConvert::toStr(ts) );
-				}
-				else
-					fileToOutput = outputFilename;
+				fileToOutput = extractFileName(fileToLoad);				
 
 				// path for folders
 				if (outputPath != ".")

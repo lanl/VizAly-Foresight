@@ -82,38 +82,7 @@ class CFDNSWorkflow(workflow.Workflow):
 		#self.add_cbench_job(dependency="single", filters="preprocess")
 		
 		self.add_cbench_job()
-		self.postprocess_cbench()
-
-
-	# Re-write the json data to include the analysis; ["pat"]["analysis"]
-	def create_analysis_input(self):	
-
-		if "analysis-results" in self.json_data["input"]:
-			analysis_path = self.json_data["input"]["analysis-results"]
-		else:
-			analysis_path = self.json_data["project-home"] +  self.json_data['wflow-path']
-
-		# Remove all entries if any
-		self.json_data['pat']['analysis'].clear()
-
-
-		# Add analysis entries
-		for ana in self.json_data['pat']['analysis-tool']['analytics']:
-			for item in ana['type']:
-				json_item = {
-					"title" : ana['name'] + "_" + item,
-					"files" : []
-				}
-
-				for inputItem in self.json_data['pat']['input-files']:
-					input_item = { 
-						'name' : inputItem["output-prefix"],
-						'path' : analysis_path + "/" + ana['name'] + "/" + inputItem['output-prefix'] + item + ana['postfix']
-					}
-
-					json_item['files'].append(input_item)
-
-				self.json_data['pat']['analysis'].append(json_item)
+		#self.postprocess_cbench()
 
 
 	# Create the analysis job; run gimlet

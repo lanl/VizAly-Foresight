@@ -16,21 +16,21 @@ from pat.utils import plot_utilities as putils
 from pat.utils import job as j
 
 
-class PATCinema(cinema.CinemaWorkflow):
+class HACCCinema(cinema.CinemaWorkflow):
 
     def prepare_cinema(self):
 
         # Open CSV file
-        if "metrics-csv" in self.json_data["input"]:
-            metrics_csv = self.json_data["input"]["metrics-csv"]
+        if "metrics-file" in self.json_data['data-reduction']['cbench-output']:
+            metrics_csv = self.json_data['data-reduction']['cbench-output']['metrics-file']
         else:
-            metrics_csv = self.json_data["project-home"] +  self.json_data['wflow-path'] + "/cbench/" + self.json_data['cbench']['output']['metrics-file'] + ".csv"
+            metrics_csv = self.json_data['project-home'] + self.json_data['wflow-path'] + "/reduction/cbench/" + metrics_csv + ".csv"
 
         print(metrics_csv)
 
         # get list of all images
         image_data = {}
-        for sec in self.json_data["pat"]["analysis"]:
+        for sec in self.json_data["analysis"]["output-files"]:
             col_name = sec["output-column"]
             prefix = sec["output-prefix"]
             path = sec["path"]
@@ -127,18 +127,18 @@ class PATCinema(cinema.CinemaWorkflow):
 
 
 # parse Input
-parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
+parser = argparse.ArgumentParser()
 parser.add_argument("--input-file", required=True)
 parser.add_argument("--output-file", default="results.cdb")
 opts = parser.parse_args()
 
-# load data
-cinema = PATCinema(opts.input_file)
 
 # create directory
 if not os.path.exists(opts.output_file):
     os.mkdir(opts.output_file)
 os.chdir(opts.output_file)
 
-# generate plots
+
+# Create Cinema DB
+cinema = HACCCinema(opts.input_file)
 cinema.prepare_cinema()
