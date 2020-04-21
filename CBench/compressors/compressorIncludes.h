@@ -1,8 +1,0 @@
-#include "BLOSC/blosccompressor.hpp"
-#include "Isabela/Isabelacompressor.hpp"
-#include "MGARD/MGARDcompressor.hpp"
-#include "SZ/SZcompressor.hpp"
-#include "SZ_gpu/SZcompressorGpu.hpp"
-#include "fpzip/fpzipcompressor.hpp"
-#include "zfp/zfpCompressor.hpp"
-#include "zfp_gpu/zfpCompressorGpu.hpp"
