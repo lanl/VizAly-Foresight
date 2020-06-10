@@ -82,6 +82,9 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
 		}
 
 
+
+        Timer entropyClock;
+        entropyClock.start();
         float entropy = 0;
         float value_max = 0;
         float value_min = 3.402823466e+38F;
@@ -95,18 +98,21 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
                         value_min = static_cast<float *>(input)[i];
         }
         float minmax = value_max - value_min;
-        printf("min = %f, max = %f, minmax = %f, numel = %d\n", value_min, value_max, minmax, numel);
+//        printf("min = %f, max = %f, minmax = %f, numel = %d\n", value_min, value_max, minmax, numel);
         for (int i = 0; i < numel; i++)
                 pos[(int)floor(((static_cast<float *>(input)[i] - value_min)/minmax) * 128)] += 1;
         for (int i = 0; i < 128; i++) {
                 if (pos[i] != 0)
                         entropy += (-float(pos[i])/numel) * (std::log(float(pos[i])/numel)/std::log(2));
         }
+	entropyClock.stop();
+        double entropy_time = entropyClock.getDuration();
+	printf("time = %f ", entropy_time);
         printf("entropy = %f ", entropy);
         //free(pos);
 //      absTol = (1/entropy)/800;
         absTol = entropy * 10;
-        printf("error bound = %f\n", absTol);
+        printf("error_bound = %f ", absTol);
 
 
 //      printf("data start = %f %f %f %f\n", static_cast<float *>(input)[0], static_cast<float *>(input)[1], static_cast<float *>(input)[134217726], static_cast<float *>(input)[134217727]);

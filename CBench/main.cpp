@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 	MPI_Comm_size(MPI_COMM_WORLD, &numRanks);
 	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
-
+	printf("MPI Init: number of ranks = %d\n", numRanks);
 
 	//
 	// Validate input params
@@ -259,6 +259,10 @@ int main(int argc, char *argv[])
 			csvOutput << compressorMgr->getCompressorName() << "_" << scalars[i] << "__" << compressorMgr->getParamsInfo()
 					  << ", " << jsonInput["compressors"][c]["output-prefix"].get<std::string>() << ", ";
 
+
+			std::cout << "enumber = " << ioMgr->getSizePerDim()[0] << std::endl;
+
+
 			MPI_Barrier(MPI_COMM_WORLD);
 
 
@@ -293,6 +297,9 @@ int main(int argc, char *argv[])
 			debuglog << "\n\ncompressedSize: " << compressedSize << ", totalCompressedSize: " << totalCompressedSize << std::endl;
 			debuglog << "unCompressedSize: " << unCompressedSize << ", totalUnCompressedSize: " << totalUnCompressedSize << std::endl;
 			debuglog << "Compression ratio: " << totalUnCompressedSize / (float) totalCompressedSize << std::endl;
+
+			printf("ratio = %f comp_time = %f ", unCompressedSize / (float) compressedSize, compressClock.getDuration());
+			std::cout << "end" << std::endl;
 
 			appendLog(outputLogFilename, compressorMgr->getLog());
 			compressorMgr->clearLog();
