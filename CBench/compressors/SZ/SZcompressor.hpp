@@ -7,6 +7,7 @@
 #include "compressorInterface.hpp"
 #include "timer.hpp"
 #include "sz.h"
+#include "fftw3.h"
 
 class SZCompressor: public CompressorInterface
 {
@@ -87,11 +88,13 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
         entropyClock.start();
         float entropy = 0;
         float value_max = 0;
+	float average = 0;
         float value_min = 3.402823466e+38F;
-        int pos[128];
-        for (int i = 0; i < 128; i++)
+        int pos[32];
+        for (int i = 0; i < 32; i++)
                 pos[i] = 0;
         for (int i = 0; i < numel; i++) {
+		average += static_cast<float *>(input)[i];
                 if (static_cast<float *>(input)[i] > value_max)
                         value_max = static_cast<float *>(input)[i];
                 if (static_cast<float *>(input)[i] < value_min)
@@ -100,19 +103,59 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
         float minmax = value_max - value_min;
 //        printf("min = %f, max = %f, minmax = %f, numel = %d\n", value_min, value_max, minmax, numel);
         for (int i = 0; i < numel; i++)
-                pos[(int)floor(((static_cast<float *>(input)[i] - value_min)/minmax) * 128)] += 1;
-        for (int i = 0; i < 128; i++) {
+                pos[(int)floor(((static_cast<float *>(input)[i] - value_min)/minmax) * 32)] += 1;
+        for (int i = 0; i < 32; i++) {
                 if (pos[i] != 0)
                         entropy += (-float(pos[i])/numel) * (std::log(float(pos[i])/numel)/std::log(2));
         }
 	entropyClock.stop();
         double entropy_time = entropyClock.getDuration();
-	printf("time = %f ", entropy_time);
-        printf("entropy = %f ", entropy);
-        //free(pos);
+	average = average / numel;
+	printf("%f ", entropy_time);
+        printf("%f ", entropy);
+	printf("%f ", average);
+
+
+	Timer lorenzoClock;
+	lorenzoClock.start();
+	float lorenzo = 0;
+	int helper0000 = 0;
+	float msr_lorenzo = 0;
+	float layer01, layer02, layer03;
+	for (int i = n[0]*n[0]+n[0]; i < numel; i++) {
+		if (i%(n[0]*n[0]) == 0)
+			i += n[0];
+		if (i%n[0] == 0)
+			i += 1;
+		helper0000 += 1;
+		layer03 = static_cast<float *>(input)[i-n[0]*n[1]-n[0]-1];
+		layer02 = -static_cast<float *>(input)[i-n[0]*n[1]-n[0]] - static_cast<float *>(input)[i-n[0]*n[1]-1] - static_cast<float *>(input)[i-n[0]-1];
+		layer01 = static_cast<float *>(input)[i-n[0]*n[1]] + static_cast<float *>(input)[i-n[0]] + static_cast<float *>(input)[i-1];
+		msr_lorenzo += pow(layer01+layer02+layer03-static_cast<float *>(input)[i], 2);
+		if (fabs(layer01+layer02+layer03-static_cast<float *>(input)[i]) > absTol*127) {
+//			if (layer01+layer02+layer03-static_cast<float *>(input)[i] > 0)
+//				static_cast<float *>(input)[i] = layer01+layer02+layer03-(absTol*127);
+//			else
+//				static_cast<float *>(input)[i] = layer01+layer02+layer03+(absTol*127);
+			lorenzo += 1;
+		}
+	}
+//	printf("%d ", helper0000);
+	msr_lorenzo = sqrt(msr_lorenzo/helper0000);
+	lorenzo = lorenzo/helper0000;
+	lorenzoClock.stop();
+	double lorenzo_time = lorenzoClock.getDuration();
+	printf("%f ", lorenzo_time);
+	printf("%f ", lorenzo);
+	printf("%f ", msr_lorenzo);
+	printf("%f ", minmax);
+
+	//free(pos);
 //      absTol = (1/entropy)/800;
-        absTol = entropy * 10;
-        printf("error_bound = %f ", absTol);
+//        absTol = absTol * entropy;
+//	absTol = absTol / msr_lorenzo;
+	absTol = absTol / average;
+	printf("%f ", absTol);
 
 
 //      printf("data start = %f %f %f %f\n", static_cast<float *>(input)[0], static_cast<float *>(input)[1], static_cast<float *>(input)[134217726], static_cast<float *>(input)[134217727]);

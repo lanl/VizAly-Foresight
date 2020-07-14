@@ -298,7 +298,7 @@ int main(int argc, char *argv[])
 			debuglog << "unCompressedSize: " << unCompressedSize << ", totalUnCompressedSize: " << totalUnCompressedSize << std::endl;
 			debuglog << "Compression ratio: " << totalUnCompressedSize / (float) totalCompressedSize << std::endl;
 
-			printf("ratio = %f comp_time = %f ", unCompressedSize / (float) compressedSize, compressClock.getDuration());
+			printf("%f %f ", unCompressedSize / (float) compressedSize, compressClock.getDuration());
 			std::cout << "end" << std::endl;
 
 			appendLog(outputLogFilename, compressorMgr->getLog());
