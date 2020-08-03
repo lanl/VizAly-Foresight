@@ -81,27 +81,27 @@
 	"compressors": 
 	[
 		{
-			"name": "zfp",
+			"name": "SZ",
 			"compressor-params" :
 			[
 				{
 					"scalar" : ["baryon_density"],
-					"abs" : 1
+					"abs" : 0.2
 				},
 
                                 {
                                         "scalar" : ["dark_matter_density"],
-                                        "abs" : 25
+                                        "abs" : 0.1
                                 },
 
 				{
 					"scalar" : ["temperature"],
-					"abs" : 5.5
+					"abs" : 15000000
 				},
 
 				{
 					"scalar" : ["velocity_x", "velocity_y", "velocity_z"],
-					"abs" : 4
+					"abs" : 100000000000
 				}
 			],
 			"output-prefix": "sz_test"

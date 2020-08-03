@@ -15,12 +15,17 @@ Authors:
 #include <sstream>
 #include "compressorInterface.hpp"
 #include "fftw3.h"
+#include <math.h>
 
 #include <zfp.h>
 
 #define REAL 0
 #define IMAG 1
 #define PI 3.14159265358979
+
+
+float entropy, average;
+
 
 class ZFPCompressor: public CompressorInterface
 {
@@ -102,9 +107,9 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
 
         Timer entropyClock;
         entropyClock.start();
-        float entropy = 0;
+        entropy = 0;
         float value_max = 0;
-        float average = 0;
+        average = 0;
         float value_min = 3.402823466e+38F;
         int pos[32];
         for (int i = 0; i < 32; i++)
@@ -266,10 +271,19 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
 	printf("%f ", minmax);
 
         //free(pos);
-//      abs = (1/entropy)/800;
+//	abs = abs/std::log(1+entropy);
+	if (fabs(average) < 0.7)
+		average = 0.8;
+	if (fabs(average) > 1.2 && fabs(average) < 1000)
+		average = 1.2;
+	if (fabs(average) > 100000 && fabs(average) < 2700000)
+		average = 2700000;
+	if (fabs(average) > 4000000)
+		average = 4000000;
+	abs = abs * fabs(average);
 //	abs = (double) ((double) abs * (double) entropy);
 //	double absTol = 5.0;
-	abs = (double) 5.0;
+//	abs = (double) 5.0;
 
 //	abs = strConvert::to_double( compressorParameters["abs"] ) / (double) 10;
 	printf("%f ", abs);
@@ -365,7 +379,9 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
         compressionTypeAbs = false;
     }
 
-    abs = 5.0;
+//    abs = abs/std::log(1+entropy);
+	abs = abs * fabs(average);
+
 
 
     Timer dTime; 
