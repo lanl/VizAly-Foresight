@@ -1,5 +1,5 @@
 Compressor_field__params, name, absolute_error, relative_error, mse, psnr, minmax, Compression Throughput(MB/s), DeCompression Throughput(MB/s), Compression Ratio
-BLOSC_Ne__, BLOSC_, 0, 0, 0, -nan, 0, 3819.84, 2701.5, 247.759
+BLOSC_Ne__, BLOSC_, 0, 0, 0, inf, 0, 3819.84, 2701.5, 247.759
 BLOSC_phi_grav__, BLOSC_, 0, 0, 0, inf, 216371, 169.09, 1573.91, 1.38873
 SZ_phi_grav__abs0.01, SZ_abs_0.01_, 0.00999975, 0.00998515, 3.1424e-05, 151.731, 216371, 82.4924, 84.683, 2.9306
 SZ_phi_grav__abs0.1, SZ_abs_0.1_, 0.0999999, 0.0998889, 0.00326942, 131.559, 216371, 87.1546, 131.57, 4.37223
@@ -30,4 +30,3 @@ zfp_grav_x__abs0.1, zfp_abs_0.1_, 0.0186768, 0.0143203, 7.52535e-06, 142.074, 34
 zfp_grav_x__abs0.5, zfp_abs_0.5_, 0.146484, 0.102354, 0.000477104, 124.054, 34832.8, 117.665, 166.688, 2.37847
 zfp_grav_x__abs1.0, zfp_abs_1.0_, 0.308167, 0.216967, 0.00190814, 118.034, 34832.8, 120.963, 174.32, 2.56945
 zfp_grav_x__abs5.0, zfp_abs_5.0_, 1.19434, 0.868367, 0.0305265, 105.993, 34832.8, 128.601, 191.798, 3.06102
-
