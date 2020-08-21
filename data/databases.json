@@ -155,11 +155,11 @@
 
 	{
 		"name" : "NYX_512_plotfile_SZ_",
-		"directory" : "data/NYX_512_plotfile_SZ_.cdb"
+		"directory" : "data/NYX_512_plotfiles_SZ_.cdb"
 	},
 
 	{
 		"name" : "NYX_512_plotfile_zfp_",
-		"directory" : "data/NYX_512_plotfile_zfp_.cdb"
+		"directory" : "data/NYX_512_plotfiles_zfp_.cdb"
         }
 ]
