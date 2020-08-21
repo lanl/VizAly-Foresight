@@ -150,7 +150,16 @@
 
 	{
 		"name" : "NYX_512_Velocity",
-		"directory" : "data/NYX_Velocity.cdb"
-		
-	}
+		"directory" : "data/NYX_Velocity.cdb"	
+	},
+
+	{
+		"name" : "NYX_512_plotfile_SZ_",
+		"directory" : "data/NYX_512_plotfile_SZ_.cdb"
+	},
+
+	{
+		"name" : "NYX_512_plotfile_zfp_",
+		"directory" : "data/NYX_512_plotfile_zfp_.cdb"
+        }
 ]
