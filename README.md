@@ -1,4 +1,4 @@
-<img src="Foresight_Logo.png" width="200">
+<img src="foresight_logo.png" width="200">
 
 # VizAly-Foresight: A Compression benchmark suite for Visualization and Analysis of Simulation Data
 
