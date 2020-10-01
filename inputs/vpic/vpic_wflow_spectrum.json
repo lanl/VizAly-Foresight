@@ -1,5 +1,5 @@
 {
-    "project-home" : "/projects/exasky/run/vpic_wflow",
+    "project-home" : "/projects/exasky/run/vpic_wflow_spectrum",
     "foresight-home" : "/projects/exasky/cmbiwer-projects/foresight",
     "wflow-path" : "",
 
@@ -56,7 +56,7 @@
         "path" : "mpirun $foresight-home$/build/CBench",
         "output" :
         {
-            "run-path" : "/projects/exasky/run/vpic_wflow",
+            "run-path" : "/projects/exasky/run/vpic_wflow_spectrum",
             "output-decompressed" : true,
             "output-decompressed-location" : "decompressed_files",
             "log-file" : "runlog",
@@ -99,9 +99,27 @@
         {
             "analytics" :
             {
-                "spectrum" :
+                "fft" :
                 {
-                    "path" : "python /home/cmbiwer/projects/vpic/vpic_spectrum",
+                    "path" : "python /home/cmbiwer/projects/vpic/vpic_spectrum_fft",
+                    "configuration" :
+                    {
+                        "partition" : "general",
+                        "ntasks-per-node" : 1
+                    }
+                },
+                "energy" :
+                {
+                    "path" : "python /home/cmbiwer/projects/vpic/vpic_spectrum_energy",
+                    "configuration" :
+                    {
+                        "partition" : "general",
+                        "ntasks-per-node" : 1
+                    }
+                },
+                "stack" :
+                {
+                    "path" : "python /home/cmbiwer/projects/vpic/vpic_spectrum_stack",
                     "configuration" :
                     {
                         "partition" : "general",
