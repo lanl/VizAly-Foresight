@@ -13,7 +13,7 @@ python3 -m Workflow.test.workflow --input-file inputs/test/test_nyx_darwin.json
 import argparse
 import os
 import sys
-
+ 
 import Workflow.draw.workflow as workflow
 import Workflow.draw.job as j
 import Workflow.draw.utils as utils
@@ -177,8 +177,8 @@ class NYXWorkflow(workflow.Workflow):
 								environment=environment)
 
 		# make dependent on CBench job and add to workflow
-		self.add_job(cinema_job, dependencies="type", filter="plot")
-		#self.add_job(cinema_job)
+		#self.add_job(cinema_job, dependencies="type", filter="plot")
+		self.add_job(cinema_job)
 
 
 

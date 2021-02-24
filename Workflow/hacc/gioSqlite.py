@@ -102,6 +102,9 @@ class GioSqlite3:
 		return resultsList
 
 
+	def getTableInfo(self, tableName):
+		return self.runQueryOutputString("PRAGMA table_info(" + tableName + ")")
+		
 
 	def getNumRanks(self, tableName):
 		query = "SELECT MAX(_rank) FROM " + tableName

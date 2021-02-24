@@ -1,0 +1,160 @@
+/*================================================================================
+This software is open source software available under the BSD-3 license.
+
+Copyright (c) 2017, Los Alamos National Security, LLC.
+All rights reserved.
+
+Authors:
+ - Pascal Grosset
+================================================================================*/
+
+#pragma once
+
+#include <cmath>
+#include <string>
+#include <sstream>
+#include <vector>
+#include "metricInterface.hpp"
+
+
+class ErrorDistribution : public MetricInterface
+{
+	int numRanks;
+	int myRank;
+
+public:
+	ErrorDistribution();
+	~ErrorDistribution();
+
+	void init(MPI_Comm _comm);
+	void execute(void *original, void *approx, size_t n, std::string dataType="float");
+	void close() { }
+
+};
+
+
+inline relativeError::relativeError()
+{
+	myRank = 0;
+	numRanks = 0;
+	metricName = "relative_error";
+}
+
+
+inline relativeError::~relativeError()
+{
+
+}
+
+
+inline void relativeError::init(MPI_Comm _comm)
+{
+	comm = _comm;
+	MPI_Comm_size(comm, &numRanks);
+	MPI_Comm_rank(comm, &myRank);
+}
+
+//
+// Helper function to compute relative error.
+// (tolerance) is used to avoid degenerative state where a near division-by-zero 
+// happens. It is also used to avoid the case where small values have very high
+// relative errors. This may be known as a bounded relative error. Any values
+// lower than this bound will default to absolute error instead.
+template <class T>
+inline T relError(T original, T approx, double tolerance)
+{
+	double absolute_error = std::abs(original - approx);
+	if (std::abs(original) < tolerance)
+	{
+		return absolute_error;
+	}
+
+	return absolute_error / std::abs(original);
+}
+
+
+inline void relativeError::execute(void *original, void *approx, size_t n, std::string dataType) {
+	std::vector<double> rel_err(n);
+
+	double sum_rel_err = 0;
+	for (std::size_t i = 0; i < n; ++i)
+	{
+		// Tolerance set to a value of 1
+		double err;
+		if (dataType == "float")
+			err = relError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i], 1);
+		else if (dataType == "double")
+			err = relError(static_cast<double *>(original)[i], static_cast<double *>(approx)[i], 1);
+
+		rel_err.push_back(err);
+		sum_rel_err += err;
+	}
+	double max_rel_err = *std::max_element(rel_err.begin(), rel_err.end());
+	val = max_rel_err;
+
+	double total_max_rel_err = 0;
+	MPI_Allreduce(&max_rel_err, &total_max_rel_err, 1, MPI_DOUBLE, MPI_MAX, comm);// MPI_COMM_WORLD);
+	total_val = total_max_rel_err;
+
+	debugLog << "-Max Rel Error: " << total_max_rel_err << std::endl;
+
+	// Additional debug metrics, only in run_log
+	// Global total sum of error
+	double glob_sum_rel_err = 0;
+	MPI_Allreduce(&sum_rel_err, &glob_sum_rel_err, 1, MPI_DOUBLE, MPI_SUM, comm);
+
+	// Global number of values
+	size_t global_n = 0;
+	MPI_Allreduce(&n, &global_n, 1, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
+
+	// Compute mean
+	double mean_rel_err = glob_sum_rel_err / global_n;
+	debugLog << " Total Rel Error: " << glob_sum_rel_err << std::endl;
+	debugLog << " Mean Rel Error: " << mean_rel_err << std::endl;
+
+	MPI_Barrier(comm);
+
+
+	auto found  = parameters.find("histogram");
+	if ( found != parameters.end() )
+	{
+		// Compute histogram of values
+		if (total_max_rel_err != 0)
+		{
+			std::vector<float>histogram;
+			size_t numBins = 1024;
+			std::vector<size_t> localHistogram(numBins,0);
+			double binSize = total_max_rel_err / numBins;
+
+			for (std::size_t i = 0; i < n; ++i)
+			{
+				// Max set tolerence to 1
+				double err= relError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i], 1);
+				int binPos = err/binSize;
+
+				if (binPos >= numBins)
+					binPos = binPos-1;
+
+				localHistogram[binPos]++;
+			}
+
+			histogram.resize(numBins);
+
+			std::vector<size_t> globalHistogram(numBins,0);
+			MPI_Allreduce(&localHistogram[0], &globalHistogram[0], numBins, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
+
+			for (std::size_t i=0; i<numBins; ++i)
+				histogram[i] = ((float)globalHistogram[i])/global_n;
+
+
+			// Output histogram as a python script file
+			if (myRank == 0)
+				additionalOutput = python_histogram(numBins,0.0, total_max_rel_err, histogram);
+		}
+	}
+
+
+	return;
+}
+
+#endif

@@ -1,0 +1,215 @@
+{
+	"project-home": "/usr/projects/ml_compression/VizAly-Foresight-CBench/build/runs/",
+	"wflow-path": "test-ml-turbulence-run1",
+	"foresight-home": "/projects/exasky/pascal-projects/VizAly-Foresight/",
+
+	"input": 
+	{
+		"filetype": "RAW",
+
+		"timesteps": [0, 50],
+		"filename": "/usr/projects/ml_compression/data/convesion1/turbulence_ts_%.info",
+
+		"scalars": ["vx", "vy", "vz"],
+		"uncompressed": ["one", "two"]
+	},
+
+
+	"data-reduction": 
+	{
+		"cbench-pre-process": 
+		[
+			{
+				"path": "python /projects/exasky/pascal-projects/VizAly-Foresight/Workflow/cfdns/dataConversion/hdf5_to_raw.py",
+				"evn_path": "/projects/exasky/pascal-projects/VizAly-Foresight/scripts/VizAly-CBench.bash.darwin",
+				"exec-dir": "cbench_preprocess",
+				"params": [
+					"/usr/projects/ml_compression/data/original/scalarHIT_fields100.h5",
+					"one",
+					"two",
+					"vx",
+					"vy",
+					"vz",
+					"0",
+					"50",
+					"/usr/projects/ml_compression/data/convesion1/"
+				],
+		
+				"configuration": 
+				{
+					"nodes": 1,
+					"ntasks-per-node": 8,
+					"partition": "galton"
+				}
+			}
+		],
+	
+		"cbench-post-process": 
+		[
+			{
+				"path": "python /projects/exasky/pascal-projects/VizAly-Foresight/Workflow/cfdns/dataConversion/raw_to_hdf5.py",
+				"evn_path": "/projects/exasky/pascal-projects/VizAly-Foresight/scripts/VizAly-CBench.bash.darwin",
+				"exec-dir": "cbench_postprocess",
+				"params": [
+					"128",
+					"128",
+					"128",
+					"/usr/projects/ml_compression/VizAly-Foresight-CBench/build/runs/test-ml-turbulence-run1/reduction/cbench/decompressed_files/",
+					"0",
+					"50",
+					"one",
+					"two",
+					"vx",
+					"vy",
+					"vz",
+					"['BLOSC_','zfp_rel_2_','zfp_rate_0.2_','SZ_rel_0.6_','SZ_rel_0.7_']"
+				],
+	
+				"configuration": 
+				{
+					"nodes": 1,
+					"ntasks-per-node": 4,
+					"partition": "galton"
+				}
+			}
+		],
+
+
+		"cbench-compressors": 
+		[
+			{
+				"name": "BLOSC",
+				"output-prefix": "BLOSC_"
+			},
+
+			{
+				"name": "zfp",
+				"rel" : 2,
+				"output-prefix" : "zfp_rel_2_"
+			},
+
+			{
+				"name": "zfp",
+				"rate" : 0.2,
+				"output-prefix" : "zfp_rate_0.2_"
+			},
+
+			{
+				"name": "SZ",
+				"rel" : 0.6,
+				"output-prefix" : "SZ_rel_0.6_"
+			},
+
+			{
+				"name": "SZ",
+				"rel" : 0.7,
+				"output-prefix" : "SZ_rel_0.7_"
+			}
+		],
+
+		"cbench-output": 
+		{
+			"run-path": "mpirun $foresight-home$build/CBench",
+
+			"output-decompressed": true,
+			"output-decompressed-location": "decompressed_files",
+
+			"log-file": "runlog_",
+			"metrics-file": "metrics"
+		},
+
+		"cbench-metrics": 
+		[
+			{
+				"name": "absolute_error"
+			},
+
+			{
+				"name": "relative_error"
+			},
+
+			{
+				"name": "mse"
+			},
+
+			{
+				"name": "psnr"
+			}
+		],
+
+		"name" : "cbench",
+		"path" : "mpirun $foresight-home$build/CBench",
+		"evn_path": "scripts/VizAly-CBench.bash.darwin",
+		"configuration": {
+			"partition": "galton",
+			"nodes": 8,
+			"ntasks-per-node": 8
+		},
+
+		"output-files": []
+	},
+
+	"analysis": 
+	{
+		"analytics": 
+		[
+			{
+				"name": "ml-comparison",
+				"params": 
+				[
+					"/projects/exasky/pascal-projects/VizAly-Foresight/Workflow/cfdns/turbulence_analytics/debugInference.py",
+					"/usr/projects/ml_compression/data/scalarHIT_fields100.h5",
+					"['/usr/projects/ml_compression/autoencoderCompressionDataSC/CAEdata.h5']",
+					"['CAEdata_']"
+				],
+				"path": "python /projects/exasky/pascal-projects/VizAly-Foresight/Workflow/cfdns/turbulence_analytics/runInference.py",
+				"evn_path": "scripts/VizAly-CBench.bash.darwin-autoencoder",
+				"configuration": 
+				{
+					"nodes": 1,
+					"partition" : "volta-x86",
+					"ntasks-per-node" : 1
+				}
+			}
+		],
+		
+		"output-files": []
+	},
+
+	"visualize" :
+	{
+		"plots" :
+		[
+			{
+				"name": "ml-comparison-plot",
+				"params": [
+					"/projects/exasky/pascal-projects/VizAly-Foresight/Workflow/cfdns/turbulence_analytics/plot_all.py",
+					"['/usr/projects/ml_compression/VizAly-Foresight-CBench/build/runs/test-ml-turbulence-run1/analysis/ml-comparison/CAEdata_']",
+					"['CAEdata_']",
+					"plots"
+				],
+				"path": "python /projects/exasky/pascal-projects/VizAly-Foresight/Workflow/cfdns/turbulence_analytics/runPlot.py",
+				"evn_path": "scripts/VizAly-CBench.bash.darwin-autoencoder",
+				"configuration": 
+				{
+					"nodes": 1,
+					"partition": "general"
+				}
+			}
+		],
+
+		"cinema" : 
+		{
+			"name" : "ml_cinema",
+			"path" : "python -m $foresight-home$/Workflow/test/cinema.py",
+			"params" : ["/projects/exasky/pascal-projects/VizAly-Foresight/inputs/cfdns/ml_turbulence.json"],
+			"evn_path": "scripts/VizAly-CBench.bash.darwin",
+			"configuration": 
+			{
+				"partition": "general",
+				"nodes": 1,
+				"ntasks-per-node": 1
+			}
+		}
+	}
+}

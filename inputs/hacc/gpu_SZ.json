@@ -1,0 +1,333 @@
+{
+	"foresight-home": "/projects/exasky/pascal-projects/VizAly-Foresight/",
+	"wflow-path": "SZ",
+	"project-home": "/projects/groups/vizproject/dssdata/foresight-data/gpu_analysis/",
+
+
+
+	"input": 
+	{
+		"metrics-csv": "/projects/exasky/pascal-projects/VizAly-Foresight/build/metrics_sz.csv",
+
+		"filetype": "HACC",
+		"filename": "/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP499/m000.full.mpicosmo.499",
+		"scalars": ["x", "y", "z", "vx", "vy", "vz"]
+	},
+
+	"compressors": 
+	[
+		{
+			"name": "SZ",
+			"output-prefix": "sz_0005_0025",
+			"compressor-params": [{
+					"scalar": ["x", "y", "z"],
+					"abs": 0.005
+				},
+				{
+					"scalar": ["vx", "vy", "vz"],
+					"abs": 0.025
+				}
+			]
+		},
+		{
+			"name": "SZ",
+			"output-prefix": "sz_0004_002",
+			"compressor-params": [{
+					"scalar": ["x", "y", "z"],
+					"abs": 0.004
+				},
+				{
+					"scalar": ["vx", "vy", "vz"],
+					"abs": 0.02
+				}
+			]
+		},
+		{
+			"name": "SZ",
+			"output-prefix": "sz_0003_0015",
+			"compressor-params": [{
+					"scalar": ["x", "y", "z"],
+					"abs": 0.003
+				},
+				{
+					"scalar": ["vx", "vy", "vz"],
+					"abs": 0.015
+				}
+			]
+		},
+		{
+			"name": "SZ",
+			"output-prefix": "sz_0002_001",
+			"compressor-params": [{
+					"scalar": ["x", "y", "z"],
+					"abs": 0.002
+				},
+				{
+					"scalar": ["vx", "vy", "vz"],
+					"abs": 0.01
+				}
+			]
+		},
+		{
+			"name": "SZ",
+			"output-prefix": "sz_00015_0008",
+			"compressor-params": [{
+					"scalar": ["x", "y", "z"],
+					"abs": 0.0015
+				},
+				{
+					"scalar": ["vx", "vy", "vz"],
+					"abs": 0.008
+				}
+			]
+		},
+		{
+			"name": "SZ",
+			"output-prefix": "sz_0001_0005",
+			"compressor-params": [{
+					"scalar": ["x", "y", "z"],
+					"abs": 0.001
+				},
+				{
+					"scalar": ["vx", "vy", "vz"],
+					"abs": 0.005
+				}
+			]
+		},
+		{
+			"name": "SZ",
+			"output-prefix": "sz_00005_0003",
+			"compressor-params": [{
+					"scalar": ["x", "y", "z"],
+					"abs": 0.0005
+				},
+				{
+					"scalar": ["vx", "vy", "vz"],
+					"abs": 0.003
+				}
+			]
+		},
+		{
+			"name": "SZ",
+			"output-prefix": "sz_00001_00005",
+			"compressor-params": [{
+					"scalar": ["x", "y", "z"],
+					"abs": 0.0001
+				},
+				{
+					"scalar": ["vx", "vy", "vz"],
+					"abs": 0.0005
+				}
+			]
+		},
+		{
+			"name": "SZ",
+			"output-prefix": "sz_0.02_0.01",
+			"compressor-params": [{
+					"scalar": ["x", "y", "z"],
+					"abs": 0.02
+				},
+				{
+					"scalar": ["vx", "vy", "vz"],
+					"abs": 0.01
+				}
+			]
+		}
+	],
+
+
+	"cbench": 
+	{
+		"path": "mpirun $foresight-home$/build/CBench",
+
+		"output": 
+		{
+			"run-path": "/projects/exasky/run/hacc_wflow_test_1",
+			"output-decompressed": true,
+			"output-decompressed-location": "decompressed_files",
+			"log-file": "runlog",
+			"metrics-file": "metrics"
+		},
+
+		"metrics": 
+		[
+			{
+				"name": "absolute_error",
+				"histogram": ["x", "y", "z"]
+			},
+			{
+				"name": "relative_error"
+			},
+			{
+				"name": "mse"
+			},
+			{
+				"name": "psnr"
+			}
+		],
+
+		"configuration": 
+		{
+			"partition": "scaling",
+			"nodes": 8,
+			"ntasks-per-node": 8
+		}
+	},
+
+
+	"pat": 
+	{
+		"evn_path": "/projects/exasky/HACC_GPU.darwin_setup",
+		"analysis-folder": "HACC_Test_",
+		"analysis-tool": 
+		{
+			"HACC-home": "/projects/exasky/HACC_GPU",
+			"analytics": 
+			{
+				"halo": 
+				{
+					"path": "/projects/opt/centos7/openmpi/2.1.3-gcc_6.4.0/bin/mpirun /projects/exasky/HACC_GPU/trunk/Darwin_GPU/mpi/bin/cosmotools-driver",
+					"config-file": "/projects/exasky/HACC_GPU/run/haloInputs/cosmotools-config.dat",
+					"timesteps-file": "/projects/exasky/HACC_GPU/run/haloInputs/timesteps.dat",
+					"parameters-file": "/projects/exasky/HACC_GPU/run/haloInputs/indat.params",
+					"configuration": {
+						"partition": "general",
+						"nodes": 8,
+						"ntasks-per-node": 1,
+						"constraint": "gpu1_model:Tesla_K40m"
+					}
+				},
+
+				"halo_query": 
+				{
+					"path": "source /projects/exasky/VizAly-Foresight/scripts/VizAly-CBench.bash.darwin; python /projects/exasky/VizAly-Foresight/Analysis/hacc/pat_hacc_query.py",
+					"sqlite-file": "/projects/exasky/VizAly-Vis_IO/genericio/frontend/GenericIOSQLite.so",
+					"query": [
+						"select fof_halo_mass from __TABLE__"
+					],
+					"xlabel": [
+						"Halo Mass"
+					],
+					"ylabel": [
+						"Counts"
+					],
+					"xlim": [
+						[1e10, 1e15]
+					],
+					"log-bins": [
+						true
+					],
+					"configuration": {
+						"partition": "scaling",
+						"nodes": 1
+					}
+				},
+
+				"spectrum": 
+				{
+					"path": "/projects/opt/centos7/openmpi/2.1.3-gcc_6.4.0/bin/mpirun /projects/exasky/HACC/trunk/Darwin/mpi/bin/hacc_pk_gio_auto_rsd",
+					"config-file": "/projects/exasky/HACC/run/inputs/indat.params",
+					"configuration": 
+					{
+						"partition": "scaling",
+						"nodes": 16,
+						"ntasks-per-node": 16
+					}
+				}
+			}
+		},
+
+		"input-files": 
+		[
+			{
+				"output-prefix": "orig",
+				"path": "/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP499/m000.full.mpicosmo.499"
+			},
+			{
+				"output-prefix": "sz_0001_0005_",
+				"path": "/projects/groups/vizproject/dssdata/cosmo/alabama_gpu_cosmo/SZ/sz_00001_00005__m000.full.mpicosmo.499"
+			},
+			{
+				"output-prefix": "sz_00005_0003_",
+				"path": "/projects/groups/vizproject/dssdata/cosmo/alabama_gpu_cosmo/SZ/sz_00005_0003__m000.full.mpicosmo.499"
+			},
+			{
+				"output-prefix": "sz_0001_0005_",
+				"path": "/projects/groups/vizproject/dssdata/cosmo/alabama_gpu_cosmo/SZ/sz_0001_0005__m000.full.mpicosmo.499"
+			},
+			{
+				"output-prefix": "sz_00015_0008_",
+				"path": "/projects/groups/vizproject/dssdata/cosmo/alabama_gpu_cosmo/SZ/sz_00015_0008__m000.full.mpicosmo.499"
+			},
+			{
+				"output-prefix": "sz_0002_001_",
+				"path": "/projects/groups/vizproject/dssdata/cosmo/alabama_gpu_cosmo/SZ/sz_0002_001__m000.full.mpicosmo.499"
+			},
+			{
+				"output-prefix": "sz_0003_0015_",
+				"path": "/projects/groups/vizproject/dssdata/cosmo/alabama_gpu_cosmo/SZ/sz_0003_0015__m000.full.mpicosmo.499"
+			},
+			{
+				"output-prefix": "sz_0004_002_",
+				"path": "/projects/groups/vizproject/dssdata/cosmo/alabama_gpu_cosmo/SZ/sz_0004_002__m000.full.mpicosmo.499"
+			},
+			{
+				"output-prefix": "sz_0005_0025_",
+				"path": "/projects/groups/vizproject/dssdata/cosmo/alabama_gpu_cosmo/SZ/sz_0005_0025__m000.full.mpicosmo.499"
+			},
+			{
+				"output-prefix": "sz_0.02_0.01_",
+				"path": "/projects/groups/vizproject/dssdata/cosmo/alabama_gpu_cosmo/SZ/sz_0.02_0.01__m000.full.mpicosmo.499"
+			}
+
+		],
+
+		"analysis": []
+	},
+
+
+	"cinema-plots": 
+	{
+		"path": "source /projects/exasky/VizAly-Foresight/scripts/VizAly-CBench.bash.darwin; python /projects/exasky/VizAly-Foresight/Analysis/hacc/pat_cinema.py",
+		"evn_path": "scripts/VizAly-CBench.bash.cori_analysis",
+		"analysis": 
+		{
+			"FILE_Halo_Distribution_0": {
+				"xscale": "log",
+				"ylim": [0.95, 1.05],
+				"xlabel": "Halo Mass",
+				"ylabel": "Ratio [Compressed/Uncompressed]"
+			},
+			"FILE_Spectrum": {
+				"xlim": [0, 10],
+				"ylim": [0.98, 1.01],
+				"xlabel": "k",
+				"ylabel": "Ratio [Compressed/Uncompressed]"
+			},
+			"FILE_Spectrum.rsd.0": {
+				"xlim": [0, 10],
+				"ylim": [0.98, 1.01],
+				"xlabel": "k",
+				"ylabel": "Ratio [Compressed/Uncompressed]"
+			},
+			"FILE_Spectrum.rsd.1": {
+				"xlim": [0, 10],
+				"ylim": [0.98, 1.01],
+				"xlabel": "k",
+				"ylabel": "Ratio [Compressed/Uncompressed]"
+			},
+			"FILE_Spectrum.rsd.2": {
+				"xlim": [0, 10],
+				"ylim": [0.98, 1.01],
+				"xlabel": "k",
+				"ylabel": "Ratio [Compressed/Uncompressed]"
+			}
+		},
+
+		"configuration": 
+		{
+			"partition": "general",
+			"nodes": 1
+		}
+	}
+}

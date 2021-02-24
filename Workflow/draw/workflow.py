@@ -66,6 +66,7 @@ class Workflow(object):
 			utils.append_list_as_row(filename, mylist)
 
 
+
 	def fill_cbench_output_files(self):
 		""" Fill in  ["data-reduction"]["output-files"]
 		"""
@@ -73,23 +74,58 @@ class Workflow(object):
 
 		## Remove all entries if any - useful for rerunning an existing workflow
 		self.json_data['data-reduction']['output-files'].clear()
+  
+  
+		# Number of timesteps
+		numTimesteps = 1
+		if "filename-timesteps" in self.json_data["input"]:
+			numTimesteps = len(self.json_data["input"]["filename-timesteps"])
 
-		# Add the original
-		orig_path_filename = utils.splitString(self.json_data['input']['filename'],'/')
-		orig_item = {
-			"output-prefix" : "orig",
-			"path" : self.json_data['input']['filename']
-		}
-		self.json_data['data-reduction']['output-files'].append(orig_item)
-
-		# Add decompressed ones
-		for _file in self.json_data['data-reduction']['cbench-compressors']:
-			json_item = {
-				"output-prefix" : _file["output-prefix"],
-				"path" : base_path + "/reduction/cbench/" + self.json_data['data-reduction']['cbench-output']['output-decompressed-location'] + "/" + _file['output-prefix'] + "__" + orig_path_filename[1]
+  
+		if numTimesteps == 1:
+			# Add the original
+			orig_path_filename = utils.splitString(self.json_data['input']['filename'],'/')
+			orig_item = {
+				"output-prefix" : "orig",
+				"path" : self.json_data['input']['filename']
 			}
+			self.json_data['data-reduction']['output-files'].append(orig_item)
 
-			self.json_data['data-reduction']['output-files'].append(json_item)
+			# Add decompressed ones
+			for _file in self.json_data['data-reduction']['cbench-compressors']:
+				json_item = {
+					"output-prefix" : _file["output-prefix"],
+					"path" : base_path + "/reduction/cbench/" + self.json_data['data-reduction']['cbench-output']['output-decompressed-location'] + "/" + _file['output-prefix'] + "__" + orig_path_filename[1]
+				}
+
+				self.json_data['data-reduction']['output-files'].append(json_item)
+		else:
+			timestepFiles = []
+			for t in range(numTimesteps):
+				currentTimestep = []
+				# Add the original
+				orig_path_filename = utils.splitString(self.json_data['input']['filename-timesteps'][t],'/')
+				orig_item = {
+					"output-prefix" : "orig",
+					"path" : self.json_data['input']['filename-timesteps'][t]
+				}
+				currentTimestep.append(orig_item)
+				#self.json_data['data-reduction']['output-files'].append(orig_item)
+
+				# Add decompressed ones
+				for _file in self.json_data['data-reduction']['cbench-compressors']:
+					json_item = {
+						"output-prefix" : _file["output-prefix"],
+						"path" : base_path + "/reduction/cbench/" + self.json_data['data-reduction']['cbench-output']['output-decompressed-location'] + "/" + _file['output-prefix'] + "__" + orig_path_filename[1]
+					}
+					currentTimestep.append(json_item)
+					#self.json_data['data-reduction']['output-files'].append(json_item)
+
+				#timestepFiles.append(currentTimestep)
+				self.json_data['data-reduction']['output-files'].append(currentTimestep)
+
+			#self.json_data['data-reduction']['output-files'].append(timestepFiles)
+
 
 
 	def add_cinema_job(self):
@@ -98,17 +134,9 @@ class Workflow(object):
   
 		# Set up environment
 		execute_dir = "cinema_db"
-
-		if "configuration" in self.json_data["visualize"]["cinema"].keys():
-			configurations = list(sum(self.json_data["visualize"]["cinema"]["configuration"].items(), ()))
-		else:
-			configurations = None
-
-		if "evn_path" in self.json_data["visualize"]["cinema"]:
-			environment =  self.json_data["foresight-home"] + self.json_data["visualize"]["cinema"]["evn_path"]
-		else:
-			environment = None
-
+  
+		configurations = get_configuration(self.json_data["visualize"]["cinema"])
+		environment = get_environment(self.json_data["visualize"]["cinema"], self.json_data["foresight-home"])
    
 		params = utils.get_list_from_json_array(analysis, "params")
    
@@ -137,7 +165,9 @@ class Workflow(object):
 			configurations = None
 
 		if "evn_path" in self.json_data["data-reduction"]:
-			environment =  self.json_data["foresight-home"] + self.json_data["data-reduction"]["evn_path"]
+			environment = self.json_data["visualize"]["cinema"]["evn_path"]
+			if environment[0] != '/':
+				environment =  self.json_data["foresight-home"] + environment
 		else:
 			environment = None
 
@@ -158,6 +188,13 @@ class Workflow(object):
   
 		# Fill output files for cbench
 		self.fill_cbench_output_files()
+  
+		#numTimesteps = 1
+		#if "filename-timesteps" in self.json_data["input"]:
+		#	numTimesteps = len(self.json_data["input"]["filename-timesteps"])
+
+		#for i in range(numTimesteps):
+		#	self.fill_cbench_output_files(i)
 
 
 

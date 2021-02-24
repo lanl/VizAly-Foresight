@@ -1,10 +1,15 @@
 #! /usr/bin/env python
 """ Writes the distribution of halos from an SQL query.
 """
+
+"""
+python3 /projects/exasky/pascal-projects/VizAly-Foresight/Workflow/hacc/hacc_query.py --input-file /projects/exasky/pascal-projects/VizAly-Foresight/runs/test-hacc-vel-2/analysis/halo/m001-499.haloproperties --output-file /projects/exasky/pascal-projects/VizAly-Foresight/halo_query_file.csv --sqlite-file /projects/exasky/pascal-projects/genericio/frontend/GenericIOSQLite.so --query "select fof_halo_mass from __TABLE__ ORDER BY fof_halo_mass" --xlabel "Halo Mass" --ylabel "Counts" --xlim 10000000000.0 1000000000000000.0 --log-bins
+"""
 import sys
 import argparse
 import numpy
-from pat.utils import gioSqlite as gio_sqlite
+sys.path.append("/projects/exasky/pascal-projects/VizAly-Foresight/Workflow/hacc")
+import gioSqlite as gio_sqlite
 
 
 def load_sqlite_data(path, query, sqlite_file):
@@ -32,11 +37,40 @@ def load_sqlite_data(path, query, sqlite_file):
     return result
 
 
+def create_histogram(data, log_bins, bins, xlabel, ylabel, output_file):
+    """ Create a istogram from the sqlite data """
+    # update ranges
+    x_min = min(x_min, data.min()) if not len(opts.xlim) > 0 else opts.xlim[0]
+    x_max = max(x_max, data.max()) if not len(opts.xlim) > 1 else opts.xlim[1]
+
+    # set binning and range of histograms
+    # can do uniform in linear space or logarithmic space
+    if opts.log_bins:
+        bins = numpy.logspace(numpy.log10(x_min), numpy.log10(x_max), num=opts.bins)
+        bins_range = None
+    else:
+        bins = opts.bins
+        bins_range = (x_min, x_max)
+
+    # create histogram
+    hist, bin_edges = numpy.histogram(data, bins=bins, range=bins_range)
+    hist = numpy.hstack([(0), numpy.repeat(hist, 2), (0)])
+    bin_edges = numpy.hstack([(bin_edges[0], bin_edges[0]),
+                            numpy.repeat(bin_edges[1:-1], 2),
+                            (bin_edges[-1], bin_edges[-1])])
+
+    # save results
+    delimiter = ","
+    results = numpy.column_stack([bin_edges, hist])
+    header = delimiter.join(map(str, [opts.xlabel, opts.ylabel]))
+    numpy.savetxt(output_file, results, header=header, delimiter=delimiter)
+
+
 # parse command line
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--input-file", required=True)
 parser.add_argument("--output-file", required=True)
-parser.add_argument("--sqlite-file", default="/projects/exasky/visio/genericio/frontend/GenericIOSQLite.so")
+parser.add_argument("--sqlite-file", default="/projects/exasky/pascal-projects/genericio/frontend/GenericIOSQLite.so")
 parser.add_argument("--query", default="select fof_halo_mass from __TABLE__ ORDER BY fof_halo_mass")
 parser.add_argument("--xlabel", default="Halo Mass")
 parser.add_argument("--ylabel", default="Counts")
@@ -48,6 +82,9 @@ opts = parser.parse_args()
 # read data
 data = numpy.array(load_sqlite_data(opts.input_file, opts.query, opts.sqlite_file))
 
+create_histogram(data, opts.log_bins, opts.bins, opts.xlabel, opts.ylabel, opts.output_file)
+
+"""
 # update ranges
 x_min = min(x_min, data.min()) if not len(opts.xlim) > 0 else opts.xlim[0]
 x_max = max(x_max, data.max()) if not len(opts.xlim) > 1 else opts.xlim[1]
@@ -73,5 +110,5 @@ delimiter = ","
 results = numpy.column_stack([bin_edges, hist])
 header = delimiter.join(map(str, [opts.xlabel, opts.ylabel]))
 numpy.savetxt(opts.output_file, results, header=header, delimiter=delimiter)
-
+"""
 print("Done!")

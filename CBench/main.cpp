@@ -101,7 +101,6 @@ int main(int argc, char *argv[])
 	// write out decompressed files + output name
 	bool writeData = false;
 	std::string outputFilename = "";
-	if (numTimesteps == 1)
 	if (jsonInput["data-reduction"]["cbench-output"].contains("output-decompressed"))
 	{
 		writeData = jsonInput["data-reduction"]["cbench-output"]["output-decompressed"];

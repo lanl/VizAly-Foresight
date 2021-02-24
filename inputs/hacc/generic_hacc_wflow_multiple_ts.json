@@ -1,16 +1,16 @@
 {
-	"project-home" : "/projects/groups/vizproject/cosmo/",
+	"project-home" : "/projects/groups/vizproject/ExaSky/runs/",
 	"foresight-home" : "/projects/exasky/pascal-projects/VizAly-Foresight/",
-	"wflow-path" : "hacc_wflow_test_2",
+	"wflow-path" : "hacc_wflow_test_7",
+	"example" : "/projects/groups/vizproject/dssdata/Exasky/Exa/",
 
 	"input" :
 	{
 		"filetype" : "HACC",
-		"filename-timesteps" : 
+		"filename" : "/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP499/m000.full.mpicosmo.499",
+
+		"filename-timesteps-test" : 
 		[ 
-			"/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP442/m000.full.mpicosmo.442",
-			"/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP464/m000.full.mpicosmo.464",
-			"/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP475/m000.full.mpicosmo.475",
 			"/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP487/m000.full.mpicosmo.487",
 			"/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP499/m000.full.mpicosmo.499"
 		],
@@ -27,6 +27,7 @@
 				"name" : "BLOSC",
 				"output-prefix" : "blosc"
 			},
+
 			{
 				"name" : "SZ",
 				"output-prefix" : "sz",
@@ -42,18 +43,7 @@
 					}
 				]
 			},
-			{
-				"name" : "Isabela",
-				"output-prefix" : "isabela",
-				"tolerance" : 27,
-				"nCoeff" : 30,
-				"window-size" : 2048
-			},
-			{
-				"name" : "fpzip",
-				"output-prefix" : "fpzip",
-				"bits" : 27
-			},
+
 			{
 				"name" : "zfp",
 				"output-prefix" : "zfp",
@@ -103,8 +93,13 @@
 			"ntasks-per-node": 8
 		},
 		
-		"output-files": []
+		"output-files": [
+			{
+
+			}
+		]
 	},
+
 
 
 	"analysis" : 
@@ -116,11 +111,12 @@
 				"path" : "mpirun /projects/exasky/HACC_GPU/trunk/Darwin_GPU/mpi/bin/cosmotools-driver",
 				"params" :
 				[
-					"/projects/exasky/HACC_GPU/run/haloInputs/cosmotools-config.dat",
-					"/projects/exasky/HACC_GPU/run/haloInputs/timesteps.dat",
-					"/projects/exasky/HACC_GPU/run/haloInputs/indat.params"
+					"--config /projects/exasky/HACC_GPU/run/haloInputs/cosmotools-config.dat",
+					"--timesteps /projects/exasky/HACC_GPU/run/haloInputs/timesteps.dat",
+					"--prefix /projects/exasky/HACC_GPU/run/haloInputs/indat.params"
 				],
 				"evn_path" : "/projects/exasky/HACC_GPU.darwin_setup",
+				"command" : "",
 				"configuration" :
 				{
 					"partition" : "shared-gpu",
@@ -132,7 +128,7 @@
 
 			{
 				"name" : "halo_query",
-				"path": "python3 -m pat.hacc.hacc_query",
+				"path": "python3 -m Workflow.hacc.hacc_query",
 				"params" :
 				[
 					"--input-file halo_file",
@@ -141,7 +137,6 @@
 					"--query select fof_halo_mass from __TABLE__",
 					"--xlabel Halo Mass",
 					"--ylabel Counts",
-					"--xlim [1e10, 1e15]",
 					"--log-bins true"
 				],
 				"evn_path" : "/projects/exasky/HACC_GPU.darwin_setup",

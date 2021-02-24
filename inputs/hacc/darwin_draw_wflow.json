@@ -1,0 +1,327 @@
+{
+	"foresight-home": "/projects/exasky/pascal-projects/VizAly-Foresight/",
+	"project-home": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/",
+	"wflow-path": "test-hacc-vel-5",
+    
+    
+	"input": 
+	{
+		"filetype": "HACC",
+		"filename": "/projects/groups/vizproject/dssdata/cosmo/Argonne_L360_HACC001/STEP499/m000.full.mpicosmo.499",
+
+		"scalars": ["x", "y", "z", "vx", "vy", "vz"]	
+	},
+
+
+    "data-reduction": 
+	{
+        "cbench-compressors" : 
+        [
+            {
+                "name": "BLOSC",
+                "output-prefix" : "BLOSC_"
+            },
+
+            {
+                "name": "fpzip",
+                "bits" : 24,
+                "output-prefix" : "fpzip_24_"
+            },
+
+            {
+                "name": "SZ",
+                "output-prefix" : "sz_abs_.01_",
+                "abs" : 1E-2
+            },
+
+            {
+                "name": "zfp",
+                "output-prefix" : "zfp_abs_.01_",
+                "abs" : 1E-2
+            }
+        ],
+
+
+        "cbench-output": 
+		{
+			"run-path": "mpirun $foresight-home$build/CBench",
+
+			"output-decompressed": true,
+			"output-decompressed-location": "decompressed_files",
+
+			"log-file": "runlog_",
+			"metrics-file": "metrics"
+        },
+        
+        "cbench-metrics": 
+		[
+			{
+				"name": "absolute_error"
+			},
+
+			{
+				"name": "relative_error"
+			},
+
+			{
+				"name": "mse"
+			},
+
+			{
+				"name": "psnr"
+			}
+		],
+
+		"name" : "cbench",
+		"path" : "mpirun $foresight-home$build/CBench",
+		"evn_path": "scripts/VizAly-CBench.bash.darwin",
+		"configuration": {
+			"partition": "galton",
+			"nodes": 8,
+			"ntasks-per-node": 8
+		},
+
+        "output-files": []
+    },
+	
+	"analysis": 
+	{
+		"analytics" :
+		[
+			{
+				"name" : "halo",
+				"path" : "mpirun /projects/exasky/HACC/trunk/darwin.gpu.cuda/mpi/bin/cosmotools-driver",
+				"params" :
+				[
+					"--config /projects/exasky/pascal-projects/VizAly-Foresight/inputs/hacc/halo_inputs/cosmotools-config.dat",
+					"--timesteps /projects/exasky/pascal-projects/VizAly-Foresight/inputs/hacc/halo_inputs/timesteps.dat",
+					"--prefix $path$",
+					"/projects/exasky/pascal-projects/VizAly-Foresight/inputs/hacc/halo_inputs/indat.params"
+				],
+				"evn_path" : "/projects/exasky/HACC/trunk/env/bashrc.darwin.cuda",
+				"configuration" :
+				{
+					"partition" : "shared-gpu",
+					"nodes" : 8,
+					"ntasks-per-node" : 1
+				},
+				"dependency-type" : "single",
+				"dependency-name" : "cbench"
+			},
+			
+			
+			{
+				"name" : "halo_query_mass",
+				"path": "python3 $foresight-home$Workflow/hacc/hacc_query.py",
+				"params" :
+				[
+					"--input-file $project-home$/$wflow-path$/analysis/halo/$output-prefix$-499.haloproperties",
+					"--output-file $output-prefix$.csv",
+					"--sqlite-file /projects/exasky/pascal-projects/genericio/frontend/GenericIOSQLite.so",
+					"--query \"select fof_halo_mass from __TABLE__\" ",
+					"--xlabel \"Halo Mass\"",
+					"--ylabel \"Counts\"",
+					"--xlim 10000000000.0 1000000000000000.0",
+					"--log-bins"
+				],
+				"evn_path" : "/projects/exasky/pascal-projects/VizAly-Foresight/scripts/VizAly-CBench.bash.darwin",
+				"configuration" :
+				{
+					"partition" : "galton",
+					"nodes" : 1
+				},
+				"dependency-type" : "single",
+				"dependency-name" : "halo"
+			},
+
+			{
+				"name" : "halo_query_count",
+				"path": "python3 $foresight-home$Workflow/hacc/hacc_query.py",
+				"params" :
+				[
+					"--input-file $project-home$/$wflow-path$/analysis/halo/$output-prefix$-499.haloproperties",
+					"--output-file $output-prefix$.csv",
+					"--sqlite-file /projects/exasky/pascal-projects/genericio/frontend/GenericIOSQLite.so",
+					"--query \"select fof_halo_count from __TABLE__\" ",
+					"--xlabel \"Halo Count\"",
+					"--ylabel \"Counts\"",
+					"--xlim 10000000000.0 1000000000000000.0",
+					"--log-bins"
+				],
+				"evn_path" : "/projects/exasky/pascal-projects/VizAly-Foresight/scripts/VizAly-CBench.bash.darwin",
+				"configuration" :
+				{
+					"partition" : "galton",
+					"nodes" : 1
+				},
+				"dependency-type" : "single",
+				"dependency-name" : "halo"
+			},
+
+			{
+				"name" : "halo_query_angmom_x",
+				"path": "python3 $foresight-home$Workflow/hacc/hacc_query.py",
+				"params" :
+				[
+					"--input-file $project-home$/$wflow-path$/analysis/halo/$output-prefix$-499.haloproperties",
+					"--output-file $output-prefix$.csv",
+					"--sqlite-file /projects/exasky/pascal-projects/genericio/frontend/GenericIOSQLite.so",
+					"--query \"select fof_halo_angmom_x from __TABLE__\" ",
+					"--xlabel \"Angular momentum x\"",
+					"--ylabel \"Counts\"",
+					"--xlim 10000000000.0 1000000000000000.0",
+					"--log-bins"
+				],
+				"evn_path" : "/projects/exasky/pascal-projects/VizAly-Foresight/scripts/VizAly-CBench.bash.darwin",
+				"configuration" :
+				{
+					"partition" : "galton",
+					"nodes" : 1
+				},
+				"dependency-type" : "single",
+				"dependency-name" : "halo"
+			},
+
+			{
+				"name" : "halo_query_angmom_y",
+				"path": "python3 $foresight-home$Workflow/hacc/hacc_query.py",
+				"params" :
+				[
+					"--input-file $project-home$/$wflow-path$/analysis/halo/$output-prefix$-499.haloproperties",
+					"--output-file $output-prefix$.csv",
+					"--sqlite-file /projects/exasky/pascal-projects/genericio/frontend/GenericIOSQLite.so",
+					"--query \"select fof_halo_angmom_y from __TABLE__\" ",
+					"--xlabel \"Angular momentum y\"",
+					"--ylabel \"Counts\"",
+					"--xlim 10000000000.0 1000000000000000.0",
+					"--log-bins"
+				],
+				"evn_path" : "/projects/exasky/pascal-projects/VizAly-Foresight/scripts/VizAly-CBench.bash.darwin",
+				"configuration" :
+				{
+					"partition" : "galton",
+					"nodes" : 1
+				},
+				"dependency-type" : "single",
+				"dependency-name" : "halo"
+			},
+
+			{
+				"name" : "halo_query_angmom_z",
+				"path": "python3 $foresight-home$Workflow/hacc/hacc_query.py",
+				"params" :
+				[
+					"--input-file $project-home$/$wflow-path$/analysis/halo/$output-prefix$-499.haloproperties",
+					"--output-file $output-prefix$.csv",
+					"--sqlite-file /projects/exasky/pascal-projects/genericio/frontend/GenericIOSQLite.so",
+					"--query \"select fof_halo_angmom_z from __TABLE__\" ",
+					"--xlabel \"Angular momentum z\"",
+					"--ylabel \"Counts\"",
+					"--xlim 10000000000.0 1000000000000000.0",
+					"--log-bins"
+				],
+				"evn_path" : "/projects/exasky/pascal-projects/VizAly-Foresight/scripts/VizAly-CBench.bash.darwin",
+				"configuration" :
+				{
+					"partition" : "galton",
+					"nodes" : 1
+				},
+				"dependency-type" : "single",
+				"dependency-name" : "halo"
+			},
+
+
+			{
+				"name" : "spectrum",
+				"path" : "mpirun /projects/exasky/HACC/trunk/darwin.cpu/mpi/bin/hacc_pk_gio_auto_rsd",
+				"params" : 
+				[ 
+					"/projects/exasky/pascal-projects/VizAly-Foresight/inputs/hacc/halo_inputs/indat.params",
+					"-n $path$",
+					"$output-prefix$",
+					"499"
+
+				],
+				"evn_path" : "/projects/exasky/HACC/trunk/env/bashrc.darwin.cpu",
+				"configuration" :
+				{
+					"partition" : "galton",
+					"nodes" : 8,
+					"ntasks-per-node" : 16
+				},
+				"dependency-type" : "single",
+				"dependency-name" : "cbench"
+			}
+		],
+		
+		"output-files": []
+    },
+    
+    "visualize" :
+	{
+		"plots" :
+		[
+            {
+				"name" : "pw_spec",
+				"path" : "python3 $foresight-home$Workflow/draw/create_plot.py",
+				"params" : 
+				[
+					"-f \"data/pw_spec_sz.txt\"",
+					"-x \"k\"",
+					"-y \"p(k)\"",
+					"-n \"Power Spectrum \"",
+					"--seperator $'\t'",
+					"--limit \"x_less\"",
+					"--limit_val 10", 
+					"--axis_type \"log\""
+				],
+				"evn_path" : "/projects/exasky/HACC/trunk/env/bashrc.darwin.cpu",
+				"configuration" :
+				{
+					"partition" : "galton",
+					"nodes" : 1
+				},
+				"dependency-type" : "type",
+				"dependency-name" : "analysis"
+			},
+
+			{
+				"name" : "mass",
+				"path" : "python3 $foresight-home$Workflow/draw/create_plot.py",
+				"params" : 
+				[
+					"-f \"data/pw_spec_sz.txt\"",
+					"-x \"Halo_mass\"",
+					"-y \"count\"",
+					"-n \"Mass Compared\"",
+					"--plot_type \"two\"", 
+					"--y_tuple_labels \"orig\" \"SZ\"",
+					"--axis_type \"log\""
+				],
+				"evn_path" : "/projects/exasky/HACC/trunk/env/bashrc.darwin.cpu",
+				"configuration" :
+				{
+					"partition" : "galton",
+					"nodes" : 1
+				},
+				"dependency-type" : "type",
+				"dependency-name" : "analysis"
+			}
+        ],
+
+        "cinema" :
+        {
+            "name" : "cinema",
+			"path" : "python -m $foresight-home$/Workflow/hacc/cinema.py",
+			"params" : [ ],
+			"evn_path": "scripts/VizAly-CBench.bash.darwin",
+			"configuration": 
+			{
+				"partition": "general",
+				"nodes": 1,
+				"ntasks-per-node": 1
+			}
+        }
+    }
+	
+}

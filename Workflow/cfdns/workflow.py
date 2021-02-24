@@ -26,6 +26,7 @@ class CFDNSWorkflow(workflow.Workflow):
 		for script in self.json_data['data-reduction']['cbench-pre-process']:
 	  
 			# Create configuration
+			"""
 			if "configuration" in script:
 				configurations = list(sum(script["configuration"].items(), ()))
 			else:
@@ -35,6 +36,10 @@ class CFDNSWorkflow(workflow.Workflow):
 				environment =  script["evn_path"]
 			else:
 				environment = None
+			"""
+    
+			configurations = get_configuration( script["configuration"] )
+			environment = get_environment( script["evn_path"], self.json_data["foresight-home"] )
 
    
 			# Create Job
@@ -52,6 +57,7 @@ class CFDNSWorkflow(workflow.Workflow):
 		for script in self.json_data['data-reduction']['cbench-post-process']:
 
 			# Create configuration
+			"""
 			if "configuration" in script:
 				configurations = list(sum(script["configuration"].items(), ()))
 			else:
@@ -61,6 +67,11 @@ class CFDNSWorkflow(workflow.Workflow):
 				environment =  script["evn_path"]
 			else:
 				environment = None
+			"""
+   
+			configurations = get_configuration( script["configuration"] )
+			environment = get_environment( script["evn_path"], self.json_data["foresight-home"] )
+
 
 			print("script['params']:", script['params'])
 
@@ -90,6 +101,7 @@ class CFDNSWorkflow(workflow.Workflow):
 		# create job to run sim_stat and lya
 		for analysis in self.json_data["analysis"]["analytics"]:
 
+			"""
 			if "evn_path" in analysis:
 				environment = self.json_data["foresight-home"] + analysis["evn_path"]
 			else:
@@ -99,6 +111,10 @@ class CFDNSWorkflow(workflow.Workflow):
 				configurations = list( sum( analysis["configuration"].items(), () ) )
 			else:
 				configurations = None
+			"""
+    
+			configurations = get_configuration( analysis["configuration"] )
+			environment = get_environment( analysis["evn_path"], self.json_data["foresight-home"] )
 
 
 			analysis_job = j.Job(name=analysis["name"],
@@ -106,6 +122,7 @@ class CFDNSWorkflow(workflow.Workflow):
 									execute_dir="analysis/" + analysis["name"],
 									executable=analysis["path"], 
 									arguments=analysis['params'],
+									commands=["export PYTHONPATH=$PYTHONPATH:/projects/exasky/pascal-projects/VizAly-Foresight/"],
 									configurations=configurations,
 									environment=environment )
 
@@ -117,6 +134,7 @@ class CFDNSWorkflow(workflow.Workflow):
 		## Create Plots
 		for plot in self.json_data["visualize"]["plots"]:
 
+			"""
 			# sources the modules to be loaded on that cluster
 			if "evn_path" in plot:
 				environment = self.json_data["foresight-home"] + plot["evn_path"]
@@ -129,12 +147,18 @@ class CFDNSWorkflow(workflow.Workflow):
 				configurations = list( sum( plot["configuration"].items(), () ) )
 			else:
 				configurations = None
+			"""
+    
+			configurations = get_configuration( plot["configuration"] )
+			environment = get_environment( plot["evn_path"], self.json_data["foresight-home"] )
+
 
 			plot_job = j.Job(name=plot["name"],
 									job_type = "plot",
 									execute_dir="plot/" + plot["name"],
 									executable=plot["path"], 
 									arguments=plot['params'],
+									commands=["export PYTHONPATH=$PYTHONPATH:/projects/exasky/pascal-projects/VizAly-Foresight/"],
 									configurations=configurations,
 									environment=environment )
 

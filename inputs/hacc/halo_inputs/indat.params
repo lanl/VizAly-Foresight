@@ -1,0 +1,128 @@
+#####################################################################
+# Header version information
+#####################################################################
+HACC_HEADER_VERSION 1.0.0
+#####################################################################
+# Cosmological Parameters
+# Length scales are measured in Mpc/h
+# OMEGA_CDM and OMEGA_NU given for Omega_cdm and Omega_nu (no $h^2$)
+# DEUT=Omegab*h^2
+# HUBBLE: Hubble constant/100 km/s/Mpc
+# SS8: target value for sigma_8
+# NS: index of the primordial power spectrum
+# W_DE: constant dark energy equation of state
+# Currently flat Universe only
+#####################################################################
+OMEGA_CDM 0.259
+DEUT 0.022
+OMEGA_NU 0.0
+HUBBLE 0.676
+SS8 0.817
+NS 0.963
+W_DE -0.92
+WA_DE -0.4
+T_CMB 0.0
+N_EFF_MASSLESS 0.0
+N_EFF_MASSIVE 0.0
+#####################################################################
+# Initializer Set-up and read-ins
+# ZIN: Starting redshift
+# USE_WHITE_NOISE_INIT: YES: real space, NO: k space
+# input type: INIT|RECORD|BLOCK|COSMO|RESTART
+# INIT: generates internal initial conditions, rest if for read-ins
+# distrib. type: ROUND_ROBIN|ALL_TO_ALL|ONE_TO_ONE|restart_step
+#            	(ignored if INPUT_TYPE is INIT)
+# ROUND_ROBIN indicates particles must be looked at by all processors
+# ONE_TO_ONE indicates that particles physically reside on matching processor
+# ALL_TO_ALL improved ROUND_ROBIN
+# For restart: specify time step and modify INPUT_BASE_NAME
+# TRANS: Read in CAMB transfer function file (specify name in INPUT_BASE_NAME)
+#    	or internal TF (KH, HS, PD, BBKS)
+#####################################################################
+Z_IN 200.0
+USE_WHITE_NOISE_INIT YES
+USE_CBRNG YES
+TRANS CMB
+INPUT_BASE_NAME cmbM001.tf
+INPUT_TYPE INIT
+DISTRIBUTE_TYPE LAST
+MAX_MINUTES 120
+###################################################################### 
+# Outputs for initial conditions, alive particles, some analysis and restarts, refreshes
+# WRITE_IC: write initial condition, format will be the same as for all outputs
+# USE_MPI_IO: YES=one large file, NO=one file per rank in cosmo format
+# REFRESH: takes either explicit time steps or file name with time steps specified,
+#      	same is true for all other outputs besides FINAL_GRID and VIS_SLAB
+#      	which only happen at the end if commented in
+# SMALL_DUMP: prints all particles from rank 0
+# OUTPUT_FRACTION: fraction of particles in alive dumps
+# VIS_STEP: prints uniform grid of full simulation in Insley format
+# FINAL_GRID_OUTPUT: ascii file! prints grid at last time step, only for small runs
+# VIZ_SLAB: prints slice of final grid in Insley format
+#####################################################################
+WRITE_IC NO
+USE_MPI_IO YES
+OUTPUT_BASE_NAME ../../output/m001
+REFRESH 10 20 
+ALIVE_DUMP
+OUTPUT_FRACTION 0.01
+FULL_ALIVE_DUMP 97
+SMALL_DUMP
+RESTART_DUMP
+PK_DUMP 
+VIZ_STEP 
+FINAL_GRID_OUTPUT NO
+VIZ_SLAB
+#####################################################################
+# Code parameters I: essential parameters to specify the run/resolution
+# ISEED: random number for realizatio
+# NG: number of grid points (1d), NP: number of particles (1d)
+# RL: physical box size [h^(-1)Mpc]
+# Z_FIN: final redshift
+# Timestepper: N_STEPS: number of PM steps, N_SUB: number of sub-cycles (3-5)
+# OL: PM overload and refresh: 8 Mpc good choice, depends on overall volume
+# RSM: Tree smoothing scale, fraction of PM grid size
+# max RCB tree particles per leaf, ~100 optimal for BG/Q, ~24 for X86
+#####################################################################
+I_SEED 99847958
+NG 1344
+NP 1344
+RL 250.0
+Z_FIN 0.0
+N_STEPS 500
+N_SUB 1
+OL 8.0
+RSM 0.01
+RCB_TREE_PPN 128
+#####################################################################
+# Code parameters II: specifications for tree/memory etc., mostly unchanged
+# CM_SIZE: chaining mesh size, 3.12 good choice, should not be smaller
+# OPENING_ANGLE: tree code
+# EDGE: ???
+# alpha, power of scale factor in timestepping
+# TOPOLOGY: allows user to pick 3d decomposition (=ranks), if commented out,
+#       	machine will pick it for you
+# BIGCHUNK: memory management, percent extra to allocate in bigchunk
+# USE_ALLV: important for N-to-N write, will not work on Mira at scale
+#####################################################################
+CM_SIZE 8.0
+USE_CHAINING_MESH YES
+CHAINING_MESH_THREADS 8
+CHAINING_MESH_PER_SUBCYCLE YES
+RCB_TREE_EXTRA_LEVELS 3
+OPENING_ANGLE 0.1
+EDGE 3.2
+ALPHA 1.0
+#TOPOLOGY 32x32x16
+USE_BIGCHUNK YES
+BIGCHUNK_EXTRA_FACTOR 20
+MEMORY_PADDING_DISPLACEMENT 10.0
+USE_MONOPOLE_RCB_TREE YES
+USE_ALLTOALLV YES
+#####################################################################
+# Analysis
+# Config file for analysis
+#####################################################################
+COSMOTOOLS ON
+COSMOTOOLS_CONFIG cosmotools-config.dat
+

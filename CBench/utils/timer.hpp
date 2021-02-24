@@ -48,7 +48,7 @@ inline int Timer::start(std::string timerName)
 		timers[timerName] = startTime;
 
 		// remove previous durarion
-		auto it=timers_duration.find(timerName);
+		auto it = timers_duration.find(timerName);
   		timers_duration.erase(it); 
 	}
 

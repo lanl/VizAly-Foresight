@@ -4,16 +4,49 @@ import os
 import json
 import csv
 import subprocess
+import fileinput
 
 from collections import OrderedDict
 
+# Env and configuration
+def get_configuration(json_data):
+	if "configuration" in json_data.keys():
+		configurations = list(sum(json_data["configuration"].items(), ()))
+	else:
+		configurations = None
+	return configurations
+
+
+def get_environment(json_data, foresight_home=""):
+	if "evn_path" in json_data:
+		environment = json_data["evn_path"]
+		if environment[0] != '/':
+			environment =  foresight_home + environment
+	else:
+		environment = None
+	return environment
+
+def get_jobDependency(json_data,):
+	if "dependency-type" in json_data:
+		dependency_type = json_data["dependency-type"]
+	else:
+		dependency_type = ""
+
+	if "dependency-name" in json_data:
+		dependency_name = json_data["dependency-name"]
+	else:
+		dependency_name = "None"
+
+	return dependency_type, dependency_name
+
 
 # Replace argument by data
-def replace_in_list(self, my_list, search_term, replacement):
-	temp_list = my_list.copy()
-	for i in range(len(params)):
-		if temp_list[i] == search_term:
-			temp_list[i] = replacement
+def replace_in_list(my_list, search_term, replacement):
+	temp_list = []
+
+	for item in my_list:
+		new_item = item.replace(search_term, replacement)
+		temp_list.append(new_item)
 
 	return temp_list
 
@@ -33,9 +66,46 @@ def get_list_from_json(json_obj, json_tag):
 		return None
 
 
+def extract_string(tempString, char):
+    found = False
+    extracted = ""
+    extractedStrings = []
+
+    for i in range(len(tempString)):
+        if tempString[i] == char:
+            if found == False:
+                found = True
+                extracted += tempString[i]
+                continue
+            else:
+                extracted += tempString[i]
+				
+                extractedStrings.append(extracted)
+
+                found == False
+                extracted = ""
+				
+                #break
+        
+        if found == True:
+            extracted += tempString[i]
+            
+    return extractedStrings
 
 
 # Utils
+def read_file(filename):
+    f = open(filename, "r")
+    return (f.read())
+    
+
+def replace_line_starting_with_in_file(filename, old, new):
+    for line in fileinput.input([filename], inplace=True):
+        if line.strip().startswith(old):
+            line = new
+        sys.stdout.write(line)
+
+		
 def validate_num_args(num_arguments, min_count):
 	if num_arguments < min_count:
 		print ("At least " + str(min_count) + " arguments are needed!")

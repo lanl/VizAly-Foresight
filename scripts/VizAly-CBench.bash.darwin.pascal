@@ -55,10 +55,9 @@ export GIO_MPICXX="${HACC_MPI_CXX}"
 # Set python path
 if [ $# -eq 0 ]
 then
-    echo ""
+
 else
 	foresight_home=$1
 	echo "foresight home is " $foresight_home
     export PYTHONPATH=$PYTHONPATH:$foresight_home
 fi
-
