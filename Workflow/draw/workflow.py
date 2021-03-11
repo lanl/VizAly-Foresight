@@ -228,10 +228,16 @@ class Workflow(object):
 			if len(self.jobs) > 0:
 				found_job = False
 				for job in self.jobs:
-					if job.name == filter:
+					#print("name:",job.name)
+					#print(filter)
+					if (job.name.find(filter) != -1):
+						#print("found")
+						#print("\n")
+					#if job.name == filter:
 						this_job.add_parents([job])
 						found_job = True
 						break
+					#print("\n")
 
 			self.jobs.append(this_job)
 

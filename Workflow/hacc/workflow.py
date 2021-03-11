@@ -29,6 +29,7 @@ class HACCWorkflow(workflow.Workflow):
 
 	# Analysis: halo
 	def process_params(self, json_data, args):
+		#print(json_data)
 		new_list = []
 		#print("\n\nargs:", args)
 		for item in args:
@@ -42,6 +43,7 @@ class HACCWorkflow(workflow.Workflow):
 
 				if e != "":
 					replacement = ""
+
 					if e == "$output-prefix$":
 						replacement = json_data["output-prefix"]
 					elif e == "$path$":
@@ -50,13 +52,36 @@ class HACCWorkflow(workflow.Workflow):
 						replacement = self.json_data["project-home"]
 					elif e == "$wflow-path$":
 						replacement = self.json_data["wflow-path"]
+					else:
+						replacement = e
 
 					item = item.replace(e, replacement)
 
 			new_list.append(item)
+
+		#print("\n")
 		
 		#print("done process_argument - new_list:", new_list)	
 		return new_list
+
+
+	def replace_in_list(self, myList, searchFor, replaceBy):
+		#print("list:", myList)
+		#print("searchFor:", searchFor)
+		#print("replaceBy:", replaceBy)
+		new_list = []
+
+		for item in myList:
+
+			if item == searchFor:
+				item = item.replace(searchFor, replaceBy)
+				
+
+			new_list.append(item)
+
+		#print("new_list:", new_list)
+		return new_list
+
 
 	
 	
@@ -151,7 +176,7 @@ class HACCWorkflow(workflow.Workflow):
 
 
 
-				analysis_job = j.Job( name=analysis["name"] + str(count),
+				analysis_job = j.Job( name=analysis["name"] + "--" + str(count),
 										job_type = "analysis",
 										execute_dir="analysis/" + analysis["name"],
 										executable=analysis["path"], 
@@ -160,6 +185,9 @@ class HACCWorkflow(workflow.Workflow):
 										environment=environment )
 
 				job_Dependecies = utils.get_jobDependency( analysis )
+				#print(job_Dependecies[0])
+				#print(job_Dependecies[1])
+				#print("\n")
 				self.add_job( analysis_job, dependencies=job_Dependecies[0], filter=job_Dependecies[1] )
 			
 			count = count + 1
@@ -177,54 +205,44 @@ class HACCWorkflow(workflow.Workflow):
 		for analysis in self.json_data["analysis"]["analytics"]:
 
 			if analysis["name"] == "halo":
-				json_item = analysis["name"] : []
-				self.json_data['analysis']['output-files'].append(json_item)
+				data = { analysis["name"] : [] }
+			
+				for output in self.json_data["data-reduction"]["output-files"]:
+					# Create output					
+					json_item = {
+						"output-prefix" : output["output-prefix"],
+						"path" : base_path + "/analysis/halo/" + output["output-prefix"] + "-499.haloproperties"
+					}
+					data["halo"].append(json_item)
 
-
-				# for output in self.json_data["data-reduction"]["output-files"]:
-				# 	# Create output					
-				# 	json_item = {
-				# 		"output-prefix" : output["output-prefix"],
-				# 		"path" : base_path + "/analysis/halo/" + output["output-prefix"] + "-499.haloproperties"
-				# 	}
-
-				# 	print(json_item)
-				# 	self.json_data['analysis']['output-files']['halo'].append(json_item)
+				self.json_data['analysis']['output-files'].append(data)
 
 
 			elif analysis["name"] == "spectrum":
-				# json_item = {
-				# 	analysis["name"] : []
-				# }
-				# self.json_data['analysis']['output-files'].append(json_item)
+				data = { analysis["name"] : [] }
 
+				for output in self.json_data["data-reduction"]["output-files"]:
+					# Create output					
+					json_item = {
+						"output-prefix" : output["output-prefix"],
+						"path" : base_path + "/analysis/spectrum/" + output["output-prefix"] + "_.pk"
+					}
+					data["spectrum"].append(json_item)
 
-			# 	for output in self.json_data["data-reduction"]["output-files"]:
-			# 		# Create output					
-			# 		json_item = {
-			# 			"output-prefix" : output["output-prefix"],
-			# 			"path" : base_path + "/analysis/spectrum/" + output["output-prefix"] + "_.pk"
-			# 		}
-
-			# 		self.json_data['analysis']['output-files']['spectrum'].append(json_item)
+				self.json_data['analysis']['output-files'].append(data)
 
 			else:
-				# json_item = {
-				# 	analysis["name"] : []
-				# }
-				# self.json_data['analysis']['output-files'].append(json_item)
-				
-			# 	self.json_data['analysis']['output-files'].append(analysis["name"])
-			# 	analysis_name = analysis["name"]
+				data = { analysis["name"] : [] }
 
-			# 	for output in self.json_data["data-reduction"]["output-files"]:
-			# 		# Create output					
-			# 		json_item = {
-			# 			"output-prefix" : output["output-prefix"],
-			# 			"path" : base_path + "/analysis/" + analysis_name + "/" + output["output-prefix"] + ".txt"
-			# 		}
+				for output in self.json_data["data-reduction"]["output-files"]:
+					# Create output					
+					json_item = {
+						"output-prefix" : output["output-prefix"],
+						"path" : base_path + "/analysis/" + analysis["name"] + "/" + output["output-prefix"] + ".csv"
+					}
+					data[analysis["name"]].append(json_item)
 
-			# 		self.json_data['analysis']['output-files'][analysis_name].append(json_item)
+				self.json_data['analysis']['output-files'].append(data)
 
 
 
@@ -232,30 +250,34 @@ class HACCWorkflow(workflow.Workflow):
 		
 		## Create Plots
 		for plot in self.json_data["visualize"]["plots"]:
+      
+			path_orig = ""
+			for data in self.json_data["analysis"]["output-files"]:			
+				# check if this is what we are looking for
+				key = list(data.keys())[0]
+				if key == plot["type"]:
+					for item in list(data.values())[0]:
+						data_name = list(item.values())[0]
+						if list(item.values())[0] == "orig":
+							path_orig = list(item.values())[1]
+							continue
 
-			# sources the modules to be loaded on that cluster
-			if "evn_path" in plot:
-				environment = self.json_data["foresight-home"] + plot["evn_path"]
-			else:
-				environment = None
+						configurations = utils.get_configuration( plot )
+						environment = utils.get_environment( plot, self.json_data["foresight-home"] )
+						args1 = self.process_params( item, plot['params'])
+						args = self.replace_in_list( args1, "$path:orig$", path_orig)
 
+						
+						plot_job = j.Job(name=plot["name"] + "--" + data_name,
+												job_type = "plot",
+												execute_dir="plot/" + plot["name"],
+												executable=plot["path"], 
+												arguments=args,
+												configurations=configurations,
+												environment=environment )
 
-			# pull the cluster parameters with which to launch job
-			if "configuration" in plot:
-				configurations = list( sum( plot["configuration"].items(), () ) )
-			else:
-				configurations = None
-
-			plot_job = j.Job(name=plot["name"],
-									job_type = "plot",
-									execute_dir="plot/" + plot["name"],
-									executable=plot["path"], 
-									arguments=plot['params'],
-									configurations=configurations,
-									environment=environment )
-
-			#self.add_job(plot_job,dependencies="type", filter="analysis")
-			self.add_job(plot_job)
+						#self.add_job(plot_job,dependencies="type", filter="analysis")
+						self.add_job(plot_job)
 
 
 
