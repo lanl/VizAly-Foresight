@@ -73,9 +73,9 @@ class HACCWorkflow(workflow.Workflow):
 
 		for item in myList:
 
-			if item == searchFor:
+			if (item.find(searchFor) != -1):
+			#if item == searchFor:
 				item = item.replace(searchFor, replaceBy)
-				
 
 			new_list.append(item)
 
@@ -176,7 +176,7 @@ class HACCWorkflow(workflow.Workflow):
 
 
 
-				analysis_job = j.Job( name=analysis["name"] + "--" + str(count),
+				analysis_job = j.Job( name=analysis["name"] + str(count),
 										job_type = "analysis",
 										execute_dir="analysis/" + analysis["name"],
 										executable=analysis["path"], 
@@ -188,7 +188,12 @@ class HACCWorkflow(workflow.Workflow):
 				#print(job_Dependecies[0])
 				#print(job_Dependecies[1])
 				#print("\n")
-				self.add_job( analysis_job, dependencies=job_Dependecies[0], filter=job_Dependecies[1] )
+				jobDependency = job_Dependecies[1]
+				if job_Dependecies[1] == "halo$id$":
+					jobDependency = "halo" + str(count)
+				#print("\nname:",analysis["name"] + str(count))
+				#print("jobDependency:", jobDependency)
+				self.add_job( analysis_job, dependencies=job_Dependecies[0], filter=jobDependency )
 			
 			count = count + 1
 
@@ -225,7 +230,7 @@ class HACCWorkflow(workflow.Workflow):
 					# Create output					
 					json_item = {
 						"output-prefix" : output["output-prefix"],
-						"path" : base_path + "/analysis/spectrum/" + output["output-prefix"] + "_.pk"
+						"path" : base_path + "/analysis/spectrum/" + output["output-prefix"] + ".pk"
 					}
 					data["spectrum"].append(json_item)
 

@@ -43,8 +43,9 @@ class CompressorInterface
     std::string getCompressorName(){ return compressorName; }
     std::string getLog() { return log.str(); }
     size_t getCompressedSize(){ return cbytes; }
+    void setCompressedSize(size_t _cbytes){ cbytes = _cbytes; }
     std::string getParamsInfo();
-	void clearLog() { log.str(""); }
+	  void clearLog() { log.str(""); }
 };
 
 

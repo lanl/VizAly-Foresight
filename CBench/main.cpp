@@ -262,12 +262,17 @@ int main(int argc, char *argv[])
 			// Apply parameter if same for all scalars, else delay for later
 			bool sameCompressorParams = true;
 			if (jsonInput["data-reduction"]["cbench-compressors"][c].find("compressor-params") != jsonInput["data-reduction"]["cbench-compressors"][c].end())
+			{
 				sameCompressorParams = false;
+				//std::cout << "sameCompressorParams = false" << std::endl;
+			}
 			else
 			{
 				for (auto it = jsonInput["data-reduction"]["cbench-compressors"][c].begin(); it != jsonInput["data-reduction"]["cbench-compressors"][c].end(); ++it)
 					if ((it.key() != "name") && (it.key() != "output-prefix"))
 						compressorMgr->compressorParameters[it.key()] = strConvert::toStr(it.value());
+				
+				//std::cout << "sameCompressorParams = true" << std::endl;
 			}
 
 
@@ -281,6 +286,7 @@ int main(int argc, char *argv[])
 
 			//
 			// Cycle through scalars
+			//std::cout << "\n"<< std::endl;
 			for (int i = 0; i < scalars.size(); i++)
 			{
 				//Timer compressClock, decompressClock;
@@ -297,8 +303,10 @@ int main(int argc, char *argv[])
 
 
 				// Read in compressor parameter for this field
+				bool scalarFound = false;
 				if (!sameCompressorParams)
 				{
+				
 					compressorMgr->compressorParameters.clear();  // reset compression param for each field
 					int numdifferentParams = jsonInput["data-reduction"]["cbench-compressors"][c]["compressor-params"].size();
 
@@ -310,6 +318,7 @@ int main(int argc, char *argv[])
 							if (*it != scalars[i])
 								continue;
 
+							scalarFound = true;
 							for (auto itt = jsonInput["data-reduction"]["cbench-compressors"][c]["compressor-params"][cp].begin();
 									itt != jsonInput["data-reduction"]["cbench-compressors"][c]["compressor-params"][cp].end(); ++itt)
 								if (itt.key() != "scalar")
@@ -318,34 +327,77 @@ int main(int argc, char *argv[])
 					}
 				}
 
+				//std::cout << "Scalar: " << i << ": " << scalarFound << std::endl;
 
 				// log stuff
 				debugLog << ioMgr->getDataInfo();
 				writeLog(outputLogFilename, debugLog.str());
 
-				metricsInfo << compressorMgr->getParamsInfo() << std::endl;
-				csvOutput << compressorMgr->getCompressorName() << "_" << scalars[i] << "__" << compressorMgr->getParamsInfo()
-						<< ", " << jsonInput["data-reduction"]["cbench-compressors"][c]["output-prefix"].get<std::string>() << ", ";
 
 				MPI_Barrier(MPI_COMM_WORLD);
 
-
-				//
-				// compress
-				void *cdata = NULL;
-
-				clock.start("compress");
-				compressorMgr->compress(ioMgr->data, cdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim());
-				clock.stop("compress");
-
-
-				//
-				// decompress
 				void *decompdata = NULL;
 
-				clock.start("decompress");
-				compressorMgr->decompress(cdata, decompdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim());
-				clock.stop("decompress");
+				if (!sameCompressorParams && scalarFound == false)
+				{
+					//std::cout << "tes1" << std::endl;
+					metricsInfo << "None" << std::endl;
+					csvOutput << "None" << "_" << scalars[i] << "__" << "None"
+							<< ", " << jsonInput["data-reduction"]["cbench-compressors"][c]["output-prefix"].get<std::string>() << ", ";
+
+					clock.start("compress");
+					clock.start("decompress");
+
+					clock.stop("compress");
+					clock.stop("decompress");
+
+
+					//std::cout << "tes2" << std::endl;
+
+
+					size_t numel = ioMgr->getSizePerDim()[0];
+					for (int i=1; i<5; i++)
+						if (ioMgr->getSizePerDim()[i] != 0)
+							numel *= ioMgr->getSizePerDim()[i];
+
+					//std::cout << "tes3" << std::endl;
+					//std::cout << "numel " << numel << std::endl;
+					//std::cout << "ioMgr->getTypeSize() " << ioMgr->getTypeSize() << std::endl;
+					//std::cout << "tes4" << std::endl;
+
+					decompdata = malloc(numel*ioMgr->getTypeSize());
+					//std::cout << "tes5" << std::endl;
+					memcpy(decompdata, ioMgr->data, numel*ioMgr->getTypeSize() );
+					compressorMgr->setCompressedSize(numel*ioMgr->getTypeSize());
+
+					//std::cout << "testes" << std::endl;
+				}
+				else
+				{
+					metricsInfo << compressorMgr->getParamsInfo() << std::endl;
+					csvOutput << compressorMgr->getCompressorName() << "_" << scalars[i] << "__" << compressorMgr->getParamsInfo()
+							<< ", " << jsonInput["data-reduction"]["cbench-compressors"][c]["output-prefix"].get<std::string>() << ", ";
+
+					
+					//
+					// compress
+					void *cdata = NULL;
+
+					clock.start("compress");
+					compressorMgr->compress(ioMgr->data, cdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim());
+					clock.stop("compress");
+
+
+					//
+					// decompress
+					//void *decompdata = NULL;
+
+					clock.start("decompress");
+					compressorMgr->decompress(cdata, decompdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim());
+					clock.stop("decompress");
+
+				}
+				//MPI_Barrier(MPI_COMM_WORLD);
 
 
 				// Get compression ratio

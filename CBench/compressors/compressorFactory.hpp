@@ -61,6 +61,7 @@ class CompressorFactory
 		  return new SZCompressorGpu();
 	  #endif
 
+
 		  return NULL;
 	}
 };

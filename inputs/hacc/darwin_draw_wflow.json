@@ -1,8 +1,8 @@
 {
 	"foresight-home": "/projects/exasky/pascal-projects/VizAly-Foresight/",
-	"project-home": "/projects/exasky/pascal-projects/VizAly-Foresight/runs/",
-	"wflow-path": "test-hacc-vel-9",
-    
+	"project-home": "/projects/groups/vizproject/dssdata/Exasky/vel_run/",
+	"wflow-path": "test-hacc-vel-1",
+   
     
 	"input": 
 	{
@@ -24,20 +24,20 @@
 
             {
                 "name": "fpzip",
-                "bits" : 24,
-                "output-prefix" : "fpzip_24_"
+                "bits" : 26,
+                "output-prefix" : "fpzip_26_"
             },
 
             {
                 "name": "SZ",
-                "output-prefix" : "sz_abs_.01_",
-                "abs" : 1E-2
+                "output-prefix" : "sz_abs_.003_",
+                "abs" : 3E-3
             },
 
             {
                 "name": "zfp",
-                "output-prefix" : "zfp_abs_.01_",
-                "abs" : 1E-2
+                "output-prefix" : "zfp_abs_.007_",
+                "abs" : 7E-3
             }
         ],
 

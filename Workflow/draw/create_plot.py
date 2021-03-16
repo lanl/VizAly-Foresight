@@ -102,6 +102,7 @@ def generic_plot(x, y_orig, x_label, y_label, name, y_tuple_labels=[], plot_type
 	plt.title(name)
 	plt.xlabel(x_label)
 	plt.ylabel(y_label)
+	plt.autoscale()
 	plt.grid(True)
 
 	
@@ -123,7 +124,8 @@ def generic_plot(x, y_orig, x_label, y_label, name, y_tuple_labels=[], plot_type
 	
 	plt.legend()
 	filename = name.replace(' ','_')
-	plt.savefig(filename + ".png")
+	plt.savefig(filename + ".png",bbox_inches='tight')
+	
 
 
 
