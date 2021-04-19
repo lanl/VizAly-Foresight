@@ -116,6 +116,10 @@ For information on Travis CI and Docker image, look at the [travis folder](testi
 
 [![Build Status](https://travis-ci.org/lanl/VizAly-Foresight.svg?branch=master;)](https://travis-ci.org/lanl/VizAly-Foresight)
 
+# Citing Foresight
+P. Grosset, C. M. Biwer, J. Pulido, A. T. Mohan, A. Biswas, J. Patchett, T. L. Turton, D. H. Rogers, D. Livescu, and J. Ahrens. “Foresight: Analysis that matters for data reduction”, In SC20: International Conference for High Performance Computing, Networking, Storage and Analysis, pages 1–15, 2020.
+
+[Paper](https://doi.org/10.1109/SC41405.2020.00087) and [Presentation](Foresight-SC-presentation.pdf)
 
 # Copyright and License
 This software is open source software available under the BSD-3 license.
