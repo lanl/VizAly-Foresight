@@ -1,9 +1,4 @@
 [
-	{
-		"name" : "NYX_SZ_1024",
-		"directory" : "data/highz_1024_SZ.cdb"
-	},
-
         {
 		"name" : "NYX_SZ",
 		"directory" : "data/nyx_sz_01_.cdb"
@@ -18,6 +13,11 @@
         {
 		"name" : "NYX_fpzip",
 		"directory" : "data/NYX_fpzip_.cdb"
+	},
+	
+	{
+		"name" : "NYX_SZ_1024",
+		"directory" : "data/highz_1024_SZ.cdb"
 	},
 	
 	{
