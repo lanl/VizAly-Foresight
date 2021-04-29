@@ -1,5 +1,32 @@
 [
 	{
+		"name" : "NYX_SZ_1024",
+		"directory" : "data/highz_1024_SZ.cdb"
+	},
+
+        {
+		"name" : "NYX_SZ",
+		"directory" : "data/nyx_sz_01_.cdb"
+	},
+
+
+	{
+		"name" : "NYX_SZ_42",
+		"directory" : "data/NYX_512_42_SZ_.cdb"
+	},
+
+        {
+		"name" : "NYX_fpzip",
+		"directory" : "data/NYX_fpzip_.cdb"
+	},
+	
+	{
+		"name" : "NYX_Test_",
+		"directory" : "data/NYX_Test_.cdb"
+	},
+	
+	
+	{
 		"name" : "Metrics (Feb 4, 2019)",
 		"directory" : "data/metrics.cdb"
 	},
@@ -69,35 +96,8 @@
 		"directory" : "data/metricsThermal2048.cdb"
 	},
 
-	{
-		"name" : "NYX_Test_",
-		"directory" : "data/NYX_Test_.cdb"
-	},
 
-	{
-		"name" : "NYX_SZ_1024",
-		"directory" : "data/highz_1024_SZ.cdb"
-	},
-
-    {
-		"name" : "NYX_SZ",
-		"directory" : "data/nyx_sz_01_.cdb"
-	},
-
-
-	{
-		"name" : "NYX_SZ_42",
-		"directory" : "data/NYX_512_42_SZ_.cdb"
-	},
-
-    {
-		"name" : "NYX_fpzip",
-		"directory" : "data/NYX_fpzip_.cdb"
-	},
-
-
-
-    {
+        {
 		"name" : "histogram_",
 		"directory" : "data/histogram.cdb"
 	},
