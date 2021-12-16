@@ -45,16 +45,16 @@ pushd $externalDependenciesPath
 
 
 # copy the scripts into that folder and run 
-cp $projectPath/build_scripts/thirdparty/*.sh .
+cp $projectPath/scripts/thirdparty/*.sh .
 if [ $buildType = "cpu" ]; then
 	echo "building all CPU dependencies ..."
-	source buildCpuExternal.sh
+	source thirdparty/buildCpuExternal.sh
 elif [ $buildType = "gpu" ]; then
 	echo "building all GPU dependencies ..."
-	source buildGpuExternal.sh
+	source thirdparty/buildGpuExternal.sh
 else
 	echo "building default dependencies ..."
-	source buildCpuExternal.sh
+	source thirdparty/buildExternal.sh
 fi
 popd
 

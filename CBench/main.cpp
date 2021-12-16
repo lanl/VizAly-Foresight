@@ -232,6 +232,10 @@ int main(int argc, char *argv[])
 				ioMgr->saveInputFileParameters();
 		}
 
+		MPI_Barrier(MPI_COMM_WORLD);
+		if (myRank == 0)
+			std::cout << "\nReading " << fileToLoad  << " done!" << std::endl;
+			
 		writeLog(outputLogFilename, debugLog.str());
 
 
@@ -259,6 +263,11 @@ int main(int argc, char *argv[])
 			compressorMgr->init();
 
 
+			MPI_Barrier(MPI_COMM_WORLD);
+			if (myRank == 0)
+				std::cout << "\nCompressor initialized!" << std::endl;
+
+
 			// Apply parameter if same for all scalars, else delay for later
 			bool sameCompressorParams = true;
 			if (jsonInput["data-reduction"]["cbench-compressors"][c].find("compressor-params") != jsonInput["data-reduction"]["cbench-compressors"][c].end())
@@ -276,6 +285,12 @@ int main(int argc, char *argv[])
 			}
 
 
+
+			MPI_Barrier(MPI_COMM_WORLD);
+			if (myRank == 0)
+				std::cout << "\nCompressor2 initialized!" << std::endl;
+
+
 			// log
 			metricsInfo << "\n---------------------------------------" << std::endl;
 			metricsInfo << "Compressor: " << compressorMgr->getCompressorName() << std::endl;
@@ -289,6 +304,10 @@ int main(int argc, char *argv[])
 			//std::cout << "\n"<< std::endl;
 			for (int i = 0; i < scalars.size(); i++)
 			{
+				MPI_Barrier(MPI_COMM_WORLD);
+				if (myRank == 0)
+					std::cout << "\n loading .: " << scalars[i] << std::endl;
+
 				//Timer compressClock, decompressClock;
 				Memory memLoad(true);
 
@@ -300,6 +319,10 @@ int main(int argc, char *argv[])
 					debugLog << "ioMgr->loadData(" << scalars[i] << ") failed!" << std::endl; 
 					continue;
 				}
+
+				MPI_Barrier(MPI_COMM_WORLD);
+				if (myRank == 0)
+					std::cout << "\n loading ...: " << scalars[i] << std::endl;
 
 
 				// Read in compressor parameter for this field
@@ -327,7 +350,9 @@ int main(int argc, char *argv[])
 					}
 				}
 
-				//std::cout << "Scalar: " << i << ": " << scalarFound << std::endl;
+				MPI_Barrier(MPI_COMM_WORLD);
+				if (myRank == 0)
+					std::cout << "Scalar: " << i << ": " << scalarFound << std::endl;
 
 				// log stuff
 				debugLog << ioMgr->getDataInfo();

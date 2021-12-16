@@ -1,0 +1,122 @@
+##==============================================================##
+COSMOTOOLS CONFIGURATION
+##============================================================= ##
+
+# Set the version of the configuration file (for backwards compatibility etc.)
+VERSION 1.0
+
+# Visualization Parameters
+VISUALIZATION  NO
+VIZ_SERVER 	127.0.0.1
+VIZ_PORT   	2222
+
+## Frequency at which to update visualization, e.g., every 20 time-steps.
+VIZ_FREQUENCY 20
+
+## Frequency at which this configuration file will be read in to update
+## any in situ analysis parameters.
+CONFIG_REFRESH_FREQUENCY -1
+
+# Enable/Disable the tools that will be used at each time-step.
+# The name of the analysis tool can be anything as long as it has no spaces.
+ANALYSISTOOL HALOFINDER 	YES
+ANALYSISTOOL CHECKPOINT_IO  NO
+
+##============================================================= ##
+##  IN SITU ALGORITHM PARAMETERS
+##============================================================= ##
+
+##============================================================= ##
+##  HALOFINDER PARAMETERS
+##============================================================= ##
+SECTION HALOFINDER
+
+## Name of the internal AnalysisTool instance used
+INSTANCE_NAME LANLHALOFINDER
+
+##-----------------------------------------------------| Framework Parameters |
+
+## Frequency type: EXPLICIT(0) or IMPLICIT(1) or REDSHIFTS(2)
+FREQUENCY_TYPE 0
+EXPLICIT_TIMESTEPS 355
+IMPLICIT_TIMESTEPS
+WRITE_OUTPUT  YES
+BASE_OUTPUT_FILE_NAME  m001
+#BASE_OUTPUT_FILE_NAME  ../run/output/analysis/Halos/b0168/m001
+
+## Indicate whether halos will be visualized 
+VISIBLE YES
+
+##-----------------------------------------------------| Algorithm Parameters |
+
+COMPUTE_ELLIPTICITY NO  # Enable halo ellipticity output (currently will report in both FOF and SOD halo property files
+
+#-------------------------------------| FOF Parameters |-----------------------
+
+LINKING_LENGTH  	0.168 # The linking length used for FOF algorithm
+MINIMUM_MASS    	1.0e5 # The minimum mass (M_solar/h)
+FOF_PMIN        	40	# Minimum number of particles to consider as a halo
+OVERLOAD_LENGTH 	6.0   # (Mpc/h)
+DIST_CONVERT_FACTOR 1.0   # positions are multiplied by this factor
+NEIGH_MIN       	1 	# min number of neighbors for linking (not used)
+SMOOTHING_LENGTH 0.001	# smoothing length for center finder
+
+#---------------------------| Center Finder Parameters |-----------------------
+
+COMPUTE_FOF_CENTERS YES   # enables finding of halo centers
+USE_MBP_FINDER  	NO   # run the MBP algorithm for FOF centers
+USE_MCP_FINDER  	NO	# run the MCP algorithm for FOF centers
+USE_HIST_FINDER 	YES	# run the histogram MCP algorithm for FOF centers
+MAX_FOR_CENTER_FINDING 0 # run center finder for halos with this maximum number of particles
+USE_BULK_MBP_FINDER 0
+
+
+#---------------------------|  Parameters |-----------------------
+
+#COMPUTE_ELLIPTICITY NO  # Enable halo ellipticity output (currently will report in both FOF and SOD halo property files)
+
+
+#---------------------------| Core Finder Parameters |-------------------------
+NUM_CORE_SIZE 20
+CORE_HALO_SIZE 100
+#ACCUMULATE_CORE_NAME ../run/output/analysis/Halos/b0168/m001
+ACCUMULATE_CORE_NAME m001
+
+#-------------------------------------| SOD Parameters |-----------------------
+
+COMPUTE_SOD_HALOS	YES	# enables SOD halos (requires FOF centers)
+RHO_C_CONVERT_FACTOR 1.0   # rho_c conversion factor
+SOD_MASS_CONVERSION  1.0   # SOD-mass conversion factor
+SOD_PMIN         	500  # min. num particles for which SOD properties
+RHO_RATIO        	200.0 # overdensity value
+CDELTA_MINIMUM_PARTICLES 500 # min. num particles for concentration measurement
+#---------------------------------| Subhalo Parameters |-----------------------
+
+COMPUTE_SUBHALOS   NO	# enables/disables sub-halofinding
+USE_SUBFIND    	NO	# enables/disables SUBFIND
+NEIGHS_SPH_DENSITY 64	# number of neighbors for computing density
+NUM_SUBHALO_NEIGHS 20	# number of close neighbors used in sub-grouping
+SUBHALO_PMIN   	20	# minimum particles in a sub-halo
+FOF_MIN_SIZE   	5000  # size of the smallest FOF halo to have sub-finding
+ALPHA          	1.0   # factor for cut/grow criteria
+BETA           	0.0   # factor for Poisson noise significance
+CHAIN_SIZE      2.0
+
+#----------------------------------| Output Parameters |-----------------------
+
+OUTPUT_FOF_HALO_SUMMARY YES   # generate a FOF halo property summary
+OUTPUT_FOF_COM      	NO	# output center of mass in FOF halo summary
+OUTPUT_SOD_HALO_SUMMARY YES	# generate a SOD halo property summary
+OUTPUT_SOD_COM      	NO	# output center of mass in SOD halo summary
+OUTPUT_SUBHALO_SUMMARY  NO	# generate a sub-halo property summary
+OUTPUT_SUBHALO_COM  	NO	# output center of mass in sub-halo summary
+OUTPUT_FOF_MEAN         NO
+OUTPUT_SOD_MEAN			NO
+
+ENABLE_PARTICLE_OUTPUTS YES   # enables halo particle outputs
+MIN_OUTPUT_HALO_SIZE 10000	# min size of halo to output particles from
+MIN_FRACTIONAL_OUTPUT_HALO 5  # min size of halo to do fractional output
+OUTPUT_PARTICLE_FRACTION 0.01 # percentage of particles to output
+OUTPUT_PARTICLE_TAGS YES  	# generate a particle tags file
+OUTPUT_ALL_PARTICLES NO   	# output all particles:0
+

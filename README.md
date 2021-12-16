@@ -13,7 +13,7 @@ Foresight has three components:
 * Cinema comparison is at: https://lanl.github.io/VizAly-Foresight/cinema_compare/
 
 # Building VizAly-Foresight
-The default master branch should always point to the latest working version. However, for more stable releases, you should checkout the latest tag release.
+The default master branch is quite stable but is not the latest version of the code
 
 ## Prerequisites:
 CBench
@@ -34,7 +34,7 @@ The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @
 git clone https://github.com/lanl/VizAly-Foresight.git
 
 cd VizAly-Foresight
-source scripts/<Name of the environment> # that sets up the environment
+source evn_scripts/<Name of the environment> # that sets up the environment
 source buildDependencies.sh
 source build.sh
 ```
@@ -47,7 +47,7 @@ python3 -m <name_of_analysis> --input-file <path to input JSON file>
 ```
 For example, to run the NYX analysis, the command is:
 ```
-python3 -m pat.nyx.workflow --input-files inputs/nyx/nyx_darwin_test.json
+python3 -m Workflow.hacc.workflow --input-file inputs/hacc/darwin_wflow_hydroTest.json --reduction-analysis --preview
 ```
 
 The outputs/logs will be generated in a folder using "project-home" and "wflow-path" in the input JSON file. The folder 

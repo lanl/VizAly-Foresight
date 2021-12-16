@@ -14,8 +14,8 @@ if (CBENCH_COMPRESSOR_SZ)
     	#find_library(ZLIB_LIBRARY ${ZLIB_LIBRARY} CACHE STRING "ZLIB library")
     	#set(MY_LIBS ${MY_LIBS} ${ZLIB_LIBRARY})
 
-    	find_library(ZSTD_LIBRARY ${ZSTD_LIBRARY} CACHE STRING "SZ library")
-    	set(MY_LIBS ${MY_LIBS} ${ZSTD_LIBRARY})
+		#find_library(ZSTD_LIBRARY ${ZSTD_LIBRARY} CACHE STRING "SZ library")
+    	#set(MY_LIBS ${MY_LIBS} ${ZSTD_LIBRARY})
 
     	#Asks for zfp include files + includes it in the project
     	set (SZ_INCLUDE_PATH ${SZ_INCLUDE_PATH} CACHE PATH "SZ include directory")

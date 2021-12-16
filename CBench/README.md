@@ -14,7 +14,7 @@ This is the compression benchmark arm of Foresight. It can be run on its own or 
 
 
 ## Building:
-The folder **[_scripts_](scripts)** contains scripts to load modules on Cooley @ ANL and Darwin @ LANL . These build a base version of CBench:
+The folder **[_evn_scripts_](evn_scripts)** contains scripts to load modules on Cooley @ ANL and Darwin @ LANL . These build a base version of CBench:
 ```
 git clone https://github.com/lanl/VizAly-Foresight.git
 

@@ -32,7 +32,7 @@ python3 -m <analysis_name> --input-file <absolute/relative path of input file>
 For example,
 ```
 # From Foresight root:
-$ python3 -m Workflow.nyx.workflow --input-file ../inputs/nyx/darwin_nyx_galton_wflow_test.json
+python3 -m Workflow.hacc.workflow --input-file inputs/hacc/darwin_wflow_hydroTest.json --reduction-analysis --preview
 ```
 
 

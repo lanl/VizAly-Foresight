@@ -1,0 +1,206 @@
+{
+	"foresight-home": "/projects/exasky/pascal-projects/VizAly-Foresight/",
+	"project-home": "/projects/groups/vizproject/dssdata/Exasky/vel_run/",
+	"wflow-path": "vel-testhydro-624",
+	"ran as" : "python3 -m Workflow.hacc.workflow --input-file inputs/hacc/darwin_wflow_hydroTest.json --preview",
+    
+	"input": 
+	{
+		"filetype": "HACC",
+		"filename": "/projects/exasky/HACC_Hydro/runs/inputs/output_sf_l64n256_ce_fire3_cloudy/m000.full.mpicosmo.624",
+		"scalars": ["x", "y", "z", "vx", "vy", "vz", "uu", "mu", "rho", "zmet", "phi"]	
+	},
+
+	
+    "data-reduction": 
+	{
+        "cbench-compressors" : 
+        [
+            {
+                "name": "BLOSC",
+                "output-prefix" : "BLOSC_"
+			},
+			
+			{
+				"name" : "SZ",
+				"output-prefix" : "sz_velNoComp",
+				"compressor-para`ms" :
+				[
+					{
+						"scalar" : ["x", "y", "z"],
+						"abs" : 0.001
+					}
+				]
+			},
+
+
+			{
+				"name" : "SZ",
+				"output-prefix" : "sz_test1",
+				"compressor-para`ms" :
+				[
+					{
+						"scalar" : ["x", "y", "z"],
+						"abs" : 0.001
+					},
+
+					{
+						"scalar" : ["vx", "vy", "vz", "uu", "mu", "rho", "zmet", "phi"],
+						"pw_rel" : 1E-1
+					}
+				]
+			},
+
+			{
+				"name" : "SZ",
+				"output-prefix" : "sz_test1",
+				"compressor-para`ms" :
+				[
+					{
+						"scalar" : ["x", "y", "z"],
+						"abs" : 0.001
+					},
+
+					{
+						"scalar" : ["vx", "vy", "vz", "uu", "mu", "rho", "zmet", "phi"],
+						"pw_rel" : 1E-1
+					}
+				]
+			},
+
+			{
+				"name" : "SZ",
+				"output-prefix" : "sz_test2",
+				"compressor-para`ms" :
+				[
+					{
+						"scalar" : ["x", "y", "z"],
+						"abs" : 0.001
+					},
+
+					{
+						"scalar" : ["vx", "vy", "vz", "uu", "mu", "rho", "zmet", "phi"],
+						"pw_rel" : 1E-2
+					}
+				]
+			},
+
+			{
+				"name" : "SZ",
+				"output-prefix" : "sz_test1",
+				"compressor-para`ms" :
+				[
+					{
+						"scalar" : ["x", "y", "z"],
+						"abs" : 0.001
+					},
+
+					{
+						"scalar" : ["vx", "vy", "vz", "uu", "mu", "rho", "zmet", "phi"],
+						"pw_rel" : 1E-3
+					}
+				]
+			}
+
+        ],
+
+
+        "cbench-output": 
+		{
+			"run-path": "mpirun $foresight-home$build/CBench",
+
+			"output-decompressed": true,
+			"output-decompressed-location": "decompressed_files",
+
+			"log-file": "runlog_",
+			"metrics-file": "metrics"
+        },
+        
+        "cbench-metrics": 
+		[
+			{
+				"name": "absolute_error"
+			},
+
+			{
+				"name": "relative_error"
+			},
+
+			{
+				"name": "mse"
+			},
+
+			{
+				"name": "psnr"
+			}
+		],
+
+		"name" : "cbench",
+		"path" : "mpirun $foresight-home$build/CBench",
+		"evn_path": "evn_scripts/VizAly-CBench.bash.darwin",
+		"configuration": {
+			"partition": "skylake-gold",
+			"nodes": 4,
+			"ntasks-per-node": 2
+		},
+
+        "output-files": []
+    },
+
+
+	"analysis": 
+	{
+		"analytics" :
+		[
+			{
+				"name" : "halo",
+				"path" : "mpirun /projects/exasky/HACC_Hydro/hacc_hydro/darwin.gpu.cuda/mpi/bin/cosmotools-driver",
+				"params" :
+				[
+					"--config /projects/exasky/HACC_Hydro/runs/inputs/cosmotools-config.dat",
+					"--timesteps /projects/exasky/HACC_Hydro/runs/inputs/haloInputs/timesteps.dat",
+					"--prefix $path$",
+					"/projects/exasky/HACC_Hydro/runs/inputs/indat.params"
+				],
+				"evn_path" : "/projects/exasky/HACC/trunk/env/bashrc.darwin.cuda",
+				"configuration" :
+				{
+					"partition" : "shared-gpu",
+					"nodes" : 8,
+					"ntasks-per-node" : 4,
+					"constraint" : "gpu1_model:GeForce_GTX1080Ti"
+
+				},
+				"dependency-type" : "single",
+				"dependency-name" : "cbench"
+			}
+			
+		],
+		
+		"output-files": []
+    },
+    
+    "visualize" :
+	{
+		"plots" :
+		[
+            
+        ],
+
+        "cinema" :
+        {
+			"status" : "off",
+            "name" : "cinema",
+			"path" : "python -m $foresight-home$/Workflow/hacc/cinema.py",
+			"params" : [ ],
+			"evn_path": "evn_scripts/VizAly-CBench.bash.darwin",
+			"configuration": 
+			{
+				"partition": "general",
+				"nodes": 1,
+				"ntasks-per-node": 1
+			}
+        }
+    }
+	
+}

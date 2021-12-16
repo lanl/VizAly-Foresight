@@ -20,6 +20,7 @@ install-*/
 
 # garbage files
 *.swp
+._*
 
 # latex generated files
 *.aux

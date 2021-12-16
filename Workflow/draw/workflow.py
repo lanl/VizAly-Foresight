@@ -290,7 +290,7 @@ class Workflow(object):
 		# create submission script
 		self.submit_path = self.name + ".sh"
 		with open(self.submit_path, "w") as fp:
-			fp.write("#! /bin/bash\n")
+			fp.write("#!/bin/bash\n")
 
 		# loop over each job
 		for i, job in enumerate(self.jobs):
@@ -313,7 +313,7 @@ class Workflow(object):
 			# write wrapper script for job
 			path = job.execute_dir + "/" + job.name + ".sh"
 			with open(path, "w") as fp:
-				fp.write("#! /bin/bash\n")
+				fp.write("#!/bin/bash\n")
 				for key, val in zip(job.configurations[::2], job.configurations[1::2]):
 					fp.write("#SBATCH --{}={}\n".format(key, val))
 
