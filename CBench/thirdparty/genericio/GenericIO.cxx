@@ -1387,12 +1387,19 @@ size_t GenericIO::readNumElems(int EffRank)
 
   if (FH.isBigEndian())
     return readNumElems<true>(EffRank);
+
   return readNumElems<false>(EffRank);
 }
+
 
 template <bool IsBigEndian>
 size_t GenericIO::readNumElems(int EffRank)
 {
+  int myRank;
+
+  MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
+  std::cout << myRank << "~readNumElems " << EffRank << "... " << std::endl;
+
   if (EffRank == -1)
   {
 #ifndef GENERICIO_NO_MPI
@@ -1402,7 +1409,13 @@ size_t GenericIO::readNumElems(int EffRank)
 #endif
   }
 
+
+  std::cout << myRank << "~readNumElems: openAndReadHeader " << EffRank << "... " << std::endl;
+  
   openAndReadHeader(Redistributing ? MismatchRedistribute : MismatchAllowed, EffRank, false);
+
+  
+
 
   assert(FH.getHeaderCache().size() && "HeaderCache must not be empty");
 
@@ -1411,9 +1424,16 @@ size_t GenericIO::readNumElems(int EffRank)
 
   assert(RankIndex < GH->NRanks && "Invalid rank specified");
 
+  std::cout << myRank << "~readNumElems: getElems " << EffRank << "... " << std::endl;
+
   RankHeader<IsBigEndian>* RH =
     (RankHeader<IsBigEndian>*)&FH.getHeaderCache()[GH->RanksStart + RankIndex * GH->RanksSize];
-  return (size_t)RH->NElems;
+
+  size_t nE = (size_t)RH->NElems;
+
+  std::cout << myRank << "~readNumElems " << EffRank << " done. #elements: " << nE << std::endl;
+
+  return nE;
 }
 
 void GenericIO::readDataSection(size_t readOffset, size_t readNumRows, int EffRank,

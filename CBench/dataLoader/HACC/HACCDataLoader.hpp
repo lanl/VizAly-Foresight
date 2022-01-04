@@ -83,7 +83,6 @@ inline int HACCDataLoader::saveInputFileParameters()
 {
 	gio::GenericIO *gioReader;
 	gioReader = new gio::GenericIO(comm, filename);
-	//gioReader = new gio::GenericIO(filename);
 
 
 	// Open file
@@ -128,16 +127,15 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	gio::GenericIO *gioReader;
 	param = paramName;
 
+
 	// Init GenericIO reader + open file
 	gioReader = new gio::GenericIO(comm, filename);
-	//gioReader = new gio::GenericIO(filename);
-
-
 
 
 	// Open file
-	gioReader->openAndReadHeader(gio::GenericIO::MismatchRedistribute);
+	gioReader->openAndReadHeader(gio::GenericIO::MismatchRedistribute);	//MismatchAllowed does not work
 	int numDataRanks = gioReader->readNRanks();
+
 
 	if (numRanks > numDataRanks)
 	{
@@ -145,12 +143,47 @@ inline int HACCDataLoader::loadData(std::string paramName)
 		return -1;
 	}
 
+	if (myRank == 0)
+		std::cout << "numRanks: " << numRanks << ", numDataRanks: " << numDataRanks << std::endl;
+
 	debugLog << "numRanks: " << numRanks << ", numDataRanks: " << numDataRanks << std::endl;
 
-	// Count number of elements
-	totalNumberOfElements = 0;
-	for (int i = 0; i < numDataRanks; ++i)
-		totalNumberOfElements += gioReader->readNumElems(i);
+
+	totalNumberOfElements = gioReader->readTotalNumElems();
+
+
+	//
+	// Split ranks among data
+	int numDataRanksPerMPIRank = numDataRanks / numRanks;
+	int loadRange[2];
+	loadRange[0] = myRank * numDataRanksPerMPIRank;
+	loadRange[1] = (myRank + 1) * numDataRanksPerMPIRank;
+	if (myRank == numRanks - 1)
+		loadRange[1] = numDataRanks;
+
+	
+	std::cout << myRank << " ~ loadRange[0]: " << loadRange[0] << ", loadRange[1]: " << loadRange[1] << std::endl;
+	MPI_Barrier(MPI_COMM_WORLD);
+
+	//
+	// Determine memory size and allocate memory
+	size_t maxNumElementsPerRank = 0;
+	numElements = 0;
+	for (int i = loadRange[0]; i < loadRange[1]; i++)
+	{
+		MPI_Barrier(MPI_COMM_WORLD);
+		if (myRank == 0)
+			std::cout << "readNumElems... "  << std::endl;
+
+		numElements += gioReader->readNumElems(i);
+
+		MPI_Barrier(MPI_COMM_WORLD);
+		if (myRank == 0)
+			std::cout << "numElements: " << numElements  << std::endl;
+
+		maxNumElementsPerRank = std::max(maxNumElementsPerRank,numElements);
+	}
+
 
 
 	// Read in the scalars information
@@ -182,39 +215,21 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	}
 
 
-	//
-	// Split ranks among data
-	int numDataRanksPerMPIRank = numDataRanks / numRanks;
-	int loadRange[2];
-	loadRange[0] = myRank * numDataRanksPerMPIRank;
-	loadRange[1] = (myRank + 1) * numDataRanksPerMPIRank;
-	if (myRank == numRanks - 1)
-		loadRange[1] = numDataRanks;
-
-	int splitDims[3];
-	gioReader->readDims(splitDims);
-	debugLog << "splitDims: " << splitDims[0] << "," << splitDims[1] << "," << splitDims[2] << std::endl;
-	debugLog << myRank << " ~ loadRange[0]: " << loadRange[0] << ", loadRange[1]: " << loadRange[1] << std::endl;
+	
 
 
+	MPI_Barrier(MPI_COMM_WORLD);
+	if (myRank == 0)
+		std::cout << "dataType: " << dataType << ", numElements" << numElements << std::endl;
 
 
-
-
-
-	//
-	// Determine memory size and allocate memory
-	size_t maxNumElementsPerRank = 0;
-	numElements = 0;
-	for (int i = loadRange[0]; i < loadRange[1]; i++)
-	{
-		numElements += gioReader->readNumElems(i);
-		maxNumElementsPerRank = std::max(maxNumElementsPerRank,numElements);
-	}
-
+	
 
 	allocateMem(dataType, numElements, 0, data);
 
+
+	if (myRank == 0)
+		std::cout << "Memory allocated!" << std::endl;
 
 	readInData.setNumElements(maxNumElementsPerRank);
 	readInData.alloc(1);
@@ -222,6 +237,16 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	sizePerDim[0] = numElements;	// For compression
 
 
+	if (myRank == 0)
+		std::cout << "loading data ..." << std::endl;
+
+
+	int splitDims[3];
+	gioReader->readDims(splitDims);
+	
+	MPI_Barrier(MPI_COMM_WORLD);
+	if (myRank == 0)
+		std::cout << "splitDims: " << splitDims[0] << "," << splitDims[1] << "," << splitDims[2] << std::endl;
 
 	
 	//
@@ -237,6 +262,18 @@ inline int HACCDataLoader::loadData(std::string paramName)
 
 		int coords[3];
 		gioReader->readCoords(coords, i);
+		if (myRank == 0)
+		{
+			std::cout << "Coord indices: " << coords[0] << ", " << coords[1] << ", " << coords[2] << " | ";
+
+			std::cout << "coordinates: (" << (float)coords[0] / splitDims[0] * physScale[0] + physOrigin[0] << ", "
+                          << (float)coords[1] / splitDims[1] * physScale[1] + physOrigin[1] << ", "
+                          << (float)coords[2] / splitDims[2] * physScale[2] + physOrigin[2] << ") -> ("
+                          << (float)(coords[0] + 1) / splitDims[0] * physScale[0] + physOrigin[0] << ", "
+                          << (float)(coords[1] + 1) / splitDims[1] * physScale[1] + physOrigin[1] << ", "
+                          << (float)(coords[2] + 1) / splitDims[2] * physScale[2] + physOrigin[2] << ")" << std::endl;
+		}
+
 		debugLog << "Coord indices: " << coords[0] << ", " << coords[1] << ", " << coords[2] << " | ";
 
 		debugLog << "coordinates: (" << (float)coords[0] / splitDims[0] * physScale[0] + physOrigin[0] << ", "
@@ -279,6 +316,9 @@ inline int HACCDataLoader::loadData(std::string paramName)
 		else if (readInData.dataType == "uint64_t")
 			gioReader->addVariable((readInData.name).c_str(), (uint64_t*)readInData.data, true);
 	
+		if (myRank == 0)
+			std::cout << "gioReader->readDataSection ..." << std::endl;
+
 		gioReader->readDataSection(0, Np, i, false); // reading the whole file
 
 
@@ -302,7 +342,10 @@ inline int HACCDataLoader::loadData(std::string paramName)
 			memcpy( &((uint32_t*)data)[offset],  readInData.data, Np*readInData.size);
 		else if (readInData.dataType == "uint64_t")
 			memcpy( &((uint64_t*)data)[offset],  readInData.data, Np*readInData.size);
-		
+
+
+		if (myRank == 0)
+			std::cout << "gioReader->readDataSection done!" << std::endl;
 		
 		offset = offset + Np;
 	}
@@ -323,7 +366,10 @@ inline int HACCDataLoader::loadData(std::string paramName)
 		debugLog  << "mpiCartPartitions: " << mpiCartPartitions[0] << ", " << mpiCartPartitions[1] << ", " << mpiCartPartitions[2] << std::endl;
 	}
 	
-	deAllocateMem(dataType, readInData.data);
+	(dataType, readInData.data);
+
+	if (myRank == 0)
+			std::cout << "deAllocateMem" << std::endl;
 
 
 	return 1; // All good

@@ -7,7 +7,8 @@
 	"input": 
 	{
 		"filetype": "HACC",
-		"filename": "/projects/exasky/HACC_Hydro/runs/inputs/output_sf_l64n256_ce_fire3_cloudy/m000.full.mpicosmo.624",
+		"filename" : "/projects/exasky/genericio/mpi/m000New.full.mpicosmo.624",
+		"filename-old": "/projects/exasky/HACC_Hydro/runs/inputs/output_sf_l64n256_ce_fire3_cloudy/m000.full.mpicosmo.624",
 		"scalars": ["x", "y", "z", "vx", "vy", "vz", "uu", "mu", "rho", "zmet", "phi"]	
 	},
 
@@ -24,7 +25,7 @@
 			{
 				"name" : "SZ",
 				"output-prefix" : "sz_velNoComp",
-				"compressor-para`ms" :
+				"compressor-params" :
 				[
 					{
 						"scalar" : ["x", "y", "z"],
@@ -37,7 +38,7 @@
 			{
 				"name" : "SZ",
 				"output-prefix" : "sz_test1",
-				"compressor-para`ms" :
+				"compressor-params" :
 				[
 					{
 						"scalar" : ["x", "y", "z"],
@@ -46,24 +47,7 @@
 
 					{
 						"scalar" : ["vx", "vy", "vz", "uu", "mu", "rho", "zmet", "phi"],
-						"pw_rel" : 1E-1
-					}
-				]
-			},
-
-			{
-				"name" : "SZ",
-				"output-prefix" : "sz_test1",
-				"compressor-para`ms" :
-				[
-					{
-						"scalar" : ["x", "y", "z"],
-						"abs" : 0.001
-					},
-
-					{
-						"scalar" : ["vx", "vy", "vz", "uu", "mu", "rho", "zmet", "phi"],
-						"pw_rel" : 1E-1
+						"pw_rel" : 0.1
 					}
 				]
 			},
@@ -71,7 +55,7 @@
 			{
 				"name" : "SZ",
 				"output-prefix" : "sz_test2",
-				"compressor-para`ms" :
+				"compressor-params" :
 				[
 					{
 						"scalar" : ["x", "y", "z"],
@@ -80,15 +64,15 @@
 
 					{
 						"scalar" : ["vx", "vy", "vz", "uu", "mu", "rho", "zmet", "phi"],
-						"pw_rel" : 1E-2
+						"pw_rel" : 0.01
 					}
 				]
 			},
 
 			{
 				"name" : "SZ",
-				"output-prefix" : "sz_test1",
-				"compressor-para`ms" :
+				"output-prefix" : "sz_test3",
+				"compressor-params" :
 				[
 					{
 						"scalar" : ["x", "y", "z"],
@@ -97,7 +81,7 @@
 
 					{
 						"scalar" : ["vx", "vy", "vz", "uu", "mu", "rho", "zmet", "phi"],
-						"pw_rel" : 1E-3
+						"pw_rel" : 0.001
 					}
 				]
 			}
@@ -139,9 +123,9 @@
 		"path" : "mpirun $foresight-home$build/CBench",
 		"evn_path": "evn_scripts/VizAly-CBench.bash.darwin",
 		"configuration": {
-			"partition": "skylake-gold",
-			"nodes": 4,
-			"ntasks-per-node": 2
+			"partition": "scaling",
+			"nodes": 1,
+			"ntasks-per-node": 1
 		},
 
         "output-files": []

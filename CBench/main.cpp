@@ -232,6 +232,8 @@ int main(int argc, char *argv[])
 				ioMgr->saveInputFileParameters();
 		}
 
+
+
 		MPI_Barrier(MPI_COMM_WORLD);
 		if (myRank == 0)
 			std::cout << "\nReading " << fileToLoad  << " done!" << std::endl;
@@ -273,7 +275,7 @@ int main(int argc, char *argv[])
 			if (jsonInput["data-reduction"]["cbench-compressors"][c].find("compressor-params") != jsonInput["data-reduction"]["cbench-compressors"][c].end())
 			{
 				sameCompressorParams = false;
-				//std::cout << "sameCompressorParams = false" << std::endl;
+				debugLog << "sameCompressorParams = false" << std::endl;
 			}
 			else
 			{
@@ -281,7 +283,7 @@ int main(int argc, char *argv[])
 					if ((it.key() != "name") && (it.key() != "output-prefix"))
 						compressorMgr->compressorParameters[it.key()] = strConvert::toStr(it.value());
 				
-				//std::cout << "sameCompressorParams = true" << std::endl;
+				debugLog << "sameCompressorParams = true" << std::endl;
 			}
 
 
@@ -304,9 +306,9 @@ int main(int argc, char *argv[])
 			//std::cout << "\n"<< std::endl;
 			for (int i = 0; i < scalars.size(); i++)
 			{
-				MPI_Barrier(MPI_COMM_WORLD);
-				if (myRank == 0)
-					std::cout << "\n loading .: " << scalars[i] << std::endl;
+				// MPI_Barrier(MPI_COMM_WORLD);
+				// if (myRank == 0)
+				// 	std::cout << "\n loading .: " << scalars[i] << std::endl;
 
 				//Timer compressClock, decompressClock;
 				Memory memLoad(true);
