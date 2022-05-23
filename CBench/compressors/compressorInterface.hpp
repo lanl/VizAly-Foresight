@@ -30,7 +30,6 @@ class CompressorInterface
 
   protected:
     std::string compressorName;		// internal compressor name
-    std::stringstream log;			// logfile stream
     size_t cbytes;					// compressed stream size in bytes
 
   public:
@@ -41,11 +40,9 @@ class CompressorInterface
 
     std::string getCompressorInfo();
     std::string getCompressorName(){ return compressorName; }
-    std::string getLog() { return log.str(); }
     size_t getCompressedSize(){ return cbytes; }
     void setCompressedSize(size_t _cbytes){ cbytes = _cbytes; }
     std::string getParamsInfo();
-	  void clearLog() { log.str(""); }
 };
 
 

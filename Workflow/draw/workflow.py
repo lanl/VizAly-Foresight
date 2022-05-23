@@ -165,7 +165,7 @@ class Workflow(object):
 			configurations = None
 
 		if "evn_path" in self.json_data["data-reduction"]:
-			environment = self.json_data["visualize"]["cinema"]["evn_path"]
+			environment = self.json_data["data-reduction"]["evn_path"]
 			if environment[0] != '/':
 				environment =  self.json_data["foresight-home"] + environment
 		else:

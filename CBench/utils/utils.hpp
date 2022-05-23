@@ -351,3 +351,20 @@ inline std::string python_histogram(size_t numBins, float min_val, float max_val
 	return outputFileSS.str();
 }
 
+inline std::string removeStartEndDoubleQuote(std::string str)
+{
+	str.erase(
+    	remove( str.begin(), str.end(), '\"' ),str.end() );
+
+	return str;
+}
+
+
+inline void assertStatus(int status)
+{
+	if (status == 0)
+	{
+		std::cout << "Something went wrong! Program will exit now!!!" << std::endl;
+		assert(status == 1);
+	}
+}

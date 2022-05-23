@@ -175,7 +175,7 @@ class HACCWorkflow(workflow.Workflow):
 						index = index + 1
 
 
-
+ 
 				analysis_job = j.Job( name=analysis["name"] + str(count),
 										job_type = "analysis",
 										execute_dir="analysis/" + analysis["name"],
@@ -183,6 +183,8 @@ class HACCWorkflow(workflow.Workflow):
 										arguments=args,
 										configurations=configurations,
 										environment=environment )
+
+				analysis_job.add_command("export OMP_NUM_THREADS=1")
 
 				job_Dependecies = utils.get_jobDependency( analysis )
 				#print(job_Dependecies[0])

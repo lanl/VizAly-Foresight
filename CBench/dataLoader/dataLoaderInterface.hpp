@@ -29,7 +29,6 @@ class DataLoaderInterface
 	std::string filename;
 	std::string dataType;
 	std::string param;
-	//std::stringstream log;
 
 	bool saveData;
 	int origNumDims;
@@ -68,9 +67,7 @@ class DataLoaderInterface
 	size_t getTypeSize() { return elemSize; }
 	std::string getType() { return dataType; }
 	std::string getParam() { return param; }
-	
-	//std::string getLog() { return log.str(); }
-	//void clearLog() { log.str(""); }
+
 
 	void setSave(bool state) { saveData = state; }	// if true, write out decomp data
 

@@ -81,7 +81,7 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
 
 	// Read in json compression parameters
 	double abs = 1E-3;
-	int rel = 32;
+	int precision = 32;
 	double rate = 1.0;
 	std::string compressionType = "";
 	if ( compressorParameters.find("abs") != compressorParameters.end() )
@@ -90,11 +90,11 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
 		compressionType = "absolute";
 		debugLog << "Compressor type: " << compressionType << ", abs: " << abs << std::endl;
 	}
-	else if ( compressorParameters.find("rel") != compressorParameters.end())
+	else if ( compressorParameters.find("precision") != compressorParameters.end())
 	{
-		rel = strConvert::to_int( compressorParameters["rel"] );
-		compressionType = "relative";
-		debugLog << "Compressor type: " << compressionType << ", rel: " << rel << std::endl;
+		precision = strConvert::to_double( compressorParameters["precision"] );
+		compressionType = "precision";
+		debugLog << "Compressor type: " << compressionType << ", precision: " << precision  << " | " << compressorParameters["rel"] << std::endl;
 	}
 	else if ( compressorParameters.find("rate") != compressorParameters.end())
 	{
@@ -135,8 +135,8 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
 	// set absolute/relative error tolerance
 	if (compressionType == "absolute")
 		zfp_stream_set_accuracy(zfp, abs);
-	else if (compressionType == "relative")
-		zfp_stream_set_precision(zfp, rel);
+	else if (compressionType == "precision")
+		zfp_stream_set_precision(zfp, precision);
 	else if (compressionType == "rate")
 		zfp_stream_set_rate(zfp, rate, type, numDims, 0);
 
@@ -187,7 +187,7 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
 
 	// Read in json compression parameters
 	double abs = 1E-3;
-	int rel = 32;
+	int precision = 32;
 	double rate = 1.0;
 	std::string compressionType = "";
 	if ( compressorParameters.find("abs") != compressorParameters.end() )
@@ -195,10 +195,10 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
 		abs = strConvert::to_double( compressorParameters["abs"] );
 		compressionType = "absolute";
 	}
-	else if ( compressorParameters.find("rel") != compressorParameters.end())
+	else if ( compressorParameters.find("precision") != compressorParameters.end())
 	{
-		rel = strConvert::to_int( compressorParameters["rel"] );
-		compressionType = "relative";
+		precision = strConvert::to_int( compressorParameters["precision"] );
+		compressionType = "precision";
 	}
 	else if ( compressorParameters.find("rate") != compressorParameters.end())
 	{
@@ -239,8 +239,8 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
 	// set absolute/relative error tolerance
 	if (compressionType == "absolute")
 		zfp_stream_set_accuracy(zfp, abs);
-	else if (compressionType == "relative")
-		zfp_stream_set_precision(zfp, rel);
+	else if (compressionType == "precision")
+		zfp_stream_set_precision(zfp, precision);
 	else if (compressionType == "rate")
 		zfp_stream_set_rate(zfp, rate, type, numDims, 0);
 		

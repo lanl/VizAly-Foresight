@@ -7,8 +7,7 @@ All rights reserved.
 Pascal Grosset
 ================================================================================*/
 
-#ifndef _GIO_PV_GIO_DATA_H_
-#define _GIO_PV_GIO_DATA_H_
+#pragma once
 
 #include <string>
 #include "utils.hpp"
@@ -133,7 +132,4 @@ inline int GioData::alloc(int offset)
     determineDataType();
 
 	return allocateMem(dataType, numElements, offset, data);
-
 }
-
-#endif

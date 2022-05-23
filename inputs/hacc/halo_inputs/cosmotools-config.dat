@@ -41,7 +41,7 @@ FREQUENCY_TYPE 0
 EXPLICIT_TIMESTEPS 499
 IMPLICIT_TIMESTEPS
 WRITE_OUTPUT  YES
-BASE_OUTPUT_FILE_NAME  m001
+BASE_OUTPUT_FILE_NAME  orig
 #BASE_OUTPUT_FILE_NAME  ../run/output/analysis/Halos/b0168/m001
 
 ## Indicate whether halos will be visualized 
@@ -55,21 +55,28 @@ COMPUTE_ELLIPTICITY NO  # Enable halo ellipticity output (currently will report 
 
 LINKING_LENGTH  	0.168 # The linking length used for FOF algorithm
 MINIMUM_MASS    	1.0e5 # The minimum mass (M_solar/h)
-FOF_PMIN        	40	# Minimum number of particles to consider as a halo
-OVERLOAD_LENGTH 	6.0   # (Mpc/h)
+FOF_PMIN        	20	  #40(previously) # Minimum number of particles to consider as a halo
+OVERLOAD_LENGTH 	8.0   #6.0(previously)   # (Mpc/h)
 DIST_CONVERT_FACTOR 1.0   # positions are multiplied by this factor
+DBSCAN_MIN          1
 NEIGH_MIN       	1 	# min number of neighbors for linking (not used)
 SMOOTHING_LENGTH 0.001	# smoothing length for center finder
 
 #---------------------------| Center Finder Parameters |-----------------------
 
 COMPUTE_FOF_CENTERS YES   # enables finding of halo centers
-USE_MBP_FINDER  	NO   # run the MBP algorithm for FOF centers
-USE_MCP_FINDER  	NO	# run the MCP algorithm for FOF centers
-USE_HIST_FINDER 	YES	# run the histogram MCP algorithm for FOF centers
+USE_SIMV_FINDER     NO   # run potential center finder
+USE_MBP_FINDER      NO    # run the MBP algorithm for FOF centers
+USE_MCP_FINDER      NO    # run the MCP algorithm for FOF centers
+USE_HIST_FINDER     NO    #YES(previously) # run the histogram MCP algorithm for FOF centers
+USE_BULK_MBP_FINDER YES    # faster center finding method 
 MAX_FOR_CENTER_FINDING 0 # run center finder for halos with this maximum number of particles
-USE_BULK_MBP_FINDER 0
-
+SEARCH_FACTOR 0.5
+GRID_CONNECTED 23
+NUMBER_GPUS_PER_NODE 6 # helps with memory
+CHAIN_SIZE 0.5 #chaining mesh size we use for SOD halo finding
+MBP_THRESHOLD 50000000 #threshold for large halos in certain center finders (describes when to do N^2 vs Astar for example). Bulk finder does not use this.
+NUM_SOD_PROFILE_BINS 21
 
 #---------------------------|  Parameters |-----------------------
 
@@ -77,10 +84,16 @@ USE_BULK_MBP_FINDER 0
 
 
 #---------------------------| Core Finder Parameters |-------------------------
-NUM_CORE_SIZE 20
-CORE_HALO_SIZE 100
+#Previously
+#NUM_CORE_SIZE 20
+#CORE_HALO_SIZE 100
+
+USE_CORE_FINDER NO
+NUM_CORE_SIZE 50
+CORE_HALO_SIZE 80
+
 #ACCUMULATE_CORE_NAME ../run/output/analysis/Halos/b0168/m001
-ACCUMULATE_CORE_NAME m001
+ACCUMULATE_CORE_NAME orig
 
 #-------------------------------------| SOD Parameters |-----------------------
 
@@ -90,6 +103,9 @@ SOD_MASS_CONVERSION  1.0   # SOD-mass conversion factor
 SOD_PMIN         	500  # min. num particles for which SOD properties
 RHO_RATIO        	200.0 # overdensity value
 CDELTA_MINIMUM_PARTICLES 500 # min. num particles for concentration measurement
+COMPUTE_ELLIPTICITY YES
+NUM_SOD_PROFILE_BINS 21
+
 #---------------------------------| Subhalo Parameters |-----------------------
 
 COMPUTE_SUBHALOS   NO	# enables/disables sub-halofinding
@@ -97,10 +113,9 @@ USE_SUBFIND    	NO	# enables/disables SUBFIND
 NEIGHS_SPH_DENSITY 64	# number of neighbors for computing density
 NUM_SUBHALO_NEIGHS 20	# number of close neighbors used in sub-grouping
 SUBHALO_PMIN   	20	# minimum particles in a sub-halo
-FOF_MIN_SIZE   	5000  # size of the smallest FOF halo to have sub-finding
+FOF_MIN_SIZE   	2000 #(previously) 5000  # size of the smallest FOF halo to have sub-finding
 ALPHA          	1.0   # factor for cut/grow criteria
 BETA           	0.0   # factor for Poisson noise significance
-CHAIN_SIZE      2.0
 
 #----------------------------------| Output Parameters |-----------------------
 
@@ -119,4 +134,3 @@ MIN_FRACTIONAL_OUTPUT_HALO 5  # min size of halo to do fractional output
 OUTPUT_PARTICLE_FRACTION 0.01 # percentage of particles to output
 OUTPUT_PARTICLE_TAGS YES  	# generate a particle tags file
 OUTPUT_ALL_PARTICLES NO   	# output all particles:0
-

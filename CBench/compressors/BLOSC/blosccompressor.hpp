@@ -56,23 +56,36 @@ inline int BLOSCCompressor::compress(void *input, void *&output, std::string dat
 	
 
 	std::string internalCompressor = "blosclz";
-	std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("mode");
-	if ( got != compressorParameters.end() )
-		if (compressorParameters["mode"] != "")
-			internalCompressor = compressorParameters["mode"];
-	blosc_set_compressor(internalCompressor.c_str());	//"blosclz", "lz4", "lz4hc", "snappy", "zlib" and "ztsd". "blosclz" is default 
+	if (compressorParameters.count("mode") > 0)
+		internalCompressor = compressorParameters["mode"];
+
+	internalCompressor = removeStartEndDoubleQuote(internalCompressor);
+	
+	int status = blosc_set_compressor(internalCompressor.c_str());	//"blosclz", "lz4", "lz4hc", "snappy", "zlib" and "ztsd". "blosclz" is default 
+	if (status == -1)
+	{
+		std::cout << internalCompressor << " is not supported! " << std::endl;
+		std::cout << "We will be using blosclz" << std::endl;
+		internalCompressor = "blosclz";
+		blosc_set_compressor(internalCompressor.c_str());
+	}
+	debugLog << "internalCompressor: " << internalCompressor.c_str() << std::endl;
+
+	
+	int shuffle = 1;
+	if (compressorParameters.count("shuffle") > 0)
+		shuffle = strConvert::to_int(compressorParameters["shuffle"]);
 
 	// Default Input Params: {clevel=9, shuffle=1, sizeof(data), idatasize, input, output, odatasize);
-	osize = blosc_compress(9, 1, dataTypeSize, isize, input, output, osize);
-	
+	debugLog << "Shuffle: " << shuffle << std::endl;
+	osize = blosc_compress(9, shuffle, dataTypeSize, isize, input, output, osize);
+
 	if (osize < 0)
-	{
 		throw std::runtime_error("Compression error. Error code: " + std::to_string(osize));
-	}
+	
 	if (osize > 0)
-	{
 		output = std::realloc(output, osize);
-	}
+	
 	clock.stop("compress");
 
 	cbytes = osize;

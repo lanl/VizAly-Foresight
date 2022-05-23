@@ -26,15 +26,6 @@ inline void writeFile(std::string filename, std::string log)
 	outputFile.close();
 }
 
-
-inline void writeLog(std::string filename, std::stringstream log)
-{
-	std::ofstream outputFile( (filename + ".log").c_str(), std::ios::out);
-	outputFile << log.str();
-	outputFile.close();
-}
-
-
 inline void writeLog(std::string filename, std::string log)
 {
 	std::ofstream outputFile( (filename + ".log").c_str(), std::ios::out);

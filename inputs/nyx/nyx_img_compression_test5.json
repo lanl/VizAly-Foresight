@@ -1,0 +1,155 @@
+{
+    "foresight-home": "/projects/exasky/pascal-projects/VizAly-Foresight/",
+	"project-home": "/projects/groups/vizproject/dssdata/Exasky/compress_for_img/",
+	"wflow-path": "img-nyx-test-z42",
+
+	"input": 
+	{
+		"filetype": "NYX",
+		"filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",  
+
+
+		"group" : "native_fields",
+		"scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ],
+
+		"uncompressed": 
+		[
+			{
+				"group": "domain",
+				"attributes": [
+					{
+						"name": "shape",
+						"type": "int",
+						"size": 3
+					},
+					{
+						"name": "size",
+						"type": "double",
+						"size": 3
+					}
+				]
+			},
+
+			{
+				"group": "universe",
+				"attributes": 
+				[
+					{
+						"name": "hubble",
+						"type": "double",
+						"size": 1 
+					},
+
+					{
+						"name": "omega_b",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "omega_l",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "omega_m",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "redshift",
+						"type": "double",
+						"size": 1
+					}
+				]
+			}
+		]
+	},
+
+    "data-reduction": 
+	{
+        "cbench-compressors" : 
+        [
+			{
+                "name": "zfp",
+                "abs" : 15,
+                "output-prefix" : "zfp_abs__15"
+			},
+
+			{
+                "name": "zfp",
+                "abs" : 20,
+                "output-prefix" : "zfp_abs__20"
+			},
+
+			{
+                "name": "zfp",
+                "abs" : 25,
+                "output-prefix" : "zfp_abs__25"
+			},
+
+			{
+                "name": "zfp",
+                "abs" : 30,
+                "output-prefix" : "zfp_abs__30"
+			},
+
+			{
+                "name": "zfp",
+                "abs" : 35,
+                "output-prefix" : "zfp_abs__35"
+			},
+
+			{
+                "name": "zfp",
+                "abs" : 40,
+                "output-prefix" : "zfp_abs__40"
+			}
+        ],
+	
+
+	
+        "cbench-output": 
+        {
+            "run-path": "mpirun $foresight-home$build/CBench",
+
+            "output-decompressed": true,
+            "output-decompressed-location": "decompressed_files",
+
+            "log-file": "runlog_",
+            "metrics-file": "metrics"
+        },
+        
+        "cbench-metrics": 
+        [
+            {
+                "name": "absolute_error"
+            },
+
+            {
+                "name": "relative_error"
+            },
+
+            {
+                "name": "mse"
+            },
+
+            {
+                "name": "psnr"
+            }
+        ],
+
+        "name" : "cbench",
+        "path" : "mpirun $foresight-home$build/CBench",
+        "evn_path": "evn_scripts/VizAly-CBench.bash.darwin",
+        "configuration": {
+            "partition": "scaling",
+            "nodes": 1,
+            "ntasks-per-node": 1
+        },
+
+        "output-files": []
+    }
+}
