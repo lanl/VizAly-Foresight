@@ -18,9 +18,9 @@ if [ $? == 1 ]; then
     python -m pip install scipy
 fi
 
-# hdf5
-export LD_LIBRARY_PATH=/projects/exasky/hdf5/install/lib:$LD_LIBRARY_PATH
-export PATH=/projects/exasky/hdf5/install/bin:$PATH
+# # hdf5
+# export LD_LIBRARY_PATH=/projects/exasky/hdf5/install/lib:$LD_LIBRARY_PATH
+# export PATH=/projects/exasky/hdf5/install/bin:$PATH
 
 # fftw 3.3.8
 export LD_LIBRARY_PATH=/projects/exasky/fftw-3.3.8/install/lib:$LD_LIBRARY_PATH

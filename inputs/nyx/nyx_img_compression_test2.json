@@ -73,39 +73,59 @@
         "cbench-compressors" : 
         [
 			{
-                "name": "zfp",
-                "abs" : 15,
-                "output-prefix" : "zfp_abs__15"
+                "name": "SZ",
+                "pw_rel" : 0.5,
+                "output-prefix" : "SZ_pwrel__0_5_"
+            },
+    
+            {
+                "name": "SZ",
+                "pw_rel" : 0.99,
+                "output-prefix" : "SZ_pwrel__0_99"
 			},
 
 			{
-                "name": "zfp",
-                "abs" : 20,
-                "output-prefix" : "zfp_abs__20"
+                "name": "SZ",
+                "abs" : 1.0,
+                "output-prefix" : "SZ_abs__1_"
 			},
+			
+			{
+                "name": "SZ",
+                "abs" : 2.0,
+                "output-prefix" : "SZ_abs__2_"
+			},
+			
+			{
+                "name": "SZ",
+                "abs" : 5.0,
+                "output-prefix" : "SZ_abs__5_"
+			},
+			
+			{
+                "name": "SZ",
+                "abs" : 10.0,
+                "output-prefix" : "SZ_abs__10_"
+            },
+	
+			
 
 			{
                 "name": "zfp",
-                "abs" : 25,
-                "output-prefix" : "zfp_abs__25"
+                "precision" : 1,
+                "output-prefix" : "zfp_prec__1"
 			},
+
+            {
+                "name": "zfp",
+                "precision" : 2,
+                "output-prefix" : "zfp_prec__2"
+			},data
 
 			{
                 "name": "zfp",
-                "abs" : 30,
-                "output-prefix" : "zfp_abs__30"
-			},
-
-			{
-                "name": "zfp",
-                "abs" : 35,
-                "output-prefix" : "zfp_abs__35"
-			},
-
-			{
-                "name": "zfp",
-                "abs" : 40,
-                "output-prefix" : "zfp_abs__40"
+                "abs" : 10,
+                "output-prefix" : "zfp_abs__10"
 			}
         ],
 	

@@ -179,6 +179,9 @@ elif [ $buildOpt = "Default" ]; then
 			-DFPZIP_LIBRARY=$externalDependencies/fpzip-1.2.0/lib/libfpzip.a \
 			-DCMAKE_BUILD_TYPE=$buildType
 	else
+		export LD_LIBRARY_PATH=$externalDependencies/hdf5/install/lib:$LD_LIBRARY_PATH
+		export PATH=$externalDependencies/hdf5/install/bin:$PATH
+
 		cmake ../CBench $opt\
 			-DCBENCH_LOADER_GDA=ON \
 			-DCBENCH_LOADER_GENERICBINARY=ON \
