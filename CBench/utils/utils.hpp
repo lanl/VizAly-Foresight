@@ -368,3 +368,25 @@ inline void assertStatus(int status)
 		assert(status == 1);
 	}
 }
+
+
+float minMeanMax(float *Input, float &minValue, float &meanValue, float &maxValue, int nrow, int ncol, int ndep)
+{
+	//std::cout << *(Input + 256*nrow + 256) << " " << *(Input + 256*nrow + 376) << std::endl;
+	for (int i = 0; i < nrow*ncol*ndep; i++)
+	{
+		if ( *(Input+i) < minValue)
+		{
+			minValue = *(Input + i);
+		}
+		if ( *(Input+i) > maxValue)
+		{
+			maxValue = *(Input + i);
+		}
+
+
+		meanValue += *(Input + i) / (nrow*ncol*ndep);
+	}
+
+	return 0;
+}

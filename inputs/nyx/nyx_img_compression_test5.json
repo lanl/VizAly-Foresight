@@ -72,7 +72,7 @@
 	{
         "cbench-compressors" : 
         [
-			{
+		{
                 "name": "zfp",
                 "abs" : 15,
                 "output-prefix" : "zfp_abs__15"

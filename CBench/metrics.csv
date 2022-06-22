@@ -1,0 +1,3 @@
+Compressor_field__params, name, absolute_error, relative_error, mse, psnr, Compression Throughput(MB/s), DeCompression Throughput(MB/s), Compression Ratio
+SZ_dark_matter_density__rel0.1, sz_rel__1e-1, 544.676, 367.422, 17.1255, 62.395, 270.544, 640.149, 5284.89
+SZ_dark_matter_density__rel0.001, sz_rel__1e-3, 5.45222, 5.45222, 0.493822, 77.7958, 231.287, 543.711, 93.8534

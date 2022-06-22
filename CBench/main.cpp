@@ -240,15 +240,12 @@ inline void writeDecompressedData(nlohmann::json jsonInput,
 	{
 		createFolder(outputPath);
 		outputPath = jsonInput["data-reduction"]["cbench-output"]["output-decompressed-location"];
-		decompressedOutputName = decompressedOutputName + "__" + fileToOutput;
+		decompressedOutputName = outputPath + "/" + decompressedOutputName + "__" + fileToOutput;
+		//std::cout << outputPath << std::endl;
 	}
 	else
-		decompressedOutputName = outputPath + "/" + decompressedOutputName + "__" + fileToOutput;
+		decompressedOutputName = decompressedOutputName + "__" + fileToOutput;
 	
-
-	
-
-
 	//
 	// Write out uncompressed (lossy) data
 	ioMgr->writeData(decompressedOutputName);
@@ -301,7 +298,6 @@ int main(int argc, char *argv[])
 	std::ifstream jsonFile(argv[1]);
 	jsonFile >> jsonInput;
 
-
 	//
 	// Load in the global input parameters
 	std::string inputFilename = "";
@@ -329,6 +325,7 @@ int main(int argc, char *argv[])
 			metrics);
 
 	writeLog(outputLogFilename, debugLog.str());
+	
 	assertStatus(status);
 
 
@@ -339,9 +336,6 @@ int main(int argc, char *argv[])
 		std::cout << "Starting ... \nLook at the log for progress update ... \n" << std::endl;
 	}
 	MPI_Barrier(MPI_COMM_WORLD);		// Syncing on all inputs
-
-
-
 
 	//
 	// All seems valid, let's start ...
@@ -446,8 +440,6 @@ int main(int argc, char *argv[])
 
 			writeLog(outputLogFilename, debugLog.str());
 
-
-
 			//
 			// Cycle through scalars
 			for (int i = 0; i < scalars.size(); i++)
@@ -467,7 +459,6 @@ int main(int argc, char *argv[])
 					writeLog(outputLogFilename, debugLog.str());
 					continue;
 				}
-
 
 				// Read in compressor parameter for this field if not the same
 				bool scalarFound = false;
@@ -503,7 +494,20 @@ int main(int argc, char *argv[])
 
 
 
-				//
+				// jinzhenw 06/15/2022
+				//std::cout << "scalar name: " << scalars[i] << std::endl;
+				float  fmin_o = std::numeric_limits<float>::max();
+				float  fmax_o = -1 * std::numeric_limits<float>::max();
+				float fmean_o = 0;
+				int nrow =  ioMgr->getSizePerDim()[0];
+				int ncol =  ioMgr->getSizePerDim()[1];
+				int ndep =  ioMgr->getSizePerDim()[2];
+
+				float* data = (float*)ioMgr->data;
+				minMeanMax(data, fmin_o, fmean_o, fmax_o, nrow, ncol, ndep);
+				//std::cout << "fmin: " << fmin << ", fmean: " << fmean << ", fmax: " << fmax << std::endl;
+				
+
 				// Do Compression
 				void *decompdata = NULL;
 				if (!sameCompressorParams && scalarFound == false)
@@ -537,7 +541,11 @@ int main(int argc, char *argv[])
 				else
 				{
 					if (myRank == 0)
+					{
 						std::cout << "Compressing " << scalars[i] << "... " << std::endl;
+						// jinzhenw 06/20/22
+						//std::cout << compressorMgr->getParamsInfo() << std::endl;
+					}
 
 					metricsInfo << compressorMgr->getParamsInfo() << std::endl;
 					csvOutput << compressorMgr->getCompressorName() << "_" << scalars[i] << "__" << compressorMgr->getParamsInfo()
@@ -562,19 +570,38 @@ int main(int argc, char *argv[])
 
 				}
 				
+				MPI_Barrier(MPI_COMM_WORLD);	// sync after compression
+
+				//jinzhenw 06/15/2022
+				float  fmin_c = std::numeric_limits<float>::max();
+				float  fmax_c = -1 * std::numeric_limits<float>::max();
+				float fmean_c = 0;
+				data = (float*)decompdata;
+				minMeanMax(data, fmin_c, fmean_c, fmax_c, nrow, ncol, ndep);
+				//std::cout << "fmin: " << fmin << ", fmean: " << fmean << ", fmax: " << fmax << std::endl;
+				//
+				float Fmin_o, Fmax_o, Fmean_o;
+				float Fmin_c, Fmax_c, Fmean_c;
+				MPI_Allreduce(&fmin_o,  &Fmin_o, 1, MPI_FLOAT, MPI_MIN, MPI_COMM_WORLD);
+				MPI_Allreduce(&fmax_o,  &Fmax_o, 1, MPI_FLOAT, MPI_MAX, MPI_COMM_WORLD);
+				MPI_Allreduce(&fmean_o, &Fmean_o, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+				MPI_Allreduce(&fmin_c,  &Fmin_c, 1, MPI_FLOAT, MPI_MIN, MPI_COMM_WORLD);
+				MPI_Allreduce(&fmax_c,  &Fmax_c, 1, MPI_FLOAT, MPI_MAX, MPI_COMM_WORLD);
+				MPI_Allreduce(&fmean_c, &Fmean_c, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
 
 				writeLog(outputLogFilename, debugLog.str());
 				MPI_Barrier(MPI_COMM_WORLD);	// sync after compression
-
-
-
 
 				//
 				// Computing Metrics
 				//
 
 				if (myRank == 0)
+				{
 					std::cout << "Computing metrics ... " << std::endl;
+					std::cout << "fmin_o: " << Fmin_o << ", fmean_o: " << Fmean_o/numRanks << ", fmax_o: " << Fmax_o << std::endl;
+					std::cout << "fmin_c: " << Fmin_c << ", fmean_c: " << Fmean_c/numRanks << ", fmax_c: " << Fmax_c << std::endl;
+				}
 
 				// Get compression ratio
 				unsigned long totalCompressedSize;
