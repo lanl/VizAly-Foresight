@@ -124,11 +124,6 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
 
 inline int SZCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
-	size_t numel = n[0];
-	for (int i = 1; i < 5; i++)
-		if (n[i] != 0)
-			numel *= n[i];
-
 	Timer clock("decompress");
 
 	if (dataType == "float")

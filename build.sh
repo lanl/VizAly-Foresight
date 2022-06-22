@@ -196,6 +196,9 @@ elif [ $buildOpt = "Default" ]; then
 			-DCBENCH_COMPRESSOR_SZ=ON \
 			-DSZ_INCLUDE_PATH=$externalDependencies/SZ/sz/include \
 			-DSZ_LIBRARY=$externalDependencies/SZ/install/lib64/libSZ.so \
+			-DCBENCH_COMPRESSOR_MGARD=ON \
+			-DMGARD_INCLUDE_PATH=$externalDependencies/MGARD/install/include \
+			-DMGARD_LIBRARY=$externalDependencies/MGARD/install/lib64/libmgard.so \
 			-DCMAKE_BUILD_TYPE=$buildType
 	fi
 
@@ -240,6 +243,9 @@ elif [ $buildOpt = "all" ]; then
 		-DCBENCH_COMPRESSOR_ISABELA=ON \
 		-DISABELA_INCLUDE_PATH=$externalDependencies/ISABELA-compress-0.2.1/include \
 		-DISABELA_LIBRARY=$externalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
+		-DCBENCH_COMPRESSOR_MGARD=ON \
+		-DMGARD_INCLUDE_PATH=$externalDependencies/MGARD/install/include \
+		-DMGARD_LIBRARY=$externalDependencies/MGARD/install/lib64/libmgard.so \
 		-DCMAKE_BUILD_TYPE=$buildType
 	else
 	  cmake ../CBench $opt\
@@ -264,7 +270,7 @@ elif [ $buildOpt = "all" ]; then
 		-DISABELA_LIBRARY=$externalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
 		-DCBENCH_COMPRESSOR_MGARD=ON \
 		-DMGARD_INCLUDE_PATH=$externalDependencies/MGARD/install/include \
-		-DMGARD_LIBRARY=$externalDependencies/MGARD/install/lib/libmgard.so \
+		-DMGARD_LIBRARY=$externalDependencies/MGARD/install/lib64/libmgard.so \
 		-DCMAKE_BUILD_TYPE=$buildType
 	fi
 

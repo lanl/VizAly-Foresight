@@ -6,7 +6,7 @@
 #include <sstream>
 #include "compressorInterface.hpp"
 #include "timer.hpp"
-#include "mgard_api.h"
+#include "compress_x.hpp"
 
 class MGARDCompressor: public CompressorInterface
 {
@@ -39,80 +39,116 @@ inline void MGARDCompressor::init()
 
 inline int MGARDCompressor::compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
+	std::vector<mgard_x::SIZE> shape;
+	shape.push_back(n[0]);
+
+	int numDims = 1;
 	size_t numel = n[0];
 	for (int i = 1; i < 5; i++)
 		if (n[i] != 0)
+		{
 			numel *= n[i];
+			numDims++;
+			shape.push_back(n[i]);
+		}
 
-	// Read in json compression parameters
-	double tol = 1E-3;
-	std::unordered_map<std::string, std::string>::const_iterator got = compressorParameters.find("tolerance");
-	if( got != compressorParameters.end() )
-		if (compressorParameters["tolerance"] != "")
-			tol = strConvert::to_double( compressorParameters["tolerance"] );
+	std::cout << "Shape" << shape[0] << ", " << shape[1] << ", " << shape[2] << std::endl;
+	std::cout << "numel" << numel << std::endl;
+	std::cout << "numDims" << numDims << std::endl;
 
-	// Set compression parameters
-	int iflag = 0; //0 -> float, 1 -> double
-
-	if (dataTypeSize == 8)
-		iflag = 1;
-
-	int out_size[1];
 
 	Timer clock("compress");
 
-	// Create a copy of the input data because compressor will auto-destroy it
-	void * in_buff = std::malloc(numel*dataTypeSize);
-	memcpy(in_buff, input, numel*dataTypeSize);
 
-	//mgard_compress(flag, in_buff, &out_size, nrow, ncol, nfib, &tol)
-	// Note: "tol" must be of same "type" as set iflagz
-	std::cout << "n[0]: " << n[0] << std::endl;
-	std::cout << "n[0]: " << n[1] << std::endl;
-	std::cout << "n[0]: " << n[2] << std::endl;
+	// // Create a copy of the input data because compressor will auto-destroy it
+	// void * in_buff = std::malloc(numel*dataTypeSize);
+	// memcpy(in_buff, input, numel*dataTypeSize);
+	
+	mgard_x::data_type mDataType = mgard_x::data_type::Float;
+	if (dataType == "double")
+	{
+		mDataType = mgard_x::data_type::Double;
+		std::cout << "double" << std::endl;
+	}
+	else
+		if (dataType == "float")
+		{
+			mDataType = mgard_x::data_type::Float;
+			std::cout << "Float" << std::endl;
+		}
+		else
+		{
+			std::cout << "double not supported!!!" << std::endl;
+			return 0;
+		}
 
-	int _n[3];
-	_n[0] = n[0];
-	_n[1] = n[1];
-	_n[2] = n[2];
+	mgard_x::error_bound_type errorType = mgard_x::error_bound_type::REL;
+	double tol = 1E-3;
+	if ( compressorParameters.find("abs") != compressorParameters.end() )
+	{
+		errorType = mgard_x::error_bound_type::ABS;
+		tol = strConvert::to_double(compressorParameters["abs"]);
+		std::cout << "Abs " << " : " << tol << std::endl;
+	}
+	else if ( compressorParameters.find("rel") != compressorParameters.end() )
+	{
+		errorType = mgard_x::error_bound_type::REL;
+		tol = strConvert::to_double(compressorParameters["rel"]);
+		std::cout << "Rel " << " : " << tol << std::endl;
+	}
+	else
+	{
+		std::cout << "error type not supported!!!" << std::endl;
+		return 0;
+	}
 
-	float *_data = new float[numel];
-	//_data = in_buff;
-	unsigned char * compressed_data = mgard_compress(iflag, _data, out_size, _n[0], _n[1], _n[2], tol );
-	std::uint64_t csize = out_size[0];
-	cbytes = csize;
+
+	mgard_x::Config config;
+	config.lossless = mgard_x::lossless_type::Huffman_Zstd;
+	config.dev_type = mgard_x::device_type::Auto;
+
+
+	mgard_x::compress(numDims, 
+					mDataType, 
+					shape, 
+					tol, 
+					0.0,	// smoothness parameter
+                    errorType, 
+					input,
+                    output, 
+					cbytes, 
+					config, 
+					false);
+
 
 	clock.stop("compress");
 
-	debugLog << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << csize << ", cRatio: " << (dataTypeSize*numel / (float)csize) << ", #elements: " << numel << std::endl;
+	debugLog << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << cbytes << ", cRatio: " << (dataTypeSize*numel / (float)cbytes) << ", #elements: " << numel << std::endl;
 	debugLog << compressorName << " ~ CompressTime: " << clock.getDuration("compress") << " s " << std::endl;
 
 	return 1;
 }
 
+
 inline int MGARDCompressor::decompress(void *&input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
-	size_t numel = n[0];
-	for (int i = 1; i < 5; i++)
-		if (n[i] != 0)
-			numel *= n[i];
-
-	// Set compression parameters
-	int iflag = 0; //0 -> float, 1 -> double
-
-	if(dataTypeSize == 8)
-		iflag = 1;
-
-	int out_size = cbytes;
-
 	Timer clock("decompress");
 
-	//output = mgard_decompress(iflag, static_cast<std::uint8_t *>(input), out_size, n[0], n[1], n[2] );
+	mgard_x::Config config;
+	config.lossless = mgard_x::lossless_type::Huffman_Zstd;
+	config.dev_type = mgard_x::device_type::Auto;
 
-	std::uint64_t dsize = out_size; // Is out_size updated by mgard?
+	mgard_x::decompress(input, 
+						cbytes,
+                        output, 
+						config, 
+						false);
 
 	clock.stop("decompress");
 	debugLog << compressorName << " ~ DecompressTime: " << clock.getDuration("decompress") << " s " << std::endl;
+
+	std::free(input);	input=NULL;
+
 
 	return 1;
 }
