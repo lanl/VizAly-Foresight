@@ -1,0 +1,109 @@
+Input file: /projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z54.hdf5
+
+---------------------------------------
+Compressor: SZ
+abs80.0696
+
+Field: dark_matter_density
+Max Compression Throughput: 288.996 Mbytes/s
+Max DeCompression Throughput: 676.256 Mbytes/s
+Max Compress Time: 0.471435 s
+Min Compression Throughput: 271.512 Mbytes/s
+Min DeCompression Throughput: 637.235 Mbytes/s
+Compression ratio: 2324.06
+
+---------------------------------------
+Compressor: SZ
+abs70.6173
+
+Field: dark_matter_density
+Max Compression Throughput: 289.537 Mbytes/s
+Max DeCompression Throughput: 692.264 Mbytes/s
+Max Compress Time: 0.471106 s
+Min Compression Throughput: 271.701 Mbytes/s
+Min DeCompression Throughput: 638.969 Mbytes/s
+Compression ratio: 2070.55
+
+---------------------------------------
+Compressor: SZ
+abs60.1653
+
+Field: dark_matter_density
+Max Compression Throughput: 292.151 Mbytes/s
+Max DeCompression Throughput: 690.605 Mbytes/s
+Max Compress Time: 0.466009 s
+Min Compression Throughput: 274.673 Mbytes/s
+Min DeCompression Throughput: 647.702 Mbytes/s
+Compression ratio: 1779.7
+
+---------------------------------------
+Compressor: SZ
+abs50.7133
+
+Field: dark_matter_density
+Max Compression Throughput: 291.041 Mbytes/s
+Max DeCompression Throughput: 683.147 Mbytes/s
+Max Compress Time: 0.465114 s
+Min Compression Throughput: 275.201 Mbytes/s
+Min DeCompression Throughput: 644.235 Mbytes/s
+Compression ratio: 1505.44
+
+---------------------------------------
+Compressor: SZ
+abs40.2611
+
+Field: dark_matter_density
+Max Compression Throughput: 290.71 Mbytes/s
+Max DeCompression Throughput: 693.141 Mbytes/s
+Max Compress Time: 0.471493 s
+Min Compression Throughput: 271.478 Mbytes/s
+Min DeCompression Throughput: 642.711 Mbytes/s
+Compression ratio: 1174.09
+
+---------------------------------------
+Compressor: SZ
+abs30.8089
+
+Field: dark_matter_density
+Max Compression Throughput: 290.588 Mbytes/s
+Max DeCompression Throughput: 688.524 Mbytes/s
+Max Compress Time: 0.476054 s
+Min Compression Throughput: 268.877 Mbytes/s
+Min DeCompression Throughput: 643.713 Mbytes/s
+Compression ratio: 884.323
+
+---------------------------------------
+Compressor: SZ
+abs20.3566
+
+Field: dark_matter_density
+Max Compression Throughput: 284.968 Mbytes/s
+Max DeCompression Throughput: 682.15 Mbytes/s
+Max Compress Time: 0.490401 s
+Min Compression Throughput: 261.011 Mbytes/s
+Min DeCompression Throughput: 636.277 Mbytes/s
+Compression ratio: 582.869
+
+---------------------------------------
+Compressor: SZ
+abs10.9044
+
+Field: dark_matter_density
+Max Compression Throughput: 265.19 Mbytes/s
+Max DeCompression Throughput: 671.821 Mbytes/s
+Max Compress Time: 0.515334 s
+Min Compression Throughput: 248.383 Mbytes/s
+Min DeCompression Throughput: 626.332 Mbytes/s
+Compression ratio: 324.11
+
+---------------------------------------
+Compressor: SZ
+abs1.45222
+
+Field: dark_matter_density
+Max Compression Throughput: 237.278 Mbytes/s
+Max DeCompression Throughput: 557 Mbytes/s
+Max Compress Time: 0.582545 s
+Min Compression Throughput: 219.725 Mbytes/s
+Min DeCompression Throughput: 488.053 Mbytes/s
+Compression ratio: 53.5601

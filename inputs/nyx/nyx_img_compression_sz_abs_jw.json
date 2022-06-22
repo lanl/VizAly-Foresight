@@ -1,0 +1,127 @@
+{
+    "foresight-home": "/projects/exasky/VizAly-Foresight-Dev/",
+	"project-home": "/projects/groups/vizproject/dssdata/Exasky/compress_for_img/",
+	"wflow-path": "img-nyx-test-z54",
+
+	"input": 
+	{
+		"filetype": "NYX",
+		"filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z54.hdf5",  
+
+		"group" : "native_fields",
+		"scalars": [ "dark_matter_density"],
+
+		"uncompressed": 
+		[
+			{
+				"group": "domain",
+				"attributes": [
+					{
+						"name": "shape",
+						"type": "int",
+						"size": 3
+					},
+					{
+						"name": "size",
+						"type": "double",
+						"size": 3
+					}
+				]
+			},
+
+			{
+				"group": "universe",
+				"attributes": 
+				[
+					{
+						"name": "hubble",
+						"type": "double",
+						"size": 1 
+					},
+
+					{
+						"name": "omega_b",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "omega_l",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "omega_m",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "redshift",
+						"type": "double",
+						"size": 1
+					}
+				]
+			}
+		]
+	},
+
+    "data-reduction": 
+	{
+        "cbench-compressors" : 
+        [
+
+		{ "name": "SZ", "abs" : 80.0696, "output-prefix" : "sz_Abs__9E-3"},
+		{ "name": "SZ", "abs" : 70.6173, "output-prefix" : "sz_Abs__8E-3"},
+		{ "name": "SZ", "abs" : 60.1653, "output-prefix" : "sz_Abs__7E-3"},
+		{ "name": "SZ", "abs" : 50.7133, "output-prefix" : "sz_Abs__6E-3"},
+		{ "name": "SZ", "abs" : 40.2611, "output-prefix" : "sz_Abs__5E-3"},
+		{ "name": "SZ", "abs" : 30.8089, "output-prefix" : "sz_Abs__4E-3"},
+		{ "name": "SZ", "abs" : 20.3566, "output-prefix" : "sz_Abs__3E-3"},
+		{ "name": "SZ", "abs" : 10.9044, "output-prefix" : "sz_Abs__2E-3"},
+		{ "name": "SZ", "abs" : 1.45222, "output-prefix" : "sz_Abs__1E-3"}
+
+        ],
+		
+        "cbench-output": 
+        {
+            "run-path": "mpirun $foresight-home$build/CBench",
+
+            "output-decompressed": true,
+            "output-decompressed-location": "/projects/exasky/VizAly-Foresight-Dev/run_jinzhenw/decompressed",
+            "log-file": "runlog_",
+            "metrics-file": "metrics"
+        },
+        
+        "cbench-metrics": 
+        [
+            {
+                "name": "absolute_error"
+            },
+
+            {
+                "name": "relative_error"
+            },
+
+            {
+                "name": "mse"
+            },
+
+            {
+                "name": "psnr"
+            }
+        ],
+
+        "name" : "cbench",
+        "path" : "mpirun $foresight-home$build/CBench",
+        "evn_path": "evn_scripts/VizAly-CBench.bash.darwin",
+        "configuration": {
+            "partition": "scaling",
+            "nodes": 1,
+            "ntasks-per-node": 1
+        },
+
+        "output-files": []
+    }
+}

@@ -1,0 +1,144 @@
+{
+    "foresight-home": "/projects/exasky/VizAly-Foresight-Dev/",
+	"project-home": "/projects/groups/vizproject/dssdata/Exasky/compress_for_img/",
+	"wflow-path": "img-nyx-test-z54",
+
+	"input": 
+	{
+		"filetype": "NYX",
+		"filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z54.hdf5",  
+
+		"group" : "native_fields",
+		"scalars": [ "dark_matter_density"],
+
+		"uncompressed": 
+		[
+			{
+				"group": "domain",
+				"attributes": [
+					{
+						"name": "shape",
+						"type": "int",
+						"size": 3
+					},
+					{
+						"name": "size",
+						"type": "double",
+						"size": 3
+					}
+				]
+			},
+
+			{
+				"group": "universe",
+				"attributes": 
+				[
+					{
+						"name": "hubble",
+						"type": "double",
+						"size": 1 
+					},
+
+					{
+						"name": "omega_b",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "omega_l",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "omega_m",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "redshift",
+						"type": "double",
+						"size": 1
+					}
+				]
+			}
+		]
+	},
+
+    "data-reduction": 
+	{
+        "cbench-compressors" : 
+        [
+
+		{ "name": "SZ", "rel" : 9E-3, "output-prefix" : "sz_rel__9E-3"},
+		{ "name": "SZ", "rel" : 8E-3, "output-prefix" : "sz_rel__8E-3"},
+		{ "name": "SZ", "rel" : 7E-3, "output-prefix" : "sz_rel__7E-3"},
+		{ "name": "SZ", "rel" : 6E-3, "output-prefix" : "sz_rel__6E-3"},
+		{ "name": "SZ", "rel" : 5E-3, "output-prefix" : "sz_rel__5E-3"},
+		{ "name": "SZ", "rel" : 4E-3, "output-prefix" : "sz_rel__4E-3"},
+		{ "name": "SZ", "rel" : 3E-3, "output-prefix" : "sz_rel__3E-3"},
+		{ "name": "SZ", "rel" : 2E-3, "output-prefix" : "sz_rel__2E-3"},
+		{ "name": "SZ", "rel" : 1E-3, "output-prefix" : "sz_rel__1E-3"},
+		{ "name": "zfp", "abs" :  490.696, "output-prefix" : "zfp_rel__9E-2"},
+		{ "name": "zfp", "abs" :  460.696, "output-prefix" : "zfp_rel__85E-2"},
+		{ "name": "zfp", "abs" :  436.173, "output-prefix" : "zfp_rel__8E-2"},
+		{ "name": "zfp", "abs" :  406.173, "output-prefix" : "zfp_rel__75E-2"},
+		{ "name": "zfp", "abs" :  381.653, "output-prefix" : "zfp_rel__7E-2"},
+		{ "name": "zfp", "abs" :  351.653, "output-prefix" : "zfp_rel__65E-2"},
+		{ "name": "zfp", "abs" :  327.133, "output-prefix" : "zfp_rel__6E-2"},
+		{ "name": "zfp", "abs" :  307.133, "output-prefix" : "zfp_rel__55E-2"},
+		{ "name": "zfp", "abs" :  272.611, "output-prefix" : "zfp_rel__5E-2"},
+		{ "name": "zfp", "abs" :  248.089, "output-prefix" : "zfp_rel__45E-2"},
+		{ "name": "zfp", "abs" :  218.089, "output-prefix" : "zfp_rel__4E-2"},
+		{ "name": "zfp", "abs" :  188.089, "output-prefix" : "zfp_rel__35E-2"},
+		{ "name": "zfp", "abs" :  163.566, "output-prefix" : "zfp_rel__3E-2"},
+		{ "name": "zfp", "abs" :  133.566, "output-prefix" : "zfp_rel__25E-2"},
+		{ "name": "zfp", "abs" :  109.044, "output-prefix" : "zfp_rel__2E-2"},
+		{ "name": "zfp", "abs" :  80.0444, "output-prefix" : "zfp_rel__15E-2"},
+		{ "name": "zfp", "abs" :  54.5222, "output-prefix" : "zfp_rel__1E-2"}
+
+        ],
+		
+        "cbench-output": 
+        {
+            "run-path": "mpirun $foresight-home$build/CBench",
+
+            "output-decompressed": true,
+            "output-decompressed-location": "/projects/exasky/VizAly-Foresight-Dev/run_jinzhenw/decompressed",
+            "log-file": "runlog_",
+            "metrics-file": "metrics"
+        },
+        
+        "cbench-metrics": 
+        [
+            {
+                "name": "absolute_error"
+            },
+
+            {
+                "name": "relative_error"
+            },
+
+            {
+                "name": "mse"
+            },
+
+            {
+                "name": "psnr"
+            }
+        ],
+
+        "name" : "cbench",
+        "path" : "mpirun $foresight-home$build/CBench",
+        "evn_path": "evn_scripts/VizAly-CBench.bash.darwin",
+        "configuration": {
+            "partition": "scaling",
+            "nodes": 1,
+            "ntasks-per-node": 1
+        },
+
+        "output-files": []
+    }
+}
