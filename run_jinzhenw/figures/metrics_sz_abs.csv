@@ -1,0 +1,10 @@
+Compressor_field__params, name, absolute_error, relative_error, mse, psnr, Compression Throughput(MB/s), DeCompression Throughput(MB/s), Compression Ratio
+SZ_dark_matter_density__abs49.0696, sz_abs__1, 49.0696, 49.0696, 5.3847, 67.4198, 271.563, 636.611, 1453.04
+SZ_dark_matter_density__abs43.6173, sz_abs__2, 43.6173, 43.5963, 4.97541, 67.7632, 270.351, 643.645, 1279.84
+SZ_dark_matter_density__abs38.1653, sz_abs__3, 38.1653, 38.1611, 4.53512, 68.1656, 269.859, 640.23, 1108.64
+SZ_dark_matter_density__abs32.7133, sz_abs__4, 32.7133, 32.7133, 4.04924, 68.6577, 270.618, 647.017, 942.125
+SZ_dark_matter_density__abs27.2611, sz_abs__5, 27.2611, 27.2611, 3.51298, 69.2747, 264.643, 640.776, 779.187
+SZ_dark_matter_density__abs21.8089, sz_abs__6, 21.8089, 21.8083, 2.91868, 70.0796, 262.59, 637.855, 622.945
+SZ_dark_matter_density__abs16.3566, sz_abs__7, 16.3566, 16.3566, 2.27103, 71.1692, 259.801, 639.948, 472.693
+SZ_dark_matter_density__abs10.9044, sz_abs__8, 10.9044, 10.9044, 1.57995, 72.745, 250.253, 628.116, 324.11
+SZ_dark_matter_density__abs1.45222, sz_abs__9, 1.45222, 1.45222, 0.215618, 81.3946, 218.365, 491.291, 53.5601
