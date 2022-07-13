@@ -127,3 +127,8 @@ src/*/*.old
 
 ExternalDependencies_old/*
 build_old/*
+
+# compression experiment results
+*.csv
+*.png
+*.pdf

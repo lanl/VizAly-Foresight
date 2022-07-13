@@ -1,0 +1,13 @@
+Input file: /projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z54.hdf5
+
+---------------------------------------
+Compressor: MGARD
+abs0.1
+
+Field: baryon_density
+Max Compression Throughput: 6.18261 Mbytes/s
+Max DeCompression Throughput: 19.3122 Mbytes/s
+Max Compress Time: 22.1488 s
+Min Compression Throughput: 5.7791 Mbytes/s
+Min DeCompression Throughput: 18.1018 Mbytes/s
+Compression ratio: 24.9396

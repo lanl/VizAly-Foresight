@@ -102,20 +102,20 @@ inline int MGARDCompressor::compress(void *input, void *&output, std::string dat
 		return 0;
 	}
 
-
 	mgard_x::Config config;
 	config.lossless = mgard_x::lossless_type::Huffman_Zstd;
+	// jwang
+	//config.decomposition = mgard_x::decomposition_type::MultiDim;
 	config.dev_type = mgard_x::device_type::Auto;
-
 
 	mgard_x::compress(numDims, 
 					mDataType, 
 					shape, 
 					tol, 
 					0.0,	// smoothness parameter
-                    errorType, 
+					errorType, 
 					input,
-                    output, 
+					output, 
 					cbytes, 
 					config, 
 					false);

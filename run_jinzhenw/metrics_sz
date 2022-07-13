@@ -2,108 +2,702 @@ Input file: /projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z54.
 
 ---------------------------------------
 Compressor: SZ
-abs0.45222
+rel0.001
+
+Field: baryon_density
+Max Compression Throughput: 271.236 Mbytes/s
+Max DeCompression Throughput: 653.172 Mbytes/s
+Max Compress Time: 0.495099 s
+Min Compression Throughput: 258.534 Mbytes/s
+Min DeCompression Throughput: 620.073 Mbytes/s
+Compression ratio: 390.404
+rel0.001
 
 Field: dark_matter_density
-Max Compression Throughput: 182.89 Mbytes/s
-Max DeCompression Throughput: 364.279 Mbytes/s
-Max Compress Time: 0.789403 s
-Min Compression Throughput: 162.148 Mbytes/s
-Min DeCompression Throughput: 310.505 Mbytes/s
-Compression ratio: 18.9214
+Max Compression Throughput: 246.198 Mbytes/s
+Max DeCompression Throughput: 613.915 Mbytes/s
+Max Compress Time: 0.555581 s
+Min Compression Throughput: 230.389 Mbytes/s
+Min DeCompression Throughput: 543.221 Mbytes/s
+Compression ratio: 93.8534
+rel0.001
+
+Field: temperature
+Max Compression Throughput: 169.25 Mbytes/s
+Max DeCompression Throughput: 285.789 Mbytes/s
+Max Compress Time: 0.934272 s
+Min Compression Throughput: 137.005 Mbytes/s
+Min DeCompression Throughput: 206.276 Mbytes/s
+Compression ratio: 9.81197
+rel0.001
+
+Field: velocity_x
+Max Compression Throughput: 134.223 Mbytes/s
+Max DeCompression Throughput: 230.792 Mbytes/s
+Max Compress Time: 1.01141 s
+Min Compression Throughput: 126.555 Mbytes/s
+Min DeCompression Throughput: 219.888 Mbytes/s
+Compression ratio: 9.34659
 
 ---------------------------------------
 Compressor: SZ
-abs1.35222
+rel0.002
+
+Field: baryon_density
+Max Compression Throughput: 279.981 Mbytes/s
+Max DeCompression Throughput: 663.076 Mbytes/s
+Max Compress Time: 0.478082 s
+Min Compression Throughput: 267.737 Mbytes/s
+Min DeCompression Throughput: 640.078 Mbytes/s
+Compression ratio: 738.902
+rel0.002
 
 Field: dark_matter_density
-Max Compression Throughput: 235.671 Mbytes/s
-Max DeCompression Throughput: 554.945 Mbytes/s
-Max Compress Time: 0.568779 s
-Min Compression Throughput: 225.044 Mbytes/s
-Min DeCompression Throughput: 492.386 Mbytes/s
-Compression ratio: 50.3476
+Max Compression Throughput: 253.622 Mbytes/s
+Max DeCompression Throughput: 641.886 Mbytes/s
+Max Compress Time: 0.524262 s
+Min Compression Throughput: 244.153 Mbytes/s
+Min DeCompression Throughput: 597.314 Mbytes/s
+Compression ratio: 173.431
+rel0.002
+
+Field: temperature
+Max Compression Throughput: 191.699 Mbytes/s
+Max DeCompression Throughput: 417.508 Mbytes/s
+Max Compress Time: 0.871416 s
+Min Compression Throughput: 146.887 Mbytes/s
+Min DeCompression Throughput: 238.382 Mbytes/s
+Compression ratio: 13.5974
+rel0.002
+
+Field: velocity_x
+Max Compression Throughput: 133.966 Mbytes/s
+Max DeCompression Throughput: 288.131 Mbytes/s
+Max Compress Time: 0.988529 s
+Min Compression Throughput: 129.485 Mbytes/s
+Min DeCompression Throughput: 279.662 Mbytes/s
+Compression ratio: 12.2656
 
 ---------------------------------------
 Compressor: SZ
-abs2.25222
+rel0.003
+
+Field: baryon_density
+Max Compression Throughput: 280.392 Mbytes/s
+Max DeCompression Throughput: 670.58 Mbytes/s
+Max Compress Time: 0.472476 s
+Min Compression Throughput: 270.913 Mbytes/s
+Min DeCompression Throughput: 640.838 Mbytes/s
+Compression ratio: 1044.32
+rel0.003
 
 Field: dark_matter_density
-Max Compression Throughput: 245.8 Mbytes/s
-Max DeCompression Throughput: 607.529 Mbytes/s
-Max Compress Time: 0.537152 s
-Min Compression Throughput: 238.294 Mbytes/s
-Min DeCompression Throughput: 552.155 Mbytes/s
-Compression ratio: 78.4263
+Max Compression Throughput: 261.641 Mbytes/s
+Max DeCompression Throughput: 654.945 Mbytes/s
+Max Compress Time: 0.517651 s
+Min Compression Throughput: 247.271 Mbytes/s
+Min DeCompression Throughput: 619.033 Mbytes/s
+Compression ratio: 252.308
+rel0.003
+
+Field: temperature
+Max Compression Throughput: 222.316 Mbytes/s
+Max DeCompression Throughput: 507.208 Mbytes/s
+Max Compress Time: 0.884662 s
+Min Compression Throughput: 144.688 Mbytes/s
+Min DeCompression Throughput: 212.616 Mbytes/s
+Compression ratio: 17.3195
+rel0.003
+
+Field: velocity_x
+Max Compression Throughput: 130.537 Mbytes/s
+Max DeCompression Throughput: 221.348 Mbytes/s
+Max Compress Time: 1.02993 s
+Min Compression Throughput: 124.28 Mbytes/s
+Min DeCompression Throughput: 214.492 Mbytes/s
+Compression ratio: 14.3816
 
 ---------------------------------------
 Compressor: SZ
-abs3.17493
+rel0.004
+
+Field: baryon_density
+Max Compression Throughput: 284.756 Mbytes/s
+Max DeCompression Throughput: 671.159 Mbytes/s
+Max Compress Time: 0.467564 s
+Min Compression Throughput: 273.759 Mbytes/s
+Min DeCompression Throughput: 641.884 Mbytes/s
+Compression ratio: 1348.14
+rel0.004
 
 Field: dark_matter_density
-Max Compression Throughput: 250.09 Mbytes/s
-Max DeCompression Throughput: 631.835 Mbytes/s
-Max Compress Time: 0.521079 s
-Min Compression Throughput: 245.644 Mbytes/s
-Min DeCompression Throughput: 588.993 Mbytes/s
-Compression ratio: 105.812
+Max Compression Throughput: 266.291 Mbytes/s
+Max DeCompression Throughput: 658.798 Mbytes/s
+Max Compress Time: 0.514183 s
+Min Compression Throughput: 248.939 Mbytes/s
+Min DeCompression Throughput: 625.181 Mbytes/s
+Compression ratio: 330.631
+rel0.004
+
+Field: temperature
+Max Compression Throughput: 234.341 Mbytes/s
+Max DeCompression Throughput: 546.271 Mbytes/s
+Max Compress Time: 0.862248 s
+Min Compression Throughput: 148.449 Mbytes/s
+Min DeCompression Throughput: 247.859 Mbytes/s
+Compression ratio: 20.7804
+rel0.004
+
+Field: velocity_x
+Max Compression Throughput: 130.842 Mbytes/s
+Max DeCompression Throughput: 232.874 Mbytes/s
+Max Compress Time: 1.02882 s
+Min Compression Throughput: 124.415 Mbytes/s
+Min DeCompression Throughput: 229.818 Mbytes/s
+Compression ratio: 15.8979
 
 ---------------------------------------
 Compressor: SZ
-abs4.57493
+rel0.005
+
+Field: baryon_density
+Max Compression Throughput: 285.038 Mbytes/s
+Max DeCompression Throughput: 680.462 Mbytes/s
+Max Compress Time: 0.467451 s
+Min Compression Throughput: 273.826 Mbytes/s
+Min DeCompression Throughput: 643.637 Mbytes/s
+Compression ratio: 1647.99
+rel0.005
 
 Field: dark_matter_density
-Max Compression Throughput: 254.991 Mbytes/s
-Max DeCompression Throughput: 654.958 Mbytes/s
-Max Compress Time: 0.510231 s
-Min Compression Throughput: 250.867 Mbytes/s
-Min DeCompression Throughput: 613.976 Mbytes/s
-Compression ratio: 145.776
+Max Compression Throughput: 271.865 Mbytes/s
+Max DeCompression Throughput: 665.586 Mbytes/s
+Max Compress Time: 0.505914 s
+Min Compression Throughput: 253.007 Mbytes/s
+Min DeCompression Throughput: 634.159 Mbytes/s
+Compression ratio: 409.56
+rel0.005
+
+Field: temperature
+Max Compression Throughput: 247.102 Mbytes/s
+Max DeCompression Throughput: 580.202 Mbytes/s
+Max Compress Time: 0.832868 s
+Min Compression Throughput: 153.686 Mbytes/s
+Min DeCompression Throughput: 290.588 Mbytes/s
+Compression ratio: 25.0927
+rel0.005
+
+Field: velocity_x
+Max Compression Throughput: 130.765 Mbytes/s
+Max DeCompression Throughput: 246.932 Mbytes/s
+Max Compress Time: 1.01691 s
+Min Compression Throughput: 125.871 Mbytes/s
+Min DeCompression Throughput: 242.375 Mbytes/s
+Compression ratio: 17.2881
 
 ---------------------------------------
 Compressor: SZ
-abs5.90072
+rel0.006
+
+Field: baryon_density
+Max Compression Throughput: 286.508 Mbytes/s
+Max DeCompression Throughput: 680.579 Mbytes/s
+Max Compress Time: 0.463702 s
+Min Compression Throughput: 276.039 Mbytes/s
+Min DeCompression Throughput: 647.213 Mbytes/s
+Compression ratio: 1922.42
+rel0.006
 
 Field: dark_matter_density
-Max Compression Throughput: 257.038 Mbytes/s
-Max DeCompression Throughput: 660.494 Mbytes/s
-Max Compress Time: 0.527361 s
-Min Compression Throughput: 242.718 Mbytes/s
-Min DeCompression Throughput: 605.217 Mbytes/s
-Compression ratio: 183.123
+Max Compression Throughput: 273.829 Mbytes/s
+Max DeCompression Throughput: 673.664 Mbytes/s
+Max Compress Time: 0.498269 s
+Min Compression Throughput: 256.889 Mbytes/s
+Min DeCompression Throughput: 638.063 Mbytes/s
+Compression ratio: 487.995
+rel0.006
+
+Field: temperature
+Max Compression Throughput: 253.115 Mbytes/s
+Max DeCompression Throughput: 604.657 Mbytes/s
+Max Compress Time: 0.799064 s
+Min Compression Throughput: 160.187 Mbytes/s
+Min DeCompression Throughput: 305.808 Mbytes/s
+Compression ratio: 28.7811
+rel0.006
+
+Field: velocity_x
+Max Compression Throughput: 131.22 Mbytes/s
+Max DeCompression Throughput: 260.283 Mbytes/s
+Max Compress Time: 1.00868 s
+Min Compression Throughput: 126.899 Mbytes/s
+Min DeCompression Throughput: 252.107 Mbytes/s
+Compression ratio: 18.5519
 
 ---------------------------------------
 Compressor: SZ
-abs6.80072
+rel0.007
+
+Field: baryon_density
+Max Compression Throughput: 288.263 Mbytes/s
+Max DeCompression Throughput: 677.688 Mbytes/s
+Max Compress Time: 0.465119 s
+Min Compression Throughput: 275.199 Mbytes/s
+Min DeCompression Throughput: 643.492 Mbytes/s
+Compression ratio: 2169.5
+rel0.007
 
 Field: dark_matter_density
-Max Compression Throughput: 259.913 Mbytes/s
-Max DeCompression Throughput: 669.588 Mbytes/s
-Max Compress Time: 0.526674 s
-Min Compression Throughput: 243.034 Mbytes/s
-Min DeCompression Throughput: 612.952 Mbytes/s
-Compression ratio: 208.949
+Max Compression Throughput: 273.673 Mbytes/s
+Max DeCompression Throughput: 672.276 Mbytes/s
+Max Compress Time: 0.490835 s
+Min Compression Throughput: 260.78 Mbytes/s
+Min DeCompression Throughput: 640.196 Mbytes/s
+Compression ratio: 565.824
+rel0.007
+
+Field: temperature
+Max Compression Throughput: 258.952 Mbytes/s
+Max DeCompression Throughput: 620.197 Mbytes/s
+Max Compress Time: 0.808315 s
+Min Compression Throughput: 158.354 Mbytes/s
+Min DeCompression Throughput: 249.896 Mbytes/s
+Compression ratio: 33.41
+rel0.007
+
+Field: velocity_x
+Max Compression Throughput: 131.594 Mbytes/s
+Max DeCompression Throughput: 270.887 Mbytes/s
+Max Compress Time: 1.00301 s
+Min Compression Throughput: 127.616 Mbytes/s
+Min DeCompression Throughput: 259.947 Mbytes/s
+Compression ratio: 19.782
 
 ---------------------------------------
 Compressor: SZ
-abs7.80072
+rel0.008
+
+Field: baryon_density
+Max Compression Throughput: 288.631 Mbytes/s
+Max DeCompression Throughput: 678.578 Mbytes/s
+Max Compress Time: 0.465452 s
+Min Compression Throughput: 275.002 Mbytes/s
+Min DeCompression Throughput: 643.425 Mbytes/s
+Compression ratio: 2403.69
+rel0.008
 
 Field: dark_matter_density
-Max Compression Throughput: 258.989 Mbytes/s
-Max DeCompression Throughput: 668.133 Mbytes/s
-Max Compress Time: 0.522353 s
-Min Compression Throughput: 245.045 Mbytes/s
-Min DeCompression Throughput: 617.61 Mbytes/s
-Compression ratio: 237.157
+Max Compression Throughput: 280.865 Mbytes/s
+Max DeCompression Throughput: 676.39 Mbytes/s
+Max Compress Time: 0.493425 s
+Min Compression Throughput: 259.411 Mbytes/s
+Min DeCompression Throughput: 652.076 Mbytes/s
+Compression ratio: 646.582
+rel0.008
+
+Field: temperature
+Max Compression Throughput: 261.061 Mbytes/s
+Max DeCompression Throughput: 628.798 Mbytes/s
+Max Compress Time: 0.776205 s
+Min Compression Throughput: 164.905 Mbytes/s
+Min DeCompression Throughput: 264.869 Mbytes/s
+Compression ratio: 37.8988
+rel0.008
+
+Field: velocity_x
+Max Compression Throughput: 133.017 Mbytes/s
+Max DeCompression Throughput: 279.949 Mbytes/s
+Max Compress Time: 0.993157 s
+Min Compression Throughput: 128.882 Mbytes/s
+Min DeCompression Throughput: 266.072 Mbytes/s
+Compression ratio: 20.8901
 
 ---------------------------------------
 Compressor: SZ
-abs8.80072
+rel0.009
+
+Field: baryon_density
+Max Compression Throughput: 288.47 Mbytes/s
+Max DeCompression Throughput: 673.809 Mbytes/s
+Max Compress Time: 0.465075 s
+Min Compression Throughput: 275.225 Mbytes/s
+Min DeCompression Throughput: 642.169 Mbytes/s
+Compression ratio: 2632.47
+rel0.009
 
 Field: dark_matter_density
-Max Compression Throughput: 262.44 Mbytes/s
-Max DeCompression Throughput: 675.238 Mbytes/s
-Max Compress Time: 0.521472 s
-Min Compression Throughput: 245.459 Mbytes/s
-Min DeCompression Throughput: 618.537 Mbytes/s
-Compression ratio: 265.136
+Max Compression Throughput: 277.173 Mbytes/s
+Max DeCompression Throughput: 673.295 Mbytes/s
+Max Compress Time: 0.484117 s
+Min Compression Throughput: 264.399 Mbytes/s
+Min DeCompression Throughput: 642.477 Mbytes/s
+Compression ratio: 721.898
+rel0.009
+
+Field: temperature
+Max Compression Throughput: 264.896 Mbytes/s
+Max DeCompression Throughput: 635.303 Mbytes/s
+Max Compress Time: 0.748049 s
+Min Compression Throughput: 171.112 Mbytes/s
+Min DeCompression Throughput: 277.151 Mbytes/s
+Compression ratio: 41.895
+rel0.009
+
+Field: velocity_x
+Max Compression Throughput: 133.618 Mbytes/s
+Max DeCompression Throughput: 287.081 Mbytes/s
+Max Compress Time: 0.98649 s
+Min Compression Throughput: 129.753 Mbytes/s
+Min DeCompression Throughput: 277.016 Mbytes/s
+Compression ratio: 21.9895
+
+---------------------------------------
+Compressor: SZ
+rel0.0001
+
+Field: baryon_density
+Max Compression Throughput: 263.518 Mbytes/s
+Max DeCompression Throughput: 611.317 Mbytes/s
+Max Compress Time: 0.765127 s
+Min Compression Throughput: 167.293 Mbytes/s
+Min DeCompression Throughput: 319.386 Mbytes/s
+Compression ratio: 39.1869
+rel0.0001
+
+Field: dark_matter_density
+Max Compression Throughput: 185.706 Mbytes/s
+Max DeCompression Throughput: 358.616 Mbytes/s
+Max Compress Time: 0.932159 s
+Min Compression Throughput: 137.316 Mbytes/s
+Min DeCompression Throughput: 205.076 Mbytes/s
+Compression ratio: 12.1768
+rel0.0001
+
+Field: temperature
+Max Compression Throughput: 138.188 Mbytes/s
+Max DeCompression Throughput: 188.996 Mbytes/s
+Max Compress Time: 0.947584 s
+Min Compression Throughput: 135.08 Mbytes/s
+Min DeCompression Throughput: 160.926 Mbytes/s
+Compression ratio: 4.99722
+rel0.0001
+
+Field: velocity_x
+Max Compression Throughput: 131.986 Mbytes/s
+Max DeCompression Throughput: 182.295 Mbytes/s
+Max Compress Time: 0.978331 s
+Min Compression Throughput: 130.835 Mbytes/s
+Min DeCompression Throughput: 174.934 Mbytes/s
+Compression ratio: 4.83299
+
+---------------------------------------
+Compressor: SZ
+rel0.0002
+
+Field: baryon_density
+Max Compression Throughput: 272.238 Mbytes/s
+Max DeCompression Throughput: 651.73 Mbytes/s
+Max Compress Time: 0.597526 s
+Min Compression Throughput: 214.217 Mbytes/s
+Min DeCompression Throughput: 452.877 Mbytes/s
+Compression ratio: 79.2297
+rel0.0002
+
+Field: dark_matter_density
+Max Compression Throughput: 219.598 Mbytes/s
+Max DeCompression Throughput: 481.006 Mbytes/s
+Max Compress Time: 0.745859 s
+Min Compression Throughput: 171.614 Mbytes/s
+Min DeCompression Throughput: 333.127 Mbytes/s
+Compression ratio: 22.6646
+rel0.0002
+
+Field: temperature
+Max Compression Throughput: 141.314 Mbytes/s
+Max DeCompression Throughput: 208.925 Mbytes/s
+Max Compress Time: 0.930594 s
+Min Compression Throughput: 137.547 Mbytes/s
+Min DeCompression Throughput: 178.87 Mbytes/s
+Compression ratio: 5.89968
+rel0.0002
+
+Field: velocity_x
+Max Compression Throughput: 133.783 Mbytes/s
+Max DeCompression Throughput: 198.246 Mbytes/s
+Max Compress Time: 0.971095 s
+Min Compression Throughput: 131.81 Mbytes/s
+Min DeCompression Throughput: 187.608 Mbytes/s
+Compression ratio: 5.67671
+
+---------------------------------------
+Compressor: SZ
+rel0.0003
+
+Field: baryon_density
+Max Compression Throughput: 269.425 Mbytes/s
+Max DeCompression Throughput: 652.354 Mbytes/s
+Max Compress Time: 0.537851 s
+Min Compression Throughput: 237.984 Mbytes/s
+Min DeCompression Throughput: 519.94 Mbytes/s
+Compression ratio: 121.323
+rel0.0003
+
+Field: dark_matter_density
+Max Compression Throughput: 226.431 Mbytes/s
+Max DeCompression Throughput: 513.586 Mbytes/s
+Max Compress Time: 0.666998 s
+Min Compression Throughput: 191.905 Mbytes/s
+Min DeCompression Throughput: 398.158 Mbytes/s
+Compression ratio: 30.8505
+rel0.0003
+
+Field: temperature
+Max Compression Throughput: 139.9 Mbytes/s
+Max DeCompression Throughput: 206.699 Mbytes/s
+Max Compress Time: 0.943581 s
+Min Compression Throughput: 135.653 Mbytes/s
+Min DeCompression Throughput: 173.43 Mbytes/s
+Compression ratio: 6.53712
+rel0.0003
+
+Field: velocity_x
+Max Compression Throughput: 133.643 Mbytes/s
+Max DeCompression Throughput: 211.871 Mbytes/s
+Max Compress Time: 0.994928 s
+Min Compression Throughput: 128.653 Mbytes/s
+Min DeCompression Throughput: 201.074 Mbytes/s
+Compression ratio: 6.18948
+
+---------------------------------------
+Compressor: SZ
+rel0.0004
+
+Field: baryon_density
+Max Compression Throughput: 266.544 Mbytes/s
+Max DeCompression Throughput: 648.821 Mbytes/s
+Max Compress Time: 0.515979 s
+Min Compression Throughput: 248.072 Mbytes/s
+Min DeCompression Throughput: 558.839 Mbytes/s
+Compression ratio: 161.692
+rel0.0004
+
+Field: dark_matter_density
+Max Compression Throughput: 233.031 Mbytes/s
+Max DeCompression Throughput: 542.806 Mbytes/s
+Max Compress Time: 0.614717 s
+Min Compression Throughput: 208.226 Mbytes/s
+Min DeCompression Throughput: 450.671 Mbytes/s
+Compression ratio: 41.8717
+rel0.0004
+
+Field: temperature
+Max Compression Throughput: 142.446 Mbytes/s
+Max DeCompression Throughput: 260.501 Mbytes/s
+Max Compress Time: 0.947505 s
+Min Compression Throughput: 135.092 Mbytes/s
+Min DeCompression Throughput: 192.535 Mbytes/s
+Compression ratio: 7.14955
+rel0.0004
+
+Field: velocity_x
+Max Compression Throughput: 135.012 Mbytes/s
+Max DeCompression Throughput: 211.19 Mbytes/s
+Max Compress Time: 0.999624 s
+Min Compression Throughput: 128.048 Mbytes/s
+Min DeCompression Throughput: 190.628 Mbytes/s
+Compression ratio: 6.8481
+
+---------------------------------------
+Compressor: SZ
+rel0.0005
+
+Field: baryon_density
+Max Compression Throughput: 269.194 Mbytes/s
+Max DeCompression Throughput: 655.924 Mbytes/s
+Max Compress Time: 0.500744 s
+Min Compression Throughput: 255.619 Mbytes/s
+Min DeCompression Throughput: 583.353 Mbytes/s
+Compression ratio: 201.647
+rel0.0005
+
+Field: dark_matter_density
+Max Compression Throughput: 235.996 Mbytes/s
+Max DeCompression Throughput: 567.101 Mbytes/s
+Max Compress Time: 0.592193 s
+Min Compression Throughput: 216.146 Mbytes/s
+Min DeCompression Throughput: 480.906 Mbytes/s
+Compression ratio: 50.8272
+rel0.0005
+
+Field: temperature
+Max Compression Throughput: 148.733 Mbytes/s
+Max DeCompression Throughput: 285.709 Mbytes/s
+Max Compress Time: 0.940408 s
+Min Compression Throughput: 136.111 Mbytes/s
+Min DeCompression Throughput: 184.426 Mbytes/s
+Compression ratio: 7.66442
+rel0.0005
+
+Field: velocity_x
+Max Compression Throughput: 134.498 Mbytes/s
+Max DeCompression Throughput: 214.458 Mbytes/s
+Max Compress Time: 0.99724 s
+Min Compression Throughput: 128.354 Mbytes/s
+Min DeCompression Throughput: 201.083 Mbytes/s
+Compression ratio: 7.4211
+
+---------------------------------------
+Compressor: SZ
+rel0.0006
+
+Field: baryon_density
+Max Compression Throughput: 273.428 Mbytes/s
+Max DeCompression Throughput: 663.439 Mbytes/s
+Max Compress Time: 0.496296 s
+Min Compression Throughput: 257.911 Mbytes/s
+Min DeCompression Throughput: 597.544 Mbytes/s
+Compression ratio: 240.239
+rel0.0006
+
+Field: dark_matter_density
+Max Compression Throughput: 239.362 Mbytes/s
+Max DeCompression Throughput: 580.764 Mbytes/s
+Max Compress Time: 0.576396 s
+Min Compression Throughput: 222.07 Mbytes/s
+Min DeCompression Throughput: 491.545 Mbytes/s
+Compression ratio: 59.4405
+rel0.0006
+
+Field: temperature
+Max Compression Throughput: 155.878 Mbytes/s
+Max DeCompression Throughput: 306.779 Mbytes/s
+Max Compress Time: 0.914682 s
+Min Compression Throughput: 139.939 Mbytes/s
+Min DeCompression Throughput: 185.336 Mbytes/s
+Compression ratio: 8.12437
+rel0.0006
+
+Field: velocity_x
+Max Compression Throughput: 134.391 Mbytes/s
+Max DeCompression Throughput: 228.253 Mbytes/s
+Max Compress Time: 0.995103 s
+Min Compression Throughput: 128.63 Mbytes/s
+Min DeCompression Throughput: 210.65 Mbytes/s
+Compression ratio: 7.64472
+
+---------------------------------------
+Compressor: SZ
+rel0.0007
+
+Field: baryon_density
+Max Compression Throughput: 271.797 Mbytes/s
+Max DeCompression Throughput: 659.419 Mbytes/s
+Max Compress Time: 0.488935 s
+Min Compression Throughput: 261.794 Mbytes/s
+Min DeCompression Throughput: 611.582 Mbytes/s
+Compression ratio: 278.377
+rel0.0007
+
+Field: dark_matter_density
+Max Compression Throughput: 241.9 Mbytes/s
+Max DeCompression Throughput: 594.434 Mbytes/s
+Max Compress Time: 0.566573 s
+Min Compression Throughput: 225.92 Mbytes/s
+Min DeCompression Throughput: 511.082 Mbytes/s
+Compression ratio: 68.2481
+rel0.0007
+
+Field: temperature
+Max Compression Throughput: 154.037 Mbytes/s
+Max DeCompression Throughput: 245.329 Mbytes/s
+Max Compress Time: 0.929362 s
+Min Compression Throughput: 137.729 Mbytes/s
+Min DeCompression Throughput: 193.458 Mbytes/s
+Compression ratio: 8.62981
+rel0.0007
+
+Field: velocity_x
+Max Compression Throughput: 135.017 Mbytes/s
+Max DeCompression Throughput: 235.37 Mbytes/s
+Max Compress Time: 1.00039 s
+Min Compression Throughput: 127.951 Mbytes/s
+Min DeCompression Throughput: 215.531 Mbytes/s
+Compression ratio: 8.0676
+
+---------------------------------------
+Compressor: SZ
+rel0.0008
+
+Field: baryon_density
+Max Compression Throughput: 273.506 Mbytes/s
+Max DeCompression Throughput: 659.361 Mbytes/s
+Max Compress Time: 0.48874 s
+Min Compression Throughput: 261.898 Mbytes/s
+Min DeCompression Throughput: 619.395 Mbytes/s
+Compression ratio: 315.846
+rel0.0008
+
+Field: dark_matter_density
+Max Compression Throughput: 243.579 Mbytes/s
+Max DeCompression Throughput: 603.188 Mbytes/s
+Max Compress Time: 0.560064 s
+Min Compression Throughput: 228.545 Mbytes/s
+Min DeCompression Throughput: 524.629 Mbytes/s
+Compression ratio: 76.8662
+rel0.0008
+
+Field: temperature
+Max Compression Throughput: 161.796 Mbytes/s
+Max DeCompression Throughput: 261.791 Mbytes/s
+Max Compress Time: 0.914885 s
+Min Compression Throughput: 139.908 Mbytes/s
+Min DeCompression Throughput: 206.199 Mbytes/s
+Compression ratio: 9.02449
+rel0.0008
+
+Field: velocity_x
+Max Compression Throughput: 135.97 Mbytes/s
+Max DeCompression Throughput: 241.807 Mbytes/s
+Max Compress Time: 0.991791 s
+Min Compression Throughput: 129.06 Mbytes/s
+Min DeCompression Throughput: 217.727 Mbytes/s
+Compression ratio: 8.52622
+
+---------------------------------------
+Compressor: SZ
+rel0.0009
+
+Field: baryon_density
+Max Compression Throughput: 274.688 Mbytes/s
+Max DeCompression Throughput: 659.062 Mbytes/s
+Max Compress Time: 0.485376 s
+Min Compression Throughput: 263.713 Mbytes/s
+Min DeCompression Throughput: 625.798 Mbytes/s
+Compression ratio: 353.091
+rel0.0009
+
+Field: dark_matter_density
+Max Compression Throughput: 245.193 Mbytes/s
+Max DeCompression Throughput: 608.469 Mbytes/s
+Max Compress Time: 0.550915 s
+Min Compression Throughput: 232.341 Mbytes/s
+Min DeCompression Throughput: 539.508 Mbytes/s
+Compression ratio: 85.5237
+rel0.0009
+
+Field: temperature
+Max Compression Throughput: 165.964 Mbytes/s
+Max DeCompression Throughput: 275.357 Mbytes/s
+Max Compress Time: 0.906311 s
+Min Compression Throughput: 141.232 Mbytes/s
+Min DeCompression Throughput: 215.535 Mbytes/s
+Compression ratio: 9.36699
+rel0.0009
+
+Field: velocity_x
+Max Compression Throughput: 132.612 Mbytes/s
+Max DeCompression Throughput: 225.988 Mbytes/s
+Max Compress Time: 1.00094 s
+Min Compression Throughput: 127.88 Mbytes/s
+Min DeCompression Throughput: 219.324 Mbytes/s
+Compression ratio: 8.95335

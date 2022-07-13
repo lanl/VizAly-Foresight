@@ -72,16 +72,36 @@
         "cbench-compressors" : 
         [
 
-		{ "name": "SZ", "abs" : 80.0696, "output-prefix" : "sz_Abs__9E-3"},
-		{ "name": "SZ", "abs" : 70.6173, "output-prefix" : "sz_Abs__8E-3"},
-		{ "name": "SZ", "abs" : 60.1653, "output-prefix" : "sz_Abs__7E-3"},
-		{ "name": "SZ", "abs" : 50.7133, "output-prefix" : "sz_Abs__6E-3"},
-		{ "name": "SZ", "abs" : 40.2611, "output-prefix" : "sz_Abs__5E-3"},
-		{ "name": "SZ", "abs" : 30.8089, "output-prefix" : "sz_Abs__4E-3"},
-		{ "name": "SZ", "abs" : 20.3566, "output-prefix" : "sz_Abs__3E-3"},
-		{ "name": "SZ", "abs" : 10.9044, "output-prefix" : "sz_Abs__2E-3"},
-		{ "name": "SZ", "abs" : 1.45222, "output-prefix" : "sz_Abs__1E-3"}
-
+		{ "name": "SZ", "abs" : 2.15222, "output-prefix" : "sz_abs__3e-3"},
+		{ "name": "SZ", "abs" : 2.25222, "output-prefix" : "sz_abs__3e-3_a"},
+		{ "name": "SZ", "abs" : 2.35222, "output-prefix" : "sz_abs__3e-3_b"},
+		{ "name": "SZ", "abs" : 2.45222, "output-prefix" : "sz_abs__3e-3_c"},
+		{ "name": "SZ", "abs" : 2.55222, "output-prefix" : "sz_abs__3e-3_d"},
+		{ "name": "SZ", "abs" : 2.65222, "output-prefix" : "sz_abs__3e-3_e"},
+		{ "name": "SZ", "abs" : 2.75222, "output-prefix" : "sz_abs__3e-3_f"},
+		{ "name": "SZ", "abs" : 2.85222, "output-prefix" : "sz_abs__3e-3_g"},
+		{ "name": "SZ", "abs" : 2.95222, "output-prefix" : "sz_abs__3e-3_h"},
+		{ "name": "SZ", "abs" : 3.05222, "output-prefix" : "sz_abs__3e-3_i"},
+		{ "name": "SZ", "abs" : 3.15222, "output-prefix" : "sz_abs__3e-3_j"},
+		{ "name": "SZ", "abs" : 3.25222, "output-prefix" : "sz_abs__3e-3_k"},
+		{ "name": "SZ", "abs" : 3.35222, "output-prefix" : "sz_abs__3e-3_l"},
+		{ "name": "SZ", "abs" : 3.45222, "output-prefix" : "sz_abs__3e-3_m"},
+		{ "name": "SZ", "abs" : 3.55222, "output-prefix" : "sz_abs__3e-3_n"},
+		{ "name": "SZ", "abs" : 3.65222, "output-prefix" : "sz_abs__3e-3_o"},
+		{ "name": "SZ", "abs" : 3.75222, "output-prefix" : "sz_abs__3e-3_p"},
+		{ "name": "SZ", "abs" : 3.85222, "output-prefix" : "sz_abs__3e-3_q"},
+		{ "name": "SZ", "abs" : 3.95222, "output-prefix" : "sz_abs__3e-3_r"},
+		{ "name": "SZ", "abs" : 4.05222, "output-prefix" : "sz_abs__3e-3_s"},
+		{ "name": "SZ", "abs" : 4.15222, "output-prefix" : "sz_abs__3e-3_t"},
+		{ "name": "SZ", "abs" : 4.25222, "output-prefix" : "sz_abs__3e-3_u"},
+		{ "name": "SZ", "abs" : 4.35222, "output-prefix" : "sz_abs__3e-3_v"},
+		{ "name": "SZ", "abs" : 5.90072, "output-prefix" : "sz_abs__6e-3"},
+		{ "name": "SZ", "abs" : 7.70072, "output-prefix" : "sz_abs__8e-3"},
+		{ "name": "SZ", "abs" : 8.20072, "output-prefix" : "sz_abs__9e-3_1"},
+		{ "name": "SZ", "abs" : 8.30072, "output-prefix" : "sz_abs__9e-3_2"},
+		{ "name": "SZ", "abs" : 8.40072, "output-prefix" : "sz_abs__9e-3_3"},
+		{ "name": "SZ", "abs" : 8.50072, "output-prefix" : "sz_abs__9e-3_4"},
+		{ "name": "SZ", "abs" : 8.60072, "output-prefix" : "sz_abs__9e-3_5"}
         ],
 		
         "cbench-output": 
@@ -91,7 +111,7 @@
             "output-decompressed": true,
             "output-decompressed-location": "/projects/exasky/VizAly-Foresight-Dev/run_jinzhenw/decompressed",
             "log-file": "runlog_",
-            "metrics-file": "metrics"
+            "metrics-file": "metrics_sz"
         },
         
         "cbench-metrics": 
