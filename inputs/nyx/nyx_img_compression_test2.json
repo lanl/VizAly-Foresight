@@ -120,7 +120,7 @@
                 "name": "zfp",
                 "precision" : 2,
                 "output-prefix" : "zfp_prec__2"
-			},data
+			},
 
 			{
                 "name": "zfp",

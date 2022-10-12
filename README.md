@@ -1,11 +1,13 @@
+<img src="foresight_logo.png" width="400">
+
 # VizAly-Foresight: A Compression benchmark suite for Visualization and Analysis of Simulation Data
 
 ## Project Scope
 VizAly is a general framework for **A**na**ly**sis and **Vi**suali**z**ation of simulation data. As supercomputing resources increase, cosmological scientists are able to run more detailed and larger simulations generating massive amounts of data. Analyzing these simulations with an available open-source toolkit is important for collaborative Department of Energy scientific discovery across labs, universities, and other partners. Developed software as a part of this collection include: comparing data with other existing simulations, verifying and validating results with observation databases, new halo finder algorithms, and using analytical tools to get insights into the physics of the cosmological universe. The goal of this software project is to provide a set of open-source libraries, tools, and packages for large-scale cosmology that allows scientists to visualize, analyze, and compare large-scale simulation and observational data sets. Developed software will provide a variety of methods for processing, visualization, and analysis of astronomical observation and cosmological simulation data. These tools are intended for deployment on multiple scientific computing platforms, including but not limited to personal computers, cloud computing, experimental sites (telescopes) and high-performance supercomputers.
 
 Foresight has three components:
-* CBench: the compression benchmark arm of Foresight desighned to run at scale on supercomputers
-* PAT: Python Analysis Toolkit, which contains a bunch of untilities to speed up analysis and plotting of results
+* CBench: the compression benchmark arm of Foresight designed to run at scale on supercomputers
+* PAT: Python Analysis Toolkit, which contains a bunch of utilities to speed up analysis and plotting of results
 * [Cinema](https://cinemascience.github.io/): The tool used to visualize the results of this project 
 
 ## Current Visualization results
@@ -59,7 +61,7 @@ cinemaDB.cdb will contain the graphed outputs.
 mpirun -np 2 build/CBench ../inputs/hacc/hacc_cbench_test.json
 cat metrics_hacc_test_.csv
 ```
-Alternatively, CBench can also be run throughj foresight as follows:
+Alternatively, CBench can also be run through foresight as follows:
 ```
 cd Analysis
 python3 -m <name_of_analysis> --input-file <path to input JSON file> --cbench
@@ -114,6 +116,10 @@ For information on Travis CI and Docker image, look at the [travis folder](testi
 
 [![Build Status](https://travis-ci.org/lanl/VizAly-Foresight.svg?branch=master;)](https://travis-ci.org/lanl/VizAly-Foresight)
 
+# Citing Foresight
+P. Grosset, C. M. Biwer, J. Pulido, A. T. Mohan, A. Biswas, J. Patchett, T. L. Turton, D. H. Rogers, D. Livescu, and J. Ahrens. “Foresight: Analysis that matters for data reduction”, In SC20: International Conference for High Performance Computing, Networking, Storage and Analysis, pages 1–15, 2020.
+
+[Paper](https://doi.org/10.1109/SC41405.2020.00087) and [Presentation](Foresight-SC-presentation.pdf)
 
 # Copyright and License
 This software is open source software available under the BSD-3 license.

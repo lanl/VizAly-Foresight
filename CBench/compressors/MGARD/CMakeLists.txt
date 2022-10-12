@@ -17,7 +17,7 @@ if (CBENCH_COMPRESSOR_MGARD)
 	    set (MGARD_INCLUDE_PATH ${MGARD_INCLUDE_PATH} CACHE PATH "MGARD include directory")
 
 	    set_property(GLOBAL APPEND PROPERTY definitions "-DCBENCH_HAS_MGARD")
-	   	set_property(GLOBAL APPEND PROPERTY includeDirectories ${MGARD_INCLUDE_PATH})
+	   	set_property(GLOBAL APPEND PROPERTY includeDirectories ${MGARD_INCLUDE_PATH}/mgard)
 	    set_property(GLOBAL APPEND PROPERTY linkLibraries ${MY_LIBS})
         
 	endif()
