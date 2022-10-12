@@ -6,11 +6,11 @@
 	"input": 
 	{
 		"filetype": "NYX",
-		"filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z42.hdf5",  
+		"filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z54.hdf5",  
 
 
 		"group" : "native_fields",
-		"scalars": [ "baryon_density", "dark_matter_density", "temperature", "velocity_x", "velocity_y", "velocity_z" ],
+		"scalars": [ "baryon_density" ],
 
 		"uncompressed": 
 		[
@@ -72,17 +72,12 @@
 	{
         "cbench-compressors" : 
         [
-            {
-                "name": "MGARD",
-                "rel" : 5,
-                "output-prefix" : "MGARD_rel__5_"
-            },
     
-            {
-                "name": "MGARD",
-                "abs" : 0.5,
-                "output-prefix" : "MGARD_abs__0_5_"
-            }
+            { "name": "MGARD", "abs" : 0.1, "output-prefix" : "MGARD_abs__0_1_"},
+            { "name": "MGARD", "abs" : 0.2, "output-prefix" : "MGARD_abs__0_2_"},
+            { "name": "MGARD", "abs" : 0.3, "output-prefix" : "MGARD_abs__0_3_"},
+            { "name": "MGARD", "abs" : 0.4, "output-prefix" : "MGARD_abs__0_4_"},
+            { "name": "MGARD", "abs" : 0.5, "output-prefix" : "MGARD_abs__0_5_"}
         ],
 	
 

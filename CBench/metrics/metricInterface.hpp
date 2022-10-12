@@ -51,6 +51,7 @@ class MetricInterface
 	MPI_Comm comm;			// Global mpi comm handle
 
   public:
+    std::unordered_map<std::string, double> results;
     std::unordered_map<std::string, std::string> parameters; // parameter inputs for metrics, i.e. enable histogram
     std::string additionalOutput;   // additional output stream, can be used for saving histogram (.py) file
                 

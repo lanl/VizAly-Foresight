@@ -126,6 +126,8 @@ inline int HACCDataLoader::loadData(std::string paramName)
 	gio::GenericIO *gioReader;
 	param = paramName;
 
+	unsigned method = gio::GenericIO::FileIOPOSIX;
+
 	// Init GenericIO reader + open file
 	gioReader = new gio::GenericIO(comm, filename);
 	//gioReader = new gio::GenericIO(filename);
@@ -145,15 +147,19 @@ inline int HACCDataLoader::loadData(std::string paramName)
 
 	debugLog << "numRanks: " << numRanks << ", numDataRanks: " << numDataRanks << std::endl;
 
-	// Count number of elements
-	totalNumberOfElements = 0;
-	for (int i = 0; i < numDataRanks; ++i)
-		totalNumberOfElements += gioReader->readNumElems(i);
-
 
 	// Read in the scalars information
 	std::vector<gio::GenericIO::VariableInfo> VI;
 	gioReader->getVariableInfo(VI);
+	
+	// Count number of elements
+	totalNumberOfElements = gioReader->readNumElems();
+	// totalNumberOfElements = 0;
+	// for (int i = 0; i < numDataRanks; ++i)
+	// 	totalNumberOfElements += gioReader->readNumElems(i);
+
+
+	
 	int numVars = static_cast<int>(VI.size());
 
 

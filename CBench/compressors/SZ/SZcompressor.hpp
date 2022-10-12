@@ -109,6 +109,7 @@ inline int SZCompressor::compress(void *input, void *&output, std::string dataTy
 		return -1;
 	}
 
+
 	output = cdata;
 	clock.stop("compress");
 

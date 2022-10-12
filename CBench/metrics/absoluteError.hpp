@@ -86,7 +86,10 @@ inline void absoluteError::execute(void *original, void *approx, size_t n, std::
 	MPI_Allreduce(&max_abs_err, &total_max_abs_err, 1, MPI_DOUBLE, MPI_MAX, comm);// MPI_COMM_WORLD);
 	total_val = total_max_abs_err;
 
-	debugLog << "-Max Abs Error: " << total_max_abs_err << std::endl;
+	debugLog << "-Local  Max Abs Error: " << max_abs_err << std::endl;
+	debugLog << " Global Max Abs Error: " << total_max_abs_err << std::endl;
+	results["absolute_error"] = total_max_abs_err;
+	
 
     // Additional debug metrics, only in run_log
     // Global total sum of error
@@ -99,10 +102,50 @@ inline void absoluteError::execute(void *original, void *approx, size_t n, std::
 
     // Compute mean
     double mean_abs_err = glob_sum_abs_err / global_n;
-    debugLog << " Total Abs Error: " << glob_sum_abs_err << std::endl;
-    debugLog << " Mean Abs Error: " << mean_abs_err << std::endl;
+	double local_mean_abs_err = sum_abs_err/n;
+    //debugLog << " Total Abs Error: " << glob_sum_abs_err << std::endl;
+	debugLog << " Local Mean Abs Error : " << local_mean_abs_err << std::endl;
+    debugLog << " Global Mean Abs Error: " << mean_abs_err << std::endl;
+	results["mean_absolute_error"] = mean_abs_err;
 
 	MPI_Barrier(comm);
+
+
+	// Compute local standard deviation
+	double localSumErrorSq = 0;
+	for (std::size_t i = 0; i < n; ++i)
+	{
+		double err;
+		if (dataType == "float")
+			err = absError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i]);
+		else if (dataType == "double")
+			err = absError(static_cast<double *>(original)[i], static_cast<double *>(approx)[i]);
+			
+        localSumErrorSq += (err - local_mean_abs_err)*(err - local_mean_abs_err);
+	}
+	debugLog << " Local STD Deviation : " << sqrt(localSumErrorSq/n) << std::endl;
+	
+
+
+
+	// Compute Global standard deviation
+	double localGlobalSumErrorSq = 0;
+	double globalSumErrorSq = 0;
+	for (std::size_t i = 0; i < n; ++i)
+	{
+		double err;
+		if (dataType == "float")
+			err = absError(static_cast<float *>(original)[i], static_cast<float *>(approx)[i]);
+		else if (dataType == "double")
+			err = absError(static_cast<double *>(original)[i], static_cast<double *>(approx)[i]);
+			
+        localGlobalSumErrorSq += (err - mean_abs_err)*(err - mean_abs_err);
+	}
+
+    MPI_Allreduce(&localGlobalSumErrorSq, &globalSumErrorSq, 1, MPI_DOUBLE, MPI_SUM, comm);
+	debugLog << " Gloabl STD Deviation : " << sqrt(globalSumErrorSq/global_n) << std::endl;
+	results["std_absolute_error"] = sqrt(globalSumErrorSq/global_n);
+
 
 
 	auto found  = parameters.find("histogram");

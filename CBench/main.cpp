@@ -215,7 +215,7 @@ inline void writeDecompressedData(nlohmann::json jsonInput,
 	{
 		if (!ioMgr->inOutData[i].doWrite)
 		{
-			debugLog << "writing uncoompressed" << std::endl;
+			debugLog << "writing uncompressed" << std::endl;
 			ioMgr->loadData(ioMgr->inOutData[i].name);
 			ioMgr->saveCompData(ioMgr->inOutData[i].name, ioMgr->data);
 			ioMgr->close();
@@ -361,8 +361,12 @@ int main(int argc, char *argv[])
 		// Create header for metrics output
 		std::stringstream csvOutput;
 		csvOutput << "Compressor_field" << "__" << "params" << ", " << "name, ";
-		for (int m = 0; m < metrics.size(); ++m)
+		for (int m = 0; m < metrics.size(); ++m){
+			if (metrics[m] == "minmax")
+				continue;
+
 			csvOutput << metrics[m] << ", ";
+		}
 
 		csvOutput << "Compression Throughput(MB/s), DeCompression Throughput(MB/s), Compression Ratio" << std::endl;
 		debugLog << "\n****************************** timestep: " << ts << " of " << numTimesteps << std::endl;
@@ -555,11 +559,9 @@ int main(int argc, char *argv[])
 
 					//
 					// decompress
-
 					clock.start("decompress");
 					compressorMgr->decompress(cdata, decompdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim());
 					clock.stop("decompress");
-
 				}
 				
 
@@ -588,6 +590,7 @@ int main(int argc, char *argv[])
 
 				debugLog << "\n\ncompressedSize: " << compressedSize << ", totalCompressedSize: " << totalCompressedSize << std::endl;
 				debugLog << "unCompressedSize: "   << unCompressedSize << ", totalUnCompressedSize: " << totalUnCompressedSize << std::endl;
+				debugLog << "Local Compression ratio: "  << unCompressedSize  / (float) compressedSize << std::endl;
 				debugLog << "Compression ratio: "  << totalUnCompressedSize / (float) totalCompressedSize << std::endl;
 
 
@@ -629,7 +632,7 @@ int main(int argc, char *argv[])
 					// Launch
 					metricsMgr->init(MPI_COMM_WORLD);
 					metricsMgr->execute(ioMgr->data, decompdata, ioMgr->getNumElements(), ioMgr->getType());
-					
+
 					csvOutput << metricsMgr->getGlobalValue() << ", ";
 
 					// draw histogram if needed
@@ -640,6 +643,7 @@ int main(int argc, char *argv[])
 							std::string outputHistogramName = "logs/";
 							outputHistogramName += extractFileName(fileToLoad) + "_" + compressors[c] + "_" + scalars[i];
 							outputHistogramName += "_" + metrics[m] + "_" + compressorMgr->getParamsInfo() + "_hist.py";
+							//std::cout << outputHistogramName << ": " << metricsMgr->additionalOutput << std::endl;
 							writeFile(outputHistogramName, metricsMgr->additionalOutput);
 						}
 					metricsMgr->close();
@@ -716,12 +720,12 @@ int main(int argc, char *argv[])
 
 					{
 						std::string metricsFile = jsonInput["data-reduction"]["cbench-output"]["metrics-file"];
-                         writeFile(metricsFile, metricsInfo.str());
+                        writeFile(metricsFile, metricsInfo.str());
  
-                         if (numTimesteps > 1)
-                             writeFile(metricsFile + std::to_string(ts) + ".csv", csvOutput.str());
-                         else
-                             writeFile(metricsFile + ".csv", csvOutput.str());
+                        if (numTimesteps > 1)
+                            writeFile(metricsFile + std::to_string(ts) + ".csv", csvOutput.str());
+                        else
+                            writeFile(metricsFile + ".csv", csvOutput.str());
 					}
 				}
 

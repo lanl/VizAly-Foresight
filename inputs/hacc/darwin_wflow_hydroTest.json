@@ -7,8 +7,8 @@
 	"input": 
 	{
 		"filetype": "HACC",
-		"filename" : "/projects/exasky/genericio/mpi/m000New.full.mpicosmo.624",
-		"filename-old": "/projects/exasky/HACC_Hydro/runs/inputs/output_sf_l64n256_ce_fire3_cloudy/m000.full.mpicosmo.624",
+		"filename-old" : "/projects/exasky/genericio/mpi/m000New.full.mpicosmo.624",
+		"filename": "/projects/exasky/HACC_Hydro/runs/inputs/output_sf_l64n256_ce_fire3_cloudy/m000.full.mpicosmo.624",
 		"scalars": ["x", "y", "z", "vx", "vy", "vz", "uu", "mu", "rho", "zmet", "phi"]	
 	},
 

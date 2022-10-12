@@ -37,6 +37,14 @@ inline void MGARDCompressor::init()
 	 
 }
 
+/*
+I assume you are trying to bound L_inf error (i.e., the maximum error). In this case you need to 
+set the smoothness parameter (s) to be infinity (e.g., s = std::numeric_limits<T>::infinity()).
+In your current code I see you set s = 0, which is for bounding the L_2 error not L_inf error.
+
+
+*/
+
 inline int MGARDCompressor::compress(void *input, void *&output, std::string dataType, size_t dataTypeSize, size_t * n)
 {
 	std::vector<mgard_x::SIZE> shape;
@@ -52,9 +60,9 @@ inline int MGARDCompressor::compress(void *input, void *&output, std::string dat
 			shape.push_back(n[i]);
 		}
 
-	std::cout << "Shape" << shape[0] << ", " << shape[1] << ", " << shape[2] << std::endl;
-	std::cout << "numel" << numel << std::endl;
-	std::cout << "numDims" << numDims << std::endl;
+	// std::cout << "Shape" << shape[0] << ", " << shape[1] << ", " << shape[2] << std::endl;
+	// std::cout << "numel" << numel << std::endl;
+	// std::cout << "numDims" << numDims << std::endl;
 
 
 	Timer clock("compress");
@@ -68,17 +76,17 @@ inline int MGARDCompressor::compress(void *input, void *&output, std::string dat
 	if (dataType == "double")
 	{
 		mDataType = mgard_x::data_type::Double;
-		std::cout << "double" << std::endl;
+		//std::cout << "double" << std::endl;
 	}
 	else
 		if (dataType == "float")
 		{
 			mDataType = mgard_x::data_type::Float;
-			std::cout << "Float" << std::endl;
+			//std::cout << "Float" << std::endl;
 		}
 		else
 		{
-			std::cout << "double not supported!!!" << std::endl;
+			std::cout << "type not supported!!!" << std::endl;
 			return 0;
 		}
 
@@ -88,13 +96,13 @@ inline int MGARDCompressor::compress(void *input, void *&output, std::string dat
 	{
 		errorType = mgard_x::error_bound_type::ABS;
 		tol = strConvert::to_double(compressorParameters["abs"]);
-		std::cout << "Abs " << " : " << tol << std::endl;
+		//std::cout << "Abs " << " : " << tol << std::endl;
 	}
 	else if ( compressorParameters.find("rel") != compressorParameters.end() )
 	{
 		errorType = mgard_x::error_bound_type::REL;
 		tol = strConvert::to_double(compressorParameters["rel"]);
-		std::cout << "Rel " << " : " << tol << std::endl;
+		//std::cout << "Rel " << " : " << tol << std::endl;
 	}
 	else
 	{
@@ -107,12 +115,14 @@ inline int MGARDCompressor::compress(void *input, void *&output, std::string dat
 	config.lossless = mgard_x::lossless_type::Huffman_Zstd;
 	config.dev_type = mgard_x::device_type::Auto;
 
+	// bounding s -> inf to control maximum error
+	double s = std::numeric_limits<double>::infinity();
 
 	mgard_x::compress(numDims, 
 					mDataType, 
 					shape, 
 					tol, 
-					0.0,	// smoothness parameter
+					s,
                     errorType, 
 					input,
                     output, 

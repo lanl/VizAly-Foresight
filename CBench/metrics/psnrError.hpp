@@ -100,6 +100,7 @@ inline void psnrError::execute(void *original, void *approx, size_t n, std::stri
 	debugLog << " local_psnr: " << local_psnr << std::endl;
 	// Currently only report Global PSNR
 	debugLog << "-psnr: " << global_psnr << std::endl;
+	results["psnr"] = global_psnr;
 
 	MPI_Barrier(comm);
 	return;
