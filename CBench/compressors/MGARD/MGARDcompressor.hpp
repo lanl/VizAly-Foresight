@@ -8,6 +8,7 @@
 #include "timer.hpp"
 #include "compress_x.hpp"
 
+
 class MGARDCompressor: public CompressorInterface
 {
 	
@@ -113,7 +114,7 @@ inline int MGARDCompressor::compress(void *input, void *&output, std::string dat
 
 	mgard_x::Config config;
 	config.lossless = mgard_x::lossless_type::Huffman_Zstd;
-	config.dev_type = mgard_x::device_type::Auto;
+	config.dev_type = mgard_x::device_type::SERIAL;
 
 	// bounding s -> inf to control maximum error
 	double s = std::numeric_limits<double>::infinity();
@@ -146,7 +147,7 @@ inline int MGARDCompressor::decompress(void *&input, void *&output, std::string 
 
 	mgard_x::Config config;
 	config.lossless = mgard_x::lossless_type::Huffman_Zstd;
-	config.dev_type = mgard_x::device_type::Auto;
+	config.dev_type = mgard_x::device_type::SERIAL;
 
 	mgard_x::decompress(input, 
 						cbytes,

@@ -5,8 +5,7 @@ echo "Building MGARD ... "
 
 git clone https://github.com/CODARcode/MGARD.git
 cd MGARD
-
-git checkout 0f6cdf9b59e837547e3298be7187de8df376bb18
+git checkout 1.3.0
 
 mkdir install
 mkdir build

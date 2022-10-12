@@ -5,7 +5,7 @@ echo "Building BLOSC ... "
 
 git clone https://github.com/Blosc/c-blosc.git
 cd c-blosc/
-git checkout v1.10.2
+git checkout v1.21.1
 mkdir install
 mkdir build
 cd build
