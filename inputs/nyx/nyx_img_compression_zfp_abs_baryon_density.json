@@ -1,0 +1,154 @@
+{
+    "foresight-home": "/projects/exasky/VizAly-Foresight-Dev/",
+	"project-home": "/projects/groups/vizproject/dssdata/Exasky/compress_for_img/",
+	"wflow-path": "img-nyx-test-z54",
+
+	"input": 
+	{
+		"filetype": "NYX",
+		"filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z54.hdf5",  
+
+		"group" : "native_fields",
+		"scalars": [ "baryon_density" ],
+
+		"uncompressed": 
+		[
+			{
+				"group": "domain",
+				"attributes": [
+					{
+						"name": "shape",
+						"type": "int",
+						"size": 3
+					},
+					{
+						"name": "size",
+						"type": "double",
+						"size": 3
+					}
+				]
+			},
+
+			{
+				"group": "universe",
+				"attributes": 
+				[
+					{
+						"name": "hubble",
+						"type": "double",
+						"size": 1 
+					},
+
+					{
+						"name": "omega_b",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "omega_l",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "omega_m",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "redshift",
+						"type": "double",
+						"size": 1
+					}
+				]
+			}
+		]
+	},
+
+    "data-reduction": 
+	{
+        "cbench-compressors" : 
+        [
+ 
+		{ "name": "zfp", "abs" : 0.0635493, "output-prefix" :"zfp_abs__0.0635493"},
+ 		{ "name": "zfp", "abs" : 0.115632 , "output-prefix" :"zfp_abs__0.1156320"},
+ 		{ "name": "zfp", "abs" : 0.154887 , "output-prefix" :"zfp_abs__0.1548870"},
+ 		{ "name": "zfp", "abs" : 0.238162 , "output-prefix" :"zfp_abs__0.2381620"},
+ 		{ "name": "zfp", "abs" : 0.286456 , "output-prefix" :"zfp_abs__0.2864560"},
+ 		{ "name": "zfp", "abs" : 0.349371 , "output-prefix" :"zfp_abs__0.3493710"},
+ 		{ "name": "zfp", "abs" : 0.42655  , "output-prefix" :"zfp_abs__0.4265500"},
+ 		{ "name": "zfp", "abs" : 0.474902 , "output-prefix" :"zfp_abs__0.4749020"},
+ 		{ "name": "zfp", "abs" : 0.507291 , "output-prefix" :"zfp_abs__0.5072910"},
+ 		{ "name": "zfp", "abs" : 0.553213 , "output-prefix" :"zfp_abs__0.5532130"},
+ 		{ "name": "zfp", "abs" : 1.1748   , "output-prefix" :"zfp_abs__1.1748000"},
+ 		{ "name": "zfp", "abs" : 1.7233   , "output-prefix" :"zfp_abs__1.7233000"},
+ 		{ "name": "zfp", "abs" : 2.0978   , "output-prefix" :"zfp_abs__2.0978000"},
+ 		{ "name": "zfp", "abs" : 2.7091   , "output-prefix" :"zfp_abs__2.7091000"},
+ 		{ "name": "zfp", "abs" : 3.3248   , "output-prefix" :"zfp_abs__3.3248000"},
+ 		{ "name": "zfp", "abs" : 3.6894   , "output-prefix" :"zfp_abs__3.6894000"},
+ 		{ "name": "zfp", "abs" : 4.1368   , "output-prefix" :"zfp_abs__4.1368000"},
+ 		{ "name": "zfp", "abs" : 4.5293   , "output-prefix" :"zfp_abs__4.5293000"},
+ 		{ "name": "zfp", "abs" : 5.4078   , "output-prefix" :"zfp_abs__5.4078000"},
+ 		{ "name": "zfp", "abs" : 9.1921   , "output-prefix" :"zfp_abs__9.1921000"},
+ 		{ "name": "zfp", "abs" : 15.469   , "output-prefix" :"zfp_abs__15.469000"},
+ 		{ "name": "zfp", "abs" : 18.885   , "output-prefix" :"zfp_abs__18.885000"},
+ 		{ "name": "zfp", "abs" : 23.109   , "output-prefix" :"zfp_abs__23.109000"},
+ 		{ "name": "zfp", "abs" : 24.373   , "output-prefix" :"zfp_abs__24.373000"},
+ 		{ "name": "zfp", "abs" : 32.886   , "output-prefix" :"zfp_abs__32.886000"},
+ 		{ "name": "zfp", "abs" : 34.953   , "output-prefix" :"zfp_abs__34.953000"},
+ 		{ "name": "zfp", "abs" : 43.364   , "output-prefix" :"zfp_abs__43.364000"},
+ 		{ "name": "zfp", "abs" : 47.293   , "output-prefix" :"zfp_abs__47.293000"},
+ 		{ "name": "zfp", "abs" : 82.960   , "output-prefix" :"zfp_abs__82.960000"},
+ 		{ "name": "zfp", "abs" : 188      , "output-prefix" :"zfp_abs__188.00000"},
+ 		{ "name": "zfp", "abs" : 144.84   , "output-prefix" :"zfp_abs__144.84000"},
+ 		{ "name": "zfp", "abs" : 162.57   , "output-prefix" :"zfp_abs__162.57000"},
+ 		{ "name": "zfp", "abs" : 205.12   , "output-prefix" :"zfp_abs__205.12000"},
+ 		{ "name": "zfp", "abs" : 277.87   , "output-prefix" :"zfp_abs__277.87000"},
+ 		{ "name": "zfp", "abs" : 302.79   , "output-prefix" :"zfp_abs__302.79000"},
+		{ "name": "zfp", "abs" : 321.16   , "output-prefix" :"zfp_abs__321.16000"}
+
+        ],
+		
+        "cbench-output": 
+        {
+            "run-path": "mpirun $foresight-home$build/CBench",
+
+            "output-decompressed": true,
+            "output-decompressed-location": "/projects/exasky/VizAly-Foresight-Dev/run_jinzhenw/decompressed/zfp/baryon_density",
+            "log-file": "runlog_",
+            "metrics-file": "metrics_zfp_baryon_density"
+        },
+        
+        "cbench-metrics": 
+        [
+            {
+                "name": "absolute_error"
+            },
+
+            {
+                "name": "relative_error"
+            },
+
+            {
+                "name": "mse"
+            },
+
+            {
+                "name": "psnr"
+            }
+        ],
+
+        "name" : "cbench",
+        "path" : "mpirun $foresight-home$build/CBench",
+        "evn_path": "evn_scripts/VizAly-CBench.bash.darwin",
+        "configuration": {
+            "partition": "scaling",
+            "nodes": 1,
+            "ntasks-per-node": 1
+        },
+
+        "output-files": []
+    }
+}

@@ -1,0 +1,37 @@
+Input file: /projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z54.hdf5
+
+---------------------------------------
+Compressor: SZ
+abs8200
+
+Field: temperature
+Max Compression Throughput: 224.887 Mbytes/s
+Max DeCompression Throughput: 579.061 Mbytes/s
+Max Compress Time: 0.685619 s
+Min Compression Throughput: 186.693 Mbytes/s
+Min DeCompression Throughput: 539.609 Mbytes/s
+Compression ratio: 197.715
+
+---------------------------------------
+Compressor: SZ
+abs90000
+
+Field: temperature
+Max Compression Throughput: 200.937 Mbytes/s
+Max DeCompression Throughput: 853.081 Mbytes/s
+Max Compress Time: 0.653875 s
+Min Compression Throughput: 195.756 Mbytes/s
+Min DeCompression Throughput: 558.192 Mbytes/s
+Compression ratio: 2123.87
+
+---------------------------------------
+Compressor: SZ
+abs870000
+
+Field: temperature
+Max Compression Throughput: 2959.51 Mbytes/s
+Max DeCompression Throughput: 3037.63 Mbytes/s
+Max Compress Time: 0.612459 s
+Min Compression Throughput: 208.994 Mbytes/s
+Min DeCompression Throughput: 608.541 Mbytes/s
+Compression ratio: 30407.3

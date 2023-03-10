@@ -1,0 +1,153 @@
+{
+    "foresight-home": "/projects/exasky/VizAly-Foresight-Dev/",
+	"project-home": "/projects/groups/vizproject/dssdata/Exasky/compress_for_img/",
+	"wflow-path": "img-nyx-test-z54",
+
+	"input": 
+	{
+		"filetype": "NYX",
+		"filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z54.hdf5",  
+
+		"group" : "native_fields",
+		"scalars": [ "temperature" ],
+
+		"uncompressed": 
+		[
+			{
+				"group": "domain",
+				"attributes": [
+					{
+						"name": "shape",
+						"type": "int",
+						"size": 3
+					},
+					{
+						"name": "size",
+						"type": "double",
+						"size": 3
+					}
+				]
+			},
+
+			{
+				"group": "universe",
+				"attributes": 
+				[
+					{
+						"name": "hubble",
+						"type": "double",
+						"size": 1 
+					},
+
+					{
+						"name": "omega_b",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "omega_l",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "omega_m",
+						"type": "double",
+						"size": 1
+					},
+
+					{
+						"name": "redshift",
+						"type": "double",
+						"size": 1
+					}
+				]
+			}
+		]
+	},
+
+    "data-reduction": 
+	{
+        "cbench-compressors" : 
+        [
+	      { "name": "zfp", "abs" : 2.85449, "output-prefix" :"zfp_abs__2.85449"}, 
+	      { "name": "zfp", "abs" : 5.396  , "output-prefix" :"zfp_abs__5.39600"},
+	      { "name": "zfp", "abs" : 8.17334, "output-prefix" :"zfp_abs__8.17334"},
+	      { "name": "zfp", "abs" : 10.7725, "output-prefix" :"zfp_abs__10.7725"},
+	      { "name": "zfp", "abs" : 12.7065, "output-prefix" :"zfp_abs__12.7065"},
+	      { "name": "zfp", "abs" : 14.8223, "output-prefix" :"zfp_abs__14.8223"},
+	      { "name": "zfp", "abs" : 18.8945, "output-prefix" :"zfp_abs__18.8945"},
+	      { "name": "zfp", "abs" : 21.3691, "output-prefix" :"zfp_abs__21.3691"},
+	      { "name": "zfp", "abs" : 25.0005, "output-prefix" :"zfp_abs__25.0005"},
+	      { "name": "zfp", "abs" : 29.2104, "output-prefix" :"zfp_abs__29.2104"},
+	      { "name": "zfp", "abs" : 50.6729, "output-prefix" :"zfp_abs__50.6729"},
+	      { "name": "zfp", "abs" : 77.3667, "output-prefix" :"zfp_abs__77.3667"},
+	      { "name": "zfp", "abs" : 105.853, "output-prefix" :"zfp_abs__105.853"},
+	      { "name": "zfp", "abs" : 134.604, "output-prefix" :"zfp_abs__134.604"},
+	      { "name": "zfp", "abs" : 159.592, "output-prefix" :"zfp_abs__159.592"},
+	      { "name": "zfp", "abs" : 178.649, "output-prefix" :"zfp_abs__178.649"},
+	      { "name": "zfp", "abs" : 202.771, "output-prefix" :"zfp_abs__202.771"},
+	      { "name": "zfp", "abs" : 247.76 , "output-prefix" :"zfp_abs__247.760"},
+	      { "name": "zfp", "abs" : 276.153, "output-prefix" :"zfp_abs__276.153"},
+	      { "name": "zfp", "abs" : 516.683, "output-prefix" :"zfp_abs__516.683"},
+	      { "name": "zfp", "abs" : 805.253, "output-prefix" :"zfp_abs__805.253"},
+	      { "name": "zfp", "abs" : 1037.16, "output-prefix" :"zfp_abs__1037.16"},
+	      { "name": "zfp", "abs" : 1298.79, "output-prefix" :"zfp_abs__1298.79"},
+	      { "name": "zfp", "abs" : 1491.37, "output-prefix" :"zfp_abs__1491.37"},
+	      { "name": "zfp", "abs" : 1818.22, "output-prefix" :"zfp_abs__1818.22"},
+	      { "name": "zfp", "abs" : 2010.56, "output-prefix" :"zfp_abs__2010.56"},
+	      { "name": "zfp", "abs" : 2474.03, "output-prefix" :"zfp_abs__2474.03"},
+	      { "name": "zfp", "abs" : 2510.36, "output-prefix" :"zfp_abs__2510.36"},
+	      { "name": "zfp", "abs" : 5074.82, "output-prefix" :"zfp_abs__5074.82"},
+	      { "name": "zfp", "abs" : 7285.65, "output-prefix" :"zfp_abs__7285.65"},
+	      { "name": "zfp", "abs" : 9538.6 , "output-prefix" :"zfp_abs__9538.60"},
+	      { "name": "zfp", "abs" : 13916.4, "output-prefix" :"zfp_abs__13916.4"},
+	      { "name": "zfp", "abs" : 15074.4, "output-prefix" :"zfp_abs__15074.4"},
+	      { "name": "zfp", "abs" : 15498.6, "output-prefix" :"zfp_abs__15498.6"},
+	      { "name": "zfp", "abs" : 18728.9, "output-prefix" :"zfp_abs__18728.9"},
+	      { "name": "zfp", "abs" : 21474  , "output-prefix" :"zfp_abs__21474.0"}
+
+        ],
+		
+        "cbench-output": 
+        {
+            "run-path": "mpirun $foresight-home$build/CBench",
+
+            "output-decompressed": true,
+            "output-decompressed-location": "/projects/exasky/VizAly-Foresight-Dev/run_jinzhenw/decompressed/zfp/temperature",
+            "log-file": "runlog_",
+            "metrics-file": "metrics_zfp_temperature"
+        },
+        
+        "cbench-metrics": 
+        [
+            {
+                "name": "absolute_error"
+            },
+
+            {
+                "name": "relative_error"
+            },
+
+            {
+                "name": "mse"
+            },
+
+            {
+                "name": "psnr"
+            }
+        ],
+
+        "name" : "cbench",
+        "path" : "mpirun $foresight-home$build/CBench",
+        "evn_path": "evn_scripts/VizAly-CBench.bash.darwin",
+        "configuration": {
+            "partition": "scaling",
+            "nodes": 1,
+            "ntasks-per-node": 1
+        },
+
+        "output-files": []
+    }
+}

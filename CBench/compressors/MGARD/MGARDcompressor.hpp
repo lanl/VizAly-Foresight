@@ -108,11 +108,13 @@ inline int MGARDCompressor::compress(void *input, void *&output, std::string dat
 	//config.decomposition = mgard_x::decomposition_type::MultiDim;
 	config.dev_type = mgard_x::device_type::Auto;
 
+	// bounding s -> inf to control maximum error
+	double s = std::numeric_limits<double>::infinity();
 	mgard_x::compress(numDims, 
 					mDataType, 
 					shape, 
 					tol, 
-					0.0,	// smoothness parameter
+					s,	// smoothness parameter
 					errorType, 
 					input,
 					output, 

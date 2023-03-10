@@ -1,13 +1,12 @@
 {
-    "foresight-home": "/projects/exasky/pascal-projects/VizAly-Foresight/",
+    "foresight-home": "/projects/exasky/VizAly-Foresight-Dev/",
 	"project-home": "/projects/groups/vizproject/dssdata/Exasky/compress_for_img/",
-	"wflow-path": "img-nyx-test-z42",
+	"wflow-path": "img-nyx-test-z54",
 
 	"input": 
 	{
 		"filetype": "NYX",
 		"filename": "/projects/exasky/data/NYX/highz/512/NVB_C009_l10n512_S12345T692_z54.hdf5",  
-
 
 		"group" : "native_fields",
 		"scalars": [ "baryon_density" ],
@@ -72,28 +71,21 @@
 	{
         "cbench-compressors" : 
         [
-		{ "name": "MGARD", "abs" : 1e-2, "output-prefix" : "mgard_abs_1e-2"},
-		{ "name": "MGARD", "abs" : 2e-2, "output-prefix" : "mgard_abs_2e-2"},
-		{ "name": "MGARD", "abs" : 3e-2, "output-prefix" : "mgard_abs_3e-2"},
-		{ "name": "MGARD", "abs" : 4e-2, "output-prefix" : "mgard_abs_4e-2"},
-		{ "name": "MGARD", "abs" : 5e-2, "output-prefix" : "mgard_abs_5e-2"},
-		{ "name": "MGARD", "abs" : 6e-2, "output-prefix" : "mgard_abs_6e-2"},
-		{ "name": "MGARD", "abs" : 7e-2, "output-prefix" : "mgard_abs_7e-2"},
-		{ "name": "MGARD", "abs" : 8e-2, "output-prefix" : "mgard_abs_8e-2"},
-		{ "name": "MGARD", "abs" : 9e-2, "output-prefix" : "mgard_abs_9e-2"}
-        ],
-	
+ 
+  		{ "name": "SZ", "abs" : 22,     "output-prefix" :"sz_abs__22"},
+ 		{ "name": "SZ", "abs" : 226.75, "output-prefix" :"sz_abs__226.75"},
+ 		{ "name": "SZ", "abs" : 2362,   "output-prefix" :"sz_abs__2362"}
 
-	
+        ],
+		
         "cbench-output": 
         {
             "run-path": "mpirun $foresight-home$build/CBench",
 
             "output-decompressed": true,
-            "output-decompressed-location": "/projects/exasky/VizAly-Foresight-Dev/run_jinzhenw/decompressed/mgard",
-
+            "output-decompressed-location": "/projects/exasky/VizAly-Foresight-Dev/run_jinzhenw/decompressed/sz/baryon_density",
             "log-file": "runlog_",
-            "metrics-file": "metrics_mgard"
+            "metrics-file": "metrics_sz_baryon_density"
         },
         
         "cbench-metrics": 
