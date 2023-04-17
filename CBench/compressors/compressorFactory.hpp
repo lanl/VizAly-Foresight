@@ -35,6 +35,11 @@ class CompressorFactory
 		  return new SZCompressor();
 	  #endif	  
 
+	  #ifdef CBENCH_HAS_SZ3
+		if (compressorName == "SZ3")
+		  return new SZ3Compressor();
+	  #endif	  
+
 	  #ifdef CBENCH_HAS_MGARD
 		if (compressorName == "MGARD")
 		  return new MGARDCompressor();

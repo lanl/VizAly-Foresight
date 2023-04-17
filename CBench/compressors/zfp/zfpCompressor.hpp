@@ -112,7 +112,7 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
 
 	debugLog << "\n" << compressorName << std::endl;
 
-	Timer clock("compress");
+	//Timer clock("compress");
 
 	zfp_type type = getZfpType( dataType );
 
@@ -164,11 +164,11 @@ inline int ZFPCompressor::compress(void *input, void *&output, std::string dataT
 	zfpCompressedSize = zfpsize;
 	cbytes = zfpsize;
 
-	clock.stop("compress");
+	//clock.stop("compress");
 
 
 	debugLog << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << cbytes << ", cRatio: " << (dataTypeSize*numel / (float)cbytes) << ", #elements: " << numel << std::endl;
-	debugLog << compressorName << " ~ CompressTime: " << clock.getDuration("compress") << " s " << std::endl;
+	//debugLog << compressorName << " ~ CompressTime: " << clock.getDuration("compress") << " s " << std::endl;
 
 	return 1;
 }
@@ -214,7 +214,7 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
 	}
 
 
-	Timer clock("decompress");
+	//Timer clock("decompress");
 	
 	zfp_type type = getZfpType( dataType );
 
@@ -271,9 +271,9 @@ inline int ZFPCompressor::decompress(void *&input, void *&output, std::string da
 	zfp_stream_close(zfp);
 	stream_close(stream);
 
-	clock.stop("decompress");
+	//clock.stop("decompress");
 
-	debugLog << compressorName << " ~ DecompressTime: " << clock.getDuration("decompress") << " s " << std::endl;
+	//debugLog << compressorName << " ~ DecompressTime: " << clock.getDuration("decompress") << " s " << std::endl;
 
 	return 1;
 }

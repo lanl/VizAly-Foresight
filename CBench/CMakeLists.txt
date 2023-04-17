@@ -21,12 +21,12 @@ include_directories(${CMAKE_SOURCE_DIR}/dataLoader)
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader/HACC)
 
 
-# Generic Binary Loader
-option(CBENCH_LOADER_GENERICBINARY "Enables the reading of Generic Binary data" OFF)
-if (CBENCH_LOADER_GENERICBINARY)
-	add_definitions(-DCBENCH_HAS_RAW)
-	include_directories(${CMAKE_SOURCE_DIR}/dataLoader/Generic_Binary)
-endif()
+## Generic Binary Loader
+#option(CBENCH_LOADER_GENERICBINARY "Enables the reading of Generic Binary data" OFF)
+#if (CBENCH_LOADER_GENERICBINARY)
+#	add_definitions(-DCBENCH_HAS_RAW)
+#	include_directories(${CMAKE_SOURCE_DIR}/dataLoader/Generic_Binary)
+#endif()
 
 
 # VPIC GDA Loader
@@ -233,20 +233,21 @@ endif()
 
 # Build executable
 add_executable(CBench main.cpp)
-target_link_libraries(CBench ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO)
+#target_link_libraries(CBench ${MPI_LIBRARIES} ${EXTRA_LIBS} GenericIO)
+target_link_libraries(CBench ${MPI_LIBRARIES} ${EXTRA_LIBS})
 
 
 # Install instructions
 install(TARGETS CBench DESTINATION .)
 
 
-# GenericIO
-include_directories(${CMAKE_SOURCE_DIR}/thirdparty/genericio)
-add_definitions(-DGENERICIO_NO_COMPRESSION)
-#add_definitions(-DGENERICIO_NO_MPI)	# might need turning on sometimnes
-add_library(GenericIO STATIC "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO.cxx")
-set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
-install(TARGETS GenericIO DESTINATION .)
+## GenericIO
+#include_directories(${CMAKE_SOURCE_DIR}/thirdparty/genericio)
+#add_definitions(-DGENERICIO_NO_COMPRESSION)
+##add_definitions(-DGENERICIO_NO_MPI)	# might need turning on sometimnes
+#add_library(GenericIO STATIC "${CMAKE_SOURCE_DIR}/thirdparty/genericio/GenericIO.cxx")
+#set_property(TARGET GenericIO PROPERTY POSITION_INDEPENDENT_CODE ON)
+#install(TARGETS GenericIO DESTINATION .)
 
 
 # Prevent in source builds since they are evil

@@ -179,9 +179,11 @@ elif [ $buildOpt = "Default" ]; then
 			-DFPZIP_LIBRARY=$externalDependencies/fpzip-1.2.0/lib/libfpzip.a \
 			-DCMAKE_BUILD_TYPE=$buildType
 	else
-		export LD_LIBRARY_PATH=$externalDependencies/hdf5/install/lib:$LD_LIBRARY_PATH
-		export PATH=$externalDependencies/hdf5/install/bin:$PATH
+		#export LD_LIBRARY_PATH=$externalDependencies/hdf5/install/lib:$LD_LIBRARY_PATH
+		#export PATH=$externalDependencies/hdf5/install/bin:$PATH
 
+		#	-DGSL_INCLUDE_DIR=$externalDependencies/gsl-2.7.1/install/include/ \
+		#	-DGSL_LIBRARY=$externalDependencies/gsl-2.7.1/install/lib/libgsl.so \
 		cmake ../CBench $opt\
 			-DCBENCH_LOADER_GDA=ON \
 			-DCBENCH_LOADER_GENERICBINARY=ON \
@@ -196,9 +198,15 @@ elif [ $buildOpt = "Default" ]; then
 			-DCBENCH_COMPRESSOR_FPZIP=ON \
 			-DFPZIP_INCLUDE_PATH=$externalDependencies/fpzip-1.2.0/inc/ \
 			-DFPZIP_LIBRARY=$externalDependencies/fpzip-1.2.0/lib/libfpzip.a \
-			-DCBENCH_COMPRESSOR_SZ=ON \
-			-DSZ_INCLUDE_PATH=$externalDependencies/SZ/sz/include \
+			-DCBENCH_COMPRESSOR_SZ=OFF \
+			-DSZ_INCLUDE_PATH=$externalDependencies/SZ/install/include/sz \
 			-DSZ_LIBRARY=$externalDependencies/SZ/install/lib64/libSZ.so \
+			-DCBENCH_COMPRESSOR_SZ3=ON \
+			-DSZ3_INCLUDE_PATH=$externalDependencies/SZ3/install/include \
+			-DSZ3_LIBRARY=$externalDependencies/SZ3/install/lib64/libSZ3c.so \
+			-DCBENCH_COMPRESSOR_MGARD=ON \
+			-DMGARD_INCLUDE_PATH=$externalDependencies/MGARD/install/include \
+			-DMGARD_LIBRARY=$externalDependencies/MGARD/install/lib64/libmgard.so \
 			-DCMAKE_BUILD_TYPE=$buildType
 	fi
 
@@ -245,14 +253,22 @@ elif [ $buildOpt = "all" ]; then
 		-DISABELA_LIBRARY=$externalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
 		-DCMAKE_BUILD_TYPE=$buildType
 	else
+	  #export LD_LIBRARY_PATH=$externalDependencies/gsl-2.7.1/install/lib/:$LD_LIBRARY_PATH 
+	  #export C_INCLUDE_PATH=$externalDependencies/gsl-2.7.1/install/include
+	  #-DGSL_INCLUDE_DIR=$externalDependencies/gsl-2.7.1/install/include/ \
+	  #-DGSL_LIBRARY=$externalDependencies/gsl-2.7.1/install/lib/libgsl.so \
+
+	  export LD_LIBRARY_PATH=$externalDependencies/hdf5/install/lib:$LD_LIBRARY_PATH
+	  export PATH=$externalDependencies/hdf5/install/bin:$PATH
 	  cmake ../CBench $opt\
-		-DCBENCH_LOADER_GDA=ON \
-		-DCBENCH_LOADER_GENERICBINARY=ON \
+		-DCBENCH_LOADER_GDA=OFF \
+		-DCBENCH_LOADER_GENERICBINARY=OFF \
 		-DCBENCH_LOADER_NYX=ON \
 		-DHDF5_DIR=$externalDependencies/hdf5/install/share/cmake/hdf5 \
 		-DCBENCH_COMPRESSOR_BLOSC=ON \
 		-DBLOSC_INCLUDE_PATH=$externalDependencies/c-blosc/install/include \
 		-DBLOSC_LIBRARY=$externalDependencies/c-blosc/install/lib/libblosc.so \
+		-DCBENCH_COMPRESSOR_SZ3=OFF \
 		-DCBENCH_COMPRESSOR_SZ=ON \
 		-DSZ_INCLUDE_PATH=$externalDependencies/SZ/sz/include \
 		-DSZ_LIBRARY=$externalDependencies/SZ/install/lib64/libSZ.so \
@@ -267,7 +283,7 @@ elif [ $buildOpt = "all" ]; then
 		-DISABELA_LIBRARY=$externalDependencies/ISABELA-compress-0.2.1/lib/libisabela.a \
 		-DCBENCH_COMPRESSOR_MGARD=ON \
 		-DMGARD_INCLUDE_PATH=$externalDependencies/MGARD/install/include \
-		-DMGARD_LIBRARY=$externalDependencies/MGARD/install/lib/libmgard.so \
+		-DMGARD_LIBRARY=$externalDependencies/MGARD/install/lib64/libmgard.so \
 		-DCMAKE_BUILD_TYPE=$buildType
 	fi
 

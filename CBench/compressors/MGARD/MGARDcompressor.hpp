@@ -6,7 +6,7 @@
 #include <sstream>
 #include "compressorInterface.hpp"
 #include "timer.hpp"
-#include "compress_x.hpp"
+#include "mgard/compress_x.hpp"
 
 class MGARDCompressor: public CompressorInterface
 {

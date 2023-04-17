@@ -143,7 +143,7 @@ inline bool NYXDataLoader::deAllocateMem()
 inline int NYXDataLoader::loadData(std::string paramName)
 {
 
-	Timer clock("load");
+	//Timer clock("load");
 
 	//log.str("");
 	debugLog << "filename: " << filename << " param name: " << paramName << std::endl;
@@ -152,8 +152,8 @@ inline int NYXDataLoader::loadData(std::string paramName)
 	herr_t status = loadGroupDataSet(file, defaultGroup, paramName);
 
 	H5Fclose(file);
-	clock.stop("load");
-	debugLog << "Loading data took " << clock.getDuration("load") << " s" << std::endl;
+	//clock.stop("load");
+	//debugLog << "Loading data took " << clock.getDuration("load") << " s" << std::endl;
 
 	int const exit_code = (status < 0 ? 0 : 1);
 	return exit_code;

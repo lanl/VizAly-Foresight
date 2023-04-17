@@ -153,8 +153,8 @@ inline void GenericBinaryLoader::init(std::string _filename, MPI_Comm _comm)
 
 inline int GenericBinaryLoader::loadData(std::string paramName)
 {
-	Timer clock;
-	clock.start("load");
+	//Timer clock;
+	//clock.start("load");
 
 
 	totalNumberOfElements = origDims[0] * origDims[1] * origDims[2];
@@ -322,7 +322,7 @@ inline int GenericBinaryLoader::loadData(std::string paramName)
 
 	
 
-	clock.stop("load");
+	//clock.stop("load");
 	debugLog << "\n--------------------------" << std::endl;
 	debugLog << "Param: " << paramName << std::endl;
 	debugLog << "mpiDivisions: " << mpiDivisions[0] << ", " << mpiDivisions[1] << ", " << mpiDivisions[2] << std::endl;
@@ -332,7 +332,7 @@ inline int GenericBinaryLoader::loadData(std::string paramName)
 	debugLog << "numElements: "	<< numElements << std::endl;
 	debugLog << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
 
-	debugLog << "Loading data took: " << clock.getDuration("load") << " s" << std::endl;
+	//debugLog << "Loading data took: " << clock.getDuration("load") << " s" << std::endl;
 
 	return 1;
 }
@@ -342,7 +342,7 @@ inline int GenericBinaryLoader::loadData(std::string paramName)
 
 inline int GenericBinaryLoader::saveCompData(std::string paramName, void * cData)
 {
-	Timer clock("save");
+	//Timer clock("save");
 	
 	int index = 0;
 	for (auto s: scalars)
@@ -363,8 +363,8 @@ inline int GenericBinaryLoader::saveCompData(std::string paramName, void * cData
 	else
 		return -1;
 
-	clock.stop("save");
-	debugLog << "Saving data " << paramName << " took: " << clock.getDuration("save") << " s" << std::endl;
+	//clock.stop("save");
+	//debugLog << "Saving data " << paramName << " took: " << clock.getDuration("save") << " s" << std::endl;
 
 	return 0;
 }
@@ -373,7 +373,7 @@ inline int GenericBinaryLoader::saveCompData(std::string paramName, void * cData
 
 inline int GenericBinaryLoader::writeData(std::string _filename)
 {
-	Timer clock("write");
+	//Timer clock("write");
 
 	MPI_File fh;
 	MPI_Status status;
@@ -436,9 +436,9 @@ inline int GenericBinaryLoader::writeData(std::string _filename)
 	MPI_File_close( &fh );
 
 	
-	clock.stop("write");
+	//clock.stop("write");
 	debugLog << minMaxAvgLog.str() << std::endl;
-	debugLog << "writing data took: " << clock.getDuration("write") << " s" << std::endl;
+	//debugLog << "writing data took: " << clock.getDuration("write") << " s" << std::endl;
 
 	return 0;
 }

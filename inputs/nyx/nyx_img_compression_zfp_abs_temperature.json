@@ -115,7 +115,7 @@
             "run-path": "mpirun $foresight-home$build/CBench",
 
             "output-decompressed": true,
-            "output-decompressed-location": "/projects/exasky/VizAly-Foresight-Dev/run_jinzhenw/decompressed/zfp/temperature",
+            "output-decompressed-location": "/projects/exasky/vis_compression/code/VizAly-Foresight/outputs/zfp/temperature",
             "log-file": "runlog_",
             "metrics-file": "metrics_zfp_temperature"
         },

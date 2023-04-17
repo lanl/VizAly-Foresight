@@ -51,7 +51,7 @@ inline int FPZIPCompressor::compress(void* input, void *&output, std::string dat
 		if (n[i] != 0)
 			numel *= n[i];
 
-	Timer clock("compress");
+	//Timer clock("compress");
 	//fprintf(stderr, "compressing to %s\n", "memory");
 	//double t = now();
 	output = malloc(1024 + dataTypeSize*numel);
@@ -88,10 +88,10 @@ inline int FPZIPCompressor::compress(void* input, void *&output, std::string dat
 
 	//t = now() - t;
 	//fprintf(stderr, "in=%zu out=%zu ratio=%.2f seconds=%.3f MB/s=%.3f\n", inbytes, outbytes, (double)inbytes / outbytes, t, (double)inbytes / (1024 * 1024 * t));
-	clock.stop("compress");
+	//clock.stop("compress");
 
 	debugLog << "\n" << compressorName << " ~ InputBytes: " << dataTypeSize*numel << ", OutputBytes: " << cbytes << ", cRatio: " << (dataTypeSize*numel / (float)cbytes) << ", #elements: " << numel << std::endl;
-	debugLog << compressorName << " ~ CompressTime: " << clock.getDuration("compress") << " s " << std::endl;
+	//debugLog << compressorName << " ~ CompressTime: " << clock.getDuration("compress") << " s " << std::endl;
 
 	return 1;
 }
@@ -105,7 +105,7 @@ inline int FPZIPCompressor::decompress(void *&input, void *&output, std::string 
 		if (n[i] != 0)
 			numel *= n[i];
 
-	Timer clock("decompress");
+	//Timer clock("decompress");
 
 	output = malloc(dataTypeSize*numel);
 
@@ -135,11 +135,11 @@ inline int FPZIPCompressor::decompress(void *&input, void *&output, std::string 
 
 	fpzip_read_close(fpz);
 
-	clock.stop("decompress");
+	//clock.stop("decompress");
 
 	std::free(input);	input=NULL;
 
-	debugLog << compressorName << " ~ DecompressTime: " << clock.getDuration("decompress") << " s " << std::endl;
+	//debugLog << compressorName << " ~ DecompressTime: " << clock.getDuration("decompress") << " s " << std::endl;
 
 	return 1;
 }

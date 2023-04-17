@@ -7,6 +7,7 @@ if (CBENCH_COMPRESSOR_MGARD)
     find_library(MGARD_LIBRARY ${MGARD_LIBRARY} CACHE STRING "MGARD_LIBRARY library")
 
     if (NOT MGARD_LIBRARY)
+	message(${MGARD_LIBRARY})
     	message(FATAL_ERROR "Could NOT find MGARD")
     else()
             

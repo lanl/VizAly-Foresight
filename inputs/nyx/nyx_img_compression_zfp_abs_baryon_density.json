@@ -116,7 +116,7 @@
             "run-path": "mpirun $foresight-home$build/CBench",
 
             "output-decompressed": true,
-            "output-decompressed-location": "/projects/exasky/VizAly-Foresight-Dev/run_jinzhenw/decompressed/zfp/baryon_density",
+            "output-decompressed-location": "/projects/exasky/vis_compression/code/VizAly-Foresight/outputs/zfp/baryon_density",
             "log-file": "runlog_",
             "metrics-file": "metrics_zfp_baryon_density"
         },

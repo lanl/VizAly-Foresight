@@ -41,6 +41,7 @@ Authors:
 std::stringstream debugLog;
 
 
+bool writeData = false;
 
 //
 // Parses the JSON file for the main inputs
@@ -200,8 +201,8 @@ inline void writeDecompressedData(nlohmann::json jsonInput,
 									std::string fileToLoad,
 									int index)
 {	
-	Timer clock;
-	clock.start("write");
+	//Timer clock;
+	//clock.start("write");
 
 	if (myRank == 0)
 		std::cout << "Writing data ... " << std::endl;
@@ -251,12 +252,12 @@ inline void writeDecompressedData(nlohmann::json jsonInput,
 	ioMgr->writeData(decompressedOutputName);
 
 
-	clock.stop("write");
+	//clock.stop("write");
 
 	if (myRank == 0)
 		std::cout << "wrote out " << decompressedOutputName << "." << std::endl;
 
-	debugLog << "Write output took: " << clock.getDuration("write") << " s " << std::endl;
+	//debugLog << "Write output took: " << clock.getDuration("write") << " s " << std::endl;
 	
 }
 
@@ -305,7 +306,8 @@ int main(int argc, char *argv[])
 	std::vector<std::string> filenameTs;
 	int minTimestep = 0;
 	int maxTimestep = 1;
-	bool writeData = false;
+	//bool writeData = false;
+	writeData = false;
 	std::string outputLogFilename = "log";
 	std::vector<std::string> compressors;
 	std::vector<std::string> scalars;
@@ -343,10 +345,10 @@ int main(int argc, char *argv[])
 
 	//
 	// Create log and metrics files
-	Timer clock;
+	//Timer clock;
 	std::stringstream metricsInfo, csvOutputHeader;
 	
-	clock.start("overall");
+	//clock.start("overall");
 
 	
 	for (int ts=minTimestep; ts<maxTimestep; ts++)
@@ -521,11 +523,11 @@ int main(int argc, char *argv[])
 					csvOutput   << "None" << "_" << scalars[i] << "__" << "None"
 							    << ", " << jsonInput["data-reduction"]["cbench-compressors"][c]["output-prefix"].get<std::string>() << ", ";
 
-					clock.start("compress");
-					clock.start("decompress");
+					//clock.start("compress");
+					//clock.start("decompress");
 
-					clock.stop("compress");
-					clock.stop("decompress");
+					//clock.stop("compress");
+					//clock.stop("decompress");
 
 
 
@@ -556,17 +558,17 @@ int main(int argc, char *argv[])
 					// compress
 					void *cdata = NULL;
 
-					clock.start("compress");
+					//clock.start("compress");
 					compressorMgr->compress(ioMgr->data, cdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim());
-					clock.stop("compress");
+					//clock.stop("compress");
 
 
 					//
 					// decompress
 
-					clock.start("decompress");
+					//clock.start("decompress");
 					compressorMgr->decompress(cdata, decompdata, ioMgr->getType(), ioMgr->getTypeSize(), ioMgr->getSizePerDim());
-					clock.stop("decompress");
+					//clock.stop("decompress");
 
 				}
 				
@@ -677,12 +679,15 @@ int main(int argc, char *argv[])
 
 				//
 				// Metrics Computation
-				double compress_time = clock.getDuration("compress");
-				double decompress_time = clock.getDuration("decompress");
+				//double compress_time = clock.getDuration("compress");
+				//double decompress_time = clock.getDuration("decompress");
+				double compress_time = -1.;
+				double decompress_time = -1.;
 
-				double compress_throughput   = ((double) (ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0 * 1024.0)) / compress_time;     // MB/s
-				double decompress_throughput = ((double) (ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0 * 1024.0)) / decompress_time;	// MB/s
-
+				//double compress_throughput   = ((double) (ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0 * 1024.0)) / compress_time;     // MB/s
+				//double decompress_throughput = ((double) (ioMgr->getNumElements() * ioMgr->getTypeSize()) / (1024.0 * 1024.0)) / decompress_time;	// MB/s
+				double compress_throughput   = -1;
+				double decompress_throughput = -1;
 
 				double max_compress_throughput = 0;
 				double max_decompress_throughput = 0;
@@ -783,8 +788,8 @@ int main(int argc, char *argv[])
 	} // timesteps
 
 	//overallClock.stop();
-	clock.stop("overall");
-	debugLog << "\nTotal run time: " << clock.getDuration("overall") << " s " << std::endl;
+	//clock.stop("overall");
+	//debugLog << "\nTotal run time: " << clock.getDuration("overall") << " s " << std::endl;
 	writeLog(outputLogFilename, debugLog.str());
 
 

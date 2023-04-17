@@ -2,6 +2,7 @@
 #include "Isabela/Isabelacompressor.hpp"
 #include "MGARD/MGARDcompressor.hpp"
 #include "SZ/SZcompressor.hpp"
+#include "SZ3/SZ3compressor.hpp"
 #include "SZ_gpu/SZcompressorGpu.hpp"
 #include "fpzip/fpzipcompressor.hpp"
 #include "zfp/zfpCompressor.hpp"

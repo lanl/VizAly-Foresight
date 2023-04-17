@@ -119,10 +119,10 @@ inline int HACCDataLoader::saveInputFileParameters()
 
 inline int HACCDataLoader::loadData(std::string paramName)
 {
-	Timer clock;
+	//Timer clock;
 	
 
-	clock.start("load");
+	//clock.start("load");
 	gio::GenericIO *gioReader;
 	param = paramName;
 
@@ -305,7 +305,7 @@ inline int HACCDataLoader::loadData(std::string paramName)
 		
 		offset = offset + Np;
 	}
-	clock.stop("load");
+	//clock.stop("load");
 
 
 	if (saveData)
@@ -563,8 +563,8 @@ inline int HACCDataLoader::saveCompData(std::string paramName, void * cData)
 inline int HACCDataLoader::writeData(std::string _filename)
 {
   #ifndef GENERICIO_NO_MPI
-	Timer clock;
-	clock.start("write");
+	//Timer clock;
+	//clock.start("write");
 	
 	// Create setup
 	int periods[3] = { 0, 0, 0 };	
@@ -625,8 +625,8 @@ inline int HACCDataLoader::writeData(std::string _filename)
 
 	MPI_Barrier(comm);
 
-	clock.stop("write");
-	debugLog << "Writing data took " << clock.getDuration("write") << " s" << std::endl;
+	//clock.stop("write");
+	//debugLog << "Writing data took " << clock.getDuration("write") << " s" << std::endl;
   #endif
 	return 1;
 }
