@@ -185,11 +185,12 @@ elif [ $buildOpt = "Default" ]; then
 		#	-DGSL_INCLUDE_DIR=$externalDependencies/gsl-2.7.1/install/include/ \
 		#	-DGSL_LIBRARY=$externalDependencies/gsl-2.7.1/install/lib/libgsl.so \
 		cmake ../CBench $opt\
-			-DCBENCH_LOADER_GDA=ON \
-			-DCBENCH_LOADER_GENERICBINARY=ON \
+			-DCBENCH_LOADER_GDA=OFF \
+			-DCBENCH_LOADER_GENERICBINARY=OFF \
 			-DCBENCH_LOADER_NYX=ON \
-			-DHDF5_DIR=$externalDependencies/hdf5/install/share/cmake/hdf5 \
-			-DCBENCH_COMPRESSOR_BLOSC=ON \
+			-DHDF5_INCLUDE_DIRS=$externalDependencies/hdf5/install/include \
+			-DHDF5_LIBRARIES=$externalDependencies/hdf5/install/lib/libhdf5.so \
+			-DCBENCH_COMPRESSOR_BLOSC=OFF \
 			-DBLOSC_INCLUDE_PATH=$externalDependencies/c-blosc/install/include \
 			-DBLOSC_LIBRARY=$externalDependencies/c-blosc/install/lib/libblosc.so \
 			-DCBENCH_COMPRESSOR_ZFP=ON \

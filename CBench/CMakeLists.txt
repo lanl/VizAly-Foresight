@@ -20,13 +20,12 @@ include_directories(${CMAKE_SOURCE_DIR}/dataLoader)
 # HACC Loader
 include_directories(${CMAKE_SOURCE_DIR}/dataLoader/HACC)
 
-
-## Generic Binary Loader
-#option(CBENCH_LOADER_GENERICBINARY "Enables the reading of Generic Binary data" OFF)
-#if (CBENCH_LOADER_GENERICBINARY)
-#	add_definitions(-DCBENCH_HAS_RAW)
-#	include_directories(${CMAKE_SOURCE_DIR}/dataLoader/Generic_Binary)
-#endif()
+# Generic Binary Loader
+option(CBENCH_LOADER_GENERICBINARY "Enables the reading of Generic Binary data" OFF)
+if (CBENCH_LOADER_GENERICBINARY)
+	add_definitions(-DCBENCH_HAS_RAW)
+	include_directories(${CMAKE_SOURCE_DIR}/dataLoader/Generic_Binary)
+endif()
 
 
 # VPIC GDA Loader
