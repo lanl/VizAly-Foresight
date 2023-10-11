@@ -1,18 +1,17 @@
 #!/bin/bash
 
-# MGARD
 echo "Building MGARD ... "
 
 git clone https://github.com/CODARcode/MGARD.git
 cd MGARD
-git checkout 1.3.0
+git checkout 1.5.2
 
 mkdir install
 mkdir build
 
 cd build
 
-echo "Building MGARD"
+
 cmake .. -DCMAKE_INSTALL_PREFIX=../install
 make -j
 
@@ -21,4 +20,4 @@ make install
 cd ..
 cd ..
 
-echo "Building MGARD done!"
+echo "Building MGARD 1.5.2 done!"

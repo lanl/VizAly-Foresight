@@ -10,7 +10,11 @@ wget http://freescience.org/cs/ISABELA/code/ISABELA-compress-0.2.1.tar.gz
 tar -zxvf ISABELA-compress-0.2.1.tar.gz
 cd ISABELA-compress-0.2.1
 make -j
-cd ..
 
+if [ $? == 1 ]; then
 echo "Building ISABELA done!"
+else
+echo "Building ISABELA failed!"
+fi
 
+cd ..

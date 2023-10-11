@@ -1,11 +1,10 @@
 #!/bin/bash
 module purge
 module load openmpi/3.1.6-gcc_9.4.0
-module load cmake/3.19.2
+module load cmake/3.22.2
 module load miniconda3/py39_4.12.0
-#module load anaconda/Anaconda3
-source activate cbench
 
+source activate cbench
 # Automatically set up conda environment if not found
 if [ $? == 1 ]; then
     echo "Conda env not found, onetime setup.."
@@ -24,7 +23,7 @@ fi
 # export PATH=/projects/exasky/hdf5/install/bin:$PATH
 
 # fftw 3.3.8
-export LD_LIBRARY_PATH=/projects/exasky/fftw-3.3.8/install/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/vast/projects/exasky/software/fftw-3.3.10/install/lib:$LD_LIBRARY_PATH
 export FFTW_MAJOR_VERSION=3
 
 # HACC

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# HDF5
 echo "Building HDF5 ... "
 
 echo $PLATFORM
@@ -8,11 +7,9 @@ echo $PLATFORM
 if [ "$PLATFORM" = "travis" ]; then
 	echo "Travis: Using docker HDF5 build"
 else
-	#git clone https://bitbucket.hdfgroup.org/scm/hdffv/hdf5.git
 	git clone https://github.com/HDFGroup/hdf5.git
 	cd hdf5
-	#git checkout hdf5-1_10_3
-	git checkout hdf5-1_13_1
+	git checkout hdf5-1_14_2
 	mkdir install
 	mkdir build
 	cd build
@@ -24,4 +21,4 @@ else
 	cd ..
 fi
 
-echo "Building HDF5 done!"
+echo "Building HDF5 1_14_2 done!"
