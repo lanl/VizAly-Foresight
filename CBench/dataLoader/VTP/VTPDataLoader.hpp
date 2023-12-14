@@ -8,8 +8,8 @@ Authors:
  - Pascal Grosset
 ================================================================================*/
 
-#ifndef _VTK_LOADER_H_
-#define _VTK_LOADER_H_
+#ifndef _VTP_LOADER_H_
+#define _VTP_LOADER_H_
 
 #include <sstream>
 #include <string>
@@ -25,6 +25,12 @@ Authors:
 #include <vtkXMLImageDataReader.h>
 #include <vtkImageData.h>
 
+#include <vtkXMLPolyDataWriter.h>
+#include <vtkXMLPolyDataReader.h>
+#include <vtkPolyData.h>
+#include <vtkPoints.h>
+
+
 #include <vtkDataArray.h>
 #include <vtkFloatArray.h>
 #include <vtkDoubleArray.h>
@@ -37,10 +43,10 @@ Authors:
 #include "utils.hpp"
 
 
-class VTKDataLoader: public DataLoaderInterface
+class VTPDataLoader: public DataLoaderInterface
 {
-	vtkSmartPointer<vtkImageData> imageData;
-	vtkSmartPointer<vtkImageData> imageWriteData;
+	vtkSmartPointer<vtkPolyData> polyData;
+	vtkSmartPointer<vtkPolyData> polyWriteData;
 
 	vtkSmartPointer<vtkMPIController> contr;
 
@@ -51,8 +57,8 @@ class VTKDataLoader: public DataLoaderInterface
 	int numComponents;
 
   public:
-	VTKDataLoader();
-	~VTKDataLoader();
+	VTPDataLoader();
+	~VTPDataLoader();
 
 	void init(std::string _filename, MPI_Comm _comm);
 	int loadData(std::string paramName);
@@ -65,22 +71,22 @@ class VTKDataLoader: public DataLoaderInterface
   	bool loadUncompressedFields(nlohmann::json const&) { return false; } 
 };
 
-inline VTKDataLoader::VTKDataLoader()
+inline VTPDataLoader::VTPDataLoader()
 {
-	imageData = nullptr;
+	polyData = nullptr;
 	
 	contr = vtkSmartPointer<vtkMPIController>::New();
 	contr->Initialize(NULL, NULL, 1);
 }
 
 
-inline VTKDataLoader::~VTKDataLoader()
+inline VTPDataLoader::~VTPDataLoader()
 {
 
 }
 
 
-inline void VTKDataLoader::init(std::string _filename, MPI_Comm _comm)
+inline void VTPDataLoader::init(std::string _filename, MPI_Comm _comm)
 {
 	filename = _filename;
 	comm = _comm;
@@ -90,49 +96,45 @@ inline void VTKDataLoader::init(std::string _filename, MPI_Comm _comm)
 	MPI_Comm_rank(comm, &myRank);
 
 	// Read in file and store in imageData
-	vtkSmartPointer<vtkXMLImageDataReader> reader = vtkSmartPointer<vtkXMLImageDataReader>::New();
+	vtkSmartPointer<vtkXMLPolyDataReader> reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
   	reader->SetFileName(filename.c_str());
   	reader->Update();
 
-  	imageData = reader->GetOutput();
+  	polyData = reader->GetOutput();
 	
-  	debugLog << "vtkXMLImageDataReader Number of point array: " << reader->GetNumberOfPointArrays() << std::endl;
-  	debugLog << "vtkXMLImageDataReader Number of cell array: " << reader->GetNumberOfCellArrays() << std::endl;
+  	debugLog << "vtkXMLPolyDataReader Number of point array: " << reader->GetNumberOfPointArrays() << std::endl;
+  	debugLog << "vtkXMLPolyDataReader Number of cell array: " << reader->GetNumberOfCellArrays() << std::endl;
 }
 
 
 
-inline int VTKDataLoader::loadData(std::string paramName)
+inline int VTPDataLoader::loadData(std::string paramName)
 {
 	Timer clock("load");
 
-	debugLog << "vtkImageData Number of points: " << imageData->GetNumberOfPoints() << std::endl;
-    debugLog << "vtkImageData Number of cells: " << imageData->GetNumberOfCells() << std::endl;
-	debugLog << "Number of cell array: " << imageData->GetCellData()->GetNumberOfArrays() << std::endl;
-	debugLog << "Number of point array: " << imageData->GetPointData()->GetNumberOfArrays() << std::endl;
+	debugLog << "vtkPolyData Number of points: " << polyData->GetNumberOfPoints() << std::endl;
+    debugLog << "vtkPolyData Number of cells: " << polyData->GetNumberOfCells() << std::endl;
+	debugLog << "Number of cell array: " << polyData->GetCellData()->GetNumberOfArrays() << std::endl;
+	debugLog << "Number of point array: " << polyData->GetPointData()->GetNumberOfArrays() << std::endl;
 
 
-	// Get Dimensions
-	int *dims = imageData->GetDimensions();
+	// Get Dimensions (physical range)
+	//int *dims = polyData->GetDimensions();
 	
 
 	// Read in array in myArray
 	vtkSmartPointer<vtkDataArray> myArray;
 
 	bool found = false;
-	for (int i=0; i<imageData->GetCellData()->GetNumberOfArrays(); i++)
+	//CellData
+	for (int i=0; i<polyData->GetCellData()->GetNumberOfArrays(); i++)
 	{
-		myArray = imageData->GetCellData()->GetArray( i );
-		std::string arrName(myArray->GetName());
+		myArray = polyData->GetCellData()->GetArray( i );
+		std::string arrName(polyData->GetCellData()->GetArrayName(i));
 		if (arrName == paramName)
 		{
 			elementType = "cell";
 			numComponents = myArray->GetNumberOfComponents();
-
-			// Cells is dims -1
-			origDims[0] = dims[0]-1;
-			origDims[1] = dims[1]-1;
-			origDims[2] = dims[2]-1;
 
 			// Get type
 			elemSize = vtkDataArray::GetDataTypeSize(myArray->GetDataType());
@@ -159,21 +161,17 @@ inline int VTKDataLoader::loadData(std::string paramName)
 		}
 	}
 
-
+	// PointData
 	if (!found)
 	{
-		for (int i=0; i<imageData->GetPointData()->GetNumberOfArrays(); i++)
+		for (int i=0; i<polyData->GetPointData()->GetNumberOfArrays(); i++)
 		{
-			myArray = imageData->GetPointData()->GetArray( i );
-			std::string arrName(myArray->GetName());
+			myArray = polyData->GetPointData()->GetArray( i );
+			std::string arrName(polyData->GetPointData()->GetArrayName(i));
 			if (arrName == paramName)
 			{
 				elementType = "point";
 				numComponents = myArray->GetNumberOfComponents();
-
-				origDims[0] = dims[0];
-				origDims[1] = dims[1];
-				origDims[2] = dims[2];
 
 				// Get type
 				elemSize = vtkDataArray::GetDataTypeSize(myArray->GetDataType());
@@ -190,12 +188,16 @@ inline int VTKDataLoader::loadData(std::string paramName)
 						break;
 				}
 
+				
+				std::cout << "Found point array " << paramName <<  std::endl;
 				found = true;
 				break;
 			}
 		}
 	}
 
+    // If xyz, convert to I
+	// Convert to I and use lossless? lossy + quant?
 
 	if (!found)
 	{
@@ -204,7 +206,10 @@ inline int VTKDataLoader::loadData(std::string paramName)
 	}
 
 
-	totalNumberOfElements = origDims[0]*origDims[1]*origDims[2];	
+
+	//totalNumberOfElements = origDims[0]*origDims[1]*origDims[2];	
+	totalNumberOfElements = polyData->GetNumberOfPoints();
+	std::cout << "Points: " << totalNumberOfElements << std::endl;
 
 	//
 	// TODO: MPI split!!!
@@ -217,15 +222,17 @@ inline int VTKDataLoader::loadData(std::string paramName)
 	sizePerDim[1] = current.max_y - current.min_y;
 	sizePerDim[2] = current.max_z - current.min_z;
 
-	numElements = sizePerDim[0]*sizePerDim[1]*sizePerDim[2];
+	//numElements = sizePerDim[0]*sizePerDim[1]*sizePerDim[2];
 
+	numElements = totalNumberOfElements;
 
 
 	// Create space for data and store data there
 	allocateMem(dataType, numElements, 0, data);
 
+	sizePerDim[0] = numElements;	// For compression
 
-	size_t indexLocal = 0;
+	/*size_t indexLocal = 0;
 	for (size_t z=0; z<sizePerDim[2]; z++)
 		for (size_t y=0; y<sizePerDim[1]; y++)
 			for (size_t x=0; x<sizePerDim[0]; x++)
@@ -244,20 +251,31 @@ inline int VTKDataLoader::loadData(std::string paramName)
 				indexLocal++;
 			}
 
-	
+	*/
+	for (size_t i=0; i<numElements; i++)
+	{
+		if (dataType == "float")
+			((float *)data)[i] = myArray->GetComponent(i, 0);
+		else if (dataType == "double")
+			((double *)data)[i] = myArray->GetComponent(i, 0);
+		else if (dataType == "int")
+			((int *)data)[i] = myArray->GetComponent(i, 0);
+	}
 
 	// Sould we save the data
 	if (saveData)
 	{
-		imageWriteData = vtkSmartPointer<vtkImageData>::New();
+		polyWriteData = vtkSmartPointer<vtkPolyData>::New();
+		// Pass through x/y/z positions
+		inOutDataPoints = polyData->GetPoints();
 
 		double spacing[3];
-		imageData->GetSpacing (spacing);
-		imageWriteData->SetSpacing (spacing[0], spacing[1], spacing[2]);
+		//polyData->GetSpacing (spacing);
+		//polyWriteData->SetSpacing (spacing[0], spacing[1], spacing[2]);
 
 		double origin[3];
-		imageData->GetOrigin(origin);
-		imageWriteData->SetOrigin (origin[0], origin[1], origin[2]);
+		//polyData->GetOrigin(origin);
+		//polyWriteData->SetOrigin (origin[0], origin[1], origin[2]);
 	}
 	
 
@@ -269,16 +287,16 @@ inline int VTKDataLoader::loadData(std::string paramName)
 	debugLog << "totalNumberOfElements: " << totalNumberOfElements << std::endl;
 	
 	debugLog << "Loading data took: " << clock.getDuration("load") << " s" << std::endl;
+	return 1; // All good!
 }
 
 
 
-inline int VTKDataLoader::saveCompData(std::string paramName, void * cData)
+inline int VTPDataLoader::saveCompData(std::string paramName, void * cData)
 {
 	Timer clock("save");
 
 		
-
 	if (dataType == "float")
 	{
 		vtkSmartPointer<vtkFloatArray> temp = vtkFloatArray::New();
@@ -291,7 +309,7 @@ inline int VTKDataLoader::saveCompData(std::string paramName, void * cData)
 		for (size_t index=0; index<numElements; index++)
 			temp->SetValue( index, ((float *)cData)[index]);
 
-		imageWriteData->GetCellData()->AddArray(temp);
+		polyWriteData->GetPointData()->AddArray(temp);
 	}
 	else if (dataType == "double")
 	{
@@ -305,7 +323,7 @@ inline int VTKDataLoader::saveCompData(std::string paramName, void * cData)
 		for (size_t index=0; index<numElements; index++)
 			temp->SetValue( index, ((double *)cData)[index]);
 
-		imageWriteData->GetCellData()->AddArray(temp);
+		polyWriteData->GetPointData()->AddArray(temp);
 	}
 	else if (dataType == "int")
 	{
@@ -319,65 +337,48 @@ inline int VTKDataLoader::saveCompData(std::string paramName, void * cData)
 		for (size_t index=0; index<numElements; index++)
 			temp->SetValue( index, ((int *)cData)[index]);
 
-		imageWriteData->GetCellData()->AddArray(temp);
+		polyWriteData->GetPointData()->AddArray(temp);
 	}
-	
+	polyWriteData->SetPoints(inOutDataPoints);
 
-
-
-
-	imageWriteData->SetDimensions(sizePerDim[0], sizePerDim[1], sizePerDim[2]);
-	imageWriteData->SetExtent(rankOffset[0], rankOffset[0]+sizePerDim[0],
-							  rankOffset[1], rankOffset[1]+sizePerDim[1],
-							  rankOffset[2], rankOffset[2]+sizePerDim[2]);
+	//polyWriteData->SetDimensions(sizePerDim[0], sizePerDim[1], sizePerDim[2]);
+	//polyWriteData->SetExtent(rankOffset[0], rankOffset[0]+sizePerDim[0],
+	//						  rankOffset[1], rankOffset[1]+sizePerDim[1],
+	//						  rankOffset[2], rankOffset[2]+sizePerDim[2]);
 
 
 	clock.stop("save");
 	debugLog << "saving data took: " << clock.getDuration("save") << " s" << std::endl;
+	
 }
 
 
 
-inline int VTKDataLoader::writeData(std::string _filename)
+inline int VTPDataLoader::writeData(std::string _filename)
 {
 	Timer clock("write");
 
 
-	vtkSmartPointer<vtkXMLPImageDataWriter> writer = vtkSmartPointer<vtkXMLPImageDataWriter>::New();
+	vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
 	std::string outputFilename;
 
-  	if (numRanks > 1)
-	{
-		_filename.replace((_filename.length()-3),3,"pvti");  
-		outputFilename =   _filename;
-
-		vtkNew<vtkTrivialProducer> tp;
-		tp->SetOutput(imageWriteData);
-		tp->SetWholeExtent(0, origDims[0],
-		                   0, origDims[1],
-		                   0, origDims[2]);
-
-		writer->SetInputConnection(tp->GetOutputPort());
-		writer->SetController(contr);
-	}
-	else
-		outputFilename = _filename + ".vti";
+	outputFilename = _filename + ".vtp";
 
 
 
 	writer->SetDataModeToBinary();
     writer->SetCompressor(nullptr);
-    writer->SetWriteSummaryFile(1);
+    //writer->SetWriteSummaryFile(1);
 	writer->SetFileName(outputFilename.c_str());
-	writer->SetNumberOfPieces(numRanks);
-	writer->SetStartPiece(myRank);
-    writer->SetEndPiece(myRank);
+	//writer->SetNumberOfPieces(numRanks);
+	//writer->SetStartPiece(myRank);
+    //writer->SetEndPiece(myRank);
 
 
 	#if VTK_MAJOR_VERSION <= 5
-    	writer->SetInput(imageWriteData);
+    	writer->SetInput(polyWriteData);
 	#else
-  		writer->SetInputData(imageWriteData);
+  		writer->SetInputData(polyWriteData);
 	#endif
 
 	writer->Write();

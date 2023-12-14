@@ -6,6 +6,7 @@
 
 #ifdef CBENCH_HAS_VTK
 	#include "VTK/VTKDataLoader.hpp"
+	#include "VTP/VTPDataLoader.hpp"
 #endif
 
 #ifdef CBENCH_HAS_GDA

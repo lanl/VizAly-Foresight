@@ -105,7 +105,6 @@ inline int parseIput(nlohmann::json jsonInput,
 	// Log file name
 	outputLogFilename = "logs/" + jsonInput["data-reduction"]["cbench-output"]["log-file"].get<std::string>() + "_" + std::to_string(myRank);
 
-
 	// Store compressors, scalars, and metrics to use
 	for (int i = 0; i < jsonInput["data-reduction"]["cbench-compressors"].size(); i++)
 		compressors.push_back(jsonInput["data-reduction"]["cbench-compressors"][i]["name"]);
@@ -394,8 +393,6 @@ int main(int argc, char *argv[])
 			std::cout << "\nReading " << fileToLoad  << " done!" << std::endl;
 		MPI_Barrier(MPI_COMM_WORLD);	// All reading synchronized!!!
 			
-
-
 
 		//
 		// Cycle through compressors

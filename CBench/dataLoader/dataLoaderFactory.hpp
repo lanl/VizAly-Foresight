@@ -31,6 +31,8 @@ class DataLoaderFactory
 	  #ifdef CBENCH_HAS_VTK
 		if (loaderName == "VTI")
 			return new VTKDataLoader();
+		if (loaderName == "VTP")
+			return new VTPDataLoader();
 	  #endif
 
 	  #ifdef CBENCH_HAS_GDA

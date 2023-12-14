@@ -1,11 +1,11 @@
 {
 	"project-home": "/projects/exasky/jesus/test/",
-	"wflow-path": "test-VTK",
+	"wflow-path": "test-VTP",
 	"foresight-home": "/projects/exasky/jesus/VizAly-Foresight/",
 
 	"input": {
-		"filetype": "VTI",
-		"filename": "/projects/exasky/jesus/data/rho_1.vti",
+		"filetype": "VTP",
+		"filename": "/projects/exasky/jesus/data/nyx_128_random_sampled_0.05.vtp",
 
 		"scalars": 
 		[
@@ -24,12 +24,48 @@
 			
 			{
 				"name" : "SZ",
-				"output-prefix" : "sz_",
+				"output-prefix" : "sz_0.001",
 				"compressor-params" :
 				[
 					{
 						"scalar" : ["logField"],
 						"abs" : 0.001
+					}
+				]
+			},
+
+			{
+				"name" : "SZ",
+				"output-prefix" : "sz_0.01",
+				"compressor-params" :
+				[
+					{
+						"scalar" : ["logField"],
+						"abs" : 0.01
+					}
+				]
+			},
+
+			{
+				"name" : "SZ",
+				"output-prefix" : "sz_0.1",
+				"compressor-params" :
+				[
+					{
+						"scalar" : ["logField"],
+						"abs" : 0.1
+					}
+				]
+			},
+			
+			{
+				"name" : "SZ",
+				"output-prefix" : "sz_0.1_all_",
+				"compressor-params" :
+				[
+					{
+						"scalar" : ["x","y","z","logField"],
+						"abs" : 0.1
 					}
 				]
 			}

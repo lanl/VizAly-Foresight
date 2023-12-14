@@ -21,6 +21,11 @@ Authors:
 #include "HACC/gioData.hpp"
 #include "log.hpp"
 
+#ifdef CBENCH_HAS_VTK
+	#include <vtkSmartPointer.h>
+	#include <vtkPoints.h>
+#endif
+
 
 class DataLoaderInterface 
 {
@@ -50,6 +55,9 @@ class DataLoaderInterface
 	std::unordered_map<std::string, std::string> loaderParams;  // data-specific parameters, used by binary reader
 	std::vector<GioData> inOutData;				// passthrough data, used by genericio reader
 	std::vector<std::string> inOutDataName;		// passthrough data
+	#ifdef CBENCH_HAS_VTK
+		vtkSmartPointer<vtkPoints> inOutDataPoints;		// passthrough data, used by the vtk reader
+	#endif
 
   public:
 	virtual void init(std::string _filename, MPI_Comm _comm) = 0;
